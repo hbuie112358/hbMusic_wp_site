@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-02T12:35:00-05:00
-current_branch: pause-2026-11-02
-last_commit: bb59b73
+timestamp: 2026-11-02T15:13:00-05:00
+current_branch: plan-drop-3h
+last_commit: d407eec
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -16,14 +16,18 @@ last_work: >
   FluentSMTP (3b), bin/check with PHPCS (WordPress standards), PHPStan, TypeScript,
   ShellCheck, actionlint, audits (3d), bin/test with scenario checks and Playwright browser
   tests (3e), GitHub workflow and public repository with branch protection (3f). Hosting:
-  the site stays at Hostinger until a move before 2028 (D15). Second session of the day: no
-  project work; shared-workspace housekeeping outside this repository at the user's request.
+  the site stays at Hostinger until a move before 2028 (D15). Later on 2026-11-02: pull
+  requests #1 and #2 merged; Dependabot set up (3f follow-up, pull request #3 merged): weekly
+  grouped updates with a 7-day wait, alerts and security updates switched on, first run done
+  with no pull requests; step 3h (no network for the check tools) added and then dropped by
+  the user, step 3i (evaluating a behaviour-scanning service) added. Shared-workspace
+  housekeeping outside this repository at the user's request.
 
 next_action: >
-  Pull request #1 (docs-after-first-push) is open; its check run 41469813294 passed after
-  almost two hours in GitHub's queue, and the pull request is clean. With the user's yes: merge
-  by rebase, update local main from GitHub, then rebase pause-2026-11-02 onto main and push it
-  through its own pull request. Then Dependabot (3f follow-up), then 3g.
+  Ask the user: 3g (deploy pipeline to a new staging site; go through the plan entry and
+  propose how to split it) or the review of docs/BEST_PRACTICES.md. The local branch
+  plan-drop-3h (commit d407eec, dropping 3h, plus this pause commit) is not pushed; it goes
+  with the next push, with the user's yes.
 
 verification:
   wordpress_version: 7.1.4 (live and local)
@@ -35,6 +39,7 @@ verification:
   local_stack: docker compose (WordPress 7.1.4 on PHP 8.4, MariaDB 11.8.9, Mailpit), ports 10100/10101
   checks: bin/check 11 checks pass; bin/test 2 scenarios + 3 browser tests pass
   repository: public, GitHub, branch protection on main (check required, also for admins)
+  dependabot: version updates weekly (action, Composer, npm); alerts and security updates on; 0 open alerts (2026-11-02)
   commit_identity: GitHub noreply address, set in this repository's git config only
   hostinger_plan: ends in 2028, auto-renewal off; SSH included, switched off until 3g
 
@@ -51,11 +56,9 @@ uncommitted_changes:
       in the scratchpad only.
 
 pending_decisions:
-  - >
-    Merging pull request #1 now that its check passed (recommended), and then pushing
-    pause-2026-11-02 through its own pull request.
-  - Dependabot for the GitHub action, Composer and npm (3f follow-up, recommended).
-  - Review of docs/BEST_PRACTICES.md with the user before step 4 (D16).
+  - What next, 3g or the review of docs/BEST_PRACTICES.md (must come before step 4, D16).
+  - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.
+  - Pushing the local branch plan-drop-3h, with the next change or on its own.
   - The new host (step 10, before the Hostinger plan ends in 2028).
 
 open_items:

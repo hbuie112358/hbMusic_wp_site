@@ -20,8 +20,10 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3g (deploy pipeline to a new staging site); 3i (evaluating a behaviour-scanning
-  service) whenever the user chooses. Dependabot read its settings on 2026-11-02 and ran its
+- **Next:** 3g (deploy pipeline to a new staging site) or the review of `docs/BEST_PRACTICES.md`,
+  the user's choice; 3i (evaluating a behaviour-scanning service) whenever the user chooses.
+  At the pause (2026-11-02), the local branch `plan-drop-3h` holds the 3h drop and the pause
+  commit, not yet pushed. Dependabot read its settings on 2026-11-02 and ran its
   first update jobs; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
