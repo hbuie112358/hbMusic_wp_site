@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+# Builds the local copy of the old site (plan step 3a) from the read-only backup: wp-content
+# from wordpress/, the database from db/, every live address replaced by the local one, and the
+# plugins that must not run locally switched off. Safe to run again: each run starts from a
+# fresh database and a fresh copy of wp-content.
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly ENV_FILE="$REPO_ROOT/.env"
+readonly WAIT_SECONDS=120
+readonly WAIT_INTERVAL_SECONDS=2
+# The "name:" in compose.yaml; Docker names the project's volumes after it.
+readonly COMPOSE_PROJECT="hbmusic"
+# Every setting compose.yaml and this script use; checked right after .env is loaded.
+readonly REQUIRED_SETTINGS=(
+  SITE_PORT MAIL_UI_PORT DB_NAME DB_USER DB_PASSWORD DB_ROOT_PASSWORD
+  LOCAL_ADMIN_USER LOCAL_ADMIN_PASSWORD LOCAL_ADMIN_EMAIL
+  LIVE_ADDRESSES LOCAL_DISABLED_PLUGINS LOCAL_EMPTIED_TABLES
+)
+
+log() { printf '%s [local-import] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+trap 'log "ERROR: failed at line $LINENO: $BASH_COMMAND"' ERR
+
+compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" "$@"; }
+
+# Plugins and themes are skipped while WP-CLI runs, so the old site's code (Wordfence above all)
+# never executes during the import itself.
+wp_cli() { compose run --rm -T cli wp --skip-plugins --skip-themes "$@"; }
+
+# For the few commands that need the site's plugins, run only after the unsafe ones are off.
+wp_cli_with_plugins() { compose run --rm -T cli wp "$@"; }
+
+as_root_in_cli() { compose run --rm -T --user 0 cli sh -c "$1"; }
+
+db_client() {
+  # The credentials stay inside the database container's environment, and MYSQL_PWD keeps the
+  # password off every command line; the server's own client also understands every statement
+  # its dump wrote.
+  # shellcheck disable=SC2016 # the variables expand inside the container, on purpose
+  compose exec -T db sh -c 'export MYSQL_PWD="$MARIADB_PASSWORD"; exec mariadb -u"$MARIADB_USER" "$@"' mariadb "$@"
+}
+
+require_tools() {
+  command -v docker >/dev/null || fail "docker is not installed"
+  docker compose version >/dev/null 2>&1 || fail "the docker compose plugin is not installed"
+}
+
+random_secret() { od -An -N24 -tx1 /dev/urandom | tr -d ' \n'; }
+
+# Prints a line of .env.example as it goes into .env: "generate" becomes a random secret.
+expand_setting_line() {
+  local line="$1"
+  [[ "$line" == *=generate ]] && line="${line%=generate}=$(random_secret)"
+  printf '%s\n' "$line"
+}
+
+database_volume_exists() { docker volume inspect "${COMPOSE_PROJECT}_db_data" >/dev/null 2>&1; }
+
+create_env_file() {
+  # The database volume keeps the passwords it was first started with; a new .env would not
+  # match them, and the import would fail later with an unexplained "access denied".
+  if database_volume_exists; then
+    fail "there is no .env, but the local database (volume ${COMPOSE_PROJECT}_db_data) still has the passwords of an earlier one. Restore that .env, or remove the local copy with 'docker compose down -v', then run again."
+  fi
+  log "Creating .env from .env.example with new random secrets"
+  local line
+  (
+    umask 077
+    while IFS= read -r line; do expand_setting_line "$line"; done <"$REPO_ROOT/.env.example" >"$ENV_FILE"
+  )
+}
+
+# Settings added to .env.example after .env was created are appended, so an existing .env
+# (and the database passwords it holds) never has to be recreated.
+add_missing_settings() {
+  local line name
+  while IFS= read -r line; do
+    [[ "$line" =~ ^([A-Z_]+)= ]] || continue
+    name="${BASH_REMATCH[1]}"
+    grep -q "^${name}=" "$ENV_FILE" && continue
+    log "Adding the new setting $name to .env"
+    expand_setting_line "$line" >>"$ENV_FILE"
+  done <"$REPO_ROOT/.env.example"
+}
+
+ensure_env_file() {
+  if [[ ! -f "$ENV_FILE" ]]; then
+    create_env_file
+    return
+  fi
+  log "Using the existing .env"
+  add_missing_settings
+}
+
+load_env() {
+  set -a
+  # shellcheck source=/dev/null
+  source "$ENV_FILE"
+  set +a
+}
+
+require_settings() {
+  local name
+  for name in "${REQUIRED_SETTINGS[@]}"; do
+    [[ -n "${!name:-}" ]] || fail "the setting $name is missing or empty in .env (see .env.example)"
+  done
+}
+
+find_dump() {
+  local dumps=("$REPO_ROOT"/db/*.sql)
+  [[ ${#dumps[@]} -eq 1 && -f "${dumps[0]}" ]] || fail "expected exactly one .sql file in db/"
+  printf '%s\n' "${dumps[0]}"
+}
+
+wait_for_wordpress_files() {
+  local waited=0
+  log "Waiting for the WordPress container to set up its files"
+  until compose exec -T wordpress test -f /var/www/html/wp-config.php 2>/dev/null; do
+    ((waited < WAIT_SECONDS)) || fail "WordPress files not ready after ${WAIT_SECONDS}s"
+    sleep "$WAIT_INTERVAL_SECONDS"
+    waited=$((waited + WAIT_INTERVAL_SECONDS))
+  done
+}
+
+copy_wp_content() {
+  log "Copying wp-content from the backup, without Wordfence's logs, the upgrade folders and the former host's plugins"
+  # shellcheck disable=SC2016 # the variables expand inside the container, on purpose
+  as_root_in_cli '
+    set -eu
+    target=/var/www/html/wp-content
+    rm -rf "$target/plugins" "$target/themes" "$target/uploads" "$target/mu-plugins"
+    cp -a /import/wp-content/plugins /import/wp-content/themes /import/wp-content/uploads "$target/"
+    rm -rf "$target"/plugins/hostinger-auto-updates-plugin-*
+    chown -R 33:33 "$target"
+  '
+}
+
+import_database() {
+  local dump_path="$1"
+  log "Importing the database from db/$(basename "$dump_path")"
+  db_client -e "DROP DATABASE IF EXISTS \`$DB_NAME\`; CREATE DATABASE \`$DB_NAME\`"
+  db_client "$DB_NAME" <"$dump_path"
+}
+
+remove_local_personal_data() {
+  # The local copy needs the content, not who visited or logged in: Wordfence's logs hold
+  # visitors' IP addresses, and the live login's two-factor secret would generate valid codes.
+  log "Removing personal data the local copy does not need: Wordfence's logs, the live login's 2FA secret and sessions"
+  local table
+  for table in $LOCAL_EMPTIED_TABLES; do
+    db_client "$DB_NAME" -e "TRUNCATE TABLE \`$table\`"
+  done
+  db_client "$DB_NAME" -e "DELETE FROM wp_usermeta WHERE meta_key = 'session_tokens'"
+}
+
+replace_live_addresses() {
+  local local_address="http://localhost:${SITE_PORT}" live_address
+  # Unquoted on purpose: LIVE_ADDRESSES is a space-separated list. search-replace handles
+  # serialized PHP values, which a plain text replacement would corrupt; GUIDs stay as they are.
+  for live_address in $LIVE_ADDRESSES; do
+    log "Replacing $live_address with $local_address"
+    wp_cli search-replace "$live_address" "$local_address" \
+      --all-tables-with-prefix --skip-columns=guid --report-changed-only
+  done
+}
+
+configure_local_site() {
+  log "Switching off plugins that must not run locally: $LOCAL_DISABLED_PLUGINS"
+  # shellcheck disable=SC2086 # a space-separated list of plugin slugs
+  wp_cli plugin deactivate $LOCAL_DISABLED_PLUGINS
+  wp_cli option update blog_public 0
+  # Plugins such as Yoast add their own address rules (the sitemap), so they must be loaded.
+  wp_cli_with_plugins rewrite flush
+}
+
+ensure_local_admin() {
+  # --prompt would echo the whole command, password included; --porcelain prints only the ID.
+  if wp_cli user get "$LOCAL_ADMIN_USER" --field=ID >/dev/null 2>&1; then
+    log "Local admin exists; setting its password from .env"
+    wp_cli user update "$LOCAL_ADMIN_USER" --user_pass="$LOCAL_ADMIN_PASSWORD" --skip-email --porcelain >/dev/null
+    return
+  fi
+  log "Creating the local admin account $LOCAL_ADMIN_USER"
+  wp_cli user create "$LOCAL_ADMIN_USER" "$LOCAL_ADMIN_EMAIL" \
+    --role=administrator --user_pass="$LOCAL_ADMIN_PASSWORD" --porcelain >/dev/null
+}
+
+main() {
+  require_tools
+  ensure_env_file
+  load_env
+  require_settings
+  local dump_path
+  dump_path="$(find_dump)"
+  compose up -d db wordpress mailpit
+  wait_for_wordpress_files
+  copy_wp_content
+  import_database "$dump_path"
+  remove_local_personal_data
+  replace_live_addresses
+  configure_local_site
+  ensure_local_admin
+  log "Done. Site: http://localhost:${SITE_PORT}  Admin: http://localhost:${SITE_PORT}/wp-admin  Mail: http://localhost:${MAIL_UI_PORT}"
+  log "Log in as ${LOCAL_ADMIN_USER}; the password is LOCAL_ADMIN_PASSWORD in .env"
+}
+
+main "$@"

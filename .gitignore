@@ -5,6 +5,9 @@
 !/.gitignore
 !/project-state.yaml
 !/docs/
+!/compose.yaml
+!/.env.example
+!/bin/
 !/themes/
 /themes/*
 !/themes/hbmusic-child/

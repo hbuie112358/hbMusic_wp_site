@@ -8,21 +8,19 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** steps 0, 1 and 2 done. The old site is still live at the former host,
-  now secured (step 0). No theme work yet.
-- **Finding:** the live site's email is unreliable (a confirmation sent on 2026-11-02 never
-  arrived; cause not known). The new site gets an authenticated mail service (step 8), working
-  before the request form (5b) goes live.
-- **Finding:** Wordfence's login log (2025-01 to 2026-10-31) shows about 1,360 failed attempts,
-  155 with the real login name, and no successful login except the user's own on 2025-01-09: no
-  sign of a break-in through the login.
-- **Next:** step 3, the local environment.
+- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose) works and
+  waits for the review gate and the user's "commit". The old site is still live, secured.
+- **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
+  log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
+  2025 (the new host must run a supported version); its plugins are behind (step 0f).
+- **Next:** commit 3a; then 3b (mail into Mailpit).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
-  - the local environment (step 3); the new host (step 8).
+  - step 0f: whether to update the live site's plugins now (recommended, at least Wordfence);
+  - the new host (step 8).
 - **Stale documents:** none.
 
 ## Decisions
@@ -40,6 +38,7 @@ new findings added as steps.
 | D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |
 | D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
 | D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
+| D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
 
 ## Steps
 
@@ -59,6 +58,11 @@ new findings added as steps.
      (2026-11-02): everything the leftovers exposed was already treated as known to others and
      replaced, so the logs could not change any action; they also cover only a short recent
      period of an exposure that lasted since at least 2025-01.
+   - 0f. Plugin updates on the live site (found 2026-11-02): WordPress 7.1.4 is current, but
+     Wordfence 8.0.5 (latest 9.0.2), Yoast SEO 28.1 (28.8), UpdraftPlus 1.26.13 (1.26.14) and
+     the inactive Twenty Twenty-Five 1.2 (1.5) are behind; the former host's updater updates
+     only WordPress itself. Recommended: update all in Dashboard → Updates, at least Wordfence;
+     then the home and login pages are checked. Waiting for the user. `[ ]`
 
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
    `project-state.yaml`, git. Status: `[x]` 92dd157
@@ -79,7 +83,30 @@ new findings added as steps.
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
    level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Includes a local
    mail catcher, so the request form's emails can be tested without sending real mail. Record
-   them in the project's `CLAUDE.md`. Status: `[ ]`
+   them in the project's `CLAUDE.md`. Chosen by the user: Docker Compose (D12). Status: `[~]`
+   - 3a. **The stack and the import.** `compose.yaml` (WordPress 7.1.4 on PHP 8.4, MariaDB
+     11.8.9 as live, Mailpit, WP-CLI), ports 10100 and 10101 on `127.0.0.1` only, `.env` from
+     `.env.example` with random secrets, `bin/local-import`. The old site's files go from the
+     read-only `wordpress/` straight into a volume, so nothing is written into the project
+     folder. Verified: all pages 200, no live-domain references, only Yoast active, no
+     password in the output (a first run printed the local admin password through WP-CLI's
+     `--prompt`; fixed and the password replaced). The import empties what the local copy does
+     not need: Wordfence's logs and caches (visitors' IP addresses), the live login's
+     two-factor secret and sessions. It checks every setting first and stops with a clear
+     message when `.env` is missing but the database volume exists. One PHP deprecation notice from
+     `wp-includes/formatting.php` (`ltrim()` given null), probably the old theme on PHP 8.4;
+     caller not traced, not fixed (the theme is replaced). Status: `[~]` waiting for "commit"
+   - 3b. **Mail into Mailpit:** a local-only must-use plugin that sends all mail to Mailpit.
+     Status: `[ ]`
+   - 3c. **File-permission check:** the rootless Docker umask bug (`DEVCONTAINER_SETUP.md` rule
+     11). 3a keeps container-written files in volumes; 3c tests what still reaches the host
+     (the theme, mounted later). Status: `[ ]`
+   - 3d. **Code-quality tools in a container:** Composer, PHPCS with the WordPress Coding
+     Standards, PHPStan. Status: `[ ]`
+   - 3e. **Test levels:** PHPUnit (unit; integration against the database container) and
+     Playwright browser tests; `.nvmrc` pins Node. Status: `[ ]`
+   - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
+     prompt. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the

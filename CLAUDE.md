@@ -30,8 +30,19 @@ The old site, as exported:
 
 ## Commands
 
-None yet. The local WordPress environment for building and checking the child theme is still
-to be chosen (see `project-state.yaml`).
+The local copy of the old site runs in Docker Compose (`compose.yaml`; settings in `.env`,
+created from `.env.example` with random secrets; `.env` is never committed). This project's
+ports are the **101xx** block: the site on 10100, the Mailpit inbox on 10101, the rest of the
+block for later needs.
+
+- `bin/local-import`: builds or rebuilds the local copy from `wordpress/` and `db/`
+  (read-only): fresh database, live addresses replaced, Wordfence and UpdraftPlus switched off,
+  a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`).
+- Site: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
+- `docker compose stop` / `docker compose start`: stop and start without losing anything.
+- `docker compose run --rm cli wp <command>`: WP-CLI against the local copy.
+- `docker compose down -v` deletes the local database and files (the volumes); Claude runs it
+  only when the user asks. `bin/local-import` rebuilds them.
 
 ## Testing
 
