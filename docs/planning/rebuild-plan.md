@@ -17,7 +17,7 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3e (tests); step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
+- **Next:** commit 3e; then 3f (checks in GitHub); step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
   (one per 24 hours): backup first, then plugin updates, then PHP 8.4, then Claude checks the
   site. Until then, 3d.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -46,7 +46,7 @@ new findings added as steps.
 | D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
 | D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
 | D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
-| D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. |
+| D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. (The check named here became `tests/scenario/mail-delivery.sh`, run by `bin/test`, in step 3e.) |
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 | D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
 | D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). A rule that seems to apply to every project is only proposed for the global files: Claude asks the user specifically each time and changes nothing there without the user's yes for that change. The first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02 after the user approved it. | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
@@ -118,7 +118,7 @@ new findings added as steps.
    - 3b. **Mail into Mailpit (D13).** The import installs FluentSMTP at a pinned version
      (`FLUENT_SMTP_VERSION`), checks it against WordPress.org's checksums, and saves a Mailpit
      connection through the plugin's own save code (`local/wp-cli/configure-fluentsmtp-mailpit.php`,
-     which refuses to run outside a local environment). `bin/local-mail-check` sends a message
+     which refuses to run outside a local environment). `bin/local-mail-check` (moved to `tests/scenario/mail-delivery.sh` in 3e) sends a message
      with a unique marker and waits for it in Mailpit. Failures met and fixed on the way:
      `declare( strict_types=1 )` is rejected under `wp eval-file`; WP-CLI had no writable cache
      folder; the import's error message now names the failing step. The check also failed, as
@@ -145,11 +145,25 @@ new findings added as steps.
      Proven by listing what each container sees. Accepted LOW items: hand-written stubs can
      drift (each names its source); `composer:2.11.1` is days old; PHPCompatibility waits
      for its version 10. Status: `[x]` 14e8788
-   - 3e. **Test levels:** PHPUnit (unit; integration against the database container) and
-     Playwright browser tests; `.nvmrc` pins Node. Includes, as integration tests, the two
-     safety stops of `local/wp-cli/configure-fluentsmtp-mailpit.php` (it refuses outside a
-     local environment; it stops on a missing or invalid setting), tested by hand in 3b only
-     (3b review, MEDIUM finding). Status: `[ ]`
+   - 3e. **Test levels.** `bin/test` runs the scenario checks (`tests/scenario/`, bash with a
+     shared `lib.sh`; bats was not used because its container would need the Docker socket):
+     mail delivery (moved from `bin/local-mail-check`) and the configuration script's safety
+     stops (not local, missing setting, invalid port, nothing saved), the MEDIUM finding
+     deferred from 3b. Then the browser tests (`tests/e2e/`, Playwright 1.64.1 in its official
+     container on the host network, seeing only `tests/e2e/`): menu entries and pages, no
+     reference to the live site on any public page, all 108 songs with artists. `bin/check`
+     gained a TypeScript check (7.0.2, strict) and an npm audit; `bin/tools-update` updates
+     the npm lock too; tools are called with `npx --no-install`. Changed by the user's
+     decision: PHPUnit moves to 5a with its first real tests; axe accessibility checks to step
+     4. Verified by planted faults: each browser test, the guard scenario and the TypeScript
+     check failed on a fault and passed after restoring. On the way: two planting commands of
+     Claude's were wrong (a menu named instead of its ID; WP-CLI lists menu items only with
+     the theme loaded); the live-domain test first checked only menu pages, so a page removed
+     from the menu escaped it; it now checks a fixed list of all public pages. Review fixes:
+     `npm ci --ignore-scripts`; the image versions in one file (`tools/versions.sh`), with a
+     check that the Playwright image and package match; `instanceof` instead of casts; Compose
+     output kept out of failure messages. Accepted: the Playwright container's host
+     networking (needed to reach the site). Status: `[~]` waiting for "commit"
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
    - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** A private GitHub

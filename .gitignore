@@ -10,6 +10,7 @@
 !/bin/
 !/local/
 !/tools/
+!/tests/
 !/composer.json
 !/composer.lock
 !/phpcs.xml.dist
@@ -31,3 +32,7 @@ wp-config.php
 # Dependencies and build output are installed from lock files, never versioned.
 node_modules/
 vendor/
+
+# Playwright's run output (traces, screenshots of failures).
+test-results/
+playwright-report/

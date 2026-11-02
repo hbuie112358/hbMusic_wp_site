@@ -9,8 +9,9 @@ set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
-readonly COMPOSER_IMAGE="composer:2.11.1"
-readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
+# The same images as bin/check and bin/test, so npm resolves with the Node that runs the tests.
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
 
 log() { printf '%s [tools-update] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
@@ -33,12 +34,26 @@ run_update() {
     "$COMPOSER_IMAGE" composer update --no-interaction --no-progress
 }
 
+# The browser-test packages (tests/e2e): only the lock file is written, in a temporary folder
+# holding copies of package.json and package-lock.json; node_modules is installed by bin/test.
+update_npm_lock() {
+  local npm_dir="$WORK_DIR/npm"
+  mkdir -p "$npm_dir"
+  cp "$REPO_ROOT/tests/e2e/package.json" "$npm_dir/"
+  [[ -f "$REPO_ROOT/tests/e2e/package-lock.json" ]] && cp "$REPO_ROOT/tests/e2e/package-lock.json" "$npm_dir/"
+  docker run --rm -w /npm -v "$npm_dir:/npm" -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    "$PLAYWRIGHT_IMAGE" npm install --package-lock-only --no-audit --no-fund --loglevel=error
+  cp "$npm_dir/package-lock.json" "$REPO_ROOT/tests/e2e/package-lock.json"
+}
+
 main() {
   copy_composer_files_in
   log "Updating the tools within the limits in composer.json"
   run_update
   cp "$WORK_DIR/composer.lock" "$REPO_ROOT/composer.lock"
-  log "Done. Next: bin/check, then review 'git diff composer.lock' and commit it."
+  log "Updating the browser-test packages within the limits in tests/e2e/package.json"
+  update_npm_lock
+  log "Done. Next: bin/check, then review 'git diff composer.lock tests/e2e/package-lock.json' and commit."
 }
 
 main "$@"

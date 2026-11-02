@@ -40,8 +40,11 @@ block for later needs.
   a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`), and
   FluentSMTP installed at a pinned version, checked against WordPress.org's checksums and
   pointed at Mailpit.
-- `bin/local-mail-check`: sends one email through WordPress and checks it arrives in Mailpit;
-  run it after `bin/local-import` and after every FluentSMTP update.
+- `bin/test`: every test against the running local copy: the scenario checks in
+  `tests/scenario/` (bash, sharing `lib.sh`), then the browser tests in `tests/e2e/` in the
+  official Playwright container (`--network host`, seeing only `tests/e2e/`). Run it after
+  `bin/local-import`, after every FluentSMTP update, and before every commit that touches the
+  site. Every test runs even after a failure; exit status 1 if any failed.
 - Site: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
 - `docker compose stop` / `docker compose start`: stop and start without losing anything.
 - `docker compose run --rm cli wp <command>`: WP-CLI against the local copy.
@@ -54,14 +57,23 @@ block for later needs.
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
-- `bin/tools-update`: the deliberate way to update the tools and `composer.lock`; then
-  `bin/check`, review the lock file's diff, commit.
+- `bin/tools-update`: the deliberate way to update the tools, `composer.lock` and
+  `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
+- `tools/versions.sh`: the one place for the images these scripts use; `bin/check` fails if the
+  Playwright image and `@playwright/test` differ. npm installs run with `--ignore-scripts`.
 
 ## Testing
 
-- **Static checks:** `bin/check` (see Commands), before every commit.
-- **Scenario checks** against the running local copy: `bin/local-mail-check`.
-- **Unit, integration and browser tests:** set up in plan step 3e.
+- **Static checks:** `bin/check` (see Commands), before every commit; it also type-checks the
+  browser tests (TypeScript, strict).
+- **Scenario checks** (`tests/scenario/`): WP-CLI-level behaviour against the running copy,
+  such as mail delivery and the configuration script's safety stops. Plain bash: the bats
+  framework would need the Docker socket in its container.
+- **Browser tests** (`tests/e2e/`, Playwright): pages, menu and content as a visitor sees them.
+  Their expected numbers are facts of the fixed dump in `db/` (plan step 2 inventory).
+- **PHPUnit** (unit and integration against a separate test database) arrives at plan step 5a
+  with its first real tests; **accessibility checks** (axe) arrive with the new theme at step 4.
+- A new test is shown to fail on a planted fault before it counts as working.
 
 ## Framework
 

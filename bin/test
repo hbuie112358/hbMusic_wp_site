@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# Runs the tests against the running local copy (plan step 3e): every scenario check in
+# tests/scenario/, then the browser tests in tests/e2e/ in the official Playwright container.
+# Needs the stack running (bin/local-import, or docker compose start). Every test runs even
+# after a failure; the exit status is 1 if any failed.
+set -Euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
+
+FAILED_TESTS=()
+
+log() { printf '%s [test] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+
+load_settings() {
+  [[ -f "$REPO_ROOT/.env" ]] || { log "no .env; run bin/local-import first"; exit 1; }
+  set -a
+  # shellcheck source=/dev/null
+  source "$REPO_ROOT/.env"
+  set +a
+}
+
+require_running_site() {
+  curl -fsS -o /dev/null --max-time 10 "http://localhost:${SITE_PORT}/" && return 0
+  log "the local site does not answer on port ${SITE_PORT}; start it with 'docker compose start' or bin/local-import"
+  exit 1
+}
+
+# The container sees only tests/e2e/. Host networking lets it reach the site on localhost, as
+# rootless Docker publishes the port in the network the container then shares.
+browser_tests() {
+  docker run --rm --network host -w /e2e \
+    -v "$REPO_ROOT/tests/e2e:/e2e" \
+    -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    -e BASE_URL="http://localhost:${SITE_PORT}" -e LIVE_ADDRESSES \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
+}
+
+run_test() {
+  local name="$1"
+  shift
+  log "--- $name"
+  if "$@"; then
+    log "PASS  $name"
+    return
+  fi
+  log "FAIL  $name"
+  FAILED_TESTS+=("$name")
+}
+
+report() {
+  if ((${#FAILED_TESTS[@]} == 0)); then
+    log "All tests passed."
+    return 0
+  fi
+  log "${#FAILED_TESTS[@]} test group(s) failed: ${FAILED_TESTS[*]}"
+  return 1
+}
+
+main() {
+  load_settings
+  require_running_site
+  local scenario
+  for scenario in "$REPO_ROOT"/tests/scenario/*.sh; do
+    [[ "$(basename "$scenario")" == "lib.sh" ]] && continue
+    run_test "Scenario: $(basename "$scenario" .sh)" bash "$scenario"
+  done
+  run_test "Browser tests (Playwright)" browser_tests
+  report
+}
+
+main "$@"

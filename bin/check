@@ -9,10 +9,8 @@ set -Euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
-readonly COMPOSER_IMAGE="composer:2.11.1"
-readonly SHELLCHECK_IMAGE="koalaman/shellcheck:v0.10.0"
-# Composer's download cache survives between runs in a named volume, not in the project folder.
-readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
 
 FAILED_CHECKS=()
 
@@ -54,8 +52,41 @@ require_lock_file() {
 
 shellcheck_scripts() {
   local script scripts=()
-  for script in "$REPO_ROOT"/bin/*; do scripts+=("/mnt/$(basename "$script")"); done
-  docker run --rm -v "$REPO_ROOT/bin:/mnt:ro" "$SHELLCHECK_IMAGE" --severity=style "${scripts[@]}"
+  for script in "$REPO_ROOT"/bin/* "$REPO_ROOT"/tests/scenario/*.sh; do
+    scripts+=("/src/${script#"$REPO_ROOT"/}")
+  done
+  # -x follows the scenario checks' `source lib.sh`; the project root is the source path.
+  docker run --rm -w /src \
+    -v "$REPO_ROOT/bin:/src/bin:ro" -v "$REPO_ROOT/tests/scenario:/src/tests/scenario:ro" \
+    -v "$REPO_ROOT/tools:/src/tools:ro" \
+    "$SHELLCHECK_IMAGE" --severity=style -x --source-path=/src "${scripts[@]}"
+}
+
+# Type-checks the browser tests. The container sees only tests/e2e/, where npm installs
+# node_modules (ignored by git) from the lock file.
+typescript_check() {
+  docker run --rm -w /e2e \
+    -v "$REPO_ROOT/tests/e2e:/e2e" \
+    -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
+}
+
+# The Playwright image and the @playwright/test package must be the same version, or the
+# tests run against browsers the test runner was not built for.
+playwright_versions_match() {
+  local package_version
+  package_version="$(sed -nE 's/.*"@playwright\/test": "([^"]+)".*/\1/p' "$REPO_ROOT/tests/e2e/package.json")"
+  [[ "$package_version" == "$PLAYWRIGHT_VERSION" ]] && return 0
+  log "tests/e2e/package.json has @playwright/test ${package_version:-(none)}; tools/versions.sh has $PLAYWRIGHT_VERSION"
+  return 1
+}
+
+# Known vulnerabilities in the browser-test packages; the container sees only the two files.
+npm_audit() {
+  docker run --rm -w /npm \
+    -v "$REPO_ROOT/tests/e2e/package.json:/npm/package.json:ro" \
+    -v "$REPO_ROOT/tests/e2e/package-lock.json:/npm/package-lock.json:ro" \
+    "$PLAYWRIGHT_IMAGE" npm audit --package-lock-only --audit-level=low
 }
 
 compose_file_is_valid() {
@@ -89,8 +120,11 @@ main() {
   run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
   run_check "Composer validation" in_composer composer validate --strict --no-check-publish
   run_check "Composer security audit" in_composer composer audit --no-interaction
+  run_check "npm security audit (browser tests)" npm_audit
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+  run_check "Playwright versions match" playwright_versions_match
+  run_check "TypeScript (browser tests)" typescript_check
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "Compose file" compose_file_is_valid
   report
