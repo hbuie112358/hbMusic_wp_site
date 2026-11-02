@@ -24,8 +24,7 @@ new findings added as steps.
 - **Order of the coming steps:** 2 → 3 → 4 → 5; steps 6-9 are rough and get refined on the way.
 - **Open decisions waiting on the user:**
   - whether to swap steps 2 and 3 (inventory before choosing the environment);
-  - extending step 9: close the host account and confirm the old files are gone; a less
-    guessable admin login name on the new site;
+  - adding D7 to the project's `CLAUDE.md` (loaded every session; the plan only on resume);
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
   - the local environment (step 2); the new host (step 8).
@@ -80,4 +79,11 @@ new findings added as steps.
    Status: `[ ]`
 8. **Choose the new host** and how updates and backups run there. Status: `[ ]`
 9. **Migrate and go live,** without the local leftovers (open item 1); check afterwards that
-   they cannot be downloaded. Status: `[ ]`
+   they cannot be downloaded. Also:
+   - a new admin account on the new site with a login name that is not easy to guess (the old
+     one is short and was in the exposed `local.sql`);
+   - once the new site is live, close the former host's account: pointing the domain elsewhere
+     leaves the old site, the staging install and both databases running there, unmaintained;
+   - afterwards, check that the old copy is really gone, also through the host's own temporary
+     address if it had one.
+   Status: `[ ]`
