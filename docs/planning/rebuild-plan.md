@@ -66,7 +66,8 @@ new findings added as steps.
    environment. Findings: [findings/step-02-inventory.md](findings/step-02-inventory.md);
    `music-lite-child` is empty, so open item 4 is settled. Status: `[x]`
 2b. **Content and design session.** First the content: what each page is for and what a visitor
-   booking a musician needs to find fast, including the new request page (step 5). Then 2-3
+   booking a musician needs to find fast, including the new request pages (5b clips, 5d setlist
+   preferences, and how simple the 5d choices can be made). Then 2-3
    visual directions as clickable sample pages with the real content and photos, for the user to
    react to; the chosen one becomes the child theme's `theme.json`. *Why:* the user does not yet
    know what the site should look like, and choosing from real examples is easier than
@@ -95,6 +96,13 @@ new findings added as steps.
    - 5c. **Private clips per song.** A short audio clip per song, stored where it cannot be
      reached by a plain URL, and served only through 5b's expiring links. Recording and the
      licensing question for cover recordings are the user's. Status: `[ ]`
+   - 5d. **Setlist preferences for a gig.** A separate page from 5b, for someone booking the
+     user: pick songs from the list they want played, and set the focus of the rest by genre,
+     era or both (for example 40% country and 60% rock, or mostly older songs). Stored in the
+     admin with the request, so the user sees what the client wants before planning the set.
+     How to make it simple and self-explanatory (percentages, sliders, or a few choices) is
+     worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
+     the music they want, and gives the user the details before the conversation. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).

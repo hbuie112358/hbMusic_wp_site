@@ -94,6 +94,8 @@ From the user's requests (plan step 5):
 - [ ] Song requests: a checkbox per song, "select all", a request form, and one-click approval
   that emails expiring links to the clips (5b, D8).
 - [ ] A private audio clip per song, served only through those links (5c).
+- [ ] Setlist preferences for a gig: chosen songs, and a focus by genre and era (5d); every song
+  tagged with genre and era (5a).
 
 To decide in the content and design session (plan step 2b):
 - [ ] The Audio page: drop it, or replace it with the request page.
