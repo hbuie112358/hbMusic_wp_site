@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Scenario check for the local copy (plan step 3b): sends one email through WordPress
+# (wp_mail, so through FluentSMTP) and confirms it arrives in Mailpit. Fails if WordPress
+# reports a send failure or the message does not arrive in time. Needs the stack running
+# (bin/local-import).
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly WAIT_SECONDS=30
+readonly WAIT_INTERVAL_SECONDS=1
+readonly TEST_RECIPIENT="mail-check@example.test"
+
+log() { printf '%s [local-mail-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "FAILED: $*"; exit 1; }
+trap 'log "FAILED at line $LINENO: $BASH_COMMAND"' ERR
+
+compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" "$@"; }
+
+load_settings() {
+  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/local-import first"
+  set -a
+  # shellcheck source=/dev/null
+  source "$REPO_ROOT/.env"
+  set +a
+}
+
+# A marker unique to this run, so an earlier test message can never count as this one's.
+new_marker() { printf 'mail-check-%s-%s' "$(date +%s)" "$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')"; }
+
+send_test_mail() {
+  local marker="$1" result
+  result="$(compose run --rm -T -e MARKER="$marker" -e RECIPIENT="$TEST_RECIPIENT" cli \
+    wp eval 'echo wp_mail( getenv( "RECIPIENT" ), "Local mail check " . getenv( "MARKER" ), "Sent by bin/local-mail-check." ) ? "sent" : "failed";')"
+  [[ "$result" == *sent ]] || fail "WordPress reported that sending failed (wp_mail returned false)"
+  log "WordPress sent the message ($marker)"
+}
+
+count_in_mailpit() {
+  local marker="$1"
+  curl -fsS --max-time 5 "http://127.0.0.1:${MAIL_UI_PORT}/api/v1/search?query=${marker}" |
+    grep -oE '"messages_count":[0-9]+' | grep -oE '[0-9]+$'
+}
+
+wait_for_arrival() {
+  local marker="$1" waited=0
+  until [[ "$(count_in_mailpit "$marker" || echo 0)" -ge 1 ]]; do
+    ((waited < WAIT_SECONDS)) || fail "the message did not arrive in Mailpit within ${WAIT_SECONDS}s"
+    sleep "$WAIT_INTERVAL_SECONDS"
+    waited=$((waited + WAIT_INTERVAL_SECONDS))
+  done
+  log "Arrived in Mailpit: http://localhost:${MAIL_UI_PORT}"
+}
+
+main() {
+  load_settings
+  local marker
+  marker="$(new_marker)"
+  send_test_mail "$marker"
+  wait_for_arrival "$marker"
+  log "PASSED"
+}
+
+main "$@"

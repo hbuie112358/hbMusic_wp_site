@@ -37,7 +37,11 @@ block for later needs.
 
 - `bin/local-import`: builds or rebuilds the local copy from `wordpress/` and `db/`
   (read-only): fresh database, live addresses replaced, Wordfence and UpdraftPlus switched off,
-  a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`).
+  a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`), and
+  FluentSMTP installed at a pinned version, checked against WordPress.org's checksums and
+  pointed at Mailpit.
+- `bin/local-mail-check`: sends one email through WordPress and checks it arrives in Mailpit;
+  run it after `bin/local-import` and after every FluentSMTP update.
 - Site: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
 - `docker compose stop` / `docker compose start`: stop and start without losing anything.
 - `docker compose run --rm cli wp <command>`: WP-CLI against the local copy.

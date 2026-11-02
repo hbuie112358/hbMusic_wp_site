@@ -10,6 +10,12 @@ x-wordpress-env: &wordpress-env
   WORDPRESS_DB_USER: ${DB_USER:?set in .env}
   WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:?set in .env}
   WORDPRESS_TABLE_PREFIX: wp_
+  # Where FluentSMTP sends mail locally: the Mailpit container's SMTP port, reachable only on
+  # the project's internal network (local/wp-cli/configure-fluentsmtp-mailpit.php).
+  LOCAL_SMTP_HOST: mailpit
+  LOCAL_SMTP_PORT: "1025"
+  LOCAL_MAIL_FROM: ${LOCAL_MAIL_FROM:?set in .env}
+  LOCAL_MAIL_FROM_NAME: ${LOCAL_MAIL_FROM_NAME:?set in .env}
   # The image's wp-config.php defines WP_DEBUG from this; defining it again warns.
   WORDPRESS_DEBUG: "1"
   WORDPRESS_CONFIG_EXTRA: |
@@ -61,12 +67,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment: *wordpress-env
+    environment:
+      <<: *wordpress-env
+      # uid 33 has no writable home folder; WP-CLI's download cache goes to /tmp instead.
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
     volumes:
       - wp_html:/var/www/html
       # The old site and its dump, read-only: plan decision D2.
       - ./wordpress/wp-content:/import/wp-content:ro
       - ./db:/import/db:ro
+      # WP-CLI scripts for the local copy (local/wp-cli/), read-only.
+      - ./local/wp-cli:/local/wp-cli:ro
 
   mailpit:
     image: axllent/mailpit:v1.33.0

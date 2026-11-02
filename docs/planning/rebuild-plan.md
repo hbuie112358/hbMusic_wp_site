@@ -13,7 +13,7 @@ new findings added as steps.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (the new host must run a supported version); its plugins are behind (step 0f).
-- **Next:** 3b, mail into Mailpit.
+- **Next:** commit 3b; then 3c (the file-permission check).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
@@ -39,6 +39,7 @@ new findings added as steps.
 | D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
 | D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
 | D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
+| D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. |
 
 ## Steps
 
@@ -96,15 +97,27 @@ new findings added as steps.
      message when `.env` is missing but the database volume exists. One PHP deprecation notice from
      `wp-includes/formatting.php` (`ltrim()` given null), probably the old theme on PHP 8.4;
      caller not traced, not fixed (the theme is replaced). Status: `[x]` 7555e34
-   - 3b. **Mail into Mailpit:** a local-only must-use plugin that sends all mail to Mailpit.
-     Status: `[ ]`
+   - 3b. **Mail into Mailpit (D13).** The import installs FluentSMTP at a pinned version
+     (`FLUENT_SMTP_VERSION`), checks it against WordPress.org's checksums, and saves a Mailpit
+     connection through the plugin's own save code (`local/wp-cli/configure-fluentsmtp-mailpit.php`,
+     which refuses to run outside a local environment). `bin/local-mail-check` sends a message
+     with a unique marker and waits for it in Mailpit. Failures met and fixed on the way:
+     `declare( strict_types=1 )` is rejected under `wp eval-file`; WP-CLI had no writable cache
+     folder; the import's error message now names the failing step. The check also failed, as
+     it should, while FluentSMTP had no connection. Status: `[~]` waiting for "commit"
    - 3c. **File-permission check:** the rootless Docker umask bug (`DEVCONTAINER_SETUP.md` rule
      11). 3a keeps container-written files in volumes; 3c tests what still reaches the host
      (the theme, mounted later). Status: `[ ]`
    - 3d. **Code-quality tools in a container:** Composer, PHPCS with the WordPress Coding
-     Standards, PHPStan. Status: `[ ]`
+     Standards, PHPStan with WordPress and WP-CLI stubs. Also: the editor's checks follow the
+     WordPress Coding Standards (SonarLint's generic PHP rules ask for spaces and camelCase,
+     which WordPress forbids), and plugin versions move from `.env` to Composer if that proves
+     the better place. Status: `[ ]`
    - 3e. **Test levels:** PHPUnit (unit; integration against the database container) and
-     Playwright browser tests; `.nvmrc` pins Node. Status: `[ ]`
+     Playwright browser tests; `.nvmrc` pins Node. Includes, as integration tests, the two
+     safety stops of `local/wp-cli/configure-fluentsmtp-mailpit.php` (it refuses outside a
+     local environment; it stops on a missing or invalid setting), tested by hand in 3b only
+     (3b review, MEDIUM finding). Status: `[ ]`
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
@@ -145,7 +158,9 @@ new findings added as steps.
      set. Layout worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
      the music they want, and gives the user the details before the conversation. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
-   former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
+   former host's auto-updates plugin and mu-plugin (open item 3). FluentSMTP is already chosen
+   (D13); its email log holds visitors' addresses, so its retention is set here
+   (`docs/BEST_PRACTICES.md` 10.2). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).
    Status: `[ ]`
 8. **Choose the new host** and how updates and backups run there, and the authenticated mail
