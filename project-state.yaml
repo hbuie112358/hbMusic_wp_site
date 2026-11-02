@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-02T10:34:00-05:00
+timestamp: 2026-11-02T12:35:00-05:00
 current_branch: pause-2026-11-02
-last_commit: 3191cd6
+last_commit: bb59b73
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -16,14 +16,14 @@ last_work: >
   FluentSMTP (3b), bin/check with PHPCS (WordPress standards), PHPStan, TypeScript,
   ShellCheck, actionlint, audits (3d), bin/test with scenario checks and Playwright browser
   tests (3e), GitHub workflow and public repository with branch protection (3f). Hosting:
-  the site stays at Hostinger until a move before 2028 (D15).
+  the site stays at Hostinger until a move before 2028 (D15). Second session of the day: no
+  project work; shared-workspace housekeeping outside this repository at the user's request.
 
 next_action: >
-  Pull request #1 (docs-after-first-push) is open; its required check run 41469813294 was stuck
-  in GitHub's queue with no job created. Ask the user: cancel and re-run it (recommended), or
-  wait. After it passes: merge by rebase, update local main from GitHub, then rebase
-  pause-2026-11-02 onto main and push it through its own pull request (with the user's yes).
-  Then Dependabot (3f follow-up), then 3g.
+  Pull request #1 (docs-after-first-push) is open; its check run 41469813294 passed after
+  almost two hours in GitHub's queue, and the pull request is clean. With the user's yes: merge
+  by rebase, update local main from GitHub, then rebase pause-2026-11-02 onto main and push it
+  through its own pull request. Then Dependabot (3f follow-up), then 3g.
 
 verification:
   wordpress_version: 7.1.4 (live and local)
@@ -51,7 +51,9 @@ uncommitted_changes:
       in the scratchpad only.
 
 pending_decisions:
-  - Pull request #1's stuck check run: cancel and re-run (recommended), or wait.
+  - >
+    Merging pull request #1 now that its check passed (recommended), and then pushing
+    pause-2026-11-02 through its own pull request.
   - Dependabot for the GitHub action, Composer and npm (3f follow-up, recommended).
   - Review of docs/BEST_PRACTICES.md with the user before step 4 (D16).
   - The new host (step 10, before the Hostinger plan ends in 2028).

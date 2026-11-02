@@ -13,10 +13,9 @@ new findings added as steps.
   14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
   branch protection) done; 3c folded into step 4. The old site is still live, secured.
 - **Open at the pause (2026-11-02):** pull request #1 (`docs-after-first-push`, the 3f status
-  and the commit/push rules) is open; its required check run (41469813294) has been queued at
-  GitHub since 15:15 UTC with no job created, while GitHub reported no incident. The user was
-  offered: cancel and re-run it, or wait. The automatic merge after the run was stopped at the
-  pause, so nothing merges unattended. The pause commit is on the local branch
+  and the commit/push rules) is open. Its required check run (41469813294) sat in GitHub's
+  queue for almost two hours, then passed; the pull request is ready to merge (checked at the
+  second pause, 17:34 UTC). Nothing merges unattended. The pause commits are on the local branch
   `pause-2026-11-02`, branched from the pull request's branch.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site's PHP and plugins are current since step 0f
@@ -24,9 +23,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** get pull request #1's check to run (the user decides: cancel and re-run, or wait),
-  merge it, update local `main`; then Dependabot (3f follow-up), then 3g (deploy pipeline to a
-  new staging site).
+- **Next:** merge pull request #1 (its check passed), update local `main`, then rebase
+  `pause-2026-11-02` onto it and push it through its own pull request, with the user's yes;
+  then Dependabot (3f follow-up), then 3g (deploy pipeline to a new staging site).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
