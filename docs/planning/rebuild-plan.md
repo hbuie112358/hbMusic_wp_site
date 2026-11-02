@@ -8,7 +8,7 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** steps 0 and 1 done. The old site is still live at the former host,
+- **Where the work stands:** steps 0, 1 and 2 done. The old site is still live at the former host,
   now secured (step 0). No theme work yet.
 - **Finding:** the live site's email is unreliable (a confirmation sent on 2026-11-02 never
   arrived; cause not known). The new site gets an authenticated mail service (step 8), working
@@ -16,7 +16,8 @@ new findings added as steps.
 - **Finding:** Wordfence's login log (2025-01 to 2026-10-31) shows about 1,360 failed attempts,
   155 with the real login name, and no successful login except the user's own on 2025-01-09: no
   sign of a break-in through the login.
-- **Next:** finish step 2 (the `music-lite` layout, Yoast settings, image sizes), write it up.
+- **Next:** step 2b, the content and design session, starting from the checklist at the end of
+  [findings/step-02-inventory.md](findings/step-02-inventory.md).
 - **Order of the coming steps:** 2 → 2b → 3 → 4 → 5 (5a-5c); 6-9 are rough.
 - **Open decisions waiting on the user:**
   - how best practices are listed and handled, per the prompt the user is bringing from another
@@ -61,9 +62,8 @@ new findings added as steps.
    settings, any shortcodes) and what `music-lite-child` changes (open item 4); the result is the
    list of what the new theme must cover. Needs only `db/` and `wordpress/`, no running site.
    Comes before step 3 because what it finds (plugins that must run, forms, embeds) shapes the
-   environment. Status: `[~]` database content done (summary in chat, 2026-11-02; write-up
-   pending); `music-lite-child` is empty, so open item 4 is settled; still to look at: the
-   `music-lite` layout, the Yoast settings, the image sizes.
+   environment. Findings: [findings/step-02-inventory.md](findings/step-02-inventory.md);
+   `music-lite-child` is empty, so open item 4 is settled. Status: `[x]`
 2b. **Content and design session.** First the content: what each page is for and what a visitor
    booking a musician needs to find fast, including the new request page (step 5). Then 2-3
    visual directions as clickable sample pages with the real content and photos, for the user to
