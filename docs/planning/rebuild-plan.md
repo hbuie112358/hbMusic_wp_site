@@ -21,6 +21,8 @@ new findings added as steps.
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
   - step 0f: whether to update the live site's plugins now (recommended, at least Wordfence);
+  - the end date of the former host's plan (the user thinks April 2027; to confirm in hPanel):
+    the staging target (3g) and the live site must move before it;
   - the new host (step 8).
 - **Stale documents:** none.
 
@@ -41,6 +43,7 @@ new findings added as steps.
 | D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
 | D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
 | D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. |
+| D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 
 ## Steps
 
@@ -121,6 +124,14 @@ new findings added as steps.
      (3b review, MEDIUM finding). Status: `[ ]`
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
+   - 3g. **Deploy pipeline to a staging site at the former host (D14).** A private GitHub
+     repository (the whole history searched for personal data before the first push; the
+     user creates it from commands Claude gives); the checks of 3f run first; then GitHub
+     packages the theme and site plugin and copies them over SSH, with a key used only for
+     deploying, to a staging subdomain's folder only, checked before copying so a wrong
+     setting cannot touch the live site. The old `staging/` install may become this target
+     (open item 2). Needs: SSH access on the user's plan (the user checks), a PHP version under
+     security support for the subdomain. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Includes the
    file-permission check folded in from 3c: files the user creates in the mounted theme folder
@@ -176,6 +187,8 @@ new findings added as steps.
      one is short and was in the exposed `local.sql`);
    - once the new site is live, close the former host's account: pointing the domain elsewhere
      leaves the old site, the staging install and both databases running there, unmaintained;
+   - point the deploy pipeline (3g) at the new host: set it up, change the pipeline's
+     address, key and folder secrets, deploy;
    - afterwards, check that the old copy is really gone, also through the host's own temporary
      address if it had one.
    Status: `[ ]`
