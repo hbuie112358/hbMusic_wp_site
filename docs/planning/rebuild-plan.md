@@ -23,10 +23,12 @@ new findings added as steps.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
-  - how best practices are listed and handled, per the prompt the user is bringing from another
-    project (`docs/BEST_PRACTICES.md` is a draft until then);
   - step 0f: when to update the live site's plugins and switch it to PHP 8.4 (recommended soon);
   - the new host (step 10, before 2028-07-16).
+- **Best practices:** no longer waiting for another project's prompt (the user, 2026-11-02).
+  `docs/BEST_PRACTICES.md` is an uncommitted draft, used so far as a reference in the plan,
+  not yet as a checklist in the review gates; to be reviewed with the user and committed
+  before step 4, when the theme code starts.
 - **Stale documents:** none.
 
 ## Decisions
