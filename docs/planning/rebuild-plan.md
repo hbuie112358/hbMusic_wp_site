@@ -38,6 +38,7 @@ new findings added as steps.
 | D7 | Theme code never hardcodes the domain; it asks WordPress (`home_url()`, `get_theme_file_uri()` and similar). | The same theme then runs unchanged locally, on staging and live; a hardcoded domain breaks on every move. Server settings that name the domain live on the server, not in the repository. |
 | D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
 | D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |
+| D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
 
 ## Steps
 
@@ -83,9 +84,9 @@ new findings added as steps.
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
-     change) with a Song type: title, artist, release year, and genre Rock/Pop or Country (D9).
-     Claude suggests the release years from public release data and the genres, for the user to
-     check. The 108 songs are converted from the current Songlist page, where titles and artists
+     change) with a Song type: title, artist, release year, genre Rock/Pop or Country (D9), and
+     energy 1-5 (D10). Claude suggests the release years from public release data, and the
+     genres and energy ratings as labelled guesses, for the user to check and correct. The 108 songs are converted from the current Songlist page, where titles and artists
      sit in two separate lists matched only by position. The Songlist page is built from the Song entries.
      *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
    - 5b. **Song requests (D8).** The Songlist has a checkbox per song and "select all"; a form
@@ -106,6 +107,10 @@ new findings added as steps.
        1979, a birth year): songs are weighted by a bell curve around that year, highest near
        it and fading smoothly with distance, clearly higher within about 15 years on either
        side; songs further out still count, less. The exact curve is tuned with the real songs.
+     - **Energy dial:** from mellow to high energy, with the same moving bell curve over the
+       songs' energy ratings (D10). Its wording is chosen in 2b.
+     - Every dial has a "no preference, the user's call" option (D10). How the dials combine is
+       tuned with the real songs, by checking that suggested sets look like real sets.
      Possible: a live preview of the songs most likely in the set as the dials move (decided in
      2b). Sliders work with keyboard and screen readers (`docs/BEST_PRACTICES.md` 7.2). Stored
      in the admin with the request, so the user sees what the client wants before planning the
