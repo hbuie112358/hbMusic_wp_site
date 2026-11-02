@@ -25,10 +25,9 @@ new findings added as steps.
 - **Open decisions waiting on the user:**
   - step 0f: when to update the live site's plugins and switch it to PHP 8.4 (recommended soon);
   - the new host (step 10, before 2028-07-16).
-- **Best practices:** no longer waiting for another project's prompt (the user, 2026-11-02).
-  `docs/BEST_PRACTICES.md` is an uncommitted draft, used so far as a reference in the plan,
-  not yet as a checklist in the review gates; to be reviewed with the user and committed
-  before step 4, when the theme code starts.
+- **Best practices (D16):** `docs/BEST_PRACTICES.md` is the draft of WordPress additions for a
+  shared `~/.claude/WORDPRESS_STANDARDS.md`; until it moves there, it is this project's
+  WordPress checklist. Uncommitted; reviewed with the user and committed before step 4.
 - **Stale documents:** none.
 
 ## Decisions
@@ -50,6 +49,7 @@ new findings added as steps.
 | D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. |
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 | D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
+| D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). Rules that apply to every project go into the global files instead: the first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02. | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
 
 ## Steps
 
