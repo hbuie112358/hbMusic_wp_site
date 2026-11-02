@@ -17,8 +17,7 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** the read-through of the plan and findings for open weaknesses of the live site
-  (D17), then the public repository and the first GitHub run (3f).
+- **Next:** Dependabot (3f follow-up), then 3g (deploy pipeline to a new staging site).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -188,7 +187,11 @@ new findings added as steps.
      only. Review fix: a weekly scheduled run, so the audits catch new advisories without a
      code change. Follow-up after the first push: Dependabot update pull requests for the
      GitHub action, Composer and npm (the images in `tools/versions.sh` and `compose.yaml`
-     stay manual). Status: `[~]` workflow written; push after step 0f (D17)
+     stay manual). Public repository created and pushed on 2026-11-02 after step 0f and the
+     read-through (D17): https://github.com/hbuie112358/hbMusic_wp_site; the first run passed
+     all 11 checks in about a minute; branch protection on `main`: the `check` workflow
+     required and up to date, also for administrators, no force-push or deletion, linear
+     history. Status: `[x]` aa2f1f2
    - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** The public GitHub
      repository (D17) (the whole history searched for personal data before the first push; the
      user creates it from commands Claude gives); the checks of 3f run first; then GitHub

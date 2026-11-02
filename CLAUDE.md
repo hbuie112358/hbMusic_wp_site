@@ -91,6 +91,24 @@ block for later needs.
 
 ## Project rules
 
+- **Commit and push are separate decisions of the user.** "commit" means a local commit on a
+  trial branch after the review gate; nothing leaves the computer. Only on "push" does Claude
+  push the branch, open a pull request, wait for GitHub's `check` workflow, merge, and update
+  the local `main` from GitHub. Local `main` never receives commits directly: GitHub's `main`
+  is protected (the check required, also for administrators; no force-push).
+  Claude suggests a push when it is a good moment (a finished step, before work that depends
+  on GitHub, several commits waiting), saying what would go and why now, and pushes only after
+  the user's yes for that push.
+  *Why:* the user wants to commit freely and decide separately what goes public, without
+  having to remember when to push.
+- **Commit messages carry the description; pull requests take it from them.** Each commit
+  message has a subject line and a body saying what changed and why, and ends with
+  `Co-Authored-By: Claude …`. A pull request's title and description come from its commits
+  (`gh pr create --fill`, or `--fill-verbose` for several commits), with no separately written
+  text and no "Generated with Claude Code" line.
+  *Why:* one text cannot drift from another; the commits credit both the user (author) and
+  Claude (co-author), so a pull request line crediting only Claude would misstate the work.
+
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
   local scripts, and `themes/hbmusic-child/`). A new path is versioned only by adding it to the
