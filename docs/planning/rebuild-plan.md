@@ -10,14 +10,14 @@ new findings added as steps.
 
 - **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34),
   3b (local mail into Mailpit through FluentSMTP, f389f76) and 3d (code checks, `bin/check`,
-  14e8788) done; 3c folded into step 4. The old site is still live, secured.
+  14e8788) and 3e (tests, `bin/test`, 69ace60) done; 3c folded into step 4. The old site is still live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (hPanel confirms 8.1; step 0f moves it to 8.4); its plugins are behind (step 0f).
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** commit 3e; then 3f (checks in GitHub); step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
+- **Next:** 3f (checks in GitHub); step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
   (one per 24 hours): backup first, then plugin updates, then PHP 8.4, then Claude checks the
   site. Until then, 3d.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -163,7 +163,7 @@ new findings added as steps.
      `npm ci --ignore-scripts`; the image versions in one file (`tools/versions.sh`), with a
      check that the Playwright image and package match; `instanceof` instead of casts; Compose
      output kept out of failure messages. Accepted: the Playwright container's host
-     networking (needed to reach the site). Status: `[~]` waiting for "commit"
+     networking (needed to reach the site). Status: `[x]` 69ace60
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
    - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** A private GitHub

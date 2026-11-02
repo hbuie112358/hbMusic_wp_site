@@ -5,7 +5,8 @@
  *
  * It saves through FluentSMTP's own code (FluentMail\App\Models\Settings::store, the same code
  * the settings screen calls), so the stored format and the handling of secrets stay the
- * plugin's concern. If an update changes that code, bin/local-mail-check fails and says so.
+ * plugin's concern. If an update changes that code, the mail-delivery scenario check
+ * (tests/scenario/mail-delivery.sh, run by bin/test) fails and says so.
  *
  * Settings come from the container's environment (compose.yaml and .env).
  *
