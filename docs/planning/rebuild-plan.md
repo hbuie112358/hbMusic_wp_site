@@ -8,19 +8,21 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** project set up; `.gitignore` and the project's `CLAUDE.md` wait
-  for the user's "commit". No theme work yet.
+- **Where the work stands:** project set up (step 1, 92dd157). No theme work yet.
 - **The old site is still live at the former host,** so open item 1 (leftover files that may be
-  downloadable: a database dump with the admin account, and a full site zip) is urgent. The
-  user regained access to WordPress admin on 2026-11-01, after a server outage at the host, and
-  was given these steps: new password, real email on the account, two-factor login, check the
-  user list. Which of them are done is not known yet.
-- **Next:** ask the user which account steps were done; then the proposed step 0 (below).
+  downloadable: a database dump with the admin account, and a full site zip) is urgent.
+- **Admin account secured on the live site (2026-11-02):** new password, verified by logging in;
+  two-factor login active; the account's email set to the user's real address (directly in the
+  database, because the confirmation email did not arrive); it is the only account.
+- **Finding:** the live site's email is unreliable. A confirmation sent a year earlier arrived;
+  the one sent on 2026-11-02 did not. The cause is not known. Plan step 6 or 9 gives the new site
+  an authenticated mail service (`docs/BEST_PRACTICES.md` 11.1).
+- **Step 0 under way:** the leftovers were downloadable (200) and are now deleted (404). The
+  live secret keys, the same as in the exposed zip, are replaced (0d).
+- **2FA confirmed:** a private window asks for the code (2026-11-02).
+- **Next:** the open decisions below, then step 2 (or 3, if swapped).
 - **Order of the coming steps:** 2 → 3 → 4 → 5; steps 6-9 are rough and get refined on the way.
 - **Open decisions waiting on the user:**
-  - adding step 0: a header-only check of the leftover paths on the live site (Claude asked to
-    run it, not yet approved); deleting the six leftover items in the host's File Manager; the
-    check again to confirm 404;
   - whether to swap steps 2 and 3 (inventory before choosing the environment);
   - extending step 9: close the host account and confirm the old files are gone; a less
     guessable admin login name on the new site;
@@ -43,8 +45,22 @@ new findings added as steps.
 
 ## Steps
 
+0. **Secure the old live site** (urgent while it is online; open item 1).
+   - 0a. Admin account: new password, two-factor login, real email, only account. `[x]` 2026-11-02
+   - 0b. Header-only check of the leftover paths: five returned 200 (zip with 73,947,771 bytes,
+     `local.sql`, `local-site.json`, `conf/`, `logs/`); `local-xdebuginfo.php` returned 500.
+     `[x]` 2026-11-02
+   - 0c. The user deleted the six items in the host's File Manager; the check again returned 404
+     for all, with the home and login pages still 200. `[x]` 2026-11-02
+   - 0d. The live secret keys and salts match the exposed zip's `wp-config.php` (five of eight
+     compared, all the same; the database login differs). The user replaced all eight with new
+     ones from the WordPress.org generator; home and login pages still 200. The next login asked
+     for no 2FA code: Wordfence's remember-device setting (on, 30 days) uses its own key, not the
+     WordPress salts, so the remembered device stayed valid. `[x]` 2026-11-02
+   - 0e. Optional: the host's access logs, for downloads of the leftovers. `[ ]`
+
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
-   `project-state.yaml`, git. Status: `[~]` waiting for the first commit.
+   `project-state.yaml`, git. Status: `[x]` 92dd157
 2. **Local environment.** Choose how to run the site locally from `db/` and a copy of
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
    level of `TESTING_APPROACH.md`. Record them in the project's `CLAUDE.md`. Status: `[ ]`
