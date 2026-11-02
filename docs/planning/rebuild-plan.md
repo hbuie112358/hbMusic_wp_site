@@ -14,7 +14,7 @@ new findings added as steps.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (the new host must run a supported version); its plugins are behind (step 0f).
-- **Next:** 3c, the file-permission check.
+- **Next:** 3d, the code-quality tools.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
@@ -106,9 +106,9 @@ new findings added as steps.
      `declare( strict_types=1 )` is rejected under `wp eval-file`; WP-CLI had no writable cache
      folder; the import's error message now names the failing step. The check also failed, as
      it should, while FluentSMTP had no connection. The port setting is checked to be 1-65535. Status: `[x]` f389f76
-   - 3c. **File-permission check:** the rootless Docker umask bug (`DEVCONTAINER_SETUP.md` rule
-     11). 3a keeps container-written files in volumes; 3c tests what still reaches the host
-     (the theme, mounted later). Status: `[ ]`
+   - 3c. **File-permission check:** folded into step 4 by the user (2026-11-02): the import
+     keeps container-written files in volumes, so the theme folder mounted in step 4 is the
+     only thing left to test, and it exists only then.
    - 3d. **Code-quality tools in a container:** Composer, PHPCS with the WordPress Coding
      Standards, PHPStan with WordPress and WP-CLI stubs. Also: the editor's checks follow the
      WordPress Coding Standards (SonarLint's generic PHP rules ask for spaces and camelCase,
@@ -122,7 +122,10 @@ new findings added as steps.
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
-   `functions.php`, activated locally on a copy. Status: `[ ]`
+   `functions.php`, activated locally on a copy. Includes the
+   file-permission check folded in from 3c: files the user creates in the mounted theme folder
+   stay owned by the user and are not world-writable (`DEVCONTAINER_SETUP.md` rule 11).
+   Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
