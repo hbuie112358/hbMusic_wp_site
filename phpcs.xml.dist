@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ruleset name="hbmusic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+	<description>The project's PHP follows the WordPress Coding Standards (plan step 3d).</description>
+
+	<!-- The project's own PHP. The child theme (step 4) and the site plugin (step 5a) are added
+	     here when they exist: PHPCS stops with an error on a path that does not exist. -->
+	<file>local</file>
+
+	<!-- Stubs describe other projects' code for PHPStan; their style follows those projects. -->
+	<exclude-pattern>/tools/phpstan/stubs/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+	<!-- s: show the sniff behind each message, so a finding can be looked up; p: progress. -->
+	<arg value="sp"/>
+
+	<!-- WordPress = Core + Docs + Extra, including the security sniffs (escaping, nonces,
+	     sanitising input, prepared SQL). -->
+	<rule ref="WordPress"/>
+
+	<config name="minimum_wp_version" value="7.1"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="hbmusic"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Every global function, class, constant and hook carries the project prefix, so nothing
+	     clashes with WordPress or a plugin. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="hbmusic"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

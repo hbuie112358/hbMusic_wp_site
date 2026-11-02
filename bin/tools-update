@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Updates the development tools to the newest versions composer.json allows, and writes the
+# new composer.lock (plan step 3d). bin/check never changes the lock file; this script is the
+# deliberate way to. Afterwards: run bin/check, review the lock file's diff, commit both.
+#
+# Composer works in a temporary folder holding only copies of composer.json and composer.lock,
+# so the third-party code it runs never sees the rest of the project (.env, db/, backups/).
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly COMPOSER_IMAGE="composer:2.11.1"
+readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
+
+log() { printf '%s [tools-update] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
+
+WORK_DIR="$(mktemp -d)"
+readonly WORK_DIR
+trap 'rm -rf "$WORK_DIR"' EXIT
+
+copy_composer_files_in() {
+  cp "$REPO_ROOT/composer.json" "$WORK_DIR/"
+  [[ -f "$REPO_ROOT/composer.lock" ]] && cp "$REPO_ROOT/composer.lock" "$WORK_DIR/"
+  mkdir -p "$REPO_ROOT/vendor"
+}
+
+run_update() {
+  docker run --rm -w /app \
+    -v "$WORK_DIR:/app" \
+    -v "$REPO_ROOT/vendor:/app/vendor" \
+    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
+    "$COMPOSER_IMAGE" composer update --no-interaction --no-progress
+}
+
+main() {
+  copy_composer_files_in
+  log "Updating the tools within the limits in composer.json"
+  run_update
+  cp "$WORK_DIR/composer.lock" "$REPO_ROOT/composer.lock"
+  log "Done. Next: bin/check, then review 'git diff composer.lock' and commit it."
+}
+
+main "$@"

@@ -47,11 +47,30 @@ block for later needs.
 - `docker compose run --rm cli wp <command>`: WP-CLI against the local copy.
 - `docker compose down -v` deletes the local database and files (the volumes); Claude runs it
   only when the user asks. `bin/local-import` rebuilds them.
+- `bin/check`: every code check, in pinned containers (nothing installed on the host):
+  Composer install from `composer.lock`, validation and security audit; PHPCS with the
+  WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
+  stubs (`phpstan.neon.dist`); ShellCheck on `bin/`; the compose file. Runs every check even
+  after a failure; exit status 1 if any failed. The review gate starts with it. The tool
+  containers see only the files their step needs, never `.env`, `db/`, `backups/` or
+  `wordpress/`; `composer.lock` is read-only to them.
+- `bin/tools-update`: the deliberate way to update the tools and `composer.lock`; then
+  `bin/check`, review the lock file's diff, commit.
 
 ## Testing
 
-Not set up yet. The tools for each level of the global `TESTING_APPROACH.md` are decided
-together with the local environment.
+- **Static checks:** `bin/check` (see Commands), before every commit.
+- **Scenario checks** against the running local copy: `bin/local-mail-check`.
+- **Unit, integration and browser tests:** set up in plan step 3e.
+
+## Framework
+
+- WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the `hbmusic`
+  prefix and text domain), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
+  them (SonarLint's camelCase and spaces), WordPress wins; `.vscode/settings.json` turns those
+  rules off for this project.
+- Outside classes PHPStan cannot see are described by hand-written stubs in
+  `tools/phpstan/stubs/`, each saying why it exists and when to replace it.
 
 ## Project rules
 

@@ -1,0 +1,10 @@
+{
+    // Project settings for the editor (plan step 3d). PHP here follows the WordPress Coding
+    // Standards, checked by bin/check; these SonarLint rules contradict them and are off here:
+    //   php:S100  function names in camelCase (WordPress requires snake_case)
+    //   php:S105  spaces instead of tabs (WordPress requires tabs)
+    "sonarlint.rules": {
+        "php:S100": { "level": "off" },
+        "php:S105": { "level": "off" }
+    }
+}

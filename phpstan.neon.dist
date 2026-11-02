@@ -1,0 +1,16 @@
+# Static analysis of the project's PHP (plan step 3d), at the strictest level.
+includes:
+    # WordPress-aware rules and the WordPress 7.1 function signatures (php-stubs/wordpress-stubs).
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: max
+    # The site runs PHP 8.4 (compose.yaml), whatever PHP the tools container has.
+    phpVersion: 80400
+    # The child theme (step 4) and the site plugin (step 5a) are added when they exist.
+    paths:
+        - local
+    # Hand-written stubs for the few outside classes the project's code calls (see the files for why).
+    scanFiles:
+        - tools/phpstan/stubs/wp-cli.php
+        - tools/phpstan/stubs/fluentsmtp.php

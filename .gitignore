@@ -9,6 +9,15 @@
 !/.env.example
 !/bin/
 !/local/
+!/tools/
+!/composer.json
+!/composer.lock
+!/phpcs.xml.dist
+!/phpstan.neon.dist
+# Only the shared project settings; personal editor files stay out.
+!/.vscode/
+/.vscode/*
+!/.vscode/settings.json
 !/themes/
 /themes/*
 !/themes/hbmusic-child/

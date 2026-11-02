@@ -17,7 +17,7 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
+- **Next:** commit 3d; step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
   (one per 24 hours): backup first, then plugin updates, then PHP 8.4, then Claude checks the
   site. Until then, 3d.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -126,11 +126,23 @@ new findings added as steps.
    - 3c. **File-permission check:** folded into step 4 by the user (2026-11-02): the import
      keeps container-written files in volumes, so the theme folder mounted in step 4 is the
      only thing left to test, and it exists only then.
-   - 3d. **Code-quality tools in a container:** Composer, PHPCS with the WordPress Coding
-     Standards, PHPStan with WordPress and WP-CLI stubs. Also: the editor's checks follow the
-     WordPress Coding Standards (SonarLint's generic PHP rules ask for spaces and camelCase,
-     which WordPress forbids), and plugin versions move from `.env` to Composer if that proves
-     the better place. Status: `[ ]`
+   - 3d. **Code-quality tools in a container.** `composer.json` and `composer.lock` (tools only,
+     never deployed), `phpcs.xml.dist` (WordPress Coding Standards, prefix and text domain
+     `hbmusic`), `phpstan.neon.dist` (level max, PHP 8.4, WordPress 7.1 stubs), `bin/check`
+     (all checks in one run), `.vscode/settings.json` (SonarLint's camelCase and spaces rules
+     off). Versions: PHPCS stays on 3.x because WPCS 3.4.1 requires it; PHPCompatibility is
+     left out (its released 9.x knows PHP only up to 7.4; PHPStan's PHP 8.4 setting covers
+     much of it); the WP-CLI stubs are hand-written in `tools/phpstan/stubs/`, because
+     php-stubs/wp-cli-stubs 2.12.0 accepts WordPress stubs only up to 6.x (replace when it
+     supports 7.x), and FluentSMTP publishes none. Verified: all checks pass; planted faults
+     (unprefixed function, unescaped and unsanitised input, a type error, two shell mistakes)
+     made PHPCS, PHPStan and ShellCheck fail as they should; files Composer wrote belong to the
+     user and none is world-writable. Review fix (MEDIUM): each tool container sees only the
+     files its step needs, never `.env`, `db/`, `backups/` or `wordpress/`, with
+     `composer.lock` read-only; `bin/tools-update` is the deliberate way to update the lock.
+     Proven by listing what each container sees. Accepted LOW items: hand-written stubs can
+     drift (each names its source); `composer:2.11.1` is days old; PHPCompatibility waits
+     for its version 10. Status: `[~]` waiting for "commit"
    - 3e. **Test levels:** PHPUnit (unit; integration against the database container) and
      Playwright browser tests; `.nvmrc` pins Node. Includes, as integration tests, the two
      safety stops of `local/wp-cli/configure-fluentsmtp-mailpit.php` (it refuses outside a

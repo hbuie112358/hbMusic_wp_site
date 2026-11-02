@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# Runs every check the project's code must pass (plan step 3d): installing the tools at the
+# versions in composer.lock, Composer's own validation and its security audit, the WordPress
+# Coding Standards (PHPCS), static analysis (PHPStan), ShellCheck on the scripts, and the
+# compose file. All tools run in pinned containers; nothing is installed on the host.
+# Every check runs even after a failure, so one run shows everything; the exit status is 1 if
+# any check failed.
+set -Euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly COMPOSER_IMAGE="composer:2.11.1"
+readonly SHELLCHECK_IMAGE="koalaman/shellcheck:v0.10.0"
+# Composer's download cache survives between runs in a named volume, not in the project folder.
+readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
+
+FAILED_CHECKS=()
+
+log() { printf '%s [check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+
+# The tools are third-party code, so each container sees only the files its step needs: never
+# .env (local secrets), db/ or backups/ (the live site's data) or wordpress/. The container runs
+# as its root, which rootless Docker maps to the user's own account, so vendor/ on the host
+# belongs to the user.
+
+# Composer's own steps: composer.json and composer.lock read-only (a check never changes the
+# locked versions; bin/tools-update does that on purpose), vendor/ writable for the install.
+in_composer() {
+  mkdir -p "$REPO_ROOT/vendor"
+  docker run --rm -w /app \
+    -v "$REPO_ROOT/composer.json:/app/composer.json:ro" \
+    -v "$REPO_ROOT/composer.lock:/app/composer.lock:ro" \
+    -v "$REPO_ROOT/vendor:/app/vendor" \
+    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
+    "$COMPOSER_IMAGE" "$@"
+}
+
+# PHPCS and PHPStan: the tools, their configuration and the project's PHP, all read-only.
+in_analysis() {
+  docker run --rm -w /app \
+    -v "$REPO_ROOT/vendor:/app/vendor:ro" \
+    -v "$REPO_ROOT/phpcs.xml.dist:/app/phpcs.xml.dist:ro" \
+    -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
+    -v "$REPO_ROOT/local:/app/local:ro" \
+    -v "$REPO_ROOT/tools:/app/tools:ro" \
+    "$COMPOSER_IMAGE" "$@"
+}
+
+require_lock_file() {
+  [[ -f "$REPO_ROOT/composer.lock" ]] && return 0
+  log "composer.lock is missing; bin/tools-update creates it"
+  exit 1
+}
+
+shellcheck_scripts() {
+  local script scripts=()
+  for script in "$REPO_ROOT"/bin/*; do scripts+=("/mnt/$(basename "$script")"); done
+  docker run --rm -v "$REPO_ROOT/bin:/mnt:ro" "$SHELLCHECK_IMAGE" --severity=style "${scripts[@]}"
+}
+
+compose_file_is_valid() {
+  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" \
+    --env-file "$REPO_ROOT/.env.example" config --quiet
+}
+
+run_check() {
+  local name="$1"
+  shift
+  log "--- $name"
+  if "$@"; then
+    log "PASS  $name"
+    return
+  fi
+  log "FAIL  $name"
+  FAILED_CHECKS+=("$name")
+}
+
+report() {
+  if ((${#FAILED_CHECKS[@]} == 0)); then
+    log "All checks passed."
+    return 0
+  fi
+  log "${#FAILED_CHECKS[@]} check(s) failed: ${FAILED_CHECKS[*]}"
+  return 1
+}
+
+main() {
+  require_lock_file
+  run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
+  run_check "Composer validation" in_composer composer validate --strict --no-check-publish
+  run_check "Composer security audit" in_composer composer audit --no-interaction
+  run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
+  run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+  run_check "Shell scripts (ShellCheck)" shellcheck_scripts
+  run_check "Compose file" compose_file_is_valid
+  report
+}
+
+main "$@"
