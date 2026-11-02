@@ -16,9 +16,9 @@ new findings added as steps.
 - **Finding:** Wordfence's login log (2025-01 to 2026-10-31) shows about 1,360 failed attempts,
   155 with the real login name, and no successful login except the user's own on 2025-01-09: no
   sign of a break-in through the login.
-- **Next:** step 2b, the content and design session, starting from the checklist at the end of
-  [findings/step-02-inventory.md](findings/step-02-inventory.md).
-- **Order of the coming steps:** 2 → 2b → 3 → 4 → 5 (5a-5c); 6-9 are rough.
+- **Next:** step 3, the local environment.
+- **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
+  visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
@@ -39,6 +39,7 @@ new findings added as steps.
 | D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
 | D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |
 | D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
+| D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
 
 ## Steps
 
