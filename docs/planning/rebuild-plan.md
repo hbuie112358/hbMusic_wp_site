@@ -8,12 +8,13 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose) done
-  (7555e34). The old site is still live, secured.
+- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34)
+  and 3b (local mail into Mailpit through FluentSMTP, f389f76) done. The old site is still
+  live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (the new host must run a supported version); its plugins are behind (step 0f).
-- **Next:** commit 3b; then 3c (the file-permission check).
+- **Next:** 3c, the file-permission check.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
@@ -104,7 +105,7 @@ new findings added as steps.
      with a unique marker and waits for it in Mailpit. Failures met and fixed on the way:
      `declare( strict_types=1 )` is rejected under `wp eval-file`; WP-CLI had no writable cache
      folder; the import's error message now names the failing step. The check also failed, as
-     it should, while FluentSMTP had no connection. Status: `[~]` waiting for "commit"
+     it should, while FluentSMTP had no connection. The port setting is checked to be 1-65535. Status: `[x]` f389f76
    - 3c. **File-permission check:** the rootless Docker umask bug (`DEVCONTAINER_SETUP.md` rule
      11). 3a keeps container-written files in volumes; 3c tests what still reaches the host
      (the theme, mounted later). Status: `[ ]`
