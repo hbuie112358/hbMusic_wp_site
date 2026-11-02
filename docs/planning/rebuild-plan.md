@@ -8,26 +8,17 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** project set up (step 1, 92dd157). No theme work yet.
-- **The old site is still live at the former host,** so open item 1 (leftover files that may be
-  downloadable: a database dump with the admin account, and a full site zip) is urgent.
-- **Admin account secured on the live site (2026-11-02):** new password, verified by logging in;
-  two-factor login active; the account's email set to the user's real address (directly in the
-  database, because the confirmation email did not arrive); it is the only account.
-- **Finding:** the live site's email is unreliable. A confirmation sent a year earlier arrived;
-  the one sent on 2026-11-02 did not. The cause is not known. Plan step 6 or 9 gives the new site
-  an authenticated mail service (`docs/BEST_PRACTICES.md` 11.1).
-- **Step 0 done:** the leftovers were downloadable (200) and are now deleted (404); the live
-  secret keys, the same as in the exposed zip, are replaced (0d); 0e dropped.
-- **2FA confirmed:** a private window asks for the code (2026-11-02).
-- **Next:** the open decisions below, then step 2 (or 3, if swapped).
+- **Where the work stands:** steps 0 and 1 done. The old site is still live at the former host,
+  now secured (step 0). No theme work yet.
+- **Finding:** the live site's email is unreliable (a confirmation sent on 2026-11-02 never
+  arrived; cause not known). The new site gets an authenticated mail service
+  (`docs/BEST_PRACTICES.md` 11.1), at step 6 or 9.
+- **Next:** step 2, the inventory of the old site, from `db/` and `wordpress/` only.
 - **Order of the coming steps:** 2 → 3 → 4 → 5; steps 6-9 are rough and get refined on the way.
 - **Open decisions waiting on the user:**
-  - whether to swap steps 2 and 3 (inventory before choosing the environment);
-  - adding D7 to the project's `CLAUDE.md` (loaded every session; the plan only on resume);
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
-  - the local environment (step 2); the new host (step 8).
+  - the local environment (step 3); the new host (step 8).
 - **Stale documents:** none.
 
 ## Decisions
@@ -63,16 +54,19 @@ new findings added as steps.
 
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
    `project-state.yaml`, git. Status: `[x]` 92dd157
-2. **Local environment.** Choose how to run the site locally from `db/` and a copy of
-   `wordpress/` (the database import needs the site URL replaced), and the test tools for each
-   level of `TESTING_APPROACH.md`. Record them in the project's `CLAUDE.md`. Status: `[ ]`
-3. **Inventory the old site.** What `music-lite` shows (pages, menus, widgets, customizer
+2. **Inventory the old site.** What `music-lite` shows (pages, menus, widgets, customizer
    settings, any shortcodes) and what `music-lite-child` changes (open item 4); the result is the
-   list of what the new theme must cover. Status: `[ ]`
+   list of what the new theme must cover. Needs only `db/` and `wordpress/`, no running site.
+   Comes before step 3 because what it finds (plugins that must run, forms, embeds) shapes the
+   environment. Status: `[ ]`
+3. **Local environment.** Choose how to run the site locally from `db/` and a copy of
+   `wordpress/` (the database import needs the site URL replaced), and the test tools for each
+   level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Record them in the
+   project's `CLAUDE.md`. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Status: `[ ]`
-5. **Rebuild the design and content** in the child theme from the step 3 inventory (rough;
-   split into steps after step 3). Status: `[ ]`
+5. **Rebuild the design and content** in the child theme from the step 2 inventory (rough;
+   split into steps after step 2). Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).

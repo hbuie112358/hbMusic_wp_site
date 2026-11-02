@@ -52,5 +52,11 @@ together with the local environment.
   The export's file names contain the former host's account number; committed files name them
   by role ("the site archive", "the database dump") instead.
   *Why:* the global rule on personal data; the host account number counts as an account number.
+- **Theme code never hardcodes the domain.** It asks WordPress for addresses (`home_url()`,
+  `site_url()`, `get_theme_file_uri()` and similar). Server settings that name the domain
+  (`wp-config.php`, the site URL in the database, security headers) live on the server, not in
+  the repository. The domain may appear in notes and plans (plan decisions D6, D7).
+  *Why:* the same theme must run unchanged locally, on staging and live; a hardcoded domain
+  breaks on every move, and reviewers read it as careless work.
 - **`backups/` and `wordpress/` are never changed.** Experiments run on copies.
   *Why:* they are the only full copy of the old site now that it is off the former host.
