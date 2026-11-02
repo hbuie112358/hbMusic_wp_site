@@ -56,19 +56,18 @@ pending_decisions:
 open_items:
   - id: 1
     item: >
-      Local leftovers in the live site root (howardbuiemusic.zip, app/sql/local.sql,
-      local-xdebuginfo.php, conf/, logs/, local-site.json) may be publicly downloadable. Not
-      verified; .htaccess has no rule blocking them. They hold a database dump with the admin
-      account's password hash and a full copy of a local site. Urgent while the old site is live.
+      Settled 2026-11-02 (plan steps 0b-0d): the local leftovers in the live site root were
+      downloadable, were deleted (all 404 since), and every credential they exposed was
+      replaced.
   - id: 2
     item: >
-      wordpress/staging/ is a second complete WordPress install (7.1.4, own wp-config.php).
-      Decide whether it is needed on the new host.
+      Settled 2026-11-02 (plan step 0g): the staging copy was backed up and removed from the
+      live server.
   - id: 3
     item: >
-      The former host's auto-updates plugin (plugins/ and mu-plugins/) will not work on a new
-      host. Remove it at migration and plan updates there.
+      Hostinger's auto-updates plugin (plugins/ and mu-plugins/) updates WordPress itself, not
+      the plugins (plan step 0f). Kept while the site is at Hostinger (D15); how plugins are
+      kept current is decided in plan step 8; removed when moving hosts (step 10).
   - id: 4
     item: >
-      music-lite-child is installed but inactive. Check it for customisations worth carrying
-      into the new child theme before it is dropped.
+      Settled (plan step 2): music-lite-child is empty; nothing to carry over.

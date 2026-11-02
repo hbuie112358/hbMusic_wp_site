@@ -45,13 +45,14 @@ credentials. Ends with the list of what the new site must cover.
 - Comments closed by default; registration off; search engines allowed.
 - No site icon (favicon).
 
-## Search and sharing (Yoast SEO 28.1)
+## Search and sharing (Yoast SEO 28.1 at the export; updated to 28.8 in plan step 0f)
 
 - Set up: XML sitemap on, titles from the site name and tagline, Facebook page linked, Open Graph
   and Twitter cards on.
 - Gaps: the site is described as a **company**, not a person or musician (`docs/BEST_PRACTICES.md`
-  9.2); **no default sharing image** (9.3); **author archives on**, one of the ways login names
-  are revealed (4.5); no home page meta description of its own (it uses the tagline).
+  9.2); **no default sharing image** (9.3); **author archives on** in Yoast, one of the ways login names
+  are revealed (4.5); checked on the live site on 2026-11-02: `/?author=1` returns 404 and the
+  REST user list 401, so the name is not revealed there; no home page meta description of its own (it uses the tagline).
 
 ## Images
 

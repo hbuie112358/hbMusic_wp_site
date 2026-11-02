@@ -26,7 +26,8 @@ The old site, as exported:
   installed but not active. `twentytwentyfive` 1.2 is installed.
 - Plugins: `updraftplus`, `wordfence`, `wordpress-seo`, and Hostinger's auto-updates
   plugin (also as a must-use plugin in `wp-content/mu-plugins/`).
-- `wordpress/staging/` is a second complete WordPress install (7.1.4) with the same themes.
+- `wordpress/staging/` is a second complete WordPress install (7.1.4) with the same themes;
+  on the live server it was removed on 2026-11-02 (plan step 0g).
 
 ## Commands
 

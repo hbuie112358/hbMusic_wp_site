@@ -12,18 +12,16 @@ new findings added as steps.
   3b (local mail into Mailpit through FluentSMTP, f389f76) and 3d (code checks, `bin/check`,
   14e8788) and 3e (tests, `bin/test`, 69ace60) done; 3c folded into step 4. The old site is still live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
-  log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
-  2025 (hPanel confirms 8.1; step 0f moves it to 8.4); its plugins are behind (step 0f).
+  log shows no break-in; the live site's PHP and plugins are current since step 0f
+  (2026-11-02), and the old staging copy is removed (0g).
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3f (checks in GitHub); step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
-  (one per 24 hours): backup first, then plugin updates, then PHP 8.4, then Claude checks the
-  site. Until then, 3d.
+- **Next:** the read-through of the plan and findings for open weaknesses of the live site
+  (D17), then the public repository and the first GitHub run (3f).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
-  - step 0f: when to update the live site's plugins and switch it to PHP 8.4 (recommended soon);
   - the new host (step 10, before 2028-07-16).
 - **Best practices (D16):** `docs/BEST_PRACTICES.md` is the draft of WordPress additions for a
   shared `~/.claude/WORDPRESS_STANDARDS.md`; until it moves there, it is this project's
@@ -82,7 +80,21 @@ new findings added as steps.
      PHP 8.4 in Websites → Manage site → Advanced → PHP Configuration; (4) Claude checks the
      pages and the login. A restore undoes (2) but not (3): the PHP version is not in the
      backup, so a PHP problem is fixed by choosing 8.3 or 8.2. Already tested: the local copy is the old site on PHP 8.4, all pages
-     200, one deprecation notice. Waiting for the user. `[ ]`
+     200, one deprecation notice. Done 2026-11-02: the backup (files, database) checked
+     complete and containing the day's security changes, made read-only in
+     `backups/2026-11-02/`; Wordfence 9.0.2, Yoast SEO 28.8, UpdraftPlus 1.26.14, Twenty
+     Twenty-Five 1.5; PHP 8.4.27; all public pages, the login, the admin and the sitemap 200,
+     no PHP error text, 108 songs with artists. `[x]` 2026-11-02
+   - 0g. The old staging copy (`/staging/`, found during the public-repository read-through):
+     its login page answered publicly, with no Wordfence or two-factor login, Yoast SEO 24.2,
+     and the live login name. Its database was downloaded (read-only in `backups/2026-11-02/`),
+     then the user deleted it with Hostinger's staging tool; all `/staging/` paths now 404,
+     the live site unaffected; the user confirmed its database is gone too. Open item 2
+     settled; step 7 no longer needed. A correction on
+     the way: WordPress password hashes are salted, so comparing them cannot tell whether two
+     passwords are equal; an earlier remark that the exposed `local.sql` did not reveal the live
+     password was not justified (irrelevant for the live site since its password changed on
+     2026-11-02; any other place using the old password needs a new one). `[x]` 2026-11-02
 
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
    `project-state.yaml`, git. Status: `[x]` 92dd157
@@ -185,7 +197,12 @@ new findings added as steps.
      setting cannot touch the live site. The old `staging/` install may become this target
      (open item 2). SSH is included in the user's plan (the user enabled it on 2026-11-02 to
      check, then turned it off until this step); Hostinger's SSH port is 65002; the pipeline
-     logs in with a key, not a password. PHP comes from step 0f. Status: `[ ]`
+     logs in with a key, not a password. PHP comes from step 0f. The new staging site (after the
+     old copy's lessons, 0g): a fresh WordPress, not a copy, with its own admin (strong
+     password, two-factor login); the whole site behind a server-level password, so its login
+     page is not reachable from outside (Hostinger's directory protection, to verify here);
+     plugins kept as current as live; not indexed; test data from scripts, no live data.
+     Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Includes the
    file-permission check folded in from 3c: files the user creates in the mounted theme folder
@@ -231,13 +248,16 @@ new findings added as steps.
    Hostinger. FluentSMTP is already chosen
    (D13); its email log holds visitors' addresses, so its retention is set here
    (`docs/BEST_PRACTICES.md` 10.2). Status: `[ ]`
-7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).
-   Status: `[ ]`
+7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
+   Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
    Hostinger updater updates only WordPress itself, open item 3), and the authenticated mail
    service with its DNS records (`docs/BEST_PRACTICES.md` 11.1, 11.2). Outgoing ports there are
    all open except 0 and 25, so FluentSMTP can use the service's SMTP (587/465) or its API. The
-   mail service must work before the request form (5b) goes live. Status: `[ ]`
+   mail service must work before the request form (5b) goes live. Also to evaluate here:
+   Hostinger's object cache (offered for free on 2026-11-02, declined during step 0f), tested
+   on the staging site first; blocking public access to plugin and theme `readme.txt` files,
+   which show the installed versions (`docs/BEST_PRACTICES.md` 3.6). Status: `[ ]`
 9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
