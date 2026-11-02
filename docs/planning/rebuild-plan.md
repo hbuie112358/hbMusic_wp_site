@@ -11,21 +11,19 @@ new findings added as steps.
 - **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34),
   3b (local mail into Mailpit through FluentSMTP, f389f76), 3d (code checks, `bin/check`,
   14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
-  branch protection) done; 3c folded into step 4. The old site is still live, secured.
-- **Open at the pause (2026-11-02):** pull request #1 (`docs-after-first-push`, the 3f status
-  and the commit/push rules) is open. Its required check run (41469813294) sat in GitHub's
-  queue for almost two hours, then passed; the pull request is ready to merge (checked at the
-  second pause, 17:34 UTC). Nothing merges unattended. The pause commits are on the local branch
-  `pause-2026-11-02`, branched from the pull request's branch.
+  branch protection, and the Dependabot follow-up) done; 3c folded into step 4. The old site is
+  still live, secured. Pull requests #1 and #2 merged on 2026-11-02 (the first one's check sat
+  in GitHub's queue for almost two hours before passing).
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site's PHP and plugins are current since step 0f
   (2026-11-02), and the old staging copy is removed (0g).
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** merge pull request #1 (its check passed), update local `main`, then rebase
-  `pause-2026-11-02` onto it and push it through its own pull request, with the user's yes;
-  then Dependabot (3f follow-up), then 3g (deploy pipeline to a new staging site).
+- **Next:** after the Dependabot settings are pushed, check on GitHub that Dependabot read them;
+  then 3g (deploy pipeline to a new staging site); 3h (no network for the check tools) and 3i
+  (evaluating a behaviour-scanning service) were added on 2026-11-02, their order with 3g for
+  the user to choose.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -200,6 +198,18 @@ new findings added as steps.
      all 11 checks in about a minute; branch protection on `main`: the `check` workflow
      required and up to date, also for administrators, no force-push or deletion, linear
      history. Status: `[x]` aa2f1f2
+     - **Follow-up: Dependabot** (`.github/dependabot.yml`). Weekly, it proposes updates of the
+       checkout action, the Composer tools (one grouped pull request) and the browser tests' npm
+       packages (one grouped pull request), each as a pull request that runs `check` and waits for
+       the user; it never merges. New releases are proposed only after 7 days (hijacked releases
+       are usually pulled within days). Dependabot alerts and security updates are switched on
+       in the repository settings (2026-11-02): an advisory against a pinned version raises an
+       alert and a fix pull request at once, without the wait. Left out on purpose:
+       PHP_CodeSniffer 4 (WPCS needs 3), minor and major updates of the WordPress stubs (they follow
+       the site's WordPress version), Playwright (must match its image), and the container images
+       in `tools/versions.sh` and `compose.yaml` (by hand; Dependabot cannot read the script, and
+       its Docker Compose support was not taken up). Before Claude recommends a merge, it reads the
+       release notes and the lock-file changes (`~/.claude/AI_SECURITY.md`, section 4).
    - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** The public GitHub
      repository (D17) (the whole history searched for personal data before the first push; the
      user creates it from commands Claude gives); the checks of 3f run first; then GitHub
@@ -214,6 +224,18 @@ new findings added as steps.
      page is not reachable from outside (Hostinger's directory protection, to verify here);
      plugins kept as current as live; not indexed; test data from scripts, no live data.
      Status: `[ ]`
+   - 3h. **No network for the check tools while they run.** `bin/check` installs packages with
+     network access, then runs PHPCS, PHPStan, TypeScript, ShellCheck and actionlint in
+     containers without it (`--network none`), so a hijacked tool version that slipped past
+     the wait and the checks cannot send anything out. Proven by a container that tries to reach
+     the internet and fails. *Why:* found while setting up Dependabot (2026-11-02): warnings come
+     only after someone notices a bad release; this prevents harm before that. Status: `[ ]`
+   - 3i. **Evaluate a behaviour-scanning service for update pull requests** (for example Socket):
+     it inspects each new package version as it is published (sudden network access, install
+     scripts, scrambled code, a new maintainer) and can comment on Dependabot's pull requests
+     before a merge. Checked like any dependency first (`~/.claude/AI_SECURITY.md`, section 4):
+     who runs it, what repository access it needs, what it costs for a public repository. The
+     user decides whether to take it up. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Includes the
    file-permission check folded in from 3c: files the user creates in the mounted theme folder

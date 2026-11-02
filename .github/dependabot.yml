@@ -1,0 +1,70 @@
+# Dependabot proposes updates of the pinned tools as pull requests (plan step 3f follow-up).
+# It never merges: each pull request runs the `check` workflow and waits for the user's decision.
+# Not covered, updated by hand: the container images in tools/versions.sh and compose.yaml, and
+# Playwright, whose package must match its image (bin/tools-update; bin/check compares them).
+version: 2
+
+updates:
+  # The checkout action, pinned by commit in .github/workflows/check.yml.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/New_York"
+    # Hijacked releases are usually found and pulled within days; waiting a week means a release
+    # is only proposed once it has survived that. Security updates are not held back by this.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  # The code-quality tools (composer.json, composer.lock); development only, never deployed.
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/New_York"
+    cooldown:
+      default-days: 7
+    # One pull request for all the tools, so they are tried together as bin/check runs them.
+    groups:
+      code-quality-tools:
+        patterns:
+          - "*"
+    ignore:
+      # WPCS 3.x requires PHP_CodeSniffer 3.x.
+      - dependency-name: "squizlabs/php_codesniffer"
+        update-types: ["version-update:semver-major"]
+      # The stubs describe the WordPress version the site runs (7.1); they move with WordPress,
+      # deliberately, not on their own.
+      - dependency-name: "php-stubs/wordpress-stubs"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    commit-message:
+      prefix: "build"
+      include: "scope"
+
+  # The browser tests' packages (tests/e2e/package.json and its lock file).
+  - package-ecosystem: "npm"
+    directory: "/tests/e2e"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/New_York"
+    cooldown:
+      default-days: 7
+    groups:
+      browser-test-tools:
+        patterns:
+          - "*"
+    ignore:
+      # Must equal the Playwright image in tools/versions.sh; both move together by hand.
+      - dependency-name: "@playwright/test"
+    commit-message:
+      prefix: "build"
+      include: "scope"

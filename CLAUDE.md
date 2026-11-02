@@ -108,6 +108,9 @@ block for later needs.
   text and no "Generated with Claude Code" line.
   *Why:* one text cannot drift from another; the commits credit both the user (author) and
   Claude (co-author), so a pull request line crediting only Claude would misstate the work.
+  Exception: Dependabot's update commits keep the messages Dependabot writes
+  (`.github/dependabot.yml` shapes their subject line); they are neither the user's nor
+  Claude's work.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
