@@ -20,10 +20,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** after the Dependabot settings are pushed, check on GitHub that Dependabot read them;
-  then 3g (deploy pipeline to a new staging site); 3h (no network for the check tools) and 3i
-  (evaluating a behaviour-scanning service) were added on 2026-11-02, their order with 3g for
-  the user to choose.
+- **Next:** 3g (deploy pipeline to a new staging site); 3i (evaluating a behaviour-scanning
+  service) whenever the user chooses. Dependabot read its settings on 2026-11-02 and ran its
+  first update jobs; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -224,12 +223,17 @@ new findings added as steps.
      page is not reachable from outside (Hostinger's directory protection, to verify here);
      plugins kept as current as live; not indexed; test data from scripts, no live data.
      Status: `[ ]`
-   - 3h. **No network for the check tools while they run.** `bin/check` installs packages with
+   - 3h. ~~**No network for the check tools while they run.** `bin/check` installs packages with
      network access, then runs PHPCS, PHPStan, TypeScript, ShellCheck and actionlint in
      containers without it (`--network none`), so a hijacked tool version that slipped past
-     the wait and the checks cannot send anything out. Proven by a container that tries to reach
-     the internet and fails. *Why:* found while setting up Dependabot (2026-11-02): warnings come
-     only after someone notices a bad release; this prevents harm before that. Status: `[ ]`
+     the wait and the checks cannot send anything out.~~ Dropped by the user (2026-11-02): on
+     GitHub the run is a throwaway machine with no secrets; locally the tools are pinned,
+     updates wait 7 days and are reviewed, and the containers already see no secrets, so the
+     remaining risk (a hijacked tool reaching the internet or the home network) was judged too
+     unlikely for the work. It is a general supply-chain defense, not an AI-specific one: the
+     AI risks nearby (injected commands, invented packages, steering through tool output) are
+     covered by `~/.claude/AI_SECURITY.md`, sections 1, 4 and 8, which the network setting would
+     not affect. Can be taken up again, for example if a check ever handles a secret.
    - 3i. **Evaluate a behaviour-scanning service for update pull requests** (for example Socket):
      it inspects each new package version as it is published (sudden network access, install
      scripts, scrambled code, a new maintainer) and can comment on Dependabot's pull requests
