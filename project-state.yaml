@@ -1,0 +1,74 @@
+project: hbMusic_wp_site
+timestamp: 2026-11-01T20:31:22-05:00
+current_branch: main
+last_commit: none
+working_mode: rolling-wave
+active_plan: docs/planning/rebuild-plan.md
+
+last_work: >
+  Project set up per MULTI_PROJECT_SETUP.md: export sorted into backups/ (read-only), db/ and
+  wordpress/; project CLAUDE.md, allow-list .gitignore, this file, git with the GitHub noreply
+  address for this repository. Rolling-wave mode started with docs/planning/rebuild-plan.md
+  (decisions D1-D7). Inspected the leftover files in the live site root: they hold a local
+  database dump with the admin account and a full site zip. The old site is still live; the
+  user got back into WordPress admin after a server outage at the former host and was given
+  account-hardening steps (new password, real email, two-factor login, check the user list).
+
+next_action: >
+  Ask the user which account-hardening steps were done in WordPress admin. Then get approval
+  for step 0 (header-only check of the leftover paths, deletion in the host's File Manager,
+  check again) and the other proposed plan changes.
+
+verification:
+  wordpress_version: 7.1.4 (wordpress/wp-includes/version.php; staging/ the same)
+  table_prefix: wp_
+  active_theme: music-lite 1.5 (template and stylesheet options in db/)
+  inactive_themes: music-lite-child 1.0.0, twentytwentyfive 1.2
+  plugins: updraftplus, wordfence, wordpress-seo, former host's auto-updates plugin (+ mu-plugin)
+  admin_accounts_in_backup: 1; its email was the Local app's placeholder, not a real mailbox
+  live_site: still online at the former host (user, 2026-11-01)
+  commit_identity: GitHub noreply address, set in this repository's git config only
+
+uncommitted_changes:
+  - file: .gitignore
+    why: staged; part of the first setup commit, waiting for the review gate and the user's "commit"
+  - file: CLAUDE.md
+    why: staged; waiting for the user's "commit" with .gitignore
+  - file: docs/BEST_PRACTICES.md
+    why: >
+      untracked draft. The user is bringing a prompt from another project describing how best
+      practices are listed and handled; the file is revised or replaced to match it first.
+
+pending_decisions:
+  - >
+    Step 0 (urgent, live site). Claude runs a header-only check of the leftover paths
+    (recommended, not yet approved); the user deletes the six items in the host's File Manager
+    (howardbuiemusic.zip, app/, local-xdebuginfo.php, local-site.json, conf/, logs/); the
+    check again to confirm 404.
+  - Swap plan steps 2 and 3 (inventory before choosing the environment). Recommended.
+  - Extend step 9 with closing the host account, confirming the old files are gone, and a less
+    guessable admin login name. Recommended.
+  - Add the D7 rule (theme code never hardcodes the domain) to the project's CLAUDE.md. Offered.
+  - How best practices are handled, per the prompt from the user's other project.
+  - Whether to add a global PHP_STANDARDS.md to ~/.claude. Raised, not yet discussed.
+  - Local environment and test tools (step 2); new host (step 8).
+
+open_items:
+  - id: 1
+    item: >
+      Local leftovers in the live site root (howardbuiemusic.zip, app/sql/local.sql,
+      local-xdebuginfo.php, conf/, logs/, local-site.json) may be publicly downloadable. Not
+      verified; .htaccess has no rule blocking them. They hold a database dump with the admin
+      account's password hash and a full copy of a local site. Urgent while the old site is live.
+  - id: 2
+    item: >
+      wordpress/staging/ is a second complete WordPress install (7.1.4, own wp-config.php).
+      Decide whether it is needed on the new host.
+  - id: 3
+    item: >
+      The former host's auto-updates plugin (plugins/ and mu-plugins/) will not work on a new
+      host. Remove it at migration and plan updates there.
+  - id: 4
+    item: >
+      music-lite-child is installed but inactive. Check it for customisations worth carrying
+      into the new child theme before it is dropped.
