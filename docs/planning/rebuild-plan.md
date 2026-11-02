@@ -13,17 +13,18 @@ new findings added as steps.
   live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
-  2025 (the new host must run a supported version); its plugins are behind (step 0f).
-- **Former host's plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
-  Subscriptions, 2026-11-02). The staging target (3g) and the live site move before then.
-- **Next:** 3d, the code-quality tools.
+  2025 (hPanel confirms 8.1; step 0f moves it to 8.4); its plugins are behind (step 0f).
+- **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
+  Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
+- **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
+- **Next:** step 0f when the user is ready (plugin updates, backup, PHP 8.4); otherwise 3d.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
-  visible parts of 5 → 7 → 8 → 9.
+  visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
-  - step 0f: whether to update the live site's plugins now (recommended, at least Wordfence);
-  - the new host (step 8).
+  - step 0f: when to update the live site's plugins and switch it to PHP 8.4 (recommended soon);
+  - the new host (step 10, before 2028-07-16).
 - **Stale documents:** none.
 
 ## Decisions
@@ -44,6 +45,7 @@ new findings added as steps.
 | D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
 | D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. |
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
+| D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
 
 ## Steps
 
@@ -65,9 +67,14 @@ new findings added as steps.
      period of an exposure that lasted since at least 2025-01.
    - 0f. Plugin updates on the live site (found 2026-11-02): WordPress 7.1.4 is current, but
      Wordfence 8.0.5 (latest 9.0.2), Yoast SEO 28.1 (28.8), UpdraftPlus 1.26.13 (1.26.14) and
-     the inactive Twenty Twenty-Five 1.2 (1.5) are behind; the former host's updater updates
-     only WordPress itself. Recommended: update all in Dashboard → Updates, at least Wordfence;
-     then the home and login pages are checked. Waiting for the user. `[ ]`
+     the inactive Twenty Twenty-Five 1.2 (1.5) are behind; Hostinger's updater updates
+     only WordPress itself. Then the PHP version: hPanel shows 8.1 (2026-11-02), without
+     security fixes since the end of 2025 and no longer selectable once changed; the version
+     applies to every website on the plan, so the staging site (3g) shares it. Sequence: (1) the
+     user updates the plugins in Dashboard → Updates; (2) a fresh backup; (3) the user selects
+     PHP 8.4 in Websites → Manage site → Advanced → PHP Configuration; (4) Claude checks the
+     pages and the login. Already tested: the local copy is the old site on PHP 8.4, all pages
+     200, one deprecation notice. Waiting for the user. `[ ]`
 
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
    `project-state.yaml`, git. Status: `[x]` 92dd157
@@ -124,14 +131,15 @@ new findings added as steps.
      (3b review, MEDIUM finding). Status: `[ ]`
    - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
      prompt. Status: `[ ]`
-   - 3g. **Deploy pipeline to a staging site at the former host (D14).** A private GitHub
+   - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** A private GitHub
      repository (the whole history searched for personal data before the first push; the
      user creates it from commands Claude gives); the checks of 3f run first; then GitHub
      packages the theme and site plugin and copies them over SSH, with a key used only for
      deploying, to a staging subdomain's folder only, checked before copying so a wrong
      setting cannot touch the live site. The old `staging/` install may become this target
-     (open item 2). Needs: SSH access on the user's plan (the user checks), a PHP version under
-     security support for the subdomain. Status: `[ ]`
+     (open item 2). SSH is included in the user's plan (the user enabled it on 2026-11-02 to
+     check, then turned it off until this step); Hostinger's SSH port is 65002; the pipeline
+     logs in with a key, not a password. PHP comes from step 0f. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Includes the
    file-permission check folded in from 3c: files the user creates in the mounted theme folder
@@ -173,22 +181,27 @@ new findings added as steps.
      set. Layout worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
      the music they want, and gives the user the details before the conversation. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
-   former host's auto-updates plugin and mu-plugin (open item 3). FluentSMTP is already chosen
+   Hostinger's auto-updates plugin and mu-plugin (open item 3), or keep them while the site is at
+   Hostinger. FluentSMTP is already chosen
    (D13); its email log holds visitors' addresses, so its retention is set here
    (`docs/BEST_PRACTICES.md` 10.2). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).
    Status: `[ ]`
-8. **Choose the new host** and how updates and backups run there, and the authenticated mail
-   service with its DNS records (`docs/BEST_PRACTICES.md` 11.1, 11.2). The mail service must
-   work before the request form (5b) goes live. Status: `[ ]`
-9. **Migrate and go live,** without the local leftovers (open item 1); check afterwards that
+8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
+   Hostinger updater updates only WordPress itself, open item 3), and the authenticated mail
+   service with its DNS records (`docs/BEST_PRACTICES.md` 11.1, 11.2). Outgoing ports there are
+   all open except 0 and 25, so FluentSMTP can use the service's SMTP (587/465) or its API. The
+   mail service must work before the request form (5b) goes live. Status: `[ ]`
+9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
      one is short and was in the exposed `local.sql`);
-   - once the new site is live, close the former host's account: pointing the domain elsewhere
-     leaves the old site, the staging install and both databases running there, unmaintained;
-   - point the deploy pipeline (3g) at the new host: set it up, change the pipeline's
-     address, key and folder secrets, deploy;
-   - afterwards, check that the old copy is really gone, also through the host's own temporary
-     address if it had one.
+   - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
    Status: `[ ]`
+10. **Move to a new host before 2028-07-16** (when the Hostinger plan ends; auto-renewal off):
+    choose the host (SSH access and a supported PHP version required), set it up, change the
+    pipeline's address, key and folder secrets, deploy, move the database and media, point the
+    domain; then close the Hostinger account (pointing the domain elsewhere leaves the old site,
+    the staging install and both databases running there, unmaintained) and check that the old
+    copy is really gone, also through Hostinger's own temporary address if it has one.
+    Status: `[ ]`

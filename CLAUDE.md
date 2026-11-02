@@ -5,8 +5,8 @@ shared rules are in `~/.claude/CLAUDE.md`; "the user" is the person Claude works
 
 ## About
 
-A musician's WordPress site, moved off its former host and being rebuilt on a maintained theme
-(a Twenty Twenty-Five child theme) before it goes live on a new host.
+A musician's WordPress site, being rebuilt on a maintained theme (a Twenty Twenty-Five child
+theme) and with booking features, to go live at its current host and move to another later.
 
 ## Where things are
 
