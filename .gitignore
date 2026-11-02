@@ -1,0 +1,24 @@
+# Allow-list: ignore everything, then allow back only what this repository versions.
+# backups/, db/ and wordpress/ hold credentials and database dumps and must never be staged.
+/*
+!/CLAUDE.md
+!/.gitignore
+!/project-state.yaml
+!/docs/
+!/themes/
+/themes/*
+!/themes/hbmusic-child/
+
+# Secrets, dumps and archives stay out even inside the allowed folders: a stray export saved
+# into docs/ or the theme must never be staged by `git add -A`.
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz
+*.log
+wp-config.php
+.env
+
+# Dependencies and build output are installed from lock files, never versioned.
+node_modules/
+vendor/
