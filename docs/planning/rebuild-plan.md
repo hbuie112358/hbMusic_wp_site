@@ -14,6 +14,8 @@ new findings added as steps.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (the new host must run a supported version); its plugins are behind (step 0f).
+- **Former host's plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
+  Subscriptions, 2026-11-02). The staging target (3g) and the live site move before then.
 - **Next:** 3d, the code-quality tools.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
@@ -21,8 +23,6 @@ new findings added as steps.
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
   - step 0f: whether to update the live site's plugins now (recommended, at least Wordfence);
-  - the end date of the former host's plan (the user thinks April 2027; to confirm in hPanel):
-    the staging target (3g) and the live site must move before it;
   - the new host (step 8).
 - **Stale documents:** none.
 
