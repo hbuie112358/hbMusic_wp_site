@@ -82,7 +82,9 @@ new findings added as steps.
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
-     change) with a Song type: title, artist, optional fields such as decade. The 108 songs are
+     change) with a Song type: title, artist, genre and era (needed by 5d). Tagging the 108 songs: the era
+     can be suggested from each song's release year for the user to check; the genre is the
+     user's call. The 108 songs are
      converted from the current Songlist page, where titles and artists sit in two separate
      lists matched only by position. The Songlist page is built from the Song entries.
      *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
