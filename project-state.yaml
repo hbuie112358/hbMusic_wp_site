@@ -1,57 +1,60 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-01T20:31:22-05:00
-current_branch: main
-last_commit: none
+timestamp: 2026-11-02T10:34:00-05:00
+current_branch: pause-2026-11-02
+last_commit: 3191cd6
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
 last_work: >
-  Project set up per MULTI_PROJECT_SETUP.md: export sorted into backups/ (read-only), db/ and
-  wordpress/; project CLAUDE.md, allow-list .gitignore, this file, git with the GitHub noreply
-  address for this repository. Rolling-wave mode started with docs/planning/rebuild-plan.md
-  (decisions D1-D7). Inspected the leftover files in the live site root: they hold a local
-  database dump with the admin account and a full site zip. The old site is still live; the
-  user got back into WordPress admin after a server outage at the former host and was given
-  account-hardening steps (new password, real email, two-factor login, check the user list).
+  2026-11-02: live site secured and brought current (plan steps 0a-0g): admin account (new
+  password, two-factor login, real email), leftover files deleted, secret keys replaced,
+  plugins updated (Wordfence 9.0.2, Yoast SEO 28.8, UpdraftPlus 1.26.14), PHP 8.4.27, a fresh
+  Hostinger backup verified, the old staging copy backed up and removed. Inventory of the old
+  site (step 2) and new booking features planned (songs as data with genre, release year and
+  energy; one-click clip requests; setlist dials). Local tooling built and committed: Docker
+  Compose copy of the old site with bin/local-import (3a), local mail into Mailpit through
+  FluentSMTP (3b), bin/check with PHPCS (WordPress standards), PHPStan, TypeScript,
+  ShellCheck, actionlint, audits (3d), bin/test with scenario checks and Playwright browser
+  tests (3e), GitHub workflow and public repository with branch protection (3f). Hosting:
+  the site stays at Hostinger until a move before 2028 (D15).
 
 next_action: >
-  Ask the user which account-hardening steps were done in WordPress admin. Then get approval
-  for step 0 (header-only check of the leftover paths, deletion in the host's File Manager,
-  check again) and the other proposed plan changes.
+  Pull request #1 (docs-after-first-push) is open; its required check run 41469813294 was stuck
+  in GitHub's queue with no job created. Ask the user: cancel and re-run it (recommended), or
+  wait. After it passes: merge by rebase, update local main from GitHub, then rebase
+  pause-2026-11-02 onto main and push it through its own pull request (with the user's yes).
+  Then Dependabot (3f follow-up), then 3g.
 
 verification:
-  wordpress_version: 7.1.4 (wordpress/wp-includes/version.php; staging/ the same)
-  table_prefix: wp_
-  active_theme: music-lite 1.5 (template and stylesheet options in db/)
-  inactive_themes: music-lite-child 1.0.0, twentytwentyfive 1.2
-  plugins: updraftplus, wordfence, wordpress-seo, former host's auto-updates plugin (+ mu-plugin)
-  admin_accounts_in_backup: 1; its email was the Local app's placeholder, not a real mailbox
-  live_site: still online at the former host (user, 2026-11-01)
+  wordpress_version: 7.1.4 (live and local)
+  live_php: 8.4.27 (switched from 8.1.34 on 2026-11-02)
+  live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
+  live_theme: music-lite 1.5 (unmaintained; replaced by the rebuild)
+  live_staging_copy: removed 2026-11-02 (files and database)
+  live_login_name_revealed: no (/?author=1 404, REST users 401, checked 2026-11-02)
+  local_stack: docker compose (WordPress 7.1.4 on PHP 8.4, MariaDB 11.8.9, Mailpit), ports 10100/10101
+  checks: bin/check 11 checks pass; bin/test 2 scenarios + 3 browser tests pass
+  repository: public, GitHub, branch protection on main (check required, also for admins)
   commit_identity: GitHub noreply address, set in this repository's git config only
+  hostinger_plan: ends in 2028, auto-renewal off; SSH included, switched off until 3g
 
 uncommitted_changes:
-  - file: .gitignore
-    why: staged; part of the first setup commit, waiting for the review gate and the user's "commit"
-  - file: CLAUDE.md
-    why: staged; waiting for the user's "commit" with .gitignore
   - file: docs/BEST_PRACTICES.md
     why: >
-      untracked draft. The user is bringing a prompt from another project describing how best
-      practices are listed and handled; the file is revised or replaced to match it first.
+      Draft of WordPress additions, candidates for a shared ~/.claude/WORDPRESS_STANDARDS.md
+      (D16); reviewed with the user and committed before step 4.
+  - file: tools/dump_to_jsonl.py
+    why: >
+      Moved from the session scratchpad at the pause: reads a mariadb/mysqldump file into JSON
+      lines per table (used for the step 2 inventory, needed again for the step 5a conversion of
+      the 108 songs). Not yet through the review gate; its output holds site data and belongs
+      in the scratchpad only.
 
 pending_decisions:
-  - >
-    Step 0 (urgent, live site). Claude runs a header-only check of the leftover paths
-    (recommended, not yet approved); the user deletes the six items in the host's File Manager
-    (howardbuiemusic.zip, app/, local-xdebuginfo.php, local-site.json, conf/, logs/); the
-    check again to confirm 404.
-  - Swap plan steps 2 and 3 (inventory before choosing the environment). Recommended.
-  - Extend step 9 with closing the host account, confirming the old files are gone, and a less
-    guessable admin login name. Recommended.
-  - Add the D7 rule (theme code never hardcodes the domain) to the project's CLAUDE.md. Offered.
-  - How best practices are handled, per the prompt from the user's other project.
-  - Whether to add a global PHP_STANDARDS.md to ~/.claude. Raised, not yet discussed.
-  - Local environment and test tools (step 2); new host (step 8).
+  - Pull request #1's stuck check run: cancel and re-run (recommended), or wait.
+  - Dependabot for the GitHub action, Composer and npm (3f follow-up, recommended).
+  - Review of docs/BEST_PRACTICES.md with the user before step 4 (D16).
+  - The new host (step 10, before the Hostinger plan ends in 2028).
 
 open_items:
   - id: 1
