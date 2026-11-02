@@ -8,12 +8,12 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose) works and
-  waits for the review gate and the user's "commit". The old site is still live, secured.
+- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose) done
+  (7555e34). The old site is still live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site runs PHP 8.1, without security fixes since the end of
   2025 (the new host must run a supported version); its plugins are behind (step 0f).
-- **Next:** commit 3a; then 3b (mail into Mailpit).
+- **Next:** 3b, mail into Mailpit.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9.
 - **Open decisions waiting on the user:**
@@ -95,7 +95,7 @@ new findings added as steps.
      two-factor secret and sessions. It checks every setting first and stops with a clear
      message when `.env` is missing but the database volume exists. One PHP deprecation notice from
      `wp-includes/formatting.php` (`ltrim()` given null), probably the old theme on PHP 8.4;
-     caller not traced, not fixed (the theme is replaced). Status: `[~]` waiting for "commit"
+     caller not traced, not fixed (the theme is replaced). Status: `[x]` 7555e34
    - 3b. **Mail into Mailpit:** a local-only must-use plugin that sends all mail to Mailpit.
      Status: `[ ]`
    - 3c. **File-permission check:** the rootless Docker umask bug (`DEVCONTAINER_SETUP.md` rule
