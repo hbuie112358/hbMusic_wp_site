@@ -11,10 +11,13 @@ new findings added as steps.
 - **Where the work stands:** steps 0 and 1 done. The old site is still live at the former host,
   now secured (step 0). No theme work yet.
 - **Finding:** the live site's email is unreliable (a confirmation sent on 2026-11-02 never
-  arrived; cause not known). The new site gets an authenticated mail service
-  (`docs/BEST_PRACTICES.md` 11.1), at step 6 or 9.
-- **Next:** step 2, the inventory of the old site, from `db/` and `wordpress/` only.
-- **Order of the coming steps:** 2 → 3 → 4 → 5; steps 6-9 are rough and get refined on the way.
+  arrived; cause not known). The new site gets an authenticated mail service (step 8), working
+  before the request form (5b) goes live.
+- **Finding:** Wordfence's login log (2025-01 to 2026-10-31) shows about 1,360 failed attempts,
+  155 with the real login name, and no successful login except the user's own on 2025-01-09: no
+  sign of a break-in through the login.
+- **Next:** finish step 2 (the `music-lite` layout, Yoast settings, image sizes), write it up.
+- **Order of the coming steps:** 2 → 2b → 3 → 4 → 5 (5a-5c); 6-9 are rough.
 - **Open decisions waiting on the user:**
   - how best practices are listed and handled, per the prompt the user is bringing from another
     project (`docs/BEST_PRACTICES.md` is a draft until then);
@@ -58,20 +61,46 @@ new findings added as steps.
    settings, any shortcodes) and what `music-lite-child` changes (open item 4); the result is the
    list of what the new theme must cover. Needs only `db/` and `wordpress/`, no running site.
    Comes before step 3 because what it finds (plugins that must run, forms, embeds) shapes the
-   environment. Status: `[ ]`
+   environment. Status: `[~]` database content done (summary in chat, 2026-11-02; write-up
+   pending); `music-lite-child` is empty, so open item 4 is settled; still to look at: the
+   `music-lite` layout, the Yoast settings, the image sizes.
+2b. **Content and design session.** First the content: what each page is for and what a visitor
+   booking a musician needs to find fast, including the new request page (step 5). Then 2-3
+   visual directions as clickable sample pages with the real content and photos, for the user to
+   react to; the chosen one becomes the child theme's `theme.json`. *Why:* the user does not yet
+   know what the site should look like, and choosing from real examples is easier than
+   describing a look. Status: `[ ]`
 3. **Local environment.** Choose how to run the site locally from `db/` and a copy of
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
-   level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Record them in the
-   project's `CLAUDE.md`. Status: `[ ]`
+   level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Includes a local
+   mail catcher, so the request form's emails can be tested without sending real mail. Record
+   them in the project's `CLAUDE.md`. Status: `[ ]`
 4. **Child theme skeleton.** `themes/hbmusic-child/` with `style.css`, `theme.json`,
    `functions.php`, activated locally on a copy. Status: `[ ]`
-5. **Rebuild the design and content** in the child theme from the step 2 inventory (rough;
-   split into steps after step 2). Status: `[ ]`
+5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
+   step 2b choices (rough; split further after 2b). Known parts:
+   - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
+     change) with a Song type: title, artist, optional fields such as decade. The 108 songs are
+     converted from the current Songlist page, where titles and artists sit in two separate
+     lists matched only by position. The Songlist page is built from the Song entries.
+     *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
+   - 5b. **Request page.** A form to request audio or video (name, email, songs or event,
+     message), and a "Request a sample" link per song that fills in the song. Submissions are
+     also stored in the admin. Needs spam protection, a privacy policy page, and checked input
+     with protection against forged submissions (`docs/BEST_PRACTICES.md` 6.4, 10.1, 10.3).
+     The form tool is chosen at this step. *Why:* the user sends recordings privately on
+     request instead of publishing them, which also limits the licensing question for covers.
+     Status: `[ ]`
+   - 5c. **Audio clips per song (optional).** A short clip with a play button per song. Only
+     after the user has settled the licensing question for cover recordings; may not be needed
+     if requests (5b) cover it. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).
    Status: `[ ]`
-8. **Choose the new host** and how updates and backups run there. Status: `[ ]`
+8. **Choose the new host** and how updates and backups run there, and the authenticated mail
+   service with its DNS records (`docs/BEST_PRACTICES.md` 11.1, 11.2). The mail service must
+   work before the request form (5b) goes live. Status: `[ ]`
 9. **Migrate and go live,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
