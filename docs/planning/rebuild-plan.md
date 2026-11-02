@@ -36,6 +36,7 @@ new findings added as steps.
 | D5 | Commits use the GitHub noreply address, set for this repository only. | Keeps the personal email address out of the history. |
 | D6 | The site's domain may appear in notes and plans (`CLAUDE.md`, the plan, `project-state.yaml`). | The domain is public; leaving it out protects nothing. Secrets, dumps, host account numbers and server paths stay out of the repository. |
 | D7 | Theme code never hardcodes the domain; it asks WordPress (`home_url()`, `get_theme_file_uri()` and similar). | The same theme then runs unchanged locally, on staging and live; a hardcoded domain breaks on every move. Server settings that name the domain live on the server, not in the repository. |
+| D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
 
 ## Steps
 
@@ -84,16 +85,16 @@ new findings added as steps.
      converted from the current Songlist page, where titles and artists sit in two separate
      lists matched only by position. The Songlist page is built from the Song entries.
      *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
-   - 5b. **Request page.** A form to request audio or video (name, email, songs or event,
-     message), and a "Request a sample" link per song that fills in the song. Submissions are
-     also stored in the admin. Needs spam protection, a privacy policy page, and checked input
-     with protection against forged submissions (`docs/BEST_PRACTICES.md` 6.4, 10.1, 10.3).
-     The form tool is chosen at this step. *Why:* the user sends recordings privately on
-     request instead of publishing them, which also limits the licensing question for covers.
-     Status: `[ ]`
-   - 5c. **Audio clips per song (optional).** A short clip with a play button per song. Only
-     after the user has settled the licensing question for cover recordings; may not be needed
-     if requests (5b) cover it. Status: `[ ]`
+   - 5b. **Song requests (D8).** The Songlist has a checkbox per song and "select all"; a form
+     (name, email, optional event date and message) sends the selection. Each request is stored
+     in the admin with its songs and notifies the user; the user clicks "Approve and send", and
+     the site emails the visitor links to those songs' clips that expire after a set time. Needs
+     spam protection, a privacy policy page, and checked input with protection against forged
+     submissions (`docs/BEST_PRACTICES.md` 6.4, 10.1, 10.3). The form tool is chosen at this
+     step. Status: `[ ]`
+   - 5c. **Private clips per song.** A short audio clip per song, stored where it cannot be
+     reached by a plain URL, and served only through 5b's expiring links. Recording and the
+     licensing question for cover recordings are the user's. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
 7. **Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).

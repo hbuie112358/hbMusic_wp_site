@@ -91,8 +91,9 @@ From the content:
 
 From the user's requests (plan step 5):
 - [ ] Songs as data, entered in the admin (5a).
-- [ ] A request page for audio and video, with a "Request a sample" link per song (5b).
-- [ ] Optional: a short audio clip per song, once licensing is settled (5c).
+- [ ] Song requests: a checkbox per song, "select all", a request form, and one-click approval
+  that emails expiring links to the clips (5b, D8).
+- [ ] A private audio clip per song, served only through those links (5c).
 
 To decide in the content and design session (plan step 2b):
 - [ ] The Audio page: drop it, or replace it with the request page.
