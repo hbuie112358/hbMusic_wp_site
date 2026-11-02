@@ -129,8 +129,10 @@ new findings added as steps.
    - 3d. **Code-quality tools in a container.** `composer.json` and `composer.lock` (tools only,
      never deployed), `phpcs.xml.dist` (WordPress Coding Standards, prefix and text domain
      `hbmusic`), `phpstan.neon.dist` (level max, PHP 8.4, WordPress 7.1 stubs), `bin/check`
-     (all checks in one run), `.vscode/settings.json` (SonarLint's camelCase and spaces rules
-     off). Versions: PHPCS stays on 3.x because WPCS 3.4.1 requires it; PHPCompatibility is
+     (all checks in one run). The editor's SonarQube rules `php:S100` and `php:S105`, which
+     contradict WordPress style, are off in the user's VS Code user settings (the extension
+     ignores a project's `.vscode/settings.json` for rules; a first attempt there had no
+     effect and was removed). Versions: PHPCS stays on 3.x because WPCS 3.4.1 requires it; PHPCompatibility is
      left out (its released 9.x knows PHP only up to 7.4; PHPStan's PHP 8.4 setting covers
      much of it); the WP-CLI stubs are hand-written in `tools/phpstan/stubs/`, because
      php-stubs/wp-cli-stubs 2.12.0 accepts WordPress stubs only up to 6.x (replace when it

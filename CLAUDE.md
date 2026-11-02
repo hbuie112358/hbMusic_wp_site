@@ -24,7 +24,7 @@ theme) and with booking features, to go live at its current host and move to ano
 The old site, as exported:
 - Active theme: the parent `music-lite` 1.5 (unmaintained). A `music-lite-child` theme is
   installed but not active. `twentytwentyfive` 1.2 is installed.
-- Plugins: `updraftplus`, `wordfence`, `wordpress-seo`, and the former host's auto-updates
+- Plugins: `updraftplus`, `wordfence`, `wordpress-seo`, and Hostinger's auto-updates
   plugin (also as a must-use plugin in `wp-content/mu-plugins/`).
 - `wordpress/staging/` is a second complete WordPress install (7.1.4) with the same themes.
 
@@ -67,16 +67,19 @@ block for later needs.
 
 - WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the `hbmusic`
   prefix and text domain), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
-  them (SonarLint's camelCase and spaces), WordPress wins; `.vscode/settings.json` turns those
-  rules off for this project.
+  them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and `php:S105` (spaces)
+  are off in the user's VS Code user settings, because that extension reads rule settings only
+  there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
+  stays on, and its findings are fixed or explained.
 - Outside classes PHPStan cannot see are described by hand-written stubs in
   `tools/phpstan/stubs/`, each saying why it exists and when to replace it.
 
 ## Project rules
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
-  `CLAUDE.md`, `.gitignore`, `project-state.yaml`, `docs/` and `themes/hbmusic-child/`. A new path is
-  versioned only by adding it to the allow-list, with the user's approval.
+  the paths listed in it (the project's notes and plan, the tooling, the configuration, the
+  local scripts, and `themes/hbmusic-child/`). A new path is versioned only by adding it to the
+  allow-list, with the user's approval.
   *Why:* `wordpress/`, `db/` and `backups/` hold credentials (`wp-config.php`), database dumps
   with user accounts and emails, and the former host's account identifiers.
 - **Before every commit, Claude lists the staged files** (`git diff --cached --name-only`) and
@@ -93,4 +96,5 @@ block for later needs.
   *Why:* the same theme must run unchanged locally, on staging and live; a hardcoded domain
   breaks on every move, and reviewers read it as careless work.
 - **`backups/` and `wordpress/` are never changed.** Experiments run on copies.
-  *Why:* they are the only full copy of the old site now that it is off the former host.
+  *Why:* they are the reference copy of the old site as exported, and the source of every
+  local rebuild.
