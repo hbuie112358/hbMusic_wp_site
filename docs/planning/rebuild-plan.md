@@ -37,6 +37,7 @@ new findings added as steps.
 | D6 | The site's domain may appear in notes and plans (`CLAUDE.md`, the plan, `project-state.yaml`). | The domain is public; leaving it out protects nothing. Secrets, dumps, host account numbers and server paths stay out of the repository. |
 | D7 | Theme code never hardcodes the domain; it asks WordPress (`home_url()`, `get_theme_file_uri()` and similar). | The same theme then runs unchanged locally, on staging and live; a hardcoded domain breaks on every move. Server settings that name the domain live on the server, not in the repository. |
 | D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
+| D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |
 
 ## Steps
 
@@ -82,11 +83,10 @@ new findings added as steps.
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
-     change) with a Song type: title, artist, genre and era (needed by 5d). Tagging the 108 songs: the era
-     can be suggested from each song's release year for the user to check; the genre is the
-     user's call. The 108 songs are
-     converted from the current Songlist page, where titles and artists sit in two separate
-     lists matched only by position. The Songlist page is built from the Song entries.
+     change) with a Song type: title, artist, release year, and genre Rock/Pop or Country (D9).
+     Claude suggests the release years from public release data and the genres, for the user to
+     check. The 108 songs are converted from the current Songlist page, where titles and artists
+     sit in two separate lists matched only by position. The Songlist page is built from the Song entries.
      *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
    - 5b. **Song requests (D8).** The Songlist has a checkbox per song and "select all"; a form
      (name, email, optional event date and message) sends the selection. Each request is stored
@@ -99,11 +99,17 @@ new findings added as steps.
      reached by a plain URL, and served only through 5b's expiring links. Recording and the
      licensing question for cover recordings are the user's. Status: `[ ]`
    - 5d. **Setlist preferences for a gig.** A separate page from 5b, for someone booking the
-     user: pick songs from the list they want played, and set the focus of the rest by genre,
-     era or both (for example 40% country and 60% rock, or mostly older songs). Stored in the
-     admin with the request, so the user sees what the client wants before planning the set.
-     How to make it simple and self-explanatory (percentages, sliders, or a few choices) is
-     worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
+     user: pick songs from the list they want played, and set the focus of the rest with two
+     dials:
+     - **Genre dial:** one slider from Country to Rock/Pop, 0-100% (50/50, 30/70, ...).
+     - **Era dial:** "All eras" (every year weighted the same), or a centre year (for example
+       1979, a birth year): songs are weighted by a bell curve around that year, highest near
+       it and fading smoothly with distance, clearly higher within about 15 years on either
+       side; songs further out still count, less. The exact curve is tuned with the real songs.
+     Possible: a live preview of the songs most likely in the set as the dials move (decided in
+     2b). Sliders work with keyboard and screen readers (`docs/BEST_PRACTICES.md` 7.2). Stored
+     in the admin with the request, so the user sees what the client wants before planning the
+     set. Layout worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
      the music they want, and gives the user the details before the conversation. Status: `[ ]`
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    former host's auto-updates plugin and mu-plugin (open item 3). Status: `[ ]`
