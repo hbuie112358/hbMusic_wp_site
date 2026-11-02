@@ -17,7 +17,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** step 0f when the user is ready (plugin updates, backup, PHP 8.4); otherwise 3d.
+- **Next:** step 0f from 2026-11-02 09:23 on, when Hostinger allows the next manual backup
+  (one per 24 hours): backup first, then plugin updates, then PHP 8.4, then Claude checks the
+  site. Until then, 3d.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -71,9 +73,12 @@ new findings added as steps.
      only WordPress itself. Then the PHP version: hPanel shows 8.1 (2026-11-02), without
      security fixes since the end of 2025 and no longer selectable once changed; the version
      applies to every website on the plan, so the staging site (3g) shares it. Sequence: (1) the
-     user updates the plugins in Dashboard → Updates; (2) a fresh backup; (3) the user selects
+     user takes a fresh Hostinger backup (Files → Backups → Generate new backup; one per 24
+     hours) and downloads it into `backups/2026-11-02/`; (2) the user updates the plugins in
+     Dashboard → Updates; (3) the user selects
      PHP 8.4 in Websites → Manage site → Advanced → PHP Configuration; (4) Claude checks the
-     pages and the login. Already tested: the local copy is the old site on PHP 8.4, all pages
+     pages and the login. A restore undoes (2) but not (3): the PHP version is not in the
+     backup, so a PHP problem is fixed by choosing 8.3 or 8.2. Already tested: the local copy is the old site on PHP 8.4, all pages
      200, one deprecation notice. Waiting for the user. `[ ]`
 
 1. **Project setup.** Layout, the project's `CLAUDE.md`, allow-list `.gitignore`,
