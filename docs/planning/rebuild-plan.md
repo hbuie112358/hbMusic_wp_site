@@ -50,6 +50,7 @@ new findings added as steps.
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 | D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
 | D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). A rule that seems to apply to every project is only proposed for the global files: Claude asks the user specifically each time and changes nothing there without the user's yes for that change. The first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02 after the user approved it. | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
+| D17 | The GitHub repository is public from its first push, created only after step 0f (the live site's plugins and PHP updated) and a read of the plan and findings for any weakness of the live site that is still open; branch protection then requires the checks before a merge. | Public gives free branch protection, unlimited Actions minutes and a portfolio from the start; the history search before the push found no personal data or secrets. Publishing an open weakness of the live site would hand attackers a shortcut, and a pushed history cannot be taken back, so the push waits for 0f. Excluding the planning documents instead would mean rewriting the whole history and losing the plan's versions. |
 
 ## Steps
 
@@ -164,10 +165,20 @@ new findings added as steps.
      check that the Playwright image and package match; `instanceof` instead of casts; Compose
      output kept out of failure messages. Accepted: the Playwright container's host
      networking (needed to reach the site). Status: `[x]` 69ace60
-   - 3f. **CI on every push:** waits for a remote repository and the user's best-practices
-     prompt. Status: `[ ]`
-   - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** A private GitHub
-     repository (the whole history searched for personal data before the first push; the
+   - 3f. **Checks in GitHub (D17).** `.github/workflows/check.yml` runs `bin/check` on every
+     push to `main` and every pull request: read-only repository access, the checkout action
+     pinned by commit (v7.0.1), the token not kept, a 20-minute limit, older runs cancelled.
+     `bin/check` gained actionlint (1.7.12) for the workflow files; shown to fail on a planted
+     typo. `bin/test` stays local until step 4 (it needs the local copy built from the backup;
+     the new theme's browser tests will run on a fresh WordPress with scripted content). The
+     history search before the first push (31 commits) found no personal data or secrets.
+     The user's plan is GitHub Free, where branch protection exists for public repositories
+     only. Review fix: a weekly scheduled run, so the audits catch new advisories without a
+     code change. Follow-up after the first push: Dependabot update pull requests for the
+     GitHub action, Composer and npm (the images in `tools/versions.sh` and `compose.yaml`
+     stay manual). Status: `[~]` workflow written; push after step 0f (D17)
+   - 3g. **Deploy pipeline to a staging site at Hostinger (D14, D15).** The public GitHub
+     repository (D17) (the whole history searched for personal data before the first push; the
      user creates it from commands Claude gives); the checks of 3f run first; then GitHub
      packages the theme and site plugin and copies them over SSH, with a key used only for
      deploying, to a staging subdomain's folder only, checked before copying so a wrong

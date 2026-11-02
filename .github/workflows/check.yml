@@ -1,0 +1,37 @@
+# Runs bin/check (every static check) on each push to main and on each pull request
+# (plan step 3f). bin/test is not run here yet: it needs the local copy built from the backup,
+# which never leaves the user's computer. From step 4, browser tests of the new theme run on a
+# fresh WordPress with scripted test content, and join this workflow.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Weekly, so the security audits catch advisories published for packages already in use,
+  # even when no code changes (Mondays 06:17 UTC; an off-minute avoids the busy hour mark).
+  schedule:
+    - cron: "17 6 * * 1"
+
+# Read-only access to the repository is all the checks need.
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the older run pointless.
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The checks never push; the token is not kept on the runner.
+          persist-credentials: false
+
+      - name: Static checks (bin/check)
+        run: bin/check

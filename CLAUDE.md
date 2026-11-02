@@ -57,6 +57,8 @@ block for later needs.
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
+- GitHub runs `bin/check` on every push to `main` and every pull request
+  (`.github/workflows/check.yml`); a pull request merges only when it passes.
 - `bin/tools-update`: the deliberate way to update the tools, `composer.lock` and
   `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
 - `tools/versions.sh`: the one place for the images these scripts use; `bin/check` fails if the

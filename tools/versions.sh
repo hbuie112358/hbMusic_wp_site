@@ -9,6 +9,7 @@
 
 readonly COMPOSER_IMAGE="composer:2.11.1"
 readonly SHELLCHECK_IMAGE="koalaman/shellcheck:v0.10.0"
+readonly ACTIONLINT_IMAGE="rhysd/actionlint:1.7.12"
 readonly PLAYWRIGHT_VERSION="1.64.1"
 readonly PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 

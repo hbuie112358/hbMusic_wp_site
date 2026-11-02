@@ -11,6 +11,7 @@
 !/local/
 !/tools/
 !/tests/
+!/.github/
 !/composer.json
 !/composer.lock
 !/phpcs.xml.dist

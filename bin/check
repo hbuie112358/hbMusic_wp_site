@@ -89,6 +89,18 @@ npm_audit() {
     "$PLAYWRIGHT_IMAGE" npm audit --package-lock-only --audit-level=low
 }
 
+# The GitHub workflows (.github/workflows/), checked before they are pushed: a broken workflow
+# would otherwise only show up as a failed run in GitHub.
+# The files are named explicitly: without them, actionlint searches for the .git folder, which
+# the container does not see.
+actionlint_workflows() {
+  local workflow workflows=()
+  for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
+    workflows+=(".github/workflows/$(basename "$workflow")")
+  done
+  docker run --rm -w /repo -v "$REPO_ROOT/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
+}
+
 compose_file_is_valid() {
   docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" \
     --env-file "$REPO_ROOT/.env.example" config --quiet
@@ -126,6 +138,7 @@ main() {
   run_check "Playwright versions match" playwright_versions_match
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
+  run_check "GitHub workflows (actionlint)" actionlint_workflows
   run_check "Compose file" compose_file_is_valid
   report
 }
