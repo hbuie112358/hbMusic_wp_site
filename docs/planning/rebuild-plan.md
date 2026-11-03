@@ -20,10 +20,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3g (deploy pipeline to a new staging site) or the review of `docs/BEST_PRACTICES.md`,
-  the user's choice; 3i (evaluating a behaviour-scanning service) whenever the user chooses.
-  At the pause (2026-11-02), the local branch `plan-drop-3h` holds the 3h drop and the pause
-  commit, not yet pushed. Dependabot read its settings on 2026-11-02 and ran its
+- **Next:** 3g, split into 3g-1 (the staging site, done 2026-11-03), 3g-2 (a restricted
+  deploy key), the start of step 4, then 3g-3 (the deploy workflow). The
+  review of `docs/BEST_PRACTICES.md` still comes before step 4; 3i whenever the user chooses. Dependabot read its settings on 2026-11-02 and ran its
   first update jobs; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
@@ -79,8 +78,10 @@ new findings added as steps.
      Wordfence 8.0.5 (latest 9.0.2), Yoast SEO 28.1 (28.8), UpdraftPlus 1.26.13 (1.26.14) and
      the inactive Twenty Twenty-Five 1.2 (1.5) are behind; Hostinger's updater updates
      only WordPress itself. Then the PHP version: hPanel shows 8.1 (2026-11-02), without
-     security fixes since the end of 2025 and no longer selectable once changed; the version
-     applies to every website on the plan, so the staging site (3g) shares it. Sequence: (1) the
+     security fixes since the end of 2025 and no longer selectable once changed; ~~the version
+     applies to every website on the plan, so the staging site (3g) shares it~~ (corrected
+     2026-11-03 in 3g-1: each website has its own version; the new staging site started on 8.3
+     and was set to 8.4. A PHP upgrade can therefore be tried on staging first). Sequence: (1) the
      user takes a fresh Hostinger backup (Files → Backups → Generate new backup; one per 24
      hours) and downloads it into `backups/2026-11-02/`; (2) the user updates the plugins in
      Dashboard → Updates; (3) the user selects
@@ -217,15 +218,64 @@ new findings added as steps.
      user creates it from commands Claude gives); the checks of 3f run first; then GitHub
      packages the theme and site plugin and copies them over SSH, with a key used only for
      deploying, to a staging subdomain's folder only, checked before copying so a wrong
-     setting cannot touch the live site. The old `staging/` install may become this target
-     (open item 2). SSH is included in the user's plan (the user enabled it on 2026-11-02 to
+     setting cannot touch the live site. (The old `staging/` install was removed in 0g; the
+     target is a new staging site.) SSH is included in the user's plan (the user enabled it on 2026-11-02 to
      check, then turned it off until this step); Hostinger's SSH port is 65002; the pipeline
      logs in with a key, not a password. PHP comes from step 0f. The new staging site (after the
      old copy's lessons, 0g): a fresh WordPress, not a copy, with its own admin (strong
      password, two-factor login); the whole site behind a server-level password, so its login
      page is not reachable from outside (Hostinger's directory protection, to verify here);
      plugins kept as current as live; not indexed; test data from scripts, no live data.
-     Status: `[ ]`
+     Split by the user's choice (2026-11-03), in the order 3g-1 → 3g-2 → the start of step 4 →
+     3g-3, since the pipeline needs the theme skeleton to deploy. Found on the way: on
+     Hostinger's shared hosting one SSH user owns the whole account, the live site included, so
+     an unrestricted deploy key would reach the live site; and no third-party actions are needed
+     (the runner has `ssh` and `rsync`). Status: `[~]`
+     - 3g-1. **The staging site.** The user, in hPanel: a staging subdomain with a fresh
+       WordPress, its own admin (strong password, two-factor login), the whole site behind a
+       server-level password, not indexed; PHP 8.4 as on the live site. Claude first
+       checks Hostinger's documentation for each part, then checks the result from outside.
+       Checked 2026-11-03: the domain's DNS is Hostinger's (`dns-parking.com`), so the subdomain
+       needs no outside DNS record; it is created with Websites → Add website as an independent
+       site (Domains → Subdomains would make a folder inside the live site); WordPress with the
+       site's auto-installer; the password with Password Protect Directories, folder field empty
+       for the whole site. Name chosen by the user: `staging.howardbuiemusic.com` (public through
+       certificate logs, so the name protects nothing; the password does). Sequence: (1) the
+       site with WordPress, an admin name that is not easy to guess and not the live one, a
+       strong password, the real email; (2) at once the site-wide password, then Claude checks
+       401 on every path, the login page included; (3) inside, "Discourage search engines",
+       two-factor login as on live, and a look at what Hostinger's installer added; (4) Claude
+       checks from outside: 401 without the password, PHP, no indexing, the live site unaffected.
+       Done 2026-11-03: the site was created with Websites → Add website → Build on WordPress →
+       Build from scratch (no migration, no AI); the wizard's default admin name `admin` was
+       changed. The site-wide password covers every path tried (home, login, admin, REST API and
+       its user list, `xmlrpc.php`, `readme.html`, `wp-content/`, `wp-cron.php`: all 401, one
+       realm), plain HTTP forwards to HTTPS, and the site has no second, temporary address (the
+       Websites list shows only the subdomain). The browser may ask for the site-wide password
+       twice, as Hostinger documents. Hostinger's installer had added Hostinger AI, Hub, Reach,
+       Tools, Preview Domain (three copies), Smart Auto Updates (two copies) and LiteSpeed Cache;
+       all deleted by the user (cause of the copies not known; to look at over SSH in 3g-2).
+       Wordfence installed with auto-updates on; its firewall optimization skipped on staging
+       (it edits `.htaccess`, which holds the site-wide password; see step 8). Two-factor login
+       (Wordfence → Login Security, tab Two-Factor Authentication; the roles are on the Settings
+       tab) active for the admin and required for the Administrator role; tested by logging in
+       again. "Discourage search engines" on. Themes: Twenty Twenty-Five active (Twenty
+       Twenty-Three and Twenty Twenty-Four to be deleted). PHP: the site started on 8.3.36, set
+       to 8.4.27 like live (step 0f corrected: the version is per website). HTTPS: a Let's
+       Encrypt certificate for the subdomain, valid until 2027-02-01. The live site answered as
+       before throughout. Status: `[x]`
+     - 3g-2. **A restricted deploy key.** The user creates the key on the user's own machine, so
+       the private key never passes through Claude or the chat. Its public key is added to the
+       server's `authorized_keys` limited to `rsync` into the staging site's theme and plugin
+       folders (`rrsync`, if the server allows it; otherwise another safeguard before the key
+       goes into GitHub). The server's identity is pinned, and a GitHub environment "staging"
+       holds the secrets. Claude checks that the key cannot open a shell or reach the live
+       site's folders. Status: `[ ]`
+     - 3g-3. **The deploy workflow.** After `check` passes on `main`, never for pull requests:
+       it refuses unless the target folder holds a marker file naming it as staging, copies only
+       the allow-listed folders with `rsync`, and ends with a smoke test (the staging site
+       answers, behind its password). Shown to refuse on planted wrong settings. Comes after the
+       child theme skeleton of step 4, which it deploys first. Status: `[ ]`
    - 3h. ~~**No network for the check tools while they run.** `bin/check` installs packages with
      network access, then runs PHPCS, PHPStan, TypeScript, ShellCheck and actionlint in
      containers without it (`--network none`), so a hijacked tool version that slipped past
@@ -298,7 +348,11 @@ new findings added as steps.
    mail service must work before the request form (5b) goes live. Also to evaluate here:
    Hostinger's object cache (offered for free on 2026-11-02, declined during step 0f), tested
    on the staging site first; blocking public access to plugin and theme `readme.txt` files,
-   which show the installed versions (`docs/BEST_PRACTICES.md` 3.6). Status: `[ ]`
+   which show the installed versions (`docs/BEST_PRACTICES.md` 3.6). From 3g-1 (2026-11-03),
+   for the live site: whether Wordfence's firewall is optimized (it edits `.htaccess`; with a
+   backup, and the site checked afterwards); two-factor login required for the Administrator
+   role, as on staging; and Wordfence's auto-updates, decided with the rest of the updates.
+   Status: `[ ]`
 9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
