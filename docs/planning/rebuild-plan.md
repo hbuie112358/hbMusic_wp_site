@@ -20,8 +20,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3g, split into 3g-1 (the staging site, done 2026-11-03), 3g-2 (a restricted
-  deploy key), the start of step 4, then 3g-3 (the deploy workflow). The
+- **Next:** the review of `docs/BEST_PRACTICES.md` (before step 4, D16), then the start of
+  step 4 (the child theme skeleton), then 3g-3 (the deploy workflow). 3g-1 (the staging site)
+  and 3g-2 (the restricted deploy key) were done on 2026-11-03. The
   review of `docs/BEST_PRACTICES.md` still comes before step 4; 3i whenever the user chooses. Dependabot read its settings on 2026-11-02 and ran its
   first update jobs; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -270,7 +271,43 @@ new findings added as steps.
        folders (`rrsync`, if the server allows it; otherwise another safeguard before the key
        goes into GitHub). The server's identity is pinned, and a GitHub environment "staging"
        holds the secrets. Claude checks that the key cannot open a shell or reach the live
-       site's folders. Status: `[ ]`
+       site's folders. Done 2026-11-03, the user running every server and key command, Claude
+       writing them and reading the masked output:
+       - **The server:** rsync 3.1.3 and Python 3, but no `rrsync` and no Perl (rsync 3.1.3's
+         `rrsync` is a Perl script). hPanel offers "Add SSH key" but no switch for SSH password
+         logins and no IP allowlist, so the SSH password (shared with FTP) stays the only
+         barrier to a shell on the account: it was made long and unique. The duplicate plugin
+         copies of 3g-1 were gone; `.dbdumps` is empty. Staging's `mu-plugins/` held Hostinger's
+         auto-updater (as on live, kept) and `hostinger-preview-domain.php` (a temporary-address
+         feature, always loaded, not on live): deleted by the user, the lock and the live site
+         checked afterwards.
+       - **The restriction, without `rrsync`:** rsync's daemon mode over SSH. The key's line in
+         `~/.ssh/authorized_keys` is `restrict,command="rsync --server --daemon
+         --config=~/.deploy/rsyncd-staging.conf ."`; the settings file (outside the web folders)
+         names one destination, `staging-child-theme` = staging's
+         `wp-content/themes/hbmusic-child` (exactly that folder, so a deploy that tidies its
+         destination cannot touch the parent theme), with `list = no`, `munge symlinks`,
+         `incoming chmod` (web permissions), one connection at a time and a log. The plugin's
+         destination is added at 5a. The empty `hbmusic-child` folder was created for it.
+       - **Proven** with the key from the user's computer (`BatchMode`, so no password fallback):
+         a shell and another command got only `@RSYNCD: 31.0`; listing destinations showed none;
+         an ordinary path to the live site was refused; an unknown destination was refused;
+         `../../../` was stripped (the only probe file on the account is inside
+         `hbmusic-child`); a normal copy worked with web permissions. The server's log recorded
+         each attempt.
+       - **The key** (ed25519, no passphrase, for GitHub's unattended use) was made on the
+         user's computer; a first one made by mistake on the server was deleted before use.
+         It went straight from its file into GitHub's secrets and was then deleted locally; a
+         lost or exposed key is replaced, not recovered.
+       - **The server's identity:** fingerprint `SHA256:DYKDxoxr9b4vOhY1xphD05FKYXI03SHgfmflIpBvAQ8`,
+         seen at the user's first login, at the staging subdomain's address, and again before
+         it was stored; the first GitHub run checks it from GitHub's network (3g-3).
+       - **GitHub:** environment `staging`, deployments only from protected branches (`main`),
+         with the secrets `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_SSH_USER`,
+         `DEPLOY_SSH_HOST`, none at repository level. The port, 65002, is Hostinger's standard
+         one and goes into the workflow file. The account's username and server address are in
+         the secrets only, never in the repository.
+       Status: `[x]`
      - 3g-3. **The deploy workflow.** After `check` passes on `main`, never for pull requests:
        it refuses unless the target folder holds a marker file naming it as staging, copies only
        the allow-listed folders with `rsync`, and ends with a smoke test (the staging site
