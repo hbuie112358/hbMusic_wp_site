@@ -49,7 +49,7 @@ credentials. Ends with the list of what the new site must cover.
 
 - Set up: XML sitemap on, titles from the site name and tagline, Facebook page linked, Open Graph
   and Twitter cards on.
-- Gaps: the site is described as a **company**, not a person or musician (`docs/BEST_PRACTICES.md`
+- Gaps: the site is described as a **company**, not a person or musician (`docs/SITE_CHECKLIST.md`
   9.2); **no default sharing image** (9.3); **author archives on** in Yoast, one of the ways login names
   are revealed (4.5); checked on the live site on 2026-11-02: `/?author=1` returns 404 and the
   REST user list 401, so the name is not revealed there; no home page meta description of its own (it uses the tagline).
@@ -104,7 +104,7 @@ To decide in the content and design session (plan step 2b):
 - [ ] The sidebar: keep or drop.
 - [ ] A site icon and a default sharing image.
 
-Fixed by the rebuild (`docs/BEST_PRACTICES.md`):
+Fixed by the rebuild (`docs/SITE_CHECKLIST.md`):
 - [ ] Links inside content without the domain written out (D7).
 - [ ] Yoast: describe a person or musician, a sharing image, author archives off.
 - [ ] Old plugin leftovers and revisions not carried over.

@@ -20,18 +20,20 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** the review of `docs/BEST_PRACTICES.md` (before step 4, D16), then the start of
-  step 4 (the child theme skeleton), then 3g-3 (the deploy workflow). 3g-1 (the staging site)
-  and 3g-2 (the restricted deploy key) were done on 2026-11-03. The
-  review of `docs/BEST_PRACTICES.md` still comes before step 4; 3i whenever the user chooses. Dependabot read its settings on 2026-11-02 and ran its
-  first update jobs; 3h was dropped by the user.
+- **Next:** the start of step 4 (the child theme skeleton), then 3g-3 (the deploy workflow);
+  3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
+  restricted deploy key) and the review of `docs/SITE_CHECKLIST.md`. Dependabot runs weekly
+  since 2026-11-02; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
   - the new host (step 10, before 2028-07-16).
-- **Best practices (D16):** `docs/BEST_PRACTICES.md` is the draft of WordPress additions for a
-  shared `~/.claude/WORDPRESS_STANDARDS.md`; until it moves there, it is this project's
-  WordPress checklist. Uncommitted; reviewed with the user and committed before step 4.
+- **Site checklist (D16):** `docs/SITE_CHECKLIST.md` (named `BEST_PRACTICES.md` until
+  2026-11-03) is the draft of WordPress additions for a shared global file; until anything moves
+  there, it is this project's checklist. Reviewed with the user on 2026-11-03 and committed: 88 items, each with
+  its check, its kind (general, WordPress or shop) and its status (done, in force, partly,
+  planned with its step, or not applicable); a section for shops (WooCommerce, for the template)
+  and a list of practices deliberately not used.
 - **Stale documents:** none.
 
 ## Decisions
@@ -53,7 +55,7 @@ new findings added as steps.
 | D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. (The check named here became `tests/scenario/mail-delivery.sh`, run by `bin/test`, in step 3e.) |
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 | D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
-| D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). A rule that seems to apply to every project is only proposed for the global files: Claude asks the user specifically each time and changes nothing there without the user's yes for that change. The first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02 after the user approved it. | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
+| D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). A rule that seems to apply to every project is only proposed for the global files: Claude asks the user specifically each time and changes nothing there without the user's yes for that change. The first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02 after the user approved it. (2026-11-03: the file was renamed `docs/SITE_CHECKLIST.md`, since "best practices" could mean coding style or design; it covers security, accessibility, performance and operations. Each item is marked general or WordPress, so if it ever moves, the WordPress items go to the WordPress file and each general item is proposed for a global file on its own. Whether `WORDPRESS_STANDARDS.md` is the right name, next to the coding-style files `JAVA_STANDARDS.md` and `GO_STANDARDS.md`, is decided then.) | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
 | D17 | The GitHub repository is public from its first push, created only after step 0f (the live site's plugins and PHP updated) and a read of the plan and findings for any weakness of the live site that is still open; branch protection then requires the checks before a merge. | Public gives free branch protection, unlimited Actions minutes and a portfolio from the start; the history search before the push found no personal data or secrets. Publishing an open weakness of the live site would hand attackers a shortcut, and a pushed history cannot be taken back, so the push waits for 0f. Excluding the planning documents instead would mean rewriting the whole history and losing the plan's versions. |
 | D18 | The project stays template-ready, and the template for further WordPress sites becomes a project of its own later, extracted from this one into a fresh repository (no history) and offered as a GitHub template repository. Meanwhile, each step that touches something another site would set differently adds a line to `docs/planning/template-notes.md`, and site-specific values stay in settings rather than code. Whether to start the template project is looked at again at the end of step 4. A template for WooCommerce sites comes from a real WooCommerce project, not from this one. | A template designed in advance guesses what is generic; one extracted from a working project starts out proven. Separating generic from site-specific is cheapest while each piece is written. After step 4 the generic part (tooling and theme skeleton) is complete; what follows is this site's own. This repository's history holds the plan and site details, so the template does not inherit it. WooCommerce adds payments, customer accounts and orders, with their own rules. |
 
@@ -334,6 +336,8 @@ new findings added as steps.
    `functions.php`, activated locally on a copy. Includes the
    file-permission check folded in from 3c: files the user creates in the mounted theme folder
    stay owned by the user and are not world-writable (`DEVCONTAINER_SETUP.md` rule 11).
+   The browser tests gain an accessibility check (axe) and a check that fails on any
+   Content-Security-Policy violation (`docs/SITE_CHECKLIST.md` 3.2, 6.7, 7.1).
    At the end of the step: the user decides whether to start the template project now (D18,
    `template-notes.md`). Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
@@ -349,7 +353,7 @@ new findings added as steps.
      in the admin with its songs and notifies the user; the user clicks "Approve and send", and
      the site emails the visitor links to those songs' clips that expire after a set time. Needs
      spam protection, a privacy policy page, and checked input with protection against forged
-     submissions (`docs/BEST_PRACTICES.md` 6.4, 10.1, 10.3). The form tool is chosen at this
+     submissions (`docs/SITE_CHECKLIST.md` 6.4, 10.1, 10.3). The form tool is chosen at this
      step. Status: `[ ]`
    - 5c. **Private clips per song.** A short audio clip per song, stored where it cannot be
      reached by a plain URL, and served only through 5b's expiring links. Recording and the
@@ -367,7 +371,7 @@ new findings added as steps.
      - Every dial has a "no preference, the user's call" option (D10). How the dials combine is
        tuned with the real songs, by checking that suggested sets look like real sets.
      Possible: a live preview of the songs most likely in the set as the dials move (decided in
-     2b). Sliders work with keyboard and screen readers (`docs/BEST_PRACTICES.md` 7.2). Stored
+     2b). Sliders work with keyboard and screen readers (`docs/SITE_CHECKLIST.md` 7.2). Stored
      in the admin with the request, so the user sees what the client wants before planning the
      set. Layout worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
      the music they want, and gives the user the details before the conversation. Status: `[ ]`
@@ -375,17 +379,17 @@ new findings added as steps.
    Hostinger's auto-updates plugin and mu-plugin (open item 3), or keep them while the site is at
    Hostinger. FluentSMTP is already chosen
    (D13); its email log holds visitors' addresses, so its retention is set here
-   (`docs/BEST_PRACTICES.md` 10.2). Status: `[ ]`
+   (`docs/SITE_CHECKLIST.md` 10.2). Status: `[ ]`
 7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
    Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
    Hostinger updater updates only WordPress itself, open item 3), and the authenticated mail
-   service with its DNS records (`docs/BEST_PRACTICES.md` 11.1, 11.2). Outgoing ports there are
+   service with its DNS records (`docs/SITE_CHECKLIST.md` 11.1, 11.2). Outgoing ports there are
    all open except 0 and 25, so FluentSMTP can use the service's SMTP (587/465) or its API. The
    mail service must work before the request form (5b) goes live. Also to evaluate here:
    Hostinger's object cache (offered for free on 2026-11-02, declined during step 0f), tested
    on the staging site first; blocking public access to plugin and theme `readme.txt` files,
-   which show the installed versions (`docs/BEST_PRACTICES.md` 3.6). From 3g-1 (2026-11-03),
+   which show the installed versions (`docs/SITE_CHECKLIST.md` 3.6). From 3g-1 (2026-11-03),
    for the live site: whether Wordfence's firewall is optimized (it edits `.htaccess`; with a
    backup, and the site checked afterwards); two-factor login required for the Administrator
    role, as on staging; and Wordfence's auto-updates, decided with the rest of the updates.
