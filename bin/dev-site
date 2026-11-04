@@ -114,7 +114,7 @@ create_test_content() {
     position=$((position + 1))
     page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="$title" \
       --menu_order="$position" --porcelain \
-      --post_content="<!-- wp:paragraph --><p>Sample text for the dev site's $title page. The real content comes with step 2b.</p><!-- /wp:paragraph -->")"
+      --post_content="<!-- wp:image --><figure class=\"wp-block-image\"><img src=\"/wp-includes/images/w-logo-blue.png\"/></figure><!-- /wp:image -->")"
     [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
   done
   wp_cli option update show_on_front page >/dev/null
