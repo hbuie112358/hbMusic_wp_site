@@ -43,6 +43,9 @@ services:
 
   wordpress:
     image: wordpress:7.1.4-php8.4-apache
+    # Apache's headers module ships with the image but is off; the security headers need it.
+    # The image's own start script still runs, with apache2-foreground, so WordPress is set up.
+    entrypoint: ["sh", "-c", "a2enmod -q headers && exec docker-entrypoint.sh apache2-foreground"]
     depends_on:
       db:
         condition: service_healthy
@@ -53,6 +56,8 @@ services:
     volumes:
       - wp_html:/var/www/html
       - *theme-mount
+      # The security headers (docs/SITE_CHECKLIST.md 3.2), from their one place, read-only.
+      - ./config/security-headers.conf:/etc/apache2/conf-enabled/zz-security-headers.conf:ro
 
   cli:
     image: wordpress:cli-2.12-php8.4

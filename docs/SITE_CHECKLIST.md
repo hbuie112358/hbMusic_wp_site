@@ -129,8 +129,7 @@ a nonce-based policy is used where a site handles payments or accounts. Also
   WordPress updates that add inline code keep working.
 - Check: the response headers carry the policy and the other headers, and the browser tests
   fail on any CSP violation, so an update that needs a new source shows up on staging first.
-- Kind: general · Status: planned: the browser tests' CSP check at step 4; the headers on the
-  server at step 8.
+- Kind: general · Status: partly: the policy and the other headers are sent on the dev site's visitor pages from `config/security-headers.conf`, and the browser tests fail on a missing header or any violation (4c; WordPress's emoji script, which the policy refused, is switched off in the theme); the admin pages and the live server at step 8.
 
 **3.3 A PHP version under active security support, that the WordPress version in use supports;
 set per site where the host allows it, with staging on the same version as live, and a new
@@ -341,7 +340,7 @@ capability; every REST route has a `permission_callback`.**
 **6.6 Every PHP file stops if loaded directly (`defined( 'ABSPATH' ) || exit;`).**
 - Why: a file opened by URL cannot run out of context.
 - Check: code review finds the guard in every PHP file of the theme and the site plugin.
-- Kind: WordPress · Status: planned: step 4 onwards.
+- Kind: WordPress · Status: in force: the theme's `functions.php` has the guard (4c); every new PHP file from now on.
 
 **6.7 Scripts and styles are loaded with `wp_enqueue_script` / `wp_enqueue_style`, with
 versions. The child theme writes no `<script>` tags or inline event handlers (`onclick=` and
@@ -351,7 +350,7 @@ similar) in templates, patterns or PHP output; data for scripts goes through Wor
   nothing of ours stands in the way of a stricter, nonce-based policy later.
 - Check: code review and the page source find no script of ours outside enqueued files, and the
   browser tests' CSP check passes.
-- Kind: WordPress · Status: planned: step 4 onwards.
+- Kind: WordPress · Status: in force: the theme writes no script of its own, and the CSP check runs on every dev-site page (4c).
 
 **6.8 Functions, hooks and handles carry a theme prefix; all text is translatable with the
 theme's text domain.**
@@ -363,16 +362,14 @@ theme's text domain.**
 **6.9 No PHP errors, warnings or notices with debug on.**
 - Why: notices hide real problems and leak paths.
 - Check: on the local site with `WP_DEBUG` on, every template visited leaves the debug log empty.
-- Kind: WordPress · Status: planned: step 4 onwards (the old theme's one deprecation notice, 3a,
-  goes with it).
+- Kind: WordPress · Status: in force on the dev site: a scenario check visits every page and fails on any debug log entry (4c); the old theme's deprecation notice (3a) goes with it at step 9.
 
 ## 7. Accessibility
 
 **7.1 WCAG 2.2 level AA.**
 - Why: usable by everyone; the common legal and professional standard.
 - Check: the automated check (axe) reports no errors, and the manual checks below pass.
-- Kind: general · Status: planned: axe in the browser tests at step 4; the full check with the
-  visible parts after 2b.
+- Kind: general · Status: partly: axe at WCAG 2.2 AA on every dev-site page (4c); the manual checks with the visible parts after 2b.
 
 **7.2 Full keyboard use: visible focus, logical order, a skip link, no traps (menus, players,
 embeds included).**
@@ -395,7 +392,7 @@ captions or transcripts where they carry speech.**
 **7.5 Headings in order, landmarks in place, link text that makes sense alone.**
 - Why: screen-reader users navigate by them.
 - Check: the automated check passes, and each page's heading outline has no skipped level.
-- Kind: general · Status: planned: step 4 (templates) and after 2b.
+- Kind: general · Status: partly: axe checks landmarks and list structure on every dev-site page (4c); headings and link texts with the content after 2b.
 
 **7.6 Media never autoplays with sound.**
 - Why: autoplay interferes with screen readers and surprises visitors.

@@ -20,8 +20,8 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** step 4, split into 4a (the theme files) and 4b (the dev site), both done on
-  2026-11-04, then 4c (the dev site's browser tests) and 4d (those tests on GitHub); then 3g-3
+- **Next:** step 4: 4a (the theme files), 4b (the dev site) and 4c (its tests) done on
+  2026-11-04; then 4d (those tests on GitHub), the user's template decision (D18), then 3g-3
   (the deploy workflow); 3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
   restricted deploy key) and the review of `docs/SITE_CHECKLIST.md`. Dependabot runs weekly
   since 2026-11-02; 3h was dropped by the user.
@@ -398,9 +398,32 @@ new findings added as steps.
      scripts, so they show briefly in the computer's list of running programs (accepted by the
      user: local passwords only, on a single-user computer; handing them over by name with
      `-e` would remove it). Status: `[ ]`
-   - 4c. **Browser tests for the fresh site:** the child theme active, no PHP notices (checklist
-     6.9), axe without errors (7.1), no CSP violations with the policy sent from one place in the
-     repository (3.2). Status: `[ ]`
+   - 4c. **Tests for the dev site.** The Playwright tests run in two projects, `local`
+     (`specs/local/`, the old-site copy) and `dev` (`specs/dev/`), each with its own address;
+     `bin/test`'s groups run their own. For every test page the dev tests check: it loads
+     through the child theme (closing 4a's MEDIUM item: the theme had not been loaded yet); the
+     security headers are sent (so the next check cannot pass on nothing); the browser reports
+     no Content-Security-Policy violation; axe finds no error at WCAG 2.2 AA. A scenario check
+     visits every page and fails on any entry in WordPress's debug log (checklist 6.9). The
+     headers live in `config/security-headers.conf` (new folder, allow-listed by the user):
+     approach B of the checklist review, on visitor pages only (the admin and login at step 8,
+     user's choice); the dev site's Apache reads the file read-only, its headers module switched
+     on at start (`a2enmod headers`, user's choice over a custom image). New dependency,
+     `@axe-core/playwright` 4.14.0 with `axe-core` 4.14.0 (user's choice), checked first per
+     `AI_SECURITY.md` section 4: the exact name in the npm registry, published by Deque (axe's
+     makers) since 2021, 19 and 29 days old, no install scripts; added to the lock file with npm
+     alone (`bin/tools-update` would also have updated the Composer tools); the lock gained only
+     these two. Findings on the way: WordPress core's emoji script starts a `blob:` worker the
+     policy refuses, and loads emoji images from WordPress.org's servers; switched off in the
+     theme's first `functions.php` by the user's choice (option A, rather than allowing `blob:`
+     workers). The header's navigation fell back to WordPress's automatic page list, which nests
+     a list in a list (an axe error), because the test content had no real menu: `bin/dev-site`
+     now creates one, as the live site will have. axe's failure message now names the
+     offending element. Proven by planted faults, each restored: an image without alt text
+     (axe failed), an image from a foreign site (the CSP check failed), a PHP warning in
+     `functions.php` (the log check failed), the policy header removed (the header test failed
+     on every page while the violation test passed, showing why both exist). Checklist 3.2,
+     6.6, 6.7, 6.9, 7.1 and 7.5 updated. Status: `[ ]`
    - 4d. **The same tests on GitHub,** on every pull request. Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:

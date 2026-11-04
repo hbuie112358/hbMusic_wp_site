@@ -50,9 +50,12 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   backup, so CI can build it too.
 - `bin/test [local|dev]`: the tests in two groups, both without an argument. **local**, against
   the old-site copy: the scenario checks in `tests/scenario/` (bash, sharing `lib.sh`), then the
-  browser tests in `tests/e2e/` in the official Playwright container (`--network host`, seeing
-  only `tests/e2e/`). **dev**, against the dev site: the scenario checks named
-  `tests/scenario/dev-*.sh`. A group whose site does not answer fails, never skipped. Run it
+  browser tests in `tests/e2e/specs/local/` in the official Playwright container (`--network
+  host`, seeing only `tests/e2e/`). **dev**, against the dev site: the scenario checks named
+  `tests/scenario/dev-*.sh` (read-only theme mount, an empty PHP debug log), then the browser
+  tests in `tests/e2e/specs/dev/` (child theme active, security headers sent, no CSP violation,
+  no axe accessibility error at WCAG 2.2 AA). A group whose site does not answer fails, never
+  skipped. Run it
   after `bin/local-import` or `bin/dev-site`, after every FluentSMTP update, and before every
   commit that touches a site or the theme. Every test runs even after a failure; exit status 1
   if any failed.
@@ -79,6 +82,10 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
   differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling
   both site scripts share.
+- `config/security-headers.conf`: the site's security headers (Content-Security-Policy and the
+  others, `docs/SITE_CHECKLIST.md` 3.2), in one place: the dev site's Apache reads it, and the
+  live server gets the same lines at plan step 8. Each outside source added to the policy is
+  listed there with its reason.
 
 ## Testing
 
@@ -88,10 +95,14 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   such as mail delivery, the configuration script's and `.env`'s safety stops, and (the
   `dev-*.sh` checks, against the dev site) the read-only theme mount. Plain bash: the bats
   framework would need the Docker socket in its container.
-- **Browser tests** (`tests/e2e/`, Playwright): pages, menu and content as a visitor sees them.
-  Their expected numbers are facts of the fixed dump in `db/` (plan step 2 inventory).
+- **Browser tests** (`tests/e2e/`, Playwright, two projects): `local`, the old-site copy's
+  pages, menu and content as a visitor sees them, with expected numbers that are facts of the
+  fixed dump in `db/` (plan step 2 inventory); `dev`, the new theme on the dev site, with axe
+  (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
+  reports.
 - **PHPUnit** (unit and integration against a separate test database) arrives at plan step 5a
-  with its first real tests; **accessibility checks** (axe) arrive with the new theme at step 4.
+  with its first real tests; **accessibility checks** (axe) run in the dev browser tests since
+  step 4c.
 - A new test is shown to fail on a planted fault before it counts as working.
 
 ## Framework

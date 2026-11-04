@@ -12,7 +12,8 @@ template project starts; until then, a list, not a to-do.
   `compose.dev.yaml` (`name:`), and the database volume names derived from them in
   `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`).
 - The dev site's title, test pages and admin: `bin/dev-site` (`TEST_PAGES`, the title in
-  `install_wordpress`) and `.env.example` (`DEV_*`).
+  `install_wordpress`) and `.env.example` (`DEV_*`); the browser tests' list of the same pages,
+  `TEST_PATHS` in `tests/e2e/specs/dev/theme.spec.ts`.
 - The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and
   `@package` tag in `local/wp-cli/` and `tools/phpstan/stubs/`.
@@ -46,6 +47,8 @@ template project starts; until then, a list, not a to-do.
 
 - `bin/check`, `bin/test`, `bin/tools-update`, `tools/versions.sh` (apart from the names above),
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
+- `config/security-headers.conf` (each site adds its own outside sources, with their reasons),
+  and the theme's `functions.php` switching off WordPress's emoji script.
 - Mail through FluentSMTP into Mailpit (D13), with `local/wp-cli/configure-fluentsmtp-mailpit.php`
   apart from its prefix.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).

@@ -118,6 +118,21 @@ create_test_content() {
     [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
   done
   wp_cli option update show_on_front page >/dev/null
+  create_navigation_menu
+}
+
+# A real navigation menu with the test pages, as the live site will have. Without one, the
+# theme's header falls back to WordPress's automatic page list, which nests a list directly in
+# a list (an accessibility error the real site would not have). The navigation block uses the
+# newest menu when none is chosen.
+create_navigation_menu() {
+  local title links="" address
+  for title in "${TEST_PAGES[@]}"; do
+    address="$(wp_cli post list --post_type=page --title="$title" --field=url)"
+    links+="<!-- wp:navigation-link {\"label\":\"$title\",\"url\":\"$address\",\"kind\":\"post-type\",\"type\":\"page\"} /-->"
+  done
+  wp_cli post create --post_type=wp_navigation --post_status=publish --post_title="Main menu" \
+    --post_content="$links" --porcelain >/dev/null
 }
 
 # A fresh debug log, so the browser tests (4c) see only what this build's pages cause.
