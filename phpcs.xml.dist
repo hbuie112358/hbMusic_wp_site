@@ -4,9 +4,10 @@
 	xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
 	<description>The project's PHP follows the WordPress Coding Standards (plan step 3d).</description>
 
-	<!-- The project's own PHP. The child theme (step 4) and the site plugin (step 5a) are added
-	     here when they exist: PHPCS stops with an error on a path that does not exist. -->
+	<!-- The project's own PHP. The site plugin (step 5a) is added here when it exists: PHPCS
+	     stops with an error on a path that does not exist. -->
 	<file>local</file>
+	<file>themes</file>
 
 	<!-- Stubs describe other projects' code for PHPStan; their style follows those projects. -->
 	<exclude-pattern>/tools/phpstan/stubs/*</exclude-pattern>

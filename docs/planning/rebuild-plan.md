@@ -20,8 +20,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** the start of step 4 (the child theme skeleton), then 3g-3 (the deploy workflow);
-  3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
+- **Next:** step 4, split into 4a (the theme files, done 2026-11-04 on its commit), 4b (the
+  fresh local site), 4c (its browser tests) and 4d (those tests on GitHub); then 3g-3 (the
+  deploy workflow); 3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
   restricted deploy key) and the review of `docs/SITE_CHECKLIST.md`. Dependabot runs weekly
   since 2026-11-02; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -339,7 +340,35 @@ new findings added as steps.
    The browser tests gain an accessibility check (axe) and a check that fails on any
    Content-Security-Policy violation (`docs/SITE_CHECKLIST.md` 3.2, 6.7, 7.1).
    At the end of the step: the user decides whether to start the template project now (D18,
-   `template-notes.md`). Status: `[ ]`
+   `template-notes.md`). Status: `[~]`
+   Split by the user's choice (2026-11-04). Found first: activating the theme on the old-site
+   copy would break that copy's tests (they check the old theme's menu) and lose the reference,
+   so the user chose a second, fresh local site for the new theme, the old-site copy kept as
+   it is; the CSP check needs a site that actually sends the policy, or it proves nothing; and
+   the checks did not cover `themes/`.
+   - 4a. **The theme files.** `style.css` (the header only: "Howard Buie Music", parent Twenty
+     Twenty-Five, text domain `hbmusic`, PHP 8.4, WordPress 7.1, GPL-2.0-or-later, no author
+     line, all by the user's choice; no domain in the description, the project rule on theme
+     code) and `theme.json` (the 7.1 schema and version 3; the design comes in 2b).
+     `functions.php` is left out until the theme has its first PHP to hold (loading CSS, or a
+     feature): an empty file with only the load guard would be a placeholder. `bin/check`'s
+     analysis container sees `themes/` read-only, and PHPCS and PHPStan check it; proven by a
+     planted file (an unprefixed function, unescaped and unsanitized input, a type error) that
+     made both fail, then passed after its removal. The WordPress coding standards check PHP
+     only (WPCS 3.4.1 has no JavaScript or CSS sniffs): ESLint and Stylelint (`@wordpress/scripts`)
+     come with the theme's first JavaScript or CSS, and a `theme.json` schema check with its
+     content in 2b. Review fix (LOW, fixed at the user's request rather than deferred): a new
+     `bin/check` step fails when `theme.json`'s schema version differs from the WordPress
+     version pinned in `compose.yaml`, so a WordPress update cannot leave the schema behind
+     (the version-free "trunk" schema was not used: it describes WordPress in development);
+     proven by a 7.2 schema and a missing schema line. 12 checks now. Status: `[ ]`
+   - 4b. **The fresh local site:** a second WordPress on port 10102 with its own database, the
+     theme mounted read-only and activated, scripted test content (a few pages and a menu, no
+     real data), mail into the same Mailpit, and the permission check of 3c. Status: `[ ]`
+   - 4c. **Browser tests for the fresh site:** the child theme active, no PHP notices (checklist
+     6.9), axe without errors (7.1), no CSP violations with the policy sent from one place in the
+     repository (3.2). Status: `[ ]`
+   - 4d. **The same tests on GitHub,** on every pull request. Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme

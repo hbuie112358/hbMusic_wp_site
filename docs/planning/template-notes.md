@@ -16,6 +16,8 @@ template project starts; until then, a list, not a to-do.
   lock file (`hbmusic-e2e`).
 - The cache volumes: `tools/versions.sh` (`hbmusic_composer_cache`, `hbmusic_npm_cache`).
 - The theme folder: `themes/hbmusic-child/` and its line in `.gitignore`.
+- The theme's header in `themes/hbmusic-child/style.css`: its name ("Howard Buie Music") and
+  description; the parent, text domain, versions and licence stay.
 
 ## Settings
 

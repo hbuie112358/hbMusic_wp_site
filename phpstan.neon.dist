@@ -7,9 +7,10 @@ parameters:
     level: max
     # The site runs PHP 8.4 (compose.yaml), whatever PHP the tools container has.
     phpVersion: 80400
-    # The child theme (step 4) and the site plugin (step 5a) are added when they exist.
+    # The site plugin (step 5a) is added when it exists.
     paths:
         - local
+        - themes
     # Hand-written stubs for the few outside classes the project's code calls (see the files for why).
     scanFiles:
         - tools/phpstan/stubs/wp-cli.php
