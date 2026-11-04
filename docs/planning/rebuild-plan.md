@@ -424,7 +424,16 @@ new findings added as steps.
      `functions.php` (the log check failed), the policy header removed (the header test failed
      on every page while the violation test passed, showing why both exist). Checklist 3.2,
      6.6, 6.7, 6.9, 7.1 and 7.5 updated. Status: `[ ]`
-   - 4d. **The same tests on GitHub,** on every pull request. Status: `[ ]`
+   - 4d. **The dev site's tests on GitHub.** A second job, `dev-site`, in
+     `.github/workflows/check.yml`, next to `check` and on the same occasions (every pull
+     request, every push to `main`, weekly; the user's choice): the same pinned checkout,
+     `bin/dev-site` (a fresh `.env` with new random secrets on GitHub's machine; no backup, no
+     secrets), then `bin/test dev`. On a failure, Playwright's traces are kept for 7 days
+     through `actions/upload-artifact`, GitHub's own action, pinned by commit (v7.0.2,
+     `cf430e03`, 28 days old when chosen; the user's choice). The job becomes a required check
+     in branch protection after its first green run (the user's choice). Why on GitHub and not
+     only locally: GitHub enforces the gate in front of `main`, on a clean machine, and for
+     pull requests that never pass through the user's computer (Dependabot's). Status: `[ ]`
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
