@@ -1,7 +1,8 @@
 # Runs on each push to main, each pull request and weekly: bin/check (every static check, plan
 # step 3f), and the dev site's tests (plan step 4d): the dev site is built here from the
 # repository alone and tested with bin/test dev. The old-site copy's tests stay local: they
-# need the backup, which never leaves the user's computer.
+# need the backup, which never leaves the user's computer. On main, once both pass, the child
+# theme is deployed to the staging site (plan step 3g-3, bin/deploy-staging).
 name: check
 
 on:
@@ -12,15 +13,18 @@ on:
   # even when no code changes (Mondays 06:17 UTC; an off-minute avoids the busy hour mark).
   schedule:
     - cron: "17 6 * * 1"
+  # The "Run workflow" button: the checks, and on main the deploy (plan step 3g-3).
+  workflow_dispatch:
 
 # Read-only access to the repository is all the checks need.
 permissions:
   contents: read
 
-# A newer push to the same branch makes the older run pointless.
+# A newer push to a pull request makes its older run pointless. On main, runs are not cancelled:
+# a deploy stopped half-way would leave staging with half a theme.
 concurrency:
   group: check-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -64,3 +68,32 @@ jobs:
           path: tests/e2e/test-results/
           retention-days: 7
           if-no-files-found: ignore
+
+  # The deploy to staging (plan step 3g-3): only after both jobs above pass, only on main, and
+  # only for a push or the "Run workflow" button, never for a pull request or the weekly run.
+  # Its secrets exist only in the "staging" environment, which accepts only protected branches.
+  deploy-staging:
+    needs: [check, dev-site]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: staging
+    # One deploy at a time, and a running one always finishes.
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Deploy the child theme to staging (bin/deploy-staging)
+        run: bin/deploy-staging
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_SSH_USER: ${{ secrets.DEPLOY_SSH_USER }}
+          DEPLOY_SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          STAGING_CHECK_USER: ${{ secrets.STAGING_CHECK_USER }}
+          STAGING_CHECK_PASSWORD: ${{ secrets.STAGING_CHECK_PASSWORD }}
+          STAGING_URL: ${{ vars.STAGING_URL }}

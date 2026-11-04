@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Deploys the child theme to the staging site (plan step 3g-3), run by the deploy-staging job
+# in .github/workflows/check.yml after every check has passed on main. The key can only write
+# into staging's theme folder: the server forces rsync's daemon mode with one destination
+# (plan step 3g-2), so no setting here can reach the live site.
+#
+# Then two checks: the staging folder matches the repository's theme folder file by file
+# (checksums), and a staging page, opened with the check-only login of the site-wide password,
+# shows the child theme active.
+#
+# Settings, from the GitHub environment "staging" (never from the repository):
+#   DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, DEPLOY_SSH_USER, DEPLOY_SSH_HOST   (secrets, 3g-2)
+#   STAGING_CHECK_USER, STAGING_CHECK_PASSWORD                            (secrets, 3g-3)
+#   STAGING_URL                                                           (variable, 3g-3)
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly THEME_SOURCE="$REPO_ROOT/themes/hbmusic-child/"
+# The destination the server's rsync settings name (~/.deploy/rsyncd-staging.conf on the server).
+readonly RSYNC_DESTINATION="staging-child-theme"
+# Hostinger's SSH port, the same for every customer (not a secret).
+readonly SSH_PORT=65002
+readonly REQUIRED_SETTINGS=(
+  DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS DEPLOY_SSH_USER DEPLOY_SSH_HOST
+  STAGING_CHECK_USER STAGING_CHECK_PASSWORD STAGING_URL
+)
+# WordPress marks the active child theme on <body>, as in the dev site's browser tests.
+readonly CHILD_THEME_BODY_CLASS="wp-child-theme-hbmusic-child"
+
+log() { printf '%s [deploy-staging] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
+
+# The key and the server's identity live only in a private folder, removed however the script ends.
+SSH_DIR=""
+trap 'rm -rf "$SSH_DIR"' EXIT
+
+require_settings() {
+  local name
+  for name in "${REQUIRED_SETTINGS[@]}"; do
+    [[ -n "${!name:-}" ]] || fail "the setting $name is missing (GitHub environment 'staging')"
+  done
+}
+
+# Strict host checking: a server that does not present the pinned identity is refused, and
+# BatchMode means a refused key can never fall back to asking for a password.
+prepare_ssh() {
+  SSH_DIR="$(mktemp -d)"
+  chmod 700 "$SSH_DIR"
+  (umask 077 && printf '%s\n' "$DEPLOY_SSH_KEY" >"$SSH_DIR/key" && printf '%s\n' "$DEPLOY_KNOWN_HOSTS" >"$SSH_DIR/known_hosts")
+  RSYNC_SSH="ssh -p $SSH_PORT -i $SSH_DIR/key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SSH_DIR/known_hosts"
+}
+
+copy_theme() {
+  log "Copying the child theme to staging ($RSYNC_DESTINATION)"
+  # --delete: the staging folder becomes exactly the repository's theme folder.
+  rsync -rt --delete --itemize-changes -e "$RSYNC_SSH" "$THEME_SOURCE" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$RSYNC_DESTINATION/"
+}
+
+# A dry run comparing every file by checksum lists nothing when staging matches the repository.
+expect_identical_files() {
+  local differences
+  differences="$(rsync -rtn --delete --checksum --itemize-changes -e "$RSYNC_SSH" "$THEME_SOURCE" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$RSYNC_DESTINATION/")"
+  [[ -z "$differences" ]] || fail "staging's theme folder differs from the repository after the copy:
+$differences"
+  log "staging's theme folder matches the repository, file by file"
+}
+
+# The login goes to curl through its configuration on standard input, never on the command
+# line, so it does not show in the machine's list of running programs.
+expect_child_theme_active() {
+  local page login="$STAGING_CHECK_USER:$STAGING_CHECK_PASSWORD"
+  # In curl's configuration a quoted value treats \ and " specially; escaped, any password works.
+  login="${login//\\/\\\\}"
+  login="${login//\"/\\\"}"
+  page="$(printf 'user = "%s"\n' "$login" |
+    curl --config - -fsS --max-time 30 "${STAGING_URL%/}/")" || fail "the staging home page did not load with the check login"
+  [[ "$page" == *"$CHILD_THEME_BODY_CLASS"* ]] || fail "the staging home page does not show the child theme as active ($CHILD_THEME_BODY_CLASS); activate it under Appearance → Themes"
+  log "the staging home page shows the child theme active"
+}
+
+main() {
+  require_settings
+  prepare_ssh
+  copy_theme
+  expect_identical_files
+  expect_child_theme_active
+}
+
+main "$@"
