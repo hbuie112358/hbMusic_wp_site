@@ -11,20 +11,20 @@ new findings added as steps.
 - **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34),
   3b (local mail into Mailpit through FluentSMTP, f389f76), 3d (code checks, `bin/check`,
   14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
-  branch protection, and the Dependabot follow-up) done; 3c folded into step 4. The old site is
-  still live, secured. Pull requests #1 and #2 merged on 2026-11-02 (the first one's check sat
-  in GitHub's queue for almost two hours before passing).
+  branch protection, and the Dependabot follow-up) done; 3g-1 (the staging site) and 3g-2 (the
+  restricted deploy key) done on 2026-11-03, with the review of `docs/SITE_CHECKLIST.md`;
+  step 4 (the child theme, the dev site, its tests, and those tests as a required check on
+  GitHub) done on 2026-11-04; 3h dropped by the user. The old site is still live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
   log shows no break-in; the live site's PHP and plugins are current since step 0f
   (2026-11-02), and the old staging copy is removed (0g).
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
-  Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
+  Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
+  theme folder, and password logins cannot be switched off (3g-2).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** step 4: 4a (the theme files), 4b (the dev site) and 4c (its tests) done on
-  2026-11-04; then 4d (those tests on GitHub), the user's template decision (D18), then 3g-3
-  (the deploy workflow); 3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
-  restricted deploy key) and the review of `docs/SITE_CHECKLIST.md`. Dependabot runs weekly
-  since 2026-11-02; 3h was dropped by the user.
+- **Next:** 3g-3 (the deploy workflow), built on 2026-11-04, its proof on GitHub pending; then
+  the template project (D18, decided by the user: after 3g-3), or 5a first, the user's
+  choice; 3i whenever the user chooses.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -315,7 +315,27 @@ new findings added as steps.
        it refuses unless the target folder holds a marker file naming it as staging, copies only
        the allow-listed folders with `rsync`, and ends with a smoke test (the staging site
        answers, behind its password). Shown to refuse on planted wrong settings. Comes after the
-       child theme skeleton of step 4, which it deploys first. Status: `[ ]`
+       child theme skeleton of step 4, which it deploys first. Built 2026-11-04, with the
+       user's choices: the job `deploy-staging` in `.github/workflows/check.yml` runs after
+       `check` and `dev-site` pass, only on `main`, for a push or the "Run workflow" button
+       (added), never for a pull request or the weekly run, in the `staging` environment; one
+       deploy at a time, never cancelled (runs on `main` are no longer cancelled by newer ones;
+       pull requests still are). `bin/deploy-staging` writes the key and the pinned server
+       identity to a private temporary folder (strict host checking, no password fallback),
+       copies `themes/hbmusic-child/` with `rsync --delete` to the one destination the server
+       allows, then checks that staging's folder matches the repository file by file
+       (checksums) and that a staging page, opened with a check-only login of the site-wide
+       password, shows the child theme active. The marker file was dropped: since 3g-2 the
+       server decides the only destination, so no setting in GitHub can reach the live site.
+       The check-only login (`github-check`, added by the user in Password Protect
+       Directories; secrets `STAGING_CHECK_USER`, `STAGING_CHECK_PASSWORD`; the address as the
+       environment variable `STAGING_URL`, so the workflow names no domain) passes only the
+       outer lock, not WordPress's login; it lives as long as the staging site and goes with
+       it (step 10), and is replaced if exposed. Proof planned without a test-only switch
+       (`TESTING_APPROACH.md`): the key's restrictions were proven in 3g-2; here, the first
+       deploy (its page check failing until the user activates the child theme on staging,
+       then passing) and a manual run on a throwaway branch, which the environment must
+       refuse. Status: `[ ]`
    - 3h. ~~**No network for the check tools while they run.** `bin/check` installs packages with
      network access, then runs PHPCS, PHPStan, TypeScript, ShellCheck and actionlint in
      containers without it (`--network none`), so a hijacked tool version that slipped past
@@ -340,7 +360,7 @@ new findings added as steps.
    The browser tests gain an accessibility check (axe) and a check that fails on any
    Content-Security-Policy violation (`docs/SITE_CHECKLIST.md` 3.2, 6.7, 7.1).
    At the end of the step: the user decides whether to start the template project now (D18,
-   `template-notes.md`). Status: `[~]`
+   `template-notes.md`): decided 2026-11-04, later, after 3g-3, so the template includes the deploy pipeline. Status: `[x]` (4a 0e5ca45, 4b dd9a4da, 4c 80461f7, 4d 350c03c)
    Split by the user's choice (2026-11-04). Found first: activating the theme on the old-site
    copy would break that copy's tests (they check the old theme's menu) and lose the reference,
    so the user chose a second, fresh local site for the new theme, the old-site copy kept as
@@ -361,7 +381,7 @@ new findings added as steps.
      `bin/check` step fails when `theme.json`'s schema version differs from the WordPress
      version pinned in `compose.yaml`, so a WordPress update cannot leave the schema behind
      (the version-free "trunk" schema was not used: it describes WordPress in development);
-     proven by a 7.2 schema and a missing schema line. 12 checks now. Status: `[ ]`
+     proven by a 7.2 schema and a missing schema line. 12 checks now. Status: `[x]` 0e5ca45
    - 4b. **The dev site** (named by the user): a second, separate Compose project
      (`compose.dev.yaml`, `hbmusic-dev`), so it runs alone, also in CI: MariaDB 11.8.9,
      WordPress 7.1.4 on PHP 8.4, WP-CLI, on `127.0.0.1:10102`; the child theme mounted read-only
@@ -397,7 +417,7 @@ new findings added as steps.
      `.env`, readable only by the user) reach WP-CLI as command-line arguments in both site
      scripts, so they show briefly in the computer's list of running programs (accepted by the
      user: local passwords only, on a single-user computer; handing them over by name with
-     `-e` would remove it). Status: `[ ]`
+     `-e` would remove it). Status: `[x]` dd9a4da
    - 4c. **Tests for the dev site.** The Playwright tests run in two projects, `local`
      (`specs/local/`, the old-site copy) and `dev` (`specs/dev/`), each with its own address;
      `bin/test`'s groups run their own. For every test page the dev tests check: it loads
@@ -423,7 +443,7 @@ new findings added as steps.
      (axe failed), an image from a foreign site (the CSP check failed), a PHP warning in
      `functions.php` (the log check failed), the policy header removed (the header test failed
      on every page while the violation test passed, showing why both exist). Checklist 3.2,
-     6.6, 6.7, 6.9, 7.1 and 7.5 updated. Status: `[ ]`
+     6.6, 6.7, 6.9, 7.1 and 7.5 updated. Status: `[x]` 80461f7
    - 4d. **The dev site's tests on GitHub.** A second job, `dev-site`, in
      `.github/workflows/check.yml`, next to `check` and on the same occasions (every pull
      request, every push to `main`, weekly; the user's choice): the same pinned checkout,
@@ -433,7 +453,13 @@ new findings added as steps.
      `cf430e03`, 28 days old when chosen; the user's choice). The job becomes a required check
      in branch protection after its first green run (the user's choice). Why on GitHub and not
      only locally: GitHub enforces the gate in front of `main`, on a clean machine, and for
-     pull requests that never pass through the user's computer (Dependabot's). Status: `[ ]`
+     pull requests that never pass through the user's computer (Dependabot's). Proven on GitHub:
+     both jobs green on its pull request (#10; dev-site 1 min 50 s, the permission check also
+     passing with Docker as root), `dev-site` then made a required check; a draft pull request
+     with a planted fault (#11, images without alt text) turned `dev-site` red on axe's
+     image-alt rule while `check` stayed green, GitHub marked it blocked, the traces were
+     stored (3.6 MB, 7 days), and it was closed unmerged with its branch deleted. Status:
+     `[x]` 350c03c
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
    - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
