@@ -2,7 +2,8 @@
 # Runs the tests (plan steps 3e, 4b) in two groups:
 #   local  the old-site copy (bin/local-import): the scenario checks in tests/scenario/ and the
 #          browser tests in tests/e2e/, in the official Playwright container;
-#   dev    the dev site (bin/dev-site): the scenario checks named tests/scenario/dev-*.sh.
+#   dev    the dev site (bin/dev-site): the scenario checks named tests/scenario/dev-*.sh and
+#          the browser tests in tests/e2e/specs/dev/.
 # Usage: bin/test [local|dev]; without an argument, both groups. A group whose site does not
 # answer fails, it is never skipped. Every test runs even after a failure; the exit status is
 # 1 if any failed.
@@ -34,12 +35,19 @@ site_answers() {
 
 # The container sees only tests/e2e/. Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
+# The project (local or dev) names both the tests and the site they run against
+# (tests/e2e/playwright.config.ts); only that site's address is passed in.
 browser_tests() {
+  local project="$1" address_setting
+  case "$project" in
+    local) address_setting="BASE_URL=http://localhost:${SITE_PORT}" ;;
+    dev) address_setting="DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" ;;
+  esac
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    -e BASE_URL="http://localhost:${SITE_PORT}" -e LIVE_ADDRESSES \
-    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
+    -e "$address_setting" -e LIVE_ADDRESSES -e PROJECT="$project" \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test --project="$PROJECT"'
 }
 
 run_test() {
@@ -72,7 +80,7 @@ local_group() {
     [[ "$name" == "lib" || "$name" == dev-* ]] && continue
     run_test "Scenario: $name" bash "$scenario"
   done
-  run_test "Browser tests (Playwright)" browser_tests
+  run_test "Browser tests (Playwright, local)" browser_tests local
 }
 
 dev_group() {
@@ -81,6 +89,7 @@ dev_group() {
   for scenario in "$REPO_ROOT"/tests/scenario/dev-*.sh; do
     run_test "Scenario (dev): $(basename "$scenario" .sh)" bash "$scenario"
   done
+  run_test "Browser tests (Playwright, dev)" browser_tests dev
 }
 
 main() {
