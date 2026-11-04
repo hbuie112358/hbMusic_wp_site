@@ -31,30 +31,43 @@ The old site, as exported:
 
 ## Commands
 
-The local copy of the old site runs in Docker Compose (`compose.yaml`; settings in `.env`,
-created from `.env.example` with random secrets; `.env` is never committed). This project's
-ports are the **101xx** block: the site on 10100, the Mailpit inbox on 10101, the rest of the
-block for later needs.
+Two local sites run in Docker Compose, with their settings in one `.env` (created from
+`.env.example` with random secrets; never committed): the **old-site copy** (`compose.yaml`,
+the reference for the rebuild) and the **dev site** (`compose.dev.yaml`, a fresh WordPress
+with the new child theme and test content, for building the theme). This project's ports are
+the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the dev site on
+10102, the rest of the block for later needs.
 
 - `bin/local-import`: builds or rebuilds the local copy from `wordpress/` and `db/`
   (read-only): fresh database, live addresses replaced, Wordfence and UpdraftPlus switched off,
   a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`), and
   FluentSMTP installed at a pinned version, checked against WordPress.org's checksums and
   pointed at Mailpit.
-- `bin/test`: every test against the running local copy: the scenario checks in
-  `tests/scenario/` (bash, sharing `lib.sh`), then the browser tests in `tests/e2e/` in the
-  official Playwright container (`--network host`, seeing only `tests/e2e/`). Run it after
-  `bin/local-import`, after every FluentSMTP update, and before every commit that touches the
-  site. Every test runs even after a failure; exit status 1 if any failed.
-- Site: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
-- `docker compose stop` / `docker compose start`: stop and start without losing anything.
-- `docker compose run --rm cli wp <command>`: WP-CLI against the local copy.
-- `docker compose down -v` deletes the local database and files (the volumes); Claude runs it
-  only when the user asks. `bin/local-import` rebuilds them.
+- `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
+  WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
+  `tools/versions.sh`, the child theme mounted read-only and activated, test pages with
+  neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
+  backup, so CI can build it too.
+- `bin/test [local|dev]`: the tests in two groups, both without an argument. **local**, against
+  the old-site copy: the scenario checks in `tests/scenario/` (bash, sharing `lib.sh`), then the
+  browser tests in `tests/e2e/` in the official Playwright container (`--network host`, seeing
+  only `tests/e2e/`). **dev**, against the dev site: the scenario checks named
+  `tests/scenario/dev-*.sh`. A group whose site does not answer fails, never skipped. Run it
+  after `bin/local-import` or `bin/dev-site`, after every FluentSMTP update, and before every
+  commit that touches a site or the theme. Every test runs even after a failure; exit status 1
+  if any failed.
+- Old-site copy: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
+  Dev site: http://localhost:10102 (admin `/wp-admin`).
+- `docker compose stop` / `docker compose start`: stop and start without losing anything
+  (add `-f compose.dev.yaml` for the dev site, here and below).
+- `docker compose run --rm cli wp <command>`: WP-CLI against the old-site copy.
+- `docker compose down -v` deletes a site's database and files (the volumes); Claude runs it
+  only when the user asks. `bin/local-import` or `bin/dev-site` rebuilds them.
 - `bin/check`: every code check, in pinned containers (nothing installed on the host):
   Composer install from `composer.lock`, validation and security audit; PHPCS with the
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
-  stubs (`phpstan.neon.dist`); ShellCheck on `bin/`; the compose file. Runs every check even
+  stubs (`phpstan.neon.dist`), both over `local/` and `themes/`; `theme.json`'s schema
+  matching the pinned WordPress; ShellCheck on `bin/`; both compose files. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
@@ -62,15 +75,18 @@ block for later needs.
   (`.github/workflows/check.yml`); a pull request merges only when it passes.
 - `bin/tools-update`: the deliberate way to update the tools, `composer.lock` and
   `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
-- `tools/versions.sh`: the one place for the images these scripts use; `bin/check` fails if the
-  Playwright image and `@playwright/test` differ. npm installs run with `--ignore-scripts`.
+- `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
+  theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
+  differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling
+  both site scripts share.
 
 ## Testing
 
 - **Static checks:** `bin/check` (see Commands), before every commit; it also type-checks the
   browser tests (TypeScript, strict).
-- **Scenario checks** (`tests/scenario/`): WP-CLI-level behaviour against the running copy,
-  such as mail delivery and the configuration script's safety stops. Plain bash: the bats
+- **Scenario checks** (`tests/scenario/`): WP-CLI-level behaviour against the running sites,
+  such as mail delivery, the configuration script's and `.env`'s safety stops, and (the
+  `dev-*.sh` checks, against the dev site) the read-only theme mount. Plain bash: the bats
   framework would need the Docker socket in its container.
 - **Browser tests** (`tests/e2e/`, Playwright): pages, menu and content as a visitor sees them.
   Their expected numbers are facts of the fixed dump in `db/` (plan step 2 inventory).

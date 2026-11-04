@@ -94,6 +94,18 @@ theme_json_schema_matches_wordpress() {
   return 1
 }
 
+# The old-site copy and the dev site must run the same database, WordPress and WP-CLI, or the
+# theme is built against different versions than it is checked against.
+compose_images_match() {
+  local old_site_images dev_site_images
+  old_site_images="$(grep -E '^\s*image:' "$REPO_ROOT/compose.yaml" | grep -v mailpit | sed -E 's/^\s*image:\s*//' | sort)"
+  dev_site_images="$(grep -E '^\s*image:' "$REPO_ROOT/compose.dev.yaml" | sed -E 's/^\s*image:\s*//' | sort)"
+  [[ -n "$dev_site_images" && "$old_site_images" == "$dev_site_images" ]] && return 0
+  log "compose.yaml and compose.dev.yaml pin different images:"
+  diff <(printf '%s\n' "$old_site_images") <(printf '%s\n' "$dev_site_images") | sed 's/^/  /' >&2
+  return 1
+}
+
 # Known vulnerabilities in the browser-test packages; the container sees only the two files.
 npm_audit() {
   docker run --rm -w /npm \
@@ -114,9 +126,12 @@ actionlint_workflows() {
   docker run --rm -w /repo -v "$REPO_ROOT/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
 }
 
-compose_file_is_valid() {
-  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" \
-    --env-file "$REPO_ROOT/.env.example" config --quiet
+compose_files_are_valid() {
+  local compose_file
+  for compose_file in compose.yaml compose.dev.yaml; do
+    docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/$compose_file" \
+      --env-file "$REPO_ROOT/.env.example" config --quiet || return 1
+  done
 }
 
 run_check() {
@@ -150,10 +165,11 @@ main() {
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
+  run_check "Both sites pin the same images" compose_images_match
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
-  run_check "Compose file" compose_file_is_valid
+  run_check "Compose files" compose_files_are_valid
   report
 }
 

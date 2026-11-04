@@ -8,8 +8,12 @@ template project starts; until then, a list, not a to-do.
 
 ## The site's name and prefix
 
-- `hbmusic`, the Compose project name: `compose.yaml` (`name:`) and `bin/local-import`
-  (`COMPOSE_PROJECT`). Set in two places; one would do.
+- `hbmusic` and `hbmusic-dev`, the Compose project names: `compose.yaml` and
+  `compose.dev.yaml` (`name:`), and the database volume names derived from them in
+  `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`).
+- The dev site's title, test pages and admin: `bin/dev-site` (`TEST_PAGES`, the title in
+  `install_wordpress`) and `.env.example` (`DEV_*`).
+- The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and
   `@package` tag in `local/wp-cli/` and `tools/phpstan/stubs/`.
 - The package names: `composer.json` (`hbmusic/site-tools`), `tests/e2e/package.json` and its
@@ -29,8 +33,8 @@ template project starts; until then, a list, not a to-do.
 ## Belongs to a site moved from an old host
 
 - `bin/local-import` builds the local copy from an old site's export (`wordpress/`, `db/`): a
-  new site has none. A template needs a fresh-install path instead (WordPress and scripted test
-  content), the same one the browser tests of the new theme will need in CI (step 4).
+  new site has none. The fresh-install path a template needs exists since step 4b:
+  `bin/dev-site` with `compose.dev.yaml`, which runs without any export.
 - `.env.example`: `LOCAL_DISABLED_PLUGINS` and `LOCAL_EMPTIED_TABLES` name this site's plugins
   (Wordfence, UpdraftPlus) and their tables.
 - `tests/e2e/specs/local-import.spec.ts` checks facts of this site's dump (the menu, 108 songs,

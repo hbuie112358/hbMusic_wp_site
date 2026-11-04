@@ -10,8 +10,6 @@ readonly REPO_ROOT
 readonly ENV_FILE="$REPO_ROOT/.env"
 readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
-# The "name:" in compose.yaml; Docker names the project's volumes after it.
-readonly COMPOSE_PROJECT="hbmusic"
 # Every setting compose.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   SITE_PORT MAIL_UI_PORT DB_NAME DB_USER DB_PASSWORD DB_ROOT_PASSWORD
@@ -22,6 +20,10 @@ readonly REQUIRED_SETTINGS=(
 
 log() { printf '%s [local-import] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
+
+# .env: creating it, adding new settings, loading and checking them (shared with bin/dev-site).
+# shellcheck source=tools/settings.sh
+source "$REPO_ROOT/tools/settings.sh"
 # FUNCNAME names the chain of steps, so the message says which step failed, not only the
 # helper (such as compose) that ran the failing command.
 trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
@@ -48,67 +50,6 @@ db_client() {
 require_tools() {
   command -v docker >/dev/null || fail "docker is not installed"
   docker compose version >/dev/null 2>&1 || fail "the docker compose plugin is not installed"
-}
-
-random_secret() { od -An -N24 -tx1 /dev/urandom | tr -d ' \n'; }
-
-# Prints a line of .env.example as it goes into .env: "generate" becomes a random secret.
-expand_setting_line() {
-  local line="$1"
-  [[ "$line" == *=generate ]] && line="${line%=generate}=$(random_secret)"
-  printf '%s\n' "$line"
-}
-
-database_volume_exists() { docker volume inspect "${COMPOSE_PROJECT}_db_data" >/dev/null 2>&1; }
-
-create_env_file() {
-  # The database volume keeps the passwords it was first started with; a new .env would not
-  # match them, and the import would fail later with an unexplained "access denied".
-  if database_volume_exists; then
-    fail "there is no .env, but the local database (volume ${COMPOSE_PROJECT}_db_data) still has the passwords of an earlier one. Restore that .env, or remove the local copy with 'docker compose down -v', then run again."
-  fi
-  log "Creating .env from .env.example with new random secrets"
-  local line
-  (
-    umask 077
-    while IFS= read -r line; do expand_setting_line "$line"; done <"$REPO_ROOT/.env.example" >"$ENV_FILE"
-  )
-}
-
-# Settings added to .env.example after .env was created are appended, so an existing .env
-# (and the database passwords it holds) never has to be recreated.
-add_missing_settings() {
-  local line name
-  while IFS= read -r line; do
-    [[ "$line" =~ ^([A-Z_]+)= ]] || continue
-    name="${BASH_REMATCH[1]}"
-    grep -q "^${name}=" "$ENV_FILE" && continue
-    log "Adding the new setting $name to .env"
-    expand_setting_line "$line" >>"$ENV_FILE"
-  done <"$REPO_ROOT/.env.example"
-}
-
-ensure_env_file() {
-  if [[ ! -f "$ENV_FILE" ]]; then
-    create_env_file
-    return
-  fi
-  log "Using the existing .env"
-  add_missing_settings
-}
-
-load_env() {
-  set -a
-  # shellcheck source=/dev/null
-  source "$ENV_FILE"
-  set +a
-}
-
-require_settings() {
-  local name
-  for name in "${REQUIRED_SETTINGS[@]}"; do
-    [[ -n "${!name:-}" ]] || fail "the setting $name is missing or empty in .env (see .env.example)"
-  done
 }
 
 find_dump() {

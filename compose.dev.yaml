@@ -1,0 +1,74 @@
+# The dev site: a fresh WordPress with the child theme and scripted test content, for building
+# and testing the new theme (plan step 4b). Separate from the old-site copy (compose.yaml), so
+# it runs alone, also in CI, and never holds real data. Never used in production.
+# Settings come from .env (the DEV_ names; bin/dev-site creates or completes it).
+name: hbmusic-dev
+
+x-wordpress-env: &wordpress-env
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_NAME: ${DEV_DB_NAME:?set in .env}
+  WORDPRESS_DB_USER: ${DEV_DB_USER:?set in .env}
+  WORDPRESS_DB_PASSWORD: ${DEV_DB_PASSWORD:?set in .env}
+  WORDPRESS_TABLE_PREFIX: wp_
+  # The image's wp-config.php defines WP_DEBUG from this; defining it again warns.
+  WORDPRESS_DEBUG: "1"
+  WORDPRESS_CONFIG_EXTRA: |
+    define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    define( 'WP_HOME', 'http://localhost:${DEV_SITE_PORT}' );
+    define( 'WP_SITEURL', 'http://localhost:${DEV_SITE_PORT}' );
+    define( 'DISALLOW_FILE_EDIT', true );
+    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_DEBUG_DISPLAY', false );
+
+# The child theme from the repository, read-only: WordPress can never write into the user's
+# files, and files the user creates on the host stay the user's (the permission check of 3c).
+x-theme-mount: &theme-mount ./themes/hbmusic-child:/var/www/html/wp-content/themes/hbmusic-child:ro
+
+services:
+  db:
+    # The same versions as the old-site copy and the live site (compose.yaml).
+    image: mariadb:11.8.9
+    environment:
+      MARIADB_DATABASE: ${DEV_DB_NAME:?set in .env}
+      MARIADB_USER: ${DEV_DB_USER:?set in .env}
+      MARIADB_PASSWORD: ${DEV_DB_PASSWORD:?set in .env}
+      MARIADB_ROOT_PASSWORD: ${DEV_DB_ROOT_PASSWORD:?set in .env}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:7.1.4-php8.4-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *wordpress-env
+    ports:
+      # Bound to this computer only, like the old-site copy.
+      - "127.0.0.1:${DEV_SITE_PORT:?set in .env}:80"
+    volumes:
+      - wp_html:/var/www/html
+      - *theme-mount
+
+  cli:
+    image: wordpress:cli-2.12-php8.4
+    profiles: ["tools"]
+    # uid 33 is www-data in the WordPress image, as for the old-site copy's WP-CLI.
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *wordpress-env
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
+    volumes:
+      - wp_html:/var/www/html
+      - *theme-mount
+
+volumes:
+  db_data:
+  wp_html:
