@@ -12,7 +12,8 @@ new findings added as steps.
   3b (local mail into Mailpit through FluentSMTP, f389f76), 3d (code checks, `bin/check`,
   14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
   branch protection, and the Dependabot follow-up) done; 3g-1 (the staging site) and 3g-2 (the
-  restricted deploy key) done on 2026-11-03, with the review of `docs/SITE_CHECKLIST.md`;
+  restricted deploy key) done on 2026-11-03, with the review of `docs/SITE_CHECKLIST.md`, and
+  3g-3 (the deploy to staging after every merge to `main`) on 2026-11-04;
   step 4 (the child theme, the dev site, its tests, and those tests as a required check on
   GitHub) done on 2026-11-04; 3h dropped by the user. The old site is still live, secured.
 - **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
@@ -22,9 +23,9 @@ new findings added as steps.
   Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
   theme folder, and password logins cannot be switched off (3g-2).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 3g-3 (the deploy workflow), built on 2026-11-04, its proof on GitHub pending; then
-  the template project (D18, decided by the user: after 3g-3), or 5a first, the user's
-  choice; 3i whenever the user chooses.
+- **Next:** the template project (D18, decided by the user: after 3g-3) or 5a (songs as
+  data), the user's choice; 3i whenever the user chooses. The live deploy's design is
+  recorded in step 9 (option B, the user's approval before live).
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
   visible parts of 5 → 7 → 8 → 9 → 10.
 - **Open decisions waiting on the user:**
@@ -127,7 +128,7 @@ new findings added as steps.
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
    level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Includes a local
    mail catcher, so the request form's emails can be tested without sending real mail. Record
-   them in the project's `CLAUDE.md`. Chosen by the user: Docker Compose (D12). Status: `[~]`
+   them in the project's `CLAUDE.md`. Chosen by the user: Docker Compose (D12). Status: `[x]` (3c folded into 4, 3h dropped, 3i optional and open)
    - 3a. **The stack and the import.** `compose.yaml` (WordPress 7.1.4 on PHP 8.4, MariaDB
      11.8.9 as live, Mailpit, WP-CLI), ports 10100 and 10101 on `127.0.0.1` only, `.env` from
      `.env.example` with random secrets, `bin/local-import`. The old site's files go from the
@@ -234,7 +235,7 @@ new findings added as steps.
      3g-3, since the pipeline needs the theme skeleton to deploy. Found on the way: on
      Hostinger's shared hosting one SSH user owns the whole account, the live site included, so
      an unrestricted deploy key would reach the live site; and no third-party actions are needed
-     (the runner has `ssh` and `rsync`). Status: `[~]`
+     (the runner has `ssh` and `rsync`). Status: `[x]` (3g-1, 3g-2, 3g-3)
      - 3g-1. **The staging site.** The user, in hPanel: a staging subdomain with a fresh
        WordPress, its own admin (strong password, two-factor login), the whole site behind a
        server-level password, not indexed; PHP 8.4 as on the live site. Claude first
@@ -335,7 +336,15 @@ new findings added as steps.
        (`TESTING_APPROACH.md`): the key's restrictions were proven in 3g-2; here, the first
        deploy (its page check failing until the user activates the child theme on staging,
        then passing) and a manual run on a throwaway branch, which the environment must
-       refuse. Status: `[ ]`
+       refuse. Proven on 2026-11-04: the first deploy on `main` (#12) deleted 3g-2's probe file
+       and added the three theme files, the file check passed, and the page check failed as
+       expected; the strict host check also passed, the server's fingerprint thus confirmed a
+       third time from GitHub's network. After the user activated the child theme on staging,
+       the re-run passed all checks. On a throwaway branch with the deploy job's "only on main"
+       condition removed (a planted fault), a manual run was refused by the `staging`
+       environment ("not allowed to deploy to staging due to environment protection rules")
+       before the job got a machine, so no secret was handed out; the branch was deleted.
+       Status: `[x]` 347ed5c
    - 3h. ~~**No network for the check tools while they run.** `bin/check` installs packages with
      network access, then runs PHPCS, PHPStan, TypeScript, ShellCheck and actionlint in
      containers without it (`--network none`), so a hijacked tool version that slipped past
@@ -521,6 +530,15 @@ new findings added as steps.
    - a new admin account on the new site with a login name that is not easy to guess (the old
      one is short and was in the exposed `local.sql`);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
+     The design, chosen by the user on 2026-11-04 (option B): a merge to `main` runs the
+     checks, then deploys to staging automatically and checks it, as since 3g-3; then GitHub
+     asks for the user's approval ("Review deployments"), and only after it deploys the same
+     `main` commit to the live site, never a copy of staging's files, with the same file and
+     page checks afterwards. Staging is where the next live deploy is staged (the project's
+     `CLAUDE.md`, Terms). Built as a second job in a `production` environment with the user as
+     required reviewer, its own restricted key and server destination (as 3g-2). The other
+     option, live deployed automatically right after staging passes (A), stays possible later,
+     once changes are routine.
    Status: `[ ]`
 10. **Move to a new host before 2028-07-16** (when the Hostinger plan ends; auto-renewal off):
     choose the host (SSH access and a supported PHP version required), set it up, change the

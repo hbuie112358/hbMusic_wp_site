@@ -8,6 +8,21 @@ shared rules are in `~/.claude/CLAUDE.md`; "the user" is the person Claude works
 A musician's WordPress site, being rebuilt on a maintained theme (a Twenty Twenty-Five child
 theme) and with booking features, to go live at its current host and move to another later.
 
+## Terms
+
+The places code passes through, in order (agreed with the user on 2026-11-04):
+
+- **Dev site:** the local fresh WordPress (`bin/dev-site`), and its tests on every pull
+  request. Where changes are tried out before they reach `main`.
+- **`main`:** the repository's accepted code: every change there has passed all checks. Merging
+  into `main` makes nothing public by itself.
+- **Staging:** the staging site at the host, behind a site-wide password, running `main`'s code
+  with test content. **Staging is where the next live deploy is staged** (the user's
+  definition): set up and running on the real host before it goes out. It is not where
+  changes wait to get into `main`.
+- **Live:** the public site visitors see. It gets the same `main` code as staging, never a copy
+  of staging's files; each site keeps its own content.
+
 ## Where things are
 
 - `backups/`: the original host export, the site archive (`.tar.gz`) and the database dump
