@@ -40,6 +40,7 @@ in_analysis() {
     -v "$REPO_ROOT/phpcs.xml.dist:/app/phpcs.xml.dist:ro" \
     -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
     -v "$REPO_ROOT/local:/app/local:ro" \
+    -v "$REPO_ROOT/themes:/app/themes:ro" \
     -v "$REPO_ROOT/tools:/app/tools:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
@@ -78,6 +79,18 @@ playwright_versions_match() {
   package_version="$(sed -nE 's/.*"@playwright\/test": "([^"]+)".*/\1/p' "$REPO_ROOT/tests/e2e/package.json")"
   [[ "$package_version" == "$PLAYWRIGHT_VERSION" ]] && return 0
   log "tests/e2e/package.json has @playwright/test ${package_version:-(none)}; tools/versions.sh has $PLAYWRIGHT_VERSION"
+  return 1
+}
+
+# theme.json's schema must describe the WordPress version the site runs (compose.yaml): an older
+# schema hides settings the site has, a newer one offers settings it silently ignores.
+theme_json_schema_matches_wordpress() {
+  local wordpress_version schema_version
+  wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.yaml")"
+  # [$] matches the literal "$schema" key without looking like a shell variable.
+  schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$REPO_ROOT/themes/hbmusic-child/theme.json")"
+  [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
+  log "themes/hbmusic-child/theme.json uses the ${schema_version:-(no recognised)} schema; compose.yaml runs WordPress ${wordpress_version:-(not found)}"
   return 1
 }
 
@@ -136,6 +149,7 @@ main() {
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
+  run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
