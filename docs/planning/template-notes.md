@@ -42,4 +42,9 @@ template project starts; until then, a list, not a to-do.
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
 - Mail through FluentSMTP into Mailpit (D13), with `local/wp-cli/configure-fluentsmtp-mailpit.php`
   apart from its prefix.
-- `docs/BEST_PRACTICES.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
+- `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
+
+## To build in
+
+- `~/.claude/CLIENT_DATA.md` (not implemented yet): the template includes its settings block, so
+  every customer project starts with it.

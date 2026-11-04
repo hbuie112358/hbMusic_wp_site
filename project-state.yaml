@@ -24,10 +24,9 @@ last_work: >
   housekeeping outside this repository at the user's request.
 
 next_action: >
-  Ask the user: 3g (deploy pipeline to a new staging site; go through the plan entry and
-  propose how to split it) or the review of docs/BEST_PRACTICES.md. The local branch
-  plan-drop-3h (commit d407eec, dropping 3h, plus this pause commit) is not pushed; it goes
-  with the next push, with the user's yes.
+  The start of step 4 (the child theme skeleton), then 3g-3 (the deploy workflow). Done on
+  2026-11-03: 3g-1 (staging site), 3g-2 (restricted deploy key), and the review of the site
+  checklist, now docs/SITE_CHECKLIST.md (renamed from BEST_PRACTICES.md).
 
 verification:
   wordpress_version: 7.1.4 (live and local)
@@ -41,13 +40,10 @@ verification:
   repository: public, GitHub, branch protection on main (check required, also for admins)
   dependabot: version updates weekly (action, Composer, npm); alerts and security updates on; 0 open alerts (2026-11-02)
   commit_identity: GitHub noreply address, set in this repository's git config only
-  hostinger_plan: ends in 2028, auto-renewal off; SSH included, switched off until 3g
+  hostinger_plan: ends in 2028, auto-renewal off; SSH on since 3g-2 (password logins cannot be switched off; the only key is restricted to staging's theme folder)
+  staging_site: staging.howardbuiemusic.com, site-wide password, WordPress with Wordfence and two-factor login, PHP 8.4.27 (3g-1)
 
 uncommitted_changes:
-  - file: docs/BEST_PRACTICES.md
-    why: >
-      Draft of WordPress additions, candidates for a shared ~/.claude/WORDPRESS_STANDARDS.md
-      (D16); reviewed with the user and committed before step 4.
   - file: tools/dump_to_jsonl.py
     why: >
       Moved from the session scratchpad at the pause: reads a mariadb/mysqldump file into JSON
@@ -56,9 +52,7 @@ uncommitted_changes:
       in the scratchpad only.
 
 pending_decisions:
-  - What next, 3g or the review of docs/BEST_PRACTICES.md (must come before step 4, D16).
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.
-  - Pushing the local branch plan-drop-3h, with the next change or on its own.
   - The new host (step 10, before the Hostinger plan ends in 2028).
 
 open_items:
