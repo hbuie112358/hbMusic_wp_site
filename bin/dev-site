@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+# Builds or rebuilds the dev site (plan step 4b): a fresh WordPress with the child theme from
+# themes/hbmusic-child/ (mounted read-only), the parent theme at its pinned version and
+# fingerprint, and scripted test content; no real data. Each run starts from an empty
+# database, so the site is the same every time. Runs alone: no backup and no old-site copy
+# needed, so CI can build it too (step 4d).
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly ENV_FILE="$REPO_ROOT/.env"
+readonly WAIT_SECONDS=120
+readonly WAIT_INTERVAL_SECONDS=2
+readonly CHILD_THEME="hbmusic-child"
+# Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
+readonly REQUIRED_SETTINGS=(
+  DEV_SITE_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
+  DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL
+)
+# The test pages, in menu order: the old site's page names, so templates and navigation are
+# exercised as the real site will use them; their text is neutral sample text (no real data).
+readonly TEST_PAGES=(Home About Songlist Video Contact)
+
+log() { printf '%s [dev-site] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
+# The parent theme's download folder, removed however the script ends.
+DOWNLOAD_DIR=""
+trap 'rm -rf "$DOWNLOAD_DIR"' EXIT
+
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
+# .env: creating it, adding new settings, loading and checking them (shared with bin/local-import).
+# shellcheck source=tools/settings.sh
+source "$REPO_ROOT/tools/settings.sh"
+
+compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
+
+# The dev site holds no code of its own beyond the theme, so plugins and themes are loaded;
+# --skip-plugins is used only before WordPress is installed.
+wp_cli() { compose run --rm -T cli wp "$@"; }
+
+require_tools() {
+  local tool
+  for tool in docker curl sha256sum; do
+    command -v "$tool" >/dev/null || fail "$tool is not installed"
+  done
+  docker compose version >/dev/null 2>&1 || fail "the docker compose plugin is not installed"
+}
+
+wait_for_wordpress_files() {
+  local waited=0
+  log "Waiting for the WordPress container to set up its files"
+  until compose exec -T wordpress test -f /var/www/html/wp-config.php 2>/dev/null; do
+    ((waited < WAIT_SECONDS)) || fail "WordPress files not ready after ${WAIT_SECONDS}s"
+    sleep "$WAIT_INTERVAL_SECONDS"
+    waited=$((waited + WAIT_INTERVAL_SECONDS))
+  done
+}
+
+install_wordpress() {
+  local address="http://localhost:${DEV_SITE_PORT}"
+  log "Emptying the dev site's database and installing WordPress at $address"
+  wp_cli --skip-plugins --skip-themes db reset --yes
+  # --skip-email: the dev site sends no mail. The password comes from .env and is never printed.
+  wp_cli --skip-plugins --skip-themes core install --url="$address" --title="Howard Buie Music (dev)" \
+    --admin_user="$DEV_ADMIN_USER" --admin_password="$DEV_ADMIN_PASSWORD" \
+    --admin_email="$DEV_ADMIN_EMAIL" --skip-email >/dev/null
+}
+
+# WordPress.org publishes no checksums for themes, so the zip is checked against the
+# fingerprint pinned in tools/versions.sh before it is installed (AI_SECURITY.md, section 4).
+install_parent_theme() {
+  local zip_name="${PARENT_THEME_SLUG}.${PARENT_THEME_VERSION}.zip" actual_sha256
+  DOWNLOAD_DIR="$(mktemp -d)"
+  log "Downloading the parent theme $PARENT_THEME_SLUG $PARENT_THEME_VERSION"
+  curl -fsSL --max-time 120 -o "$DOWNLOAD_DIR/$zip_name" "https://downloads.wordpress.org/theme/$zip_name"
+  actual_sha256="$(sha256sum "$DOWNLOAD_DIR/$zip_name" | cut -d' ' -f1)"
+  [[ "$actual_sha256" == "$PARENT_THEME_SHA256" ]] ||
+    fail "$zip_name has the SHA-256 $actual_sha256, not the pinned $PARENT_THEME_SHA256 (tools/versions.sh): not installed"
+  # The container's user is not the host user (rootless Docker), so the folder must be readable.
+  chmod a+rx "$DOWNLOAD_DIR"
+  chmod a+r "$DOWNLOAD_DIR/$zip_name"
+  compose run --rm -T -v "$DOWNLOAD_DIR:/download:ro" cli wp theme install "/download/$zip_name" --force
+}
+
+# Only the parent and the child stay: the image's other default themes and plugins are code the
+# dev site does not use (checklist 5.2), and they would differ from live.
+remove_unused_code() {
+  local theme
+  log "Removing the image's other themes and its plugins"
+  for theme in $(wp_cli theme list --field=name); do
+    [[ "$theme" == "$PARENT_THEME_SLUG" || "$theme" == "$CHILD_THEME" ]] && continue
+    wp_cli theme delete "$theme"
+  done
+  wp_cli plugin delete --all
+}
+
+configure_site() {
+  log "Activating $CHILD_THEME, discouraging search engines, setting the live site's permalinks"
+  wp_cli theme activate "$CHILD_THEME"
+  wp_cli option update blog_public 0
+  # The WordPress image already writes the standard .htaccess rules this structure needs.
+  wp_cli rewrite structure '/%postname%/'
+}
+
+create_test_content() {
+  log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
+  local ids position=0 title page_id
+  ids="$(wp_cli post list --post_type=post,page --post_status=any --format=ids)"
+  # shellcheck disable=SC2086 # a space-separated list of post IDs
+  [[ -n "$ids" ]] && wp_cli post delete $ids --force >/dev/null
+  for title in "${TEST_PAGES[@]}"; do
+    position=$((position + 1))
+    page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="$title" \
+      --menu_order="$position" --porcelain \
+      --post_content="<!-- wp:paragraph --><p>Sample text for the dev site's $title page. The real content comes with step 2b.</p><!-- /wp:paragraph -->")"
+    [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
+  done
+  wp_cli option update show_on_front page >/dev/null
+}
+
+# A fresh debug log, so the browser tests (4c) see only what this build's pages cause.
+clear_debug_log() {
+  compose exec -T wordpress rm -f /var/www/html/wp-content/debug.log
+}
+
+main() {
+  require_tools
+  ensure_env_file
+  load_env
+  require_settings
+  compose up -d db wordpress
+  wait_for_wordpress_files
+  install_wordpress
+  install_parent_theme
+  remove_unused_code
+  configure_site
+  create_test_content
+  clear_debug_log
+  log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"
+  log "Log in as ${DEV_ADMIN_USER}; the password is DEV_ADMIN_PASSWORD in .env"
+}
+
+main "$@"

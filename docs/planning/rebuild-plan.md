@@ -20,9 +20,9 @@ new findings added as steps.
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is included (enabled to check, then off until 3g).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** step 4, split into 4a (the theme files, done 2026-11-04 on its commit), 4b (the
-  fresh local site), 4c (its browser tests) and 4d (those tests on GitHub); then 3g-3 (the
-  deploy workflow); 3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
+- **Next:** step 4, split into 4a (the theme files) and 4b (the dev site), both done on
+  2026-11-04, then 4c (the dev site's browser tests) and 4d (those tests on GitHub); then 3g-3
+  (the deploy workflow); 3i whenever the user chooses. Done on 2026-11-03: 3g-1 (the staging site), 3g-2 (the
   restricted deploy key) and the review of `docs/SITE_CHECKLIST.md`. Dependabot runs weekly
   since 2026-11-02; 3h was dropped by the user.
 - **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
@@ -362,9 +362,42 @@ new findings added as steps.
      version pinned in `compose.yaml`, so a WordPress update cannot leave the schema behind
      (the version-free "trunk" schema was not used: it describes WordPress in development);
      proven by a 7.2 schema and a missing schema line. 12 checks now. Status: `[ ]`
-   - 4b. **The fresh local site:** a second WordPress on port 10102 with its own database, the
-     theme mounted read-only and activated, scripted test content (a few pages and a menu, no
-     real data), mail into the same Mailpit, and the permission check of 3c. Status: `[ ]`
+   - 4b. **The dev site** (named by the user): a second, separate Compose project
+     (`compose.dev.yaml`, `hbmusic-dev`), so it runs alone, also in CI: MariaDB 11.8.9,
+     WordPress 7.1.4 on PHP 8.4, WP-CLI, on `127.0.0.1:10102`; the child theme mounted read-only
+     into WordPress and WP-CLI. `bin/dev-site` rebuilds it from an empty database each run
+     (`wp db reset`, no volumes deleted): WordPress installed, the parent theme Twenty
+     Twenty-Five 1.5 installed only if its zip matches the SHA-256 pinned in `tools/versions.sh`
+     (WordPress.org publishes no theme checksums; the fingerprint was taken from the download
+     and three files compared with WordPress.org's theme repository; user's choice, so section 4
+     of `AI_SECURITY.md` is met rather than excepted), the image's other themes and plugins
+     deleted, the child theme activated, search engines discouraged, the live permalinks, test
+     pages (the old site's page names with neutral text; Twenty Twenty-Five's navigation lists
+     them), a fresh debug log, a dev admin. No mail yet (user's choice; it comes with 5b). The
+     `.env` handling moved from `bin/local-import` to `tools/settings.sh`, shared by both
+     scripts; its safety stop now covers both sites' databases. `bin/test` runs two groups,
+     `local` and `dev` (both by default); a group whose site does not answer fails. New
+     checks: `tests/scenario/dev-theme-mount.sh` (the permission check of 3c: neither
+     WordPress's user nor the container's root can write into the theme folder; on the host
+     every file there is the user's and none is writable by others) and
+     `tests/scenario/settings-guard.sh` (the `.env` safety stop, run against a temporary path);
+     `bin/check` validates both compose files. Proven: the mount made writable (root could
+     write), a world-writable file, the site stopped, and the guard removed each made their
+     check fail, and passed after restoring from copies; the old-site copy was rebuilt with the
+     shared code and all its tests passed. Failures on the way, all in the new code: a first
+     planted-fault run tested before Apache had started, so two faults failed for the wrong
+     reason (redone, waiting for the site); `run_test` returned success after a failure, so a
+     group did not stop when its site was down (fixed); WP-CLI could not rewrite `.htaccess`
+     (not needed: the image writes it). Review fix (MEDIUM): the two compose files pin the same
+     images twice, so a `bin/check` step fails when they differ (proven with the dev site on
+     MariaDB 11.8.8); 13 checks now. Accepted LOW items, each with its moment: files uploaded
+     on the dev site would survive a rebuild (none today; if uploads appear, `bin/dev-site`
+     empties the uploads folder); `bin/dev-site` deletes every plugin on each build (at 5a, the
+     mounted site plugin must be left alone, see 5a); the local admin passwords (settings in
+     `.env`, readable only by the user) reach WP-CLI as command-line arguments in both site
+     scripts, so they show briefly in the computer's list of running programs (accepted by the
+     user: local passwords only, on a single-user computer; handing them over by name with
+     `-e` would remove it). Status: `[ ]`
    - 4c. **Browser tests for the fresh site:** the child theme active, no PHP notices (checklist
      6.9), axe without errors (7.1), no CSP violations with the policy sent from one place in the
      repository (3.2). Status: `[ ]`
@@ -376,7 +409,9 @@ new findings added as steps.
      energy 1-5 (D10). Claude suggests the release years from public release data, and the
      genres and energy ratings as labelled guesses, for the user to check and correct. The 108 songs are converted from the current Songlist page, where titles and artists
      sit in two separate lists matched only by position. The Songlist page is built from the Song entries.
-     *Why:* the user adds songs in the admin instead of editing page text. Status: `[ ]`
+     *Why:* the user adds songs in the admin instead of editing page text. On the dev site
+     (4b), the plugin is mounted read-only like the theme, and `bin/dev-site`'s step that
+     deletes every plugin must leave it alone (a LOW item from 4b's review). Status: `[ ]`
    - 5b. **Song requests (D8).** The Songlist has a checkbox per song and "select all"; a form
      (name, email, optional event date and message) sends the selection. Each request is stored
      in the admin with its songs and notifies the user; the user clicks "Approve and send", and
