@@ -1,57 +1,57 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-02T15:13:00-05:00
-current_branch: plan-drop-3h
-last_commit: d407eec
+timestamp: 2026-11-04T09:14:00-05:00
+current_branch: pause-2026-11-04
+last_commit: 4f8577f
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
 last_work: >
-  2026-11-02: live site secured and brought current (plan steps 0a-0g): admin account (new
-  password, two-factor login, real email), leftover files deleted, secret keys replaced,
-  plugins updated (Wordfence 9.0.2, Yoast SEO 28.8, UpdraftPlus 1.26.14), PHP 8.4.27, a fresh
-  Hostinger backup verified, the old staging copy backed up and removed. Inventory of the old
-  site (step 2) and new booking features planned (songs as data with genre, release year and
-  energy; one-click clip requests; setlist dials). Local tooling built and committed: Docker
-  Compose copy of the old site with bin/local-import (3a), local mail into Mailpit through
-  FluentSMTP (3b), bin/check with PHPCS (WordPress standards), PHPStan, TypeScript,
-  ShellCheck, actionlint, audits (3d), bin/test with scenario checks and Playwright browser
-  tests (3e), GitHub workflow and public repository with branch protection (3f). Hosting:
-  the site stays at Hostinger until a move before 2028 (D15). Later on 2026-11-02: pull
-  requests #1 and #2 merged; Dependabot set up (3f follow-up, pull request #3 merged): weekly
-  grouped updates with a 7-day wait, alerts and security updates switched on, first run done
-  with no pull requests; step 3h (no network for the check tools) added and then dropped by
-  the user, step 3i (evaluating a behaviour-scanning service) added. Shared-workspace
-  housekeeping outside this repository at the user's request.
+  2026-11-02: live site secured and current (step 0), inventory (2), local tooling (3a-3f),
+  public repository with branch protection, Dependabot. 2026-11-03: staging site (3g-1),
+  restricted deploy key (3g-2), site checklist reviewed and renamed docs/SITE_CHECKLIST.md
+  (89 items with check, kind and status), template decision D18 and template notes, shared
+  client data notes (outside the repository). 2026-11-04: step 4 done: the child theme
+  skeleton checked by PHPCS and PHPStan (4a), the dev site on port 10102 built by
+  bin/dev-site with the parent theme pinned by SHA-256 (4b), its tests (theme active,
+  security headers from config/security-headers.conf, no CSP violation, axe at WCAG 2.2 AA,
+  empty PHP debug log; WordPress's emoji script switched off in functions.php) (4c), and
+  those tests as a required GitHub check, proven by a blocked planted fault (4d). Then 3g-3:
+  every merge to main deploys the theme to staging after both checks and checks the result,
+  proven (first deploy, page check after the child theme was activated on staging, a
+  throwaway branch refused by the staging environment). The project's CLAUDE.md gained
+  Terms (dev site, main, staging, live); the live deploy design for step 9 is option B (the
+  user's approval before live). Pull requests #6 to #13 merged.
 
 next_action: >
-  The start of step 4 (the child theme skeleton), then 3g-3 (the deploy workflow). Done on
-  2026-11-03: 3g-1 (staging site), 3g-2 (restricted deploy key), and the review of the site
-  checklist, now docs/SITE_CHECKLIST.md (renamed from BEST_PRACTICES.md).
+  Ask the user what comes next: the template project (D18, decided for after 3g-3, which is
+  now done; about 3-5 hours, as its own project) or 5a (songs as data; about 3-4 hours plus
+  the user's check of the 108 songs). The local branch pause-2026-11-04 holds only this pause
+  commit; it goes with the next push.
 
 verification:
-  wordpress_version: 7.1.4 (live and local)
-  live_php: 8.4.27 (switched from 8.1.34 on 2026-11-02)
+  wordpress_version: 7.1.4 (live, staging, local, dev site)
+  live_php: 8.4.27
+  staging_php: 8.4.27 (set per website; step 0f corrected)
   live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
-  live_theme: music-lite 1.5 (unmaintained; replaced by the rebuild)
-  live_staging_copy: removed 2026-11-02 (files and database)
+  live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
+  staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, child theme Howard Buie Music active, deployed from main
   live_login_name_revealed: no (/?author=1 404, REST users 401, checked 2026-11-02)
-  local_stack: docker compose (WordPress 7.1.4 on PHP 8.4, MariaDB 11.8.9, Mailpit), ports 10100/10101
-  checks: bin/check 11 checks pass; bin/test 2 scenarios + 3 browser tests pass
-  repository: public, GitHub, branch protection on main (check required, also for admins)
-  dependabot: version updates weekly (action, Composer, npm); alerts and security updates on; 0 open alerts (2026-11-02)
+  local_sites: old-site copy on 10100 (Mailpit 10101), dev site on 10102
+  checks: bin/check 13 checks; bin/test local (3 scenarios + 3 browser tests) and dev (2 scenarios + 20 browser tests), all passing on 2026-11-04
+  github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only
+  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; 0 open alerts (2026-11-04)
   commit_identity: GitHub noreply address, set in this repository's git config only
-  hostinger_plan: ends in 2028, auto-renewal off; SSH on since 3g-2 (password logins cannot be switched off; the only key is restricted to staging's theme folder)
-  staging_site: staging.howardbuiemusic.com, site-wide password, WordPress with Wordfence and two-factor login, PHP 8.4.27 (3g-1)
+  hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme folder
 
 uncommitted_changes:
   - file: tools/dump_to_jsonl.py
     why: >
-      Moved from the session scratchpad at the pause: reads a mariadb/mysqldump file into JSON
-      lines per table (used for the step 2 inventory, needed again for the step 5a conversion of
-      the 108 songs). Not yet through the review gate; its output holds site data and belongs
-      in the scratchpad only.
+      Reads a mariadb/mysqldump file into JSON lines per table (used for the step 2 inventory,
+      needed again for the step 5a conversion of the 108 songs). Not yet through the review
+      gate; its output holds site data and belongs in the scratchpad only.
 
 pending_decisions:
+  - What comes next, the template project (D18) or 5a.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.
   - The new host (step 10, before the Hostinger plan ends in 2028).
 
