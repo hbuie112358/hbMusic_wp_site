@@ -1,7 +1,7 @@
-# Runs bin/check (every static check) on each push to main and on each pull request
-# (plan step 3f). bin/test is not run here yet: it needs the local copy built from the backup,
-# which never leaves the user's computer. From step 4, browser tests of the new theme run on a
-# fresh WordPress with scripted test content, and join this workflow.
+# Runs on each push to main, each pull request and weekly: bin/check (every static check, plan
+# step 3f), and the dev site's tests (plan step 4d): the dev site is built here from the
+# repository alone and tested with bin/test dev. The old-site copy's tests stay local: they
+# need the backup, which never leaves the user's computer.
 name: check
 
 on:
@@ -35,3 +35,32 @@ jobs:
 
       - name: Static checks (bin/check)
         run: bin/check
+
+  dev-site:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      # The same pinned checkout as above, the token again not kept.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # No backup and no secrets needed: bin/dev-site creates a fresh .env with new random
+      # secrets on this machine, which never leaves it.
+      - name: Build the dev site (bin/dev-site)
+        run: bin/dev-site
+
+      - name: Test the dev site (bin/test dev)
+        run: bin/test dev
+
+      # Playwright keeps a trace of each failed browser test (what the browser saw, step by step);
+      # kept for a week so a failure here can be understood. The traces hold only the dev site's
+      # test pages, never .env.
+      - name: Keep the traces of failed browser tests
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-traces
+          path: tests/e2e/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
