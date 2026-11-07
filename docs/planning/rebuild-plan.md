@@ -26,8 +26,11 @@ new findings added as steps.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging) and
   5a-2 (the old-site copy removed, D20).
   2b (the pages, D22, and the look, D23) too.
-- **Next:** the visible parts of 5; 3i whenever the user chooses. The live deploy's design is
-  recorded in step 9 (option B, the user's approval before live).
+- **Next:** the visible parts of 5: the real Home page from `data/content/home-draft.html`, and
+  the Music, Songs, About and Book pages, with video placeholders until the user chooses; 3i
+  whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+  approval before live). The live site's text still names the old service area (D22); Claude gave
+  the user wording to correct it there before go-live, and whether that was done is not known.
 - **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
   form (5e) → 6 → 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
@@ -155,7 +158,7 @@ new findings added as steps.
      pages: the draft Home page in `data/content/home-draft.html`, web-sized images in
      `data/photos/web/`, the three looks' screenshots in `data/design-samples/`. Left for the
      visible parts of 5: the other pages, the Home video (the user chooses), and the wording.
-   Status: `[x]`
+   Status: `[x]` f47fd0d
 3. **Local environment.** Choose how to run the site locally from `db/` and a copy of
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
    level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Includes a local
@@ -525,8 +528,8 @@ new findings added as steps.
      `.env` safety stop stays, now against the dev site's database and also on GitHub. `bin/test`
      has no groups now. `bin/dev-site` recreates its WordPress container each run: a running one
      kept pointing at a plugin folder git had removed and recreated, and showed it empty (proven:
-     0 files, 3 after a rebuild). The copy's Docker volumes stay on the user's computer until the
-     user asks to delete them. Status: `[x]`
+     0 files, 3 after a rebuild). The copy's Docker containers, volumes and settings in `.env` were
+     then deleted at the user's request. Status: `[x]` b779578
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test

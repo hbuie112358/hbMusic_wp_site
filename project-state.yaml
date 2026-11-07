@@ -1,59 +1,62 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-04T09:14:00-05:00
-current_branch: pause-2026-11-04
-last_commit: 4f8577f
+timestamp: 2026-11-07T11:51:00-05:00
+current_branch: pause-2026-11-07
+last_commit: f47fd0d
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
 last_work: >
   2026-11-02: live site secured and current (step 0), inventory (2), local tooling (3a-3f),
   public repository with branch protection, Dependabot. 2026-11-03: staging site (3g-1),
-  restricted deploy key (3g-2), site checklist reviewed and renamed docs/SITE_CHECKLIST.md
-  (89 items with check, kind and status), template decision D18 and template notes, shared
-  client data notes (outside the repository). 2026-11-04: step 4 done: the child theme
-  skeleton checked by PHPCS and PHPStan (4a), the dev site on port 10102 built by
-  bin/dev-site with the parent theme pinned by SHA-256 (4b), its tests (theme active,
-  security headers from config/security-headers.conf, no CSP violation, axe at WCAG 2.2 AA,
-  empty PHP debug log; WordPress's emoji script switched off in functions.php) (4c), and
-  those tests as a required GitHub check, proven by a blocked planted fault (4d). Then 3g-3:
-  every merge to main deploys the theme to staging after both checks and checks the result,
-  proven (first deploy, page check after the child theme was activated on staging, a
-  throwaway branch refused by the staging environment). The project's CLAUDE.md gained
-  Terms (dev site, main, staging, live); the live deploy design for step 9 is option B (the
-  user's approval before live). Pull requests #6 to #13 merged.
+  restricted deploy key (3g-2), site checklist reviewed, template decision D18. 2026-11-04: step
+  4 (child theme, dev site, tests, required GitHub check) and 3g-3 (deploy to staging after
+  every merge to main). 2026-11-07: a review of the plan for work built on wrong assumptions, with
+  the user's decisions recorded as D19-D21: clip requests and setlist preferences become future
+  plugins, the template waits for a second site, the old-site copy goes. 5a: the Song List plugin
+  built, deployed and activated on staging, its 108 checked songs imported there. 5a-2: the
+  old-site copy removed, its Docker containers and volumes deleted at the user's request. 2b: the
+  five pages and the new service area, Fayetteville NC (D22), and the "On Stage" look (D23), in
+  the child theme's files and on staging. Pull requests #14 to #16 merged.
 
 next_action: >
-  Ask the user what comes next: the template project (D18, decided for after 3g-3, which is
-  now done; about 3-5 hours, as its own project) or 5a (songs as data; about 3-4 hours plus
-  the user's check of the 108 songs). The local branch pause-2026-11-04 holds only this pause
+  The visible parts of step 5: build the real Home page (from data/content/home-draft.html, with
+  the images in data/photos/web/) and the Music, Songs, About and Book pages in the new design,
+  with placeholders for the videos until the user chooses them. The Home page uses the theme's
+  page-no-title template, and the draft's image address and ID are from a trial, so they are
+  replaced when the image is uploaded. The local branch pause-2026-11-07 holds only this pause
   commit; it goes with the next push.
 
 verification:
-  wordpress_version: 7.1.4 (live, staging, local, dev site)
+  wordpress_version: 7.1.4 (live, staging, dev site)
   live_php: 8.4.27
   staging_php: 8.4.27 (set per website; step 0f corrected)
   live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
-  staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, child theme Howard Buie Music active, deployed from main
+  live_text: still names the old service area (Parkersburg, Marietta, Mid Ohio Valley); see pending_decisions
+  staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, child theme Howard Buie Music active with the On Stage look, Song List plugin active with the 108 songs and a Songlist page; deployed from main; WordPress Importer deleted again
   live_login_name_revealed: no (/?author=1 404, REST users 401, checked 2026-11-02)
-  local_sites: old-site copy on 10100 (Mailpit 10101), dev site on 10102
-  checks: bin/check 13 checks; bin/test local (3 scenarios + 3 browser tests) and dev (2 scenarios + 20 browser tests), all passing on 2026-11-04
+  local_sites: dev site on 10102 only; the rest of the 101xx block is free
+  checks: bin/check 14 checks; bin/test 3 scenarios + 30 browser tests, all passing on 2026-11-07
   github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only
-  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; 0 open alerts (2026-11-04)
+  deploy_destinations: staging-child-theme and staging-song-list in the server's rsync settings
+  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; no Dependabot pull requests yet (checked 2026-11-07)
   commit_identity: GitHub noreply address, set in this repository's git config only
-  hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme folder
+  hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
+  not_versioned: data/ holds the song list and its import file (needed at go-live), the photos, the draft Home page and the looks' screenshots; only on the user's computer
 
-uncommitted_changes:
-  - file: tools/dump_to_jsonl.py
-    why: >
-      Reads a mariadb/mysqldump file into JSON lines per table (used for the step 2 inventory,
-      needed again for the step 5a conversion of the 108 songs). Not yet through the review
-      gate; its output holds site data and belongs in the scratchpad only.
+uncommitted_changes: []
 
 pending_decisions:
-  - What comes next, the template project (D18) or 5a.
+  - >
+    Whether to correct the live site's wording now, before go-live, since it names the old service
+    area. Claude recommended yes and gave the user paste-ready text for the tagline, Home and About;
+    the user has not said whether this was done. The wording is short: Fayetteville, NC, and
+    surrounding areas, including Southern Pines.
+  - Which videos to use, and which one on Home (the user goes through them).
+  - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.
   - The new host (step 10, before the Hostinger plan ends in 2028).
+  - Decided when the step is reached, noted in the plan - step 8 (backups, updates, cache, headers), step 9 (updating the site in place or a fresh install).
 
 open_items:
   - id: 1
