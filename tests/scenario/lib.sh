@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Shared helpers for the scenario checks (plan step 3e): checks against the running old-site
-# copy (bin/local-import), and, for the checks named dev-*.sh, the dev site (bin/dev-site).
-# Sourced by each check, never run on its own.
+# Shared helpers for the scenario checks (plan step 3e), which run against the dev site
+# (bin/dev-site). Sourced by each check, never run on its own.
 #
 # Plain bash instead of the bats test framework: bats would run in a container that needs the
 # Docker socket to reach the stack, which gives that container full control of the user's
@@ -17,12 +16,10 @@ fail() { log "FAILED: $*"; exit 1; }
 
 # --progress quiet keeps Compose's "Container ..." lines out of captured output, so a failure
 # message shows what the command itself printed.
-compose() { docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.yaml" "$@"; }
-# The dev site (bin/dev-site), for the checks named dev-*.sh.
 dev_compose() { docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
 
 load_settings() {
-  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/local-import first"
+  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/dev-site first"
   set -a
   # shellcheck source=/dev/null
   source "$REPO_ROOT/.env"

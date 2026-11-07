@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The container images, caches and downloads the project's scripts use (bin/check, bin/test,
 # bin/tools-update, bin/dev-site), in one place so they cannot drift apart. Sourced, never run.
-# The images in compose.yaml (the local copy) are pinned there.
+# The images in compose.dev.yaml (the dev site) are pinned there.
 #
 # The Playwright image's version must equal @playwright/test in tests/e2e/package.json;
 # bin/check fails if they differ.

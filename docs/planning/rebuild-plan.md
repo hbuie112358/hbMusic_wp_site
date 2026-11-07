@@ -23,11 +23,12 @@ new findings added as steps.
   Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
   theme folder, and password logins cannot be switched off (3g-2).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** 5a (the song list plugin), then 5a-2 (removing the old-site copy, D20); 3i whenever
-  the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
-  approval before live).
-- **Order of the coming steps (D19, replacing D11's):** 5a → 5a-2 → 2b → the visible parts of 5,
-  with the booking form (5e) → 6 → 8 → 9 → 10.
+- **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging) and
+  5a-2 (the old-site copy removed, D20).
+- **Next:** 2b (content and design); 3i whenever the user chooses. The live deploy's design is
+  recorded in step 9 (option B, the user's approval before live).
+- **Order of the coming steps (D19, replacing D11's):** 2b → the visible parts of 5, with the
+  booking form (5e) → 6 → 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -41,7 +42,8 @@ new findings added as steps.
 - **Stale documents:** in `docs/SITE_CHECKLIST.md` (2.7, 6.4, 8.3, 10.1-10.3) and
   `docs/planning/findings/step-02-inventory.md` ("What the new site must cover"), references to
   5b, 5d and song years, genres and energy predate D19: the form at go-live is now 5e, and the
-  rest is future work. The project's `CLAUDE.md` describes the old-site copy until 5a-2 removes it.
+  rest is future work. The checklist's and earlier steps' mentions of `bin/local-import`, the
+  local copy and Mailpit describe what was true before 5a-2.
 
 ## Decisions
 
@@ -490,14 +492,19 @@ new findings added as steps.
      `plugins/song-list/`, a block in PHP alone (`autoRegister`, WordPress 7.0), no page per song,
      its own PHPCS ruleset, and a check that it names nothing of this site. PHPUnit waits for a
      plugin with real logic. Proven by planted faults. The 108 songs are converted and the user
-     checked them (`data/song-list/songs.csv`, not versioned; eight spelling fixes). Left: the
-     server's `staging-song-list` destination before the next push, the import file, and the
-     import on staging. Status: `[~]`
+     checked them (`data/song-list/songs.csv`, not versioned; eight spelling fixes). Deployed with
+     the server's new `staging-song-list` destination (#14), and the songs imported on staging with
+     WordPress's importer from `data/song-list/songs-import.xml` (first tried on the dev site; a
+     second import adds no duplicates). Status: `[x]` faec6a9
    - 5a-2. **Remove the old-site copy (D20),** after the songs are converted: `compose.yaml`,
      `bin/local-import`, `local/`, the `local` test group, the FluentSMTP tests and stubs, and
      their settings. `bin/check`'s checks that read `compose.yaml` move to `compose.dev.yaml`, or
-     go where they compared the two sites. `backups/`, `db/` and `wordpress/` stay untouched.
-     Status: `[ ]`
+     go where they compared the two sites. `backups/`, `db/` and `wordpress/` stay untouched. The
+     `.env` safety stop stays, now against the dev site's database and also on GitHub. `bin/test`
+     has no groups now. `bin/dev-site` recreates its WordPress container each run: a running one
+     kept pointing at a plugin folder git had removed and recreated, and showed it empty (proven:
+     0 files, 3 after a rebuild). The copy's Docker volumes stay on the user's computer until the
+     user asks to delete them. Status: `[x]`
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test
@@ -559,6 +566,8 @@ new findings added as steps.
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
      one is short and was in the exposed `local.sql`);
+   - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
+     which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
      The design, chosen by the user on 2026-11-04 (option B): a merge to `main` runs the
      checks, then deploys to staging automatically and checks it, as since 3g-3; then GitHub

@@ -1,6 +1,6 @@
 # The dev site: a fresh WordPress with the child theme and scripted test content, for building
-# and testing the new theme (plan step 4b). Separate from the old-site copy (compose.yaml), so
-# it runs alone, also in CI, and never holds real data. Never used in production.
+# and testing the new theme and plugins (plan step 4b). It runs alone, also in CI, and never holds
+# real data. Never used in production.
 # Settings come from .env (the DEV_ names; bin/dev-site creates or completes it).
 name: hbmusic-dev
 
@@ -28,7 +28,7 @@ x-song-list-mount: &song-list-mount ./plugins/song-list:/var/www/html/wp-content
 
 services:
   db:
-    # The same versions as the old-site copy and the live site (compose.yaml).
+    # The same version as the live site.
     image: mariadb:11.8.9
     environment:
       MARIADB_DATABASE: ${DEV_DB_NAME:?set in .env}
@@ -53,7 +53,7 @@ services:
         condition: service_healthy
     environment: *wordpress-env
     ports:
-      # Bound to this computer only, like the old-site copy.
+      # Bound to this computer only.
       - "127.0.0.1:${DEV_SITE_PORT:?set in .env}:80"
     volumes:
       - wp_html:/var/www/html
@@ -65,7 +65,7 @@ services:
   cli:
     image: wordpress:cli-2.12-php8.4
     profiles: ["tools"]
-    # uid 33 is www-data in the WordPress image, as for the old-site copy's WP-CLI.
+    # uid 33 is www-data in the WordPress image, so WP-CLI can write what WordPress can.
     user: "33:33"
     depends_on:
       db:

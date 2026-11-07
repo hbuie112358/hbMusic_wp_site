@@ -48,48 +48,37 @@ The old site, as exported:
 
 ## Commands
 
-Two local sites run in Docker Compose, with their settings in one `.env` (created from
-`.env.example` with random secrets; never committed): the **old-site copy** (`compose.yaml`,
-the reference for the rebuild) and the **dev site** (`compose.dev.yaml`, a fresh WordPress
-with the new child theme and test content, for building the theme). This project's ports are
-the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the dev site on
-10102, the rest of the block for later needs.
+The **dev site** runs in Docker Compose (`compose.dev.yaml`): a fresh WordPress with the new child
+theme, the plugins and test content, with its settings in `.env` (created from `.env.example`
+with random secrets; never committed). This project's ports are the **101xx** block: the dev
+site on 10102, the rest of the block for later needs. The old site's local copy was removed at
+plan step 5a-2; the real old site stays online until go-live, and the export stays in `backups/`,
+`db/` and `wordpress/`.
 
-- `bin/local-import`: builds or rebuilds the local copy from `wordpress/` and `db/`
-  (read-only): fresh database, live addresses replaced, Wordfence and UpdraftPlus switched off,
-  a local admin account (`localadmin`, password `LOCAL_ADMIN_PASSWORD` in `.env`), and
-  FluentSMTP installed at a pinned version, checked against WordPress.org's checksums and
-  pointed at Mailpit.
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
   `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
   test pages and songs with neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
   backup, so CI can build it too.
-- `bin/test [local|dev]`: the tests in two groups, both without an argument. **local**, against
-  the old-site copy: the scenario checks in `tests/scenario/` (bash, sharing `lib.sh`), then the
-  browser tests in `tests/e2e/specs/local/` in the official Playwright container (`--network
-  host`, seeing only `tests/e2e/`). **dev**, against the dev site: the scenario checks named
-  `tests/scenario/dev-*.sh` (read-only theme and plugin mounts, an empty PHP debug log), then the
-  browser tests in `tests/e2e/specs/dev/` (child theme active, security headers sent, no CSP
-  violation, no axe accessibility error at WCAG 2.2 AA, the Song List's page and admin form). A
-  group whose site does not answer fails, never
-  skipped. Run it
-  after `bin/local-import` or `bin/dev-site`, after every FluentSMTP update, and before every
-  commit that touches a site or the theme. Every test runs even after a failure; exit status 1
-  if any failed.
-- Old-site copy: http://localhost:10100 (admin `/wp-admin`); mail inbox: http://localhost:10101.
-  Dev site: http://localhost:10102 (admin `/wp-admin`).
-- `docker compose stop` / `docker compose start`: stop and start without losing anything
-  (add `-f compose.dev.yaml` for the dev site, here and below).
-- `docker compose run --rm cli wp <command>`: WP-CLI against the old-site copy.
-- `docker compose down -v` deletes a site's database and files (the volumes); Claude runs it
-  only when the user asks. `bin/local-import` or `bin/dev-site` rebuilds them.
+- `bin/test`: the tests against the dev site: the scenario checks named
+  `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
+  PHP debug log, the `.env` safety stop), then the browser tests in `tests/e2e/specs/dev/` in the
+  official Playwright container (`--network host`, seeing only `tests/e2e/`): child theme active,
+  security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
+  List's page and admin form. If the site does not answer, the run fails; it is never skipped.
+  Run it after `bin/dev-site` and before every commit that touches the site, the theme or a
+  plugin. Every test runs even after a failure; exit status 1 if any failed.
+- Dev site: http://localhost:10102 (admin `/wp-admin`).
+- `docker compose -f compose.dev.yaml stop` / `start`: stop and start without losing anything.
+- `docker compose -f compose.dev.yaml run --rm cli wp <command>`: WP-CLI against the dev site.
+- `docker compose -f compose.dev.yaml down -v` deletes the dev site's database and files (the
+  volumes); Claude runs it only when the user asks. `bin/dev-site` rebuilds them.
 - `bin/check`: every code check, in pinned containers (nothing installed on the host):
   Composer install from `composer.lock`, validation and security audit; PHPCS with the
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
-  stubs (`phpstan.neon.dist`), both over `local/`, `themes/` and `plugins/` (each plugin with its
-  own PHPCS ruleset), and a check that plugins name nothing of this site; `theme.json`'s schema
-  matching the pinned WordPress; ShellCheck on `bin/`; both compose files. Runs every check even
+  stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
+  ruleset), and a check that plugins name nothing of this site; `theme.json`'s schema matching
+  the pinned WordPress; ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
@@ -99,8 +88,8 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
   theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
-  differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling
-  both site scripts share.
+  differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling of
+  `bin/dev-site`.
 - `config/security-headers.conf`: the site's security headers (Content-Security-Policy and the
   others, `docs/SITE_CHECKLIST.md` 3.2), in one place: the dev site's Apache reads it, and the
   live server gets the same lines at plan step 8. Each outside source added to the policy is
@@ -110,13 +99,10 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
 
 - **Static checks:** `bin/check` (see Commands), before every commit; it also type-checks the
   browser tests (TypeScript, strict).
-- **Scenario checks** (`tests/scenario/`): WP-CLI-level behaviour against the running sites,
-  such as mail delivery, the configuration script's and `.env`'s safety stops, and (the
-  `dev-*.sh` checks, against the dev site) the read-only theme and plugin mounts. Plain bash: the bats
-  framework would need the Docker socket in its container.
-- **Browser tests** (`tests/e2e/`, Playwright, two projects): `local`, the old-site copy's
-  pages, menu and content as a visitor sees them, with expected numbers that are facts of the
-  fixed dump in `db/` (plan step 2 inventory); `dev`, the new theme on the dev site, with axe
+- **Scenario checks** (`tests/scenario/`): behaviour against the running dev site, such as the
+  `.env` safety stop and the read-only theme and plugin mounts. Plain bash: the bats framework
+  would need the Docker socket in its container.
+- **Browser tests** (`tests/e2e/`, Playwright): the new theme on the dev site, with axe
   (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
   reports, and the Song List's page and admin form, which log in with the dev admin.
 - **PHPUnit** (unit and integration against a separate test database) arrives with the first
@@ -132,8 +118,6 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   are off in the user's VS Code user settings, because that extension reads rule settings only
   there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
   stays on, and its findings are fixed or explained.
-- Outside classes PHPStan cannot see are described by hand-written stubs in
-  `tools/phpstan/stubs/`, each saying why it exists and when to replace it.
 
 ## Project rules
 
@@ -178,5 +162,4 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   *Why:* the same theme must run unchanged locally, on staging and live; a hardcoded domain
   breaks on every move, and reviewers read it as careless work.
 - **`backups/` and `wordpress/` are never changed.** Experiments run on copies.
-  *Why:* they are the reference copy of the old site as exported, and the source of every
-  local rebuild.
+  *Why:* they are the reference copy of the old site as exported.

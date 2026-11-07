@@ -1,8 +1,7 @@
 # Runs on each push to main, each pull request and weekly: bin/check (every static check, plan
 # step 3f), and the dev site's tests (plan step 4d): the dev site is built here from the
-# repository alone and tested with bin/test dev. The old-site copy's tests stay local: they
-# need the backup, which never leaves the user's computer. On main, once both pass, the child
-# theme is deployed to the staging site (plan step 3g-3, bin/deploy-staging).
+# repository alone and tested with bin/test. On main, once both pass, the child theme and the
+# plugins are deployed to the staging site (plan step 3g-3, bin/deploy-staging).
 name: check
 
 on:
@@ -54,8 +53,8 @@ jobs:
       - name: Build the dev site (bin/dev-site)
         run: bin/dev-site
 
-      - name: Test the dev site (bin/test dev)
-        run: bin/test dev
+      - name: Test the dev site (bin/test)
+        run: bin/test
 
       # Playwright keeps a trace of each failed browser test (what the browser saw, step by step);
       # kept for a week so a failure here can be understood. The traces hold only the dev site's
@@ -87,7 +86,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Deploy the child theme to staging (bin/deploy-staging)
+      - name: Deploy the child theme and plugins to staging (bin/deploy-staging)
         run: bin/deploy-staging
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
