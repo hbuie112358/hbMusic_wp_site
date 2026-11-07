@@ -21,16 +21,14 @@ new findings added as steps.
   (2026-11-02), and the old staging copy is removed (0g).
 - **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
   Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
-  theme folder, and password logins cannot be switched off (3g-2).
+  theme and plugin folders, and password logins cannot be switched off (3g-2).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging) and
-  5a-2 (the old-site copy removed, D20).
-  2b (the pages, D22, and the look, D23) too.
-- **Next:** the visible parts of 5: the real Home page from `data/content/home-draft.html`, and
-  the Music, Songs, About and Book pages, with video placeholders until the user chooses; 3i
-  whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
-  approval before live). The live site's text still names the old service area (D22); Claude gave
-  the user wording to correct it there before go-live, and whether that was done is not known.
+- **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
+  5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
+- **Next:** 5f (the five pages): the design and tests are built, then the import on staging; the
+  user's video choices and wording follow; 3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+  approval before live). The live site's text still names the old service area (D22); the user
+  chose to leave it until go-live, since the site has little traffic (2026-11-07).
 - **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
   form (5e) → 6 → 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
@@ -154,10 +152,9 @@ new findings added as steps.
      videos later; a newer photo is coming; the email address stays, and no phone number is shown.
      The Book page's form (5e) emails the user when a visitor sends it, beside the address and
      Facebook link.
-   - **Done 2026-11-07:** the pages (D22) and the look (D23). Not versioned, for building the real
-     pages: the draft Home page in `data/content/home-draft.html`, web-sized images in
-     `data/photos/web/`, the three looks' screenshots in `data/design-samples/`. Left for the
-     visible parts of 5: the other pages, the Home video (the user chooses), and the wording.
+   - **Done 2026-11-07:** the pages (D22) and the look (D23). Not versioned: web-sized images in
+     `data/photos/web/`, the three looks' screenshots in `data/design-samples/`. The pages
+     themselves continue in 5f.
    Status: `[x]` f47fd0d
 3. **Local environment.** Choose how to run the site locally from `db/` and a copy of
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
@@ -530,6 +527,16 @@ new findings added as steps.
      kept pointing at a plugin folder git had removed and recreated, and showed it empty (proven:
      0 files, 3 after a rebuild). The copy's Docker containers, volumes and settings in `.env` were
      then deleted at the user's request. Status: `[x]` b779578
+   - 5f. **The five pages (D22, D23).** The real pages are content, entered through the admin: their
+     wording and import file are in `data/content/` (not versioned; `build_pages.py` writes
+     `pages-import.xml`, five pages and the menu), tried on the dev site, including a second import
+     that adds nothing. The dates in that file must be in the past, or WordPress schedules the pages
+     instead of publishing them (found in that trial). The photo goes in the Media Library, so the
+     user can swap it; the logo ships with the theme (`patterns/site-logo.php`). The policy allows
+     YouTube frames. The dev site has neutral pages with the same layouts
+     (`tests/dev-content/`), and tests check the logo and one main heading per page; each shown to
+     fail on a planted fault. Left: the import on staging, the user's video choices (Home and
+     Music), the wording, and the form in place of its stand-in (5e). Status: `[~]`
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test

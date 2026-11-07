@@ -37,6 +37,12 @@ async function recordCspViolations(page: Page): Promise<void> {
 
 for (const path of TEST_PATHS) {
 	test.describe(`the page ${path}`, () => {
+		// The Music page plays a video from YouTube. Answered here, so the tests need no network and
+		// no outside site, while the browser still applies the policy to the frame.
+		test.beforeEach(async ({ page }) => {
+			await page.route(/youtube\.com\/embed/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>video</title>' }));
+		});
+
 		test('loads through the child theme', async ({ page }) => {
 			const response = await page.goto(path);
 			expect(response?.status(), 'status').toBe(200);
@@ -49,6 +55,19 @@ for (const path of TEST_PATHS) {
 			await expect(page.locator('header.hb-site-header'), 'the header').toHaveCount(1);
 			await expect(page.locator('footer.hb-site-footer'), 'the footer').toHaveCount(1);
 			await expect(page.locator('footer a[href*="/shop"], footer a[href*="/blog"]'), "the parent's footer links").toHaveCount(0);
+		});
+
+		test('shows the logo from the theme', async ({ page }) => {
+			await page.goto(path);
+			const logo = page.locator('header.hb-site-header .hb-site-logo img');
+			await expect(logo, 'the logo').toBeVisible();
+			const hasLoaded = await logo.evaluate((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0);
+			expect(hasLoaded, 'the logo image has loaded').toBe(true);
+		});
+
+		test('has exactly one main heading', async ({ page }) => {
+			await page.goto(path);
+			await expect(page.locator('h1'), 'the h1 headings').toHaveCount(1);
 		});
 
 		test('carries the security headers', async ({ request }) => {

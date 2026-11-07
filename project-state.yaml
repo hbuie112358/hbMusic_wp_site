@@ -19,12 +19,10 @@ last_work: >
   the child theme's files and on staging. Pull requests #14 to #16 merged.
 
 next_action: >
-  The visible parts of step 5: build the real Home page (from data/content/home-draft.html, with
-  the images in data/photos/web/) and the Music, Songs, About and Book pages in the new design,
-  with placeholders for the videos until the user chooses them. The Home page uses the theme's
-  page-no-title template, and the draft's image address and ID are from a trial, so they are
-  replaced when the image is uploaded. The local branch pause-2026-11-07 holds only this pause
-  commit; it goes with the next push.
+  Step 5f: import data/content/pages-import.xml on staging (the Songlist page made there is deleted
+  first, so its address is free), set Home as the front page, and place the photo from
+  data/photos/web/ on Home through the Media Library. Video placeholders stay until the user
+  chooses the videos.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -32,7 +30,7 @@ verification:
   staging_php: 8.4.27 (set per website; step 0f corrected)
   live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
-  live_text: still names the old service area (Parkersburg, Marietta, Mid Ohio Valley); see pending_decisions
+  live_text: still names the old service area (Parkersburg, Marietta, Mid Ohio Valley); the user chose to leave it until go-live, since the site has little traffic
   staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, child theme Howard Buie Music active with the On Stage look, Song List plugin active with the 108 songs and a Songlist page; deployed from main; WordPress Importer deleted again
   live_login_name_revealed: no (/?author=1 404, REST users 401, checked 2026-11-02)
   local_sites: dev site on 10102 only; the rest of the 101xx block is free
@@ -47,11 +45,6 @@ verification:
 uncommitted_changes: []
 
 pending_decisions:
-  - >
-    Whether to correct the live site's wording now, before go-live, since it names the old service
-    area. Claude recommended yes and gave the user paste-ready text for the tagline, Home and About;
-    the user has not said whether this was done. The wording is short: Fayetteville, NC, and
-    surrounding areas, including Southern Pines.
   - Which videos to use, and which one on Home (the user goes through them).
   - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.

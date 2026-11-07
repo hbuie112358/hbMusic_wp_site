@@ -116,16 +116,6 @@ configure_site() {
   wp_cli rewrite structure '/%postname%/'
 }
 
-# The block content of one test page: the Songlist page shows the plugin's block.
-test_page_content() {
-  local title="$1"
-  if [[ "$title" == "Songs" ]]; then
-    printf '%s' '<!-- wp:songlist/song-list /-->'
-    return
-  fi
-  printf '%s' "<!-- wp:paragraph --><p>Sample text for the dev site's $title page. The real content comes with step 2b.</p><!-- /wp:paragraph -->"
-}
-
 create_test_songs() {
   local song title artist
   for song in "${TEST_SONGS[@]}"; do
@@ -138,17 +128,22 @@ create_test_songs() {
 
 create_test_content() {
   log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
-  local ids position=0 test_page title page_id
+  local ids position=0 test_page title address page_id
   ids="$(wp_cli post list --post_type=post,page --post_status=any --format=ids)"
   # shellcheck disable=SC2086 # a space-separated list of post IDs
   [[ -n "$ids" ]] && wp_cli post delete $ids --force >/dev/null
   for test_page in "${TEST_PAGES[@]}"; do
     title="${test_page%%|*}"
+    address="${test_page#*|}"
     position=$((position + 1))
-    page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="$title" \
-      --post_name="${test_page#*|}" --menu_order="$position" --porcelain \
-      --post_content="$(test_page_content "$title")")"
-    [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
+    # As the admin: WordPress strips the Music page's video frame from anyone else's content.
+    page_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
+      --post_title="$title" --post_name="$address" --menu_order="$position" --porcelain \
+      --post_content="$(cat "$REPO_ROOT/tests/dev-content/$address.html")")"
+    [[ "$title" != "Home" ]] && continue
+    # Home opens with its own headline, so WordPress's page title would be a second one.
+    wp_cli post meta update "$page_id" _wp_page_template page-no-title >/dev/null
+    wp_cli option update page_on_front "$page_id" >/dev/null
   done
   wp_cli option update show_on_front page >/dev/null
   create_navigation_menu
