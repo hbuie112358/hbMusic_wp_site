@@ -25,13 +25,14 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** step 6 (plugins), then step 8, whose mail service the booking form's delivery waits for
-  (5e). 5f's pages are on staging; the user's video choices and wording follow. 3i whenever the
-  user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+- **Next:** the mail service from step 8, taken first by the user's choice, since the booking form's
+  delivery waits for it (5e); the user's answer about an address at the domain decides the service.
+  Then the rest of 8, and 6. 5f's pages are on staging; the user's video choices and wording follow.
+  3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
-- **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
-  form (5e) → 6 → 8 → 9 → 10.
+- **Order of the coming steps (D19, replacing D11's):** the mail service (8) → the rest of 5e → 6 →
+  the rest of 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -606,6 +607,17 @@ new findings added as steps.
    for the live site: whether Wordfence's firewall is optimized (it edits `.htaccess`; with a
    backup, and the site checked afterwards); two-factor login required for the Administrator
    role, as on staging; and Wordfence's auto-updates, decided with the rest of the updates.
+   - **The mail service, researched 2026-11-07, waiting on the user's answer:** does the user have, or
+     can the user create, an address at the domain (hPanel, Emails)? If yes, SMTP2GO, which refuses
+     signups from Gmail: free for 1,000 mails a month, native in FluentSMTP, three CNAME records with
+     the SPF record untouched, and it survives the move at step 10. If no, or at extra cost, Brevo,
+     after confirming its branding and limits, whose pricing page did not load. A Hostinger mailbox
+     over SMTP needs no new account but is redone at step 10. Not yet confirmed: SMTP2GO's daily limits
+     and branding, and which email the Hostinger plan includes. Public records then: MX at Hostinger,
+     SPF naming only `_spf.mail.hostinger.com`, DMARC `p=none`, no DKIM under the common names checked,
+     no SPF for the staging subdomain. Gmail requires SPF or DKIM, which fits the staging test mail
+     not arriving (5e); that cause is still unproven until a message arrives. FluentSMTP is not yet on
+     staging.
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are

@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-07T11:51:00-05:00
-current_branch: pause-2026-11-07
-last_commit: f47fd0d
+timestamp: 2026-11-07T14:58:00-05:00
+current_branch: step-5e-on-staging
+last_commit: ad7580e
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -11,18 +11,19 @@ last_work: >
   restricted deploy key (3g-2), site checklist reviewed, template decision D18. 2026-11-04: step
   4 (child theme, dev site, tests, required GitHub check) and 3g-3 (deploy to staging after
   every merge to main). 2026-11-07: a review of the plan for work built on wrong assumptions, with
-  the user's decisions recorded as D19-D21: clip requests and setlist preferences become future
-  plugins, the template waits for a second site, the old-site copy goes. 5a: the Song List plugin
-  built, deployed and activated on staging, its 108 checked songs imported there. 5a-2: the
-  old-site copy removed, its Docker containers and volumes deleted at the user's request. 2b: the
-  five pages and the new service area, Fayetteville NC (D22), and the "On Stage" look (D23), in
-  the child theme's files and on staging. Pull requests #14 to #16 merged.
+  the user's decisions recorded as D19-D21. 5a: the Song List plugin, on staging with its 108
+  songs. 5a-2: the old-site copy removed. 2b: the five pages and the new service area (D22) and the
+  "On Stage" look (D23). 5f: the real pages on staging. 5e: the booking form with Contact Form 7 and
+  Cloudflare Turnstile, on staging with the user's real keys; the spam check passes and the form
+  reports the message sent, but no mail reaches the user yet. The mail service was researched.
+  Pull requests #14 to #18 merged.
 
 next_action: >
-  Step 5f: import data/content/pages-import.xml on staging (the Songlist page made there is deleted
-  first, so its address is free), set Home as the front page, and place the photo from
-  data/photos/web/ on Home through the Media Library. Video placeholders stay until the user
-  chooses the videos.
+  Ask the user the waiting question: does the user have, or can the user create, an address at the
+  domain (hPanel, Emails)? That decides the mail service (SMTP2GO if yes; otherwise Brevo, after
+  confirming its branding and limits), with the research in the plan's step 8. Then set it up with
+  FluentSMTP on staging and confirm a test request reaches the user's inbox. Suggest a push: this
+  branch holds ad7580e (the form's hidden widget, sender fix and settings test) and this pause commit.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -30,24 +31,29 @@ verification:
   staging_php: 8.4.27 (set per website; step 0f corrected)
   live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
-  live_text: still names the old service area (Parkersburg, Marietta, Mid Ohio Valley); the user chose to leave it until go-live, since the site has little traffic
-  staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, child theme Howard Buie Music active with the On Stage look, Song List plugin active with the 108 songs and a Songlist page; deployed from main; WordPress Importer deleted again
-  live_login_name_revealed: no (/?author=1 404, REST users 401, checked 2026-11-02)
-  local_sites: dev site on 10102 only; the rest of the 101xx block is free
-  checks: bin/check 14 checks; bin/test 3 scenarios + 30 browser tests, all passing on 2026-11-07
+  live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
+  staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
+  staging_mail: the form reports sent, but no mail arrived in Gmail, spam folder not confirmed; FluentSMTP is not on staging
+  local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
+  checks: bin/check 14 checks; bin/test 4 scenarios + 60 browser tests, all passing on 2026-11-07
+  unexplained: one login timeout in the Song List's browser tests, once, not in the nine runs after it; cause not known, test unchanged; if it recurs, keep its trace
   github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only
   deploy_destinations: staging-child-theme and staging-song-list in the server's rsync settings
-  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; no Dependabot pull requests yet (checked 2026-11-07)
+  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; no open pull requests (checked 2026-11-07)
   commit_identity: GitHub noreply address, set in this repository's git config only
   hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
-  not_versioned: data/ holds the song list and its import file (needed at go-live), the photos, the draft Home page and the looks' screenshots; only on the user's computer
+  not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml, written by build_pages.py), the photos and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys
 
 uncommitted_changes: []
 
 pending_decisions:
+  - >
+    Whether the user has or can create an address at the domain, which decides the mail service:
+    SMTP2GO if yes (Claude's recommendation; it refuses Gmail signups), otherwise Brevo. Details in the
+    plan's step 8.
   - Which videos to use, and which one on Home (the user goes through them).
   - Testimonials, left out for now; the user may check Facebook for some.
-  - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses.
+  - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).
   - The new host (step 10, before the Hostinger plan ends in 2028).
   - Decided when the step is reached, noted in the plan - step 8 (backups, updates, cache, headers), step 9 (updating the site in place or a fresh install).
 
