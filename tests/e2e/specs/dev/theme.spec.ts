@@ -7,7 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 //
 // The paths of the test pages bin/dev-site creates (TEST_PAGES; "Home" is the front page).
 // Fixed here, not read from the site's menu: a page missing from the menu must still fail.
-const TEST_PATHS = ['/', '/about/', '/songlist/', '/video/', '/contact/'];
+const TEST_PATHS = ['/', '/music/', '/songlist/', '/about/', '/book/'];
 // WordPress marks the active child theme on <body> (wp-child-theme-<folder>).
 const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
 // WCAG 2.2 level AA and the levels it includes (checklist 7.1).
@@ -41,6 +41,14 @@ for (const path of TEST_PATHS) {
 			const response = await page.goto(path);
 			expect(response?.status(), 'status').toBe(200);
 			await expect(page.locator('body'), 'the active child theme').toHaveClass(CHILD_THEME_BODY_CLASS);
+		});
+
+		// The parent theme's own footer links to a blog, shop and events this site does not have.
+		test("uses the site's own header and footer", async ({ page }) => {
+			await page.goto(path);
+			await expect(page.locator('header.hb-site-header'), 'the header').toHaveCount(1);
+			await expect(page.locator('footer.hb-site-footer'), 'the footer').toHaveCount(1);
+			await expect(page.locator('footer a[href*="/shop"], footer a[href*="/blog"]'), "the parent's footer links").toHaveCount(0);
 		});
 
 		test('carries the security headers', async ({ request }) => {

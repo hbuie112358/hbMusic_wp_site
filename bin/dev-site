@@ -18,9 +18,10 @@ readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
   DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL
 )
-# The test pages, in menu order: the old site's page names, so templates and navigation are
-# exercised as the real site will use them; their text is neutral sample text (no real data).
-readonly TEST_PAGES=(Home About Songlist Video Contact)
+# The test pages as "title|address", in menu order: the new site's pages (plan D22), so templates
+# and navigation are exercised as the real site will use them; their text is neutral sample text
+# (no real data).
+readonly TEST_PAGES=('Home|home' 'Music|music' 'Songs|songlist' 'About|about' 'Book|book')
 # Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
 # shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
 # expects them sorted and escaped. Neutral text, no real data.
@@ -118,7 +119,7 @@ configure_site() {
 # The block content of one test page: the Songlist page shows the plugin's block.
 test_page_content() {
   local title="$1"
-  if [[ "$title" == "Songlist" ]]; then
+  if [[ "$title" == "Songs" ]]; then
     printf '%s' '<!-- wp:songlist/song-list /-->'
     return
   fi
@@ -137,14 +138,16 @@ create_test_songs() {
 
 create_test_content() {
   log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
-  local ids position=0 title page_id
+  local ids position=0 test_page title page_id
   ids="$(wp_cli post list --post_type=post,page --post_status=any --format=ids)"
   # shellcheck disable=SC2086 # a space-separated list of post IDs
   [[ -n "$ids" ]] && wp_cli post delete $ids --force >/dev/null
-  for title in "${TEST_PAGES[@]}"; do
+  for test_page in "${TEST_PAGES[@]}"; do
+    title="${test_page%%|*}"
     position=$((position + 1))
     page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="$title" \
-      --menu_order="$position" --porcelain --post_content="$(test_page_content "$title")")"
+      --post_name="${test_page#*|}" --menu_order="$position" --porcelain \
+      --post_content="$(test_page_content "$title")")"
     [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
   done
   wp_cli option update show_on_front page >/dev/null
@@ -157,8 +160,9 @@ create_test_content() {
 # a list (an accessibility error the real site would not have). The navigation block uses the
 # newest menu when none is chosen.
 create_navigation_menu() {
-  local title links="" address
-  for title in "${TEST_PAGES[@]}"; do
+  local test_page title links="" address
+  for test_page in "${TEST_PAGES[@]}"; do
+    title="${test_page%%|*}"
     address="$(wp_cli post list --post_type=page --title="$title" --field=url)"
     links+="<!-- wp:navigation-link {\"label\":\"$title\",\"url\":\"$address\",\"kind\":\"post-type\",\"type\":\"page\"} /-->"
   done
@@ -169,6 +173,12 @@ create_navigation_menu() {
 # A fresh debug log, so the browser tests (4c) see only what this build's pages cause.
 clear_debug_log() {
   compose exec -T wordpress rm -f /var/www/html/wp-content/debug.log
+}
+
+# The database is emptied each run but uploads live in the files volume, so a trial's images
+# would otherwise survive a rebuild (a LOW item from 4b's review).
+clear_uploads() {
+  compose exec -T wordpress sh -c 'rm -rf /var/www/html/wp-content/uploads/*'
 }
 
 main() {
@@ -182,6 +192,7 @@ main() {
   compose up -d --force-recreate --no-deps wordpress
   wait_for_wordpress_files
   install_wordpress
+  clear_uploads
   install_parent_theme
   remove_unused_code
   configure_site

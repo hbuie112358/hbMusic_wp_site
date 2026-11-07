@@ -25,10 +25,11 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging) and
   5a-2 (the old-site copy removed, D20).
-- **Next:** 2b (content and design); 3i whenever the user chooses. The live deploy's design is
+  2b (the pages, D22, and the look, D23) too.
+- **Next:** the visible parts of 5; 3i whenever the user chooses. The live deploy's design is
   recorded in step 9 (option B, the user's approval before live).
-- **Order of the coming steps (D19, replacing D11's):** 2b → the visible parts of 5, with the
-  booking form (5e) → 6 → 8 → 9 → 10.
+- **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
+  form (5e) → 6 → 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -70,6 +71,8 @@ new findings added as steps.
 | D19 | Features become separate plugins (the user, 2026-11-07). The song list plugin (5a) is built now, with a general name and nothing specific to this site, so it can be changed on its own, added to a site or not, and shared. Clip requests with emailed clips (5b, 5c) and setlist preferences (5d) are future plugins, not needed for go-live; each needs the song list plugin and adds its own fields to songs (the clip; year, genre and energy). Video is always linked from YouTube, never stored on the site. Go-live has a plain booking form (5e). The order: 5a → 5a-2 → 2b → the visible parts of 5, with 5e → 6 → 8 → 9 → 10. | Year, energy, approval, expiring links and a real cron job existed only for those features. A site that wants only a song list never sees their fields, the plugin stays small enough to share, and the unmaintained old theme leaves the live site sooner. D8, D9 and D10 stay as the design of those future plugins. |
 | D20 | The old-site copy is removed after the songs are converted (5a-2): `compose.yaml`, `bin/local-import`, the `local` test group, and what was built only for it (FluentSMTP's local setup, its script, tests and stubs). `backups/`, `db/` and `wordpress/` stay untouched. Replaces D12's old-site copy, not its Docker Compose and port choices, which the dev site keeps. FluentSMTP stays the live site's mail plugin (D13). | The copy assumed the rebuild needed the old site running locally and mail tested there. Since step 4 the new theme has its own dev site, the real old site is still online to look at, and the copy's tests check a frozen dump that no theme work can break. |
 | D21 | The template project starts when a second site has a date, not now (the user, 2026-11-07). `template-notes.md` keeps collecting what it must set differently. | Built after go-live, it starts with the plugin setup, live deploy and mail already proven, without 2-3 hours of carrying them over and a second repository to keep updated. Plugins in their own folders keep separation easy later. |
+| D23 | The site's look is "On Stage" (the user, 2026-11-07, chosen from three looks built on the real photo, logo and draft wording): a black page in which the photo blends, warm white text, and green from the logo for buttons and the booking band, using the parent's Manrope font. It lives in the child theme's `theme.json` and `parts/`. Wording is refined later in the admin. The current 885-pixel photo is used, without upscaling. | The user preferred it to the warm cream and black-and-white looks. Styles stay in `theme.json` (checklist 6.1), so no separate CSS file and no Stylelint yet; a CSS file would bring that up again. |
+| D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 
 ## Steps
 
@@ -133,7 +136,26 @@ new findings added as steps.
    visual directions as clickable sample pages with the real content and photos, for the user to
    react to; the chosen one becomes the child theme's `theme.json`. *Why:* the user does not yet
    know what the site should look like, and choosing from real examples is easier than
-   describing a look. Status: `[ ]`
+   describing a look. Found in the review of 2026-11-07, for this session:
+   - **What someone booking needs:** listenable music (the Audio page is empty), event types and
+     service area, testimonials, a clear way to book on a phone, a Google Business Profile, and
+     whether to have analytics at all.
+   - **A quicker way to choose:** Twenty Twenty-Five ships 8 style variations (counted in the
+     exported 1.2) that can be tried on the real content before building any sample by hand.
+     Twenty Twenty-Six could not be checked then; compare it here.
+   - **Design lives in files (rule for this project from here on):** edits saved in the Site Editor
+     go into the database and override the theme's files, so a later deploy can seem to do nothing.
+     Design changes go through the theme's files; a Site Editor trial is copied into them and reset.
+   - **The user's answers (2026-11-07):** all kinds of events are welcome; the area stays as in D22;
+     no testimonials for now (the user may check Facebook for some later); the user chooses the
+     videos later; a newer photo is coming; the email address stays, and no phone number is shown.
+     The Book page's form (5e) emails the user when a visitor sends it, beside the address and
+     Facebook link.
+   - **Done 2026-11-07:** the pages (D22) and the look (D23). Not versioned, for building the real
+     pages: the draft Home page in `data/content/home-draft.html`, web-sized images in
+     `data/photos/web/`, the three looks' screenshots in `data/design-samples/`. Left for the
+     visible parts of 5: the other pages, the Home video (the user chooses), and the wording.
+   Status: `[x]`
 3. **Local environment.** Choose how to run the site locally from `db/` and a copy of
    `wordpress/` (the database import needs the site URL replaced), and the test tools for each
    level of `TESTING_APPROACH.md`, covering what the step 2 inventory found. Includes a local
@@ -561,11 +583,27 @@ new findings added as steps.
    for the live site: whether Wordfence's firewall is optimized (it edits `.htaccess`; with a
    backup, and the site checked afterwards); two-factor login required for the Administrator
    role, as on staging; and Wordfence's auto-updates, decided with the rest of the updates.
+   Found in the review of 2026-11-07, for this step:
+   - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
+     cannot be met as written without paying or changing the item; Hostinger's own backups are
+     weekly or daily depending on the plan, which the user checks.
+   - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
+     days without activity, so the weekly audits need regular activity, such as Dependabot merges.
+   - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
+     page cache unless the speed check (8.1) fails, since a cache needs purging after deploys;
+     sending the security headers from the theme, so they deploy with the code and follow a host
+     move; an uptime service whose terms are read first (sources conflicted on UptimeRobot).
    Status: `[ ]`
 9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
      one is short and was in the exposed `local.sql`);
+   - how the new site reaches the live address, a gap found in the review of 2026-11-07 and not yet
+     decided: updating the existing WordPress in place (keeps URLs and the Yoast and Wordfence
+     settings, with old plugin tables and revisions to clean up; Claude's recommendation then) or a
+     fresh install (nothing carried over, more set up again). Decided when this step is reached,
+     with what the pages and staging have shown by then. New page content is ready before the
+     theme is switched, and the deploy key cannot run WP-CLI, so content goes through the admin;
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
