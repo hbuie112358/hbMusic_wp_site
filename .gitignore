@@ -21,6 +21,9 @@
 !/themes/
 /themes/*
 !/themes/hbmusic-child/
+!/plugins/
+/plugins/*
+!/plugins/song-list/
 
 # Secrets, dumps and archives stay out even inside the allowed folders: a stray export saved
 # into docs/ or the theme must never be staged by `git add -A`.

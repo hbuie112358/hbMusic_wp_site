@@ -14,7 +14,8 @@ if (configured.length === 0) {
 }
 
 export default defineConfig({
-	// The tests only read pages, so they can run side by side.
+	// Almost every test only reads pages, so they can run side by side. The Song List's admin
+	// tests add songs, one at a time, and remove them again; the visitor tests tolerate that.
 	fullyParallel: true,
 	forbidOnly: true,
 	retries: 0,

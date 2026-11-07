@@ -24,6 +24,12 @@ template project starts; until then, a list, not a to-do.
 - The theme's header in `themes/hbmusic-child/style.css`: its name ("Howard Buie Music") and
   description; the parent, text domain, versions and licence stay.
 
+## Plugins
+
+- A site chooses its plugins (plan D19). Each one sits in `plugins/<name>/`, needs a line in
+  `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry
+  in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync settings.
+
 ## Settings
 
 - The ports (the 101xx block): `.env.example` (`SITE_PORT`, `MAIL_UI_PORT`) and the project's

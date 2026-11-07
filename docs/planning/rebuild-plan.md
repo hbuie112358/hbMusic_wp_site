@@ -23,20 +23,25 @@ new findings added as steps.
   Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
   theme folder, and password logins cannot be switched off (3g-2).
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Next:** the template project (D18, decided by the user: after 3g-3) or 5a (songs as
-  data), the user's choice; 3i whenever the user chooses. The live deploy's design is
-  recorded in step 9 (option B, the user's approval before live).
-- **Order of the coming steps (D11):** 3 → 4 → 5a → the logic of 5b and 5d → 6 → 2b → the
-  visible parts of 5 → 7 → 8 → 9 → 10.
+- **Next:** 5a (the song list plugin), then 5a-2 (removing the old-site copy, D20); 3i whenever
+  the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+  approval before live).
+- **Order of the coming steps (D19, replacing D11's):** 5a → 5a-2 → 2b → the visible parts of 5,
+  with the booking form (5e) → 6 → 8 → 9 → 10.
+- **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
+  preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
   - the new host (step 10, before 2028-07-16).
 - **Site checklist (D16):** `docs/SITE_CHECKLIST.md` (named `BEST_PRACTICES.md` until
   2026-11-03) is the draft of WordPress additions for a shared global file; until anything moves
-  there, it is this project's checklist. Reviewed with the user on 2026-11-03 and committed: 88 items, each with
+  there, it is this project's checklist. Reviewed with the user on 2026-11-03 and committed: 89 items, each with
   its check, its kind (general, WordPress or shop) and its status (done, in force, partly,
   planned with its step, or not applicable); a section for shops (WooCommerce, for the template)
   and a list of practices deliberately not used.
-- **Stale documents:** none.
+- **Stale documents:** in `docs/SITE_CHECKLIST.md` (2.7, 6.4, 8.3, 10.1-10.3) and
+  `docs/planning/findings/step-02-inventory.md` ("What the new site must cover"), references to
+  5b, 5d and song years, genres and energy predate D19: the form at go-live is now 5e, and the
+  rest is future work. The project's `CLAUDE.md` describes the old-site copy until 5a-2 removes it.
 
 ## Decisions
 
@@ -52,14 +57,17 @@ new findings added as steps.
 | D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
 | D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |
 | D10 | Each song also stores an energy rating from 1 (mellow) to 5 (high energy); every setlist dial (genre, era, energy) has a "no preference, the user's call" option. | The client can set the feel of the set; energy is how the song lands in the user's own acoustic version, so the user rates it (Claude's pre-filled values are labelled as guesses). Skippable dials keep the page simple and show what the client cared about. |
-| D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. |
+| D11 | The technical groundwork comes before the content and design session (2b): the local environment, the theme skeleton, songs as data, and the logic of the requests and dials, which a visitor does not see. What a visitor sees waits for 2b. | The user prefers to have the technical parts in place first; 2b then reacts to sample pages built on the real songs and working features, and nothing visible is built twice. **The order is replaced by D19's (2026-11-07):** with the clip and setlist features moved to future plugins, no logic of 5b or 5d comes before 2b. |
 | D12 | The local copy runs in Docker Compose, set up in the repository (`compose.yaml`, `bin/local-import`), with this project's ports in the 101xx block, bound to `127.0.0.1`. | It reproduces the live database version, includes a mail catcher, can be read by a reviewer and run the same way in CI; wp-env (the WordPress project's tool) has no mail catcher, a desktop app cannot be reviewed or reproduced. The 101xx block keeps clear of the 80xx and 90xx ports other projects use. |
 | D13 | FluentSMTP sends the site's mail, locally to Mailpit and live to the mail service of step 8; it supports plain SMTP and the main services' APIs. | Chosen by the user over WP Mail SMTP: fully free with no paid tier or upsells, and an email log included. Accepted cost: its connection settings live in the database, so the import saves them through the plugin's own code, and `bin/local-mail-check` catches a format change after an update. WP Mail SMTP would have allowed all settings in `wp-config.php` but keeps the log for its paid version. (The check named here became `tests/scenario/mail-delivery.sh`, run by `bin/test`, in step 3e.) |
 | D14 | The deploy pipeline is built now, against a staging subdomain at the former host, and re-pointed to the new host at step 9; deploys go through GitHub (checks first, then SSH), not a host's own deploy feature. | Proves the pipeline on a real host early, so the move is routine; a staging target keeps the unfinished theme away from the live site; GitHub-based deploys work with any host offering SSH, so switching hosts means changing three secrets (address, key, folder). |
 | D15 | The new site goes live at Hostinger, where the plan is already paid until 2028-07-16; the move to another host becomes step 10, before then. Supersedes the original assumption that the site leaves Hostinger before going live (D14's "re-pointed at step 9" now happens at step 10). | Avoids paying two hosts at once. Hostinger meets the conditions checked on 2026-11-02: PHP 8.2-8.5 selectable, SSH included in the plan, outgoing mail ports open; the pipeline (3g) keeps the later move routine. |
 | D16 | `docs/BEST_PRACTICES.md` holds the WordPress-specific practices, as candidates for a shared `~/.claude/WORDPRESS_STANDARDS.md` (alongside the Java and Go files). A rule that seems to apply to every project is only proposed for the global files: Claude asks the user specifically each time and changes nothing there without the user's yes for that change. The first one, "secrets stay out of repositories and output", went into `WORKING_STYLE.md` on 2026-11-02 after the user approved it. (2026-11-03: the file was renamed `docs/SITE_CHECKLIST.md`, since "best practices" could mean coding style or design; it covers security, accessibility, performance and operations. Each item is marked general or WordPress, so if it ever moves, the WordPress items go to the WordPress file and each general item is proposed for a global file on its own. Whether `WORDPRESS_STANDARDS.md` is the right name, next to the coding-style files `JAVA_STANDARDS.md` and `GO_STANDARDS.md`, is decided then.) | The user builds WordPress sites as a service provider, so these practices will repeat in other projects; one shared file avoids copies drifting apart. |
 | D17 | The GitHub repository is public from its first push, created only after step 0f (the live site's plugins and PHP updated) and a read of the plan and findings for any weakness of the live site that is still open; branch protection then requires the checks before a merge. | Public gives free branch protection, unlimited Actions minutes and a portfolio from the start; the history search before the push found no personal data or secrets. Publishing an open weakness of the live site would hand attackers a shortcut, and a pushed history cannot be taken back, so the push waits for 0f. Excluding the planning documents instead would mean rewriting the whole history and losing the plan's versions. |
-| D18 | The project stays template-ready, and the template for further WordPress sites becomes a project of its own later, extracted from this one into a fresh repository (no history) and offered as a GitHub template repository. Meanwhile, each step that touches something another site would set differently adds a line to `docs/planning/template-notes.md`, and site-specific values stay in settings rather than code. Whether to start the template project is looked at again at the end of step 4. A template for WooCommerce sites comes from a real WooCommerce project, not from this one. | A template designed in advance guesses what is generic; one extracted from a working project starts out proven. Separating generic from site-specific is cheapest while each piece is written. After step 4 the generic part (tooling and theme skeleton) is complete; what follows is this site's own. This repository's history holds the plan and site details, so the template does not inherit it. WooCommerce adds payments, customer accounts and orders, with their own rules. |
+| D18 | The project stays template-ready, and the template for further WordPress sites becomes a project of its own later, extracted from this one into a fresh repository (no history) and offered as a GitHub template repository. Meanwhile, each step that touches something another site would set differently adds a line to `docs/planning/template-notes.md`, and site-specific values stay in settings rather than code. Whether to start the template project is looked at again at the end of step 4. A template for WooCommerce sites comes from a real WooCommerce project, not from this one. | A template designed in advance guesses what is generic; one extracted from a working project starts out proven. Separating generic from site-specific is cheapest while each piece is written. After step 4 the generic part (tooling and theme skeleton) is complete; what follows is this site's own. This repository's history holds the plan and site details, so the template does not inherit it. WooCommerce adds payments, customer accounts and orders, with their own rules. **The timing is replaced by D21 (2026-11-07).** |
+| D19 | Features become separate plugins (the user, 2026-11-07). The song list plugin (5a) is built now, with a general name and nothing specific to this site, so it can be changed on its own, added to a site or not, and shared. Clip requests with emailed clips (5b, 5c) and setlist preferences (5d) are future plugins, not needed for go-live; each needs the song list plugin and adds its own fields to songs (the clip; year, genre and energy). Video is always linked from YouTube, never stored on the site. Go-live has a plain booking form (5e). The order: 5a → 5a-2 → 2b → the visible parts of 5, with 5e → 6 → 8 → 9 → 10. | Year, energy, approval, expiring links and a real cron job existed only for those features. A site that wants only a song list never sees their fields, the plugin stays small enough to share, and the unmaintained old theme leaves the live site sooner. D8, D9 and D10 stay as the design of those future plugins. |
+| D20 | The old-site copy is removed after the songs are converted (5a-2): `compose.yaml`, `bin/local-import`, the `local` test group, and what was built only for it (FluentSMTP's local setup, its script, tests and stubs). `backups/`, `db/` and `wordpress/` stay untouched. Replaces D12's old-site copy, not its Docker Compose and port choices, which the dev site keeps. FluentSMTP stays the live site's mail plugin (D13). | The copy assumed the rebuild needed the old site running locally and mail tested there. Since step 4 the new theme has its own dev site, the real old site is still online to look at, and the copy's tests check a frozen dump that no theme work can break. |
+| D21 | The template project starts when a second site has a date, not now (the user, 2026-11-07). `template-notes.md` keeps collecting what it must set differently. | Built after go-live, it starts with the plugin setup, live deploy and mail already proven, without 2-3 hours of carrying them over and a second repository to keep updated. Plugins in their own folders keep separation easy later. |
 
 ## Steps
 
@@ -118,8 +126,8 @@ new findings added as steps.
    environment. Findings: [findings/step-02-inventory.md](findings/step-02-inventory.md);
    `music-lite-child` is empty, so open item 4 is settled. Status: `[x]`
 2b. **Content and design session.** First the content: what each page is for and what a visitor
-   booking a musician needs to find fast, including the new request pages (5b clips, 5d setlist
-   preferences, and how simple the 5d choices can be made). Then 2-3
+   booking a musician needs to find fast, including the booking form (5e); the request pages of
+   5b and 5d are future work (D19). Then 2-3
    visual directions as clickable sample pages with the real content and photos, for the user to
    react to; the chosen one becomes the child theme's `theme.json`. *Why:* the user does not yet
    know what the site should look like, and choosing from real examples is easier than
@@ -471,14 +479,36 @@ new findings added as steps.
      `[x]` 350c03c
 5. **Rebuild the design and content** in the child theme from the step 2 inventory and the
    step 2b choices (rough; split further after 2b). Known parts:
-   - 5a. **Songs as data.** A small site plugin (not the theme, so the songs survive a theme
-     change) with a Song type: title, artist, release year, genre Rock/Pop or Country (D9), and
-     energy 1-5 (D10). Claude suggests the release years from public release data, and the
-     genres and energy ratings as labelled guesses, for the user to check and correct. The 108 songs are converted from the current Songlist page, where titles and artists
+   - 5a. **The song list plugin (D19).** A plugin with a general name and nothing specific to
+     this site (not the theme, so the songs survive a theme change), with a Song type: title and
+     artist. The 108 songs are converted from the current Songlist page, where titles and artists
      sit in two separate lists matched only by position. The Songlist page is built from the Song entries.
-     *Why:* the user adds songs in the admin instead of editing page text. On the dev site
+     *Why:* the user adds songs in the admin instead of editing page text, and can change or
+     share the plugin on its own. On the dev site
      (4b), the plugin is mounted read-only like the theme, and `bin/dev-site`'s step that
-     deletes every plugin must leave it alone (a LOW item from 4b's review). Status: `[ ]`
+     deletes every plugin must leave it alone (a LOW item from 4b's review). Built 2026-11-07:
+     `plugins/song-list/`, a block in PHP alone (`autoRegister`, WordPress 7.0), no page per song,
+     its own PHPCS ruleset, and a check that it names nothing of this site. PHPUnit waits for a
+     plugin with real logic. Proven by planted faults. The 108 songs are converted and the user
+     checked them (`data/song-list/songs.csv`, not versioned; eight spelling fixes). Left: the
+     server's `staging-song-list` destination before the next push, the import file, and the
+     import on staging. Status: `[~]`
+   - 5a-2. **Remove the old-site copy (D20),** after the songs are converted: `compose.yaml`,
+     `bin/local-import`, `local/`, the `local` test group, the FluentSMTP tests and stubs, and
+     their settings. `bin/check`'s checks that read `compose.yaml` move to `compose.dev.yaml`, or
+     go where they compared the two sites. `backups/`, `db/` and `wordpress/` stay untouched.
+     Status: `[ ]`
+   - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
+     date and message, sent to the user. The form tool is chosen at this step; a maintained
+     ready-made plugin first. Needs spam protection, a privacy policy page and a way to test
+     its mail on the dev site (`docs/SITE_CHECKLIST.md` 6.4, 10.1, 10.3). Status: `[ ]`
+   - **Future plugins (D19), not needed for go-live:** 5b and 5c are one clip request plugin; 5d
+     is the setlist preferences plugin. Their descriptions below are kept as their design.
+     Clips would be short compressed MP3s (about 240-320 KB for 20 seconds).
+   - **When release years are added (the user, 2026-11-07):** a song known in two artists' versions
+     shows both years, each with its artist. Eight songs today hold two artists separated by " / "
+     in the artist field, which can be split when this is built. The field and a one-time bulk
+     load are small; the user checks the suggested years.
    - 5b. **Song requests (D8).** The Songlist has a checkbox per song and "select all"; a form
      (name, email, optional event date and message) sends the selection. Each request is stored
      in the admin with its songs and notifies the user; the user clicks "Approve and send", and
@@ -517,7 +547,7 @@ new findings added as steps.
    Hostinger updater updates only WordPress itself, open item 3), and the authenticated mail
    service with its DNS records (`docs/SITE_CHECKLIST.md` 11.1, 11.2). Outgoing ports there are
    all open except 0 and 25, so FluentSMTP can use the service's SMTP (587/465) or its API. The
-   mail service must work before the request form (5b) goes live. Also to evaluate here:
+   mail service must work before the booking form (5e) goes live. Also to evaluate here:
    Hostinger's object cache (offered for free on 2026-11-02, declined during step 0f), tested
    on the staging site first; blocking public access to plugin and theme `readme.txt` files,
    which show the installed versions (`docs/SITE_CHECKLIST.md` 3.6). From 3g-1 (2026-11-03),

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset name="song-list">
+	<description>The Song List plugin follows the WordPress Coding Standards with its own prefix and text domain, kept apart from the site's, so it can be shared.</description>
+
+	<file>.</file>
+
+	<arg name="extensions" value="php"/>
+	<!-- s: show the sniff behind each message, so a finding can be looked up; p: progress. -->
+	<arg value="sp"/>
+
+	<rule ref="WordPress"/>
+
+	<config name="minimum_wp_version" value="7.0"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="song-list"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="songlist"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

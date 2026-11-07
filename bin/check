@@ -41,8 +41,15 @@ in_analysis() {
     -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
     -v "$REPO_ROOT/local:/app/local:ro" \
     -v "$REPO_ROOT/themes:/app/themes:ro" \
+    -v "$REPO_ROOT/plugins:/app/plugins:ro" \
     -v "$REPO_ROOT/tools:/app/tools:ro" \
     "$COMPOSER_IMAGE" "$@"
+}
+
+# A plugin may be shared with other sites, so it must name nothing of this one. The names are
+# the site's prefix and the host's; the repository's rules keep everything else out already.
+plugins_name_nothing_of_this_site() {
+  ! grep -rniE 'hbmusic|howard|buie|hostinger' "$REPO_ROOT/plugins"
 }
 
 require_lock_file() {
@@ -162,6 +169,8 @@ main() {
   run_check "Composer security audit" in_composer composer audit --no-interaction
   run_check "npm security audit (browser tests)" npm_audit
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
+  run_check "WordPress Coding Standards (Song List plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/song-list/phpcs.xml.dist --basepath=plugins/song-list plugins/song-list
+  run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
