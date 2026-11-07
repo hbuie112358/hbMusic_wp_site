@@ -32,3 +32,30 @@ function hbmusic_remove_emoji_support(): void {
 	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 }
 add_action( 'init', 'hbmusic_remove_emoji_support' );
+
+/**
+ * Tells whether the page being shown has the booking form.
+ *
+ * Contact Form 7 and Cloudflare's script otherwise load on every page, which slows pages without a
+ * form and sends visitors who never see one to Cloudflare (docs/SITE_CHECKLIST.md 8.4, 10.2).
+ *
+ * @return bool True on a page with the form.
+ */
+function hbmusic_page_has_booking_form(): bool {
+	return is_singular() && has_shortcode( (string) get_post_field( 'post_content' ), 'contact-form-7' );
+}
+add_filter( 'wpcf7_load_js', 'hbmusic_page_has_booking_form' );
+add_filter( 'wpcf7_load_css', 'hbmusic_page_has_booking_form' );
+
+/**
+ * Removes Cloudflare's script from pages without the booking form.
+ *
+ * Contact Form 7's own loading filters do not cover this script. It runs at priority 11 because the
+ * plugin adds the script at the default 10.
+ */
+function hbmusic_remove_turnstile_script_without_form(): void {
+	if ( ! hbmusic_page_has_booking_form() ) {
+		wp_dequeue_script( 'cloudflare-turnstile' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'hbmusic_remove_turnstile_script_without_form', 11 );

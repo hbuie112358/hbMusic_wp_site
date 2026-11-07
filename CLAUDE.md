@@ -52,24 +52,29 @@ The old site, as exported:
 The **dev site** runs in Docker Compose (`compose.dev.yaml`): a fresh WordPress with the new child
 theme, the plugins and test content, with its settings in `.env` (created from `.env.example`
 with random secrets; never committed). This project's ports are the **101xx** block: the dev
-site on 10102, the rest of the block for later needs. The old site's local copy was removed at
+site on 10102, its Mailpit inbox on 10103, the rest of the block for later needs. The old site's local copy was removed at
 plan step 5a-2; the real old site stays online until go-live, and the export stays in `backups/`,
 `db/` and `wordpress/`.
 
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
   `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
-  test pages (`tests/dev-content/`) and songs with neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
-  backup, so CI can build it too.
+  Contact Form 7 at the version in `tools/versions.sh`, checked against WordPress.org's checksums,
+  with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
+  test pages (`tests/dev-content/`) and songs with neutral text, a dev admin (`devadmin`, password
+  `DEV_ADMIN_PASSWORD` in `.env`). `config/dev-mu-plugins/`, on the dev site only and never
+  deployed, sends mail to Mailpit and answers for Cloudflare. Needs no backup, so CI can build it
+  too.
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
   PHP debug log, the `.env` safety stop), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/`): child theme active,
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
-  List's page and admin form. If the site does not answer, the run fails; it is never skipped.
+  List's page and admin form, the booking form's mail and refusals, and its files loading only
+  where it appears. If the site does not answer, the run fails; it is never skipped.
   Run it after `bin/dev-site` and before every commit that touches the site, the theme or a
   plugin. Every test runs even after a failure; exit status 1 if any failed.
-- Dev site: http://localhost:10102 (admin `/wp-admin`).
+- Dev site: http://localhost:10102 (admin `/wp-admin`); mail inbox: http://localhost:10103.
 - `docker compose -f compose.dev.yaml stop` / `start`: stop and start without losing anything.
 - `docker compose -f compose.dev.yaml run --rm cli wp <command>`: WP-CLI against the dev site.
 - `docker compose -f compose.dev.yaml down -v` deletes the dev site's database and files (the

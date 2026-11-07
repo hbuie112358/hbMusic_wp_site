@@ -7,6 +7,7 @@
 	<!-- The project's own PHP. Plugins are checked by their own rulesets (plugins/*/phpcs.xml.dist),
 	     with their own prefixes, so a shared plugin never depends on this site's names. -->
 	<file>themes</file>
+	<file>config/dev-mu-plugins</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
 

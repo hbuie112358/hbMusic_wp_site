@@ -25,8 +25,9 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** 5f (the five pages): the design and tests are built, then the import on staging; the
-  user's video choices and wording follow; 3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+- **Next:** 5e (the booking form): built on the dev site, then the plugin, form and Cloudflare keys
+  on staging. 5f's pages are on staging; the user's video choices and wording follow. 3i whenever
+  the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
 - **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
@@ -540,7 +541,17 @@ new findings added as steps.
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test
-     its mail on the dev site (`docs/SITE_CHECKLIST.md` 6.4, 10.1, 10.3). Status: `[ ]`
+     its mail on the dev site (`docs/SITE_CHECKLIST.md` 6.4, 10.1, 10.3). Chosen with the user
+     (2026-11-07), after trying Contact Form 7 and Fluent Forms on the dev site: Contact Form 7 6.2.4.1,
+     with Cloudflare Turnstile and no add-ons. It is about a twentieth of the size (2 MB against 38 MB)
+     and keeps no visitor details on the site. The form and mail settings are in `config/`; the real
+     keys only in each site's admin. The theme limits its files and Cloudflare's script to pages with
+     the form, since by default both load everywhere. Mail goes to Mailpit on the dev site, and
+     Cloudflare is simulated in the tests; the real script was proven once with Cloudflare's published
+     test keys (widget and token, no policy violation). Eight planted faults were caught. Draft
+     privacy policy in `data/content/`, linked from the footer, for the user's review. Left: the user's
+     Cloudflare account and keys, the plugin and form on staging, and real delivery with step 8's mail
+     service. Status: `[~]`
    - **Future plugins (D19), not needed for go-live:** 5b and 5c are one clip request plugin; 5d
      is the setlist preferences plugin. Their descriptions below are kept as their design.
      Clips would be short compressed MP3s (about 240-320 KB for 20 seconds).

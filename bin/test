@@ -36,7 +36,8 @@ browser_tests() {
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD \
+    -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e "DEV_MAIL_URL=http://localhost:${DEV_MAIL_UI_PORT}" \
+    -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD -e DEV_ADMIN_EMAIL \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
 }
 

@@ -41,6 +41,7 @@ in_analysis() {
     -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
     -v "$REPO_ROOT/themes:/app/themes:ro" \
     -v "$REPO_ROOT/plugins:/app/plugins:ro" \
+    -v "$REPO_ROOT/config/dev-mu-plugins:/app/config/dev-mu-plugins:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
 

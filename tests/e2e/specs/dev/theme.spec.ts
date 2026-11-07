@@ -7,7 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 //
 // The paths of the test pages bin/dev-site creates (TEST_PAGES; "Home" is the front page).
 // Fixed here, not read from the site's menu: a page missing from the menu must still fail.
-const TEST_PATHS = ['/', '/music/', '/songlist/', '/about/', '/book/'];
+const TEST_PATHS = ['/', '/music/', '/songlist/', '/about/', '/book/', '/privacy-policy/'];
 // WordPress marks the active child theme on <body> (wp-child-theme-<folder>).
 const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
 // WCAG 2.2 level AA and the levels it includes (checklist 7.1).
@@ -37,10 +37,12 @@ async function recordCspViolations(page: Page): Promise<void> {
 
 for (const path of TEST_PATHS) {
 	test.describe(`the page ${path}`, () => {
-		// The Music page plays a video from YouTube. Answered here, so the tests need no network and
-		// no outside site, while the browser still applies the policy to the frame.
+		// The Music page plays a video from YouTube, and the Book page loads Cloudflare's script.
+		// Answered here, so the tests need no network and no outside site, while the browser still
+		// applies the policy to both.
 		test.beforeEach(async ({ page }) => {
 			await page.route(/youtube\.com\/embed/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>video</title>' }));
+			await page.route(/challenges\.cloudflare\.com/, (route) => route.fulfill({ contentType: 'text/javascript', body: '' }));
 		});
 
 		test('loads through the child theme', async ({ page }) => {
@@ -63,6 +65,11 @@ for (const path of TEST_PATHS) {
 			await expect(logo, 'the logo').toBeVisible();
 			const hasLoaded = await logo.evaluate((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0);
 			expect(hasLoaded, 'the logo image has loaded').toBe(true);
+		});
+
+		test('links to the privacy policy from the footer', async ({ page }) => {
+			await page.goto(path);
+			await expect(page.locator('footer a[href="/privacy-policy/"]'), 'the footer link').toHaveCount(1);
 		});
 
 		test('has exactly one main heading', async ({ page }) => {

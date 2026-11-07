@@ -21,6 +21,9 @@ readonly PARENT_THEME_SLUG="twentytwentyfive"
 readonly PARENT_THEME_VERSION="1.5"
 readonly PARENT_THEME_SHA256="f333ce53aaa4049639298247d03480a4bd9b56fa8f0fea0440da262d7d595ba4"
 
+# The booking form's plugin (bin/dev-site, plan step 5e), checked against WordPress.org's checksums.
+readonly CONTACT_FORM_7_VERSION="6.2.4.1"
+
 # Download caches survive between runs in named volumes, not in the project folder.
 readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
 readonly NPM_CACHE_VOLUME="hbmusic_npm_cache"

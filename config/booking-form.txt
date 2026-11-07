@@ -1,0 +1,15 @@
+<label> Your name
+    [text* your-name autocomplete:name] </label>
+
+<label> Your email
+    [email* your-email autocomplete:email] </label>
+
+<label> Event date (optional)
+    [date event-date] </label>
+
+<label> About your event (optional)
+    [textarea your-message] </label>
+
+[turnstile theme:dark]
+
+[submit "Send"]

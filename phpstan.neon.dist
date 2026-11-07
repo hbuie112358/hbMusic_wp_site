@@ -10,3 +10,4 @@ parameters:
     paths:
         - themes
         - plugins
+        - config/dev-mu-plugins
