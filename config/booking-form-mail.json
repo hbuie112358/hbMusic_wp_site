@@ -1,7 +1,7 @@
 {
 	"active": true,
 	"subject": "[_site_title] booking request from [your-name]",
-	"sender": "[_site_title] <wordpress@[_site_domain]>",
+	"sender": "[_site_title] <wordpress@example.test>",
 	"recipient": "[_site_admin_email]",
 	"body": "Name: [your-name]\nEmail: [your-email]\nEvent date: [event-date]\n\nAbout the event:\n[your-message]\n\nSent from the booking form on [_site_url]. Reply to this message to answer the visitor.",
 	"additional_headers": "Reply-To: [your-email]",

@@ -25,9 +25,9 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** 5e (the booking form): built on the dev site, then the plugin, form and Cloudflare keys
-  on staging. 5f's pages are on staging; the user's video choices and wording follow. 3i whenever
-  the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
+- **Next:** step 6 (plugins), then step 8, whose mail service the booking form's delivery waits for
+  (5e). 5f's pages are on staging; the user's video choices and wording follow. 3i whenever the
+  user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
 - **Order of the coming steps (D19, replacing D11's):** the visible parts of 5, with the booking
@@ -549,9 +549,11 @@ new findings added as steps.
      the form, since by default both load everywhere. Mail goes to Mailpit on the dev site, and
      Cloudflare is simulated in the tests; the real script was proven once with Cloudflare's published
      test keys (widget and token, no policy violation). Eight planted faults were caught. Draft
-     privacy policy in `data/content/`, linked from the footer, for the user's review. Left: the user's
-     Cloudflare account and keys, the plugin and form on staging, and real delivery with step 8's mail
-     service. Status: `[~]`
+     privacy policy in `data/content/`, linked from the footer, reviewed by the user. On staging
+     (2026-11-07), with the user's real Turnstile keys: the widget stays hidden unless needed (the
+     visible "Success" read as if the request had been sent), the spam check passed and the form
+     reported the message sent, but no mail reached the user, as the server's own mail is unreliable
+     (Findings). Left: real delivery, with step 8's mail service. Status: `[~]`
    - **Future plugins (D19), not needed for go-live:** 5b and 5c are one clip request plugin; 5d
      is the setlist preferences plugin. Their descriptions below are kept as their design.
      Clips would be short compressed MP3s (about 240-320 KB for 20 seconds).
@@ -625,6 +627,8 @@ new findings added as steps.
      fresh install (nothing carried over, more set up again). Decided when this step is reached,
      with what the pages and staging have shown by then. New page content is ready before the
      theme is switched, and the deploy key cannot run WP-CLI, so content goes through the admin;
+   - the booking form's plugin and Turnstile keys (Contact → Integration, 5e); the import file sets its
+     From and To for live, and staging's were set by hand in its Mail tab;
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
