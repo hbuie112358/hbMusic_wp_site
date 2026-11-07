@@ -25,9 +25,8 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** the mail service from step 8, taken first by the user's choice, since the booking form's
-  delivery waits for it (5e); the user's answer about an address at the domain decides the service.
-  Then the rest of 8, and 6. 5f's pages are on staging; the user's video choices and wording follow.
+- **Next:** the mail service (D24, Brevo), mid-way: continue at "Brevo setup, where it stands" in
+  step 8. Then the rest of 5e, step 6 and the rest of 8. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
@@ -75,6 +74,7 @@ new findings added as steps.
 | D20 | The old-site copy is removed after the songs are converted (5a-2): `compose.yaml`, `bin/local-import`, the `local` test group, and what was built only for it (FluentSMTP's local setup, its script, tests and stubs). `backups/`, `db/` and `wordpress/` stay untouched. Replaces D12's old-site copy, not its Docker Compose and port choices, which the dev site keeps. FluentSMTP stays the live site's mail plugin (D13). | The copy assumed the rebuild needed the old site running locally and mail tested there. Since step 4 the new theme has its own dev site, the real old site is still online to look at, and the copy's tests check a frozen dump that no theme work can break. |
 | D21 | The template project starts when a second site has a date, not now (the user, 2026-11-07). `template-notes.md` keeps collecting what it must set differently. | Built after go-live, it starts with the plugin setup, live deploy and mail already proven, without 2-3 hours of carrying them over and a second repository to keep updated. Plugins in their own folders keep separation easy later. |
 | D23 | The site's look is "On Stage" (the user, 2026-11-07, chosen from three looks built on the real photo, logo and draft wording): a black page in which the photo blends, warm white text, and green from the logo for buttons and the booking band, using the parent's Manrope font. It lives in the child theme's `theme.json` and `parts/`. Wording is refined later in the admin. The current 885-pixel photo is used, without upscaling. | The user preferred it to the warm cream and black-and-white looks. Styles stay in `theme.json` (checklist 6.1), so no separate CSS file and no Stylelint yet; a CSS file would bring that up again. |
+| D24 | Site mail goes through a mail service, Brevo, connected by FluentSMTP (D13), for this site and as the pattern for every site (the user, 2026-11-07). Brevo's retention rule is set to 3 months and its email previews stay off. FluentSMTP keeps copies of failed mail only; requests that arrive are kept in the user's Gmail. | Gmail through Google's API was tried first: publishing the Google app needs a public home page and privacy policy, which a site that is not yet live does not have, and a Google project per site. A mail service needs only DNS records, the same before and after launch. Brevo over SMTP2GO: its delivery records are kept as long as the retention rule says, where SMTP2GO's free plan shows 5 days. |
 | D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 
 ## Steps
@@ -618,6 +618,54 @@ new findings added as steps.
      no SPF for the staging subdomain. Gmail requires SPF or DKIM, which fits the staging test mail
      not arriving (5e); that cause is still unproven until a message arrives. FluentSMTP is not yet on
      staging.
+   - **The mail service, delivery records (checked 2026-11-07):** SMTP2GO's free plan shows only 5 days
+     of activity, and that cannot be extended (its support pages). Brevo's pricing page and FAQ state
+     unlimited log retention on all plans, with webhooks on the free plan. This reverses the
+     recommendation above to Brevo, pending the user's choice. Its reported branding would reach only
+     the user, since these mails go to the user, not to visitors. Whether it accepts a Gmail signup is
+     unconfirmed. Long retention at Brevo means visitors' details are kept there: the privacy policy
+     names the service.
+   - **Limiting what Brevo keeps (checked 2026-11-07, from its help pages as shown in search results; the
+     pages themselves refused the fetch):** logs and email previews are kept without limit by default.
+     Settings > Transactional emails > Retention rules sets 1 to 24 months; deletion follows within 24
+     to 72 hours and cannot be undone. Previews store each email's full content, are said to be off by
+     default, and must stay off. An API call deletes a log entry by message or address. Whether the free
+     plan has the rule is confirmed in the account. Proposed: previews off, a 3-month rule, the same
+     period for FluentSMTP's log.
+   - **Open source and Gmail, checked 2026-11-07 at the user's request:** self-hosted open source mail
+     (Postal) needs a dedicated server with 4 GB of memory and outbound port 25, which Hostinger blocks,
+     and leaves the sender reputation to the user: not a fit for a handful of mails. Hosted Plunk's plans
+     conflict between sources and were not pursued. FluentSMTP (already chosen, D13) can instead send
+     through the user's own Gmail with Google's API: no new mail company, no DNS records, and a record of
+     each mail in Gmail's Sent folder. Chosen by the user (2026-11-07). From Google's documentation: a token in
+     Testing lasts 7 days, so the app is published; it also stops working if the Google password changes,
+     access is revoked, or it goes unused for six months. Whether FluentSMTP's daily connection check
+     counts as use is to be observed; its alert must fire in any of these cases, proven by revoking
+     access. Gmail's limit is 500 mails a day. Setup follows FluentSMTP's guide; its redirect goes through
+     `fluentsmtp.com/gapi/`, the plugin vendor's page, during the one-time connection.
+   - **Brevo setup, where it stands (2026-11-07, paused mid-way):** the account exists (the user's Gmail
+     address; the user's password notes hold the login). Domain added manually, no branded subdomain.
+     DNS at Hostinger, all checked live by Claude: added TXT `@` = `brevo-code:825b…` and CNAMEs
+     `brevo1._domainkey` → `b1.howardbuiemusic-com.dkim.brevo.com`, `brevo2._domainkey` →
+     `b2.howardbuiemusic-com.dkim.brevo.com`; the existing DMARC record edited (Brevo would not
+     authenticate without it) to `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`, one record, TTL one
+     hour. SPF, MX and the Google record unchanged. Brevo showed all four records green but the domain
+     still "not authenticated", most likely its one-hour cache of the old DMARC record. The Google Cloud
+     project from the Gmail attempt is shut down. Remaining, in order: (1) Brevo authenticates the
+     domain; (2) Brevo two-factor login on; (3) sender `website@howardbuiemusic.com`, named "Howard Buie
+     Music website"; stop if Brevo wants it verified by email, as it has no mailbox; (4) an API key per
+     site, named for the site, kept in the password notes; (5) FluentSMTP on staging (installed, its
+     Gmail connection never completed) connected to Brevo with that key and sender, forcing the From
+     address; logging failures only, with automatic deletion; failure alerts by a channel other than
+     email; (6) Brevo's retention rule 3 months, previews off, confirmed on the free plan; (7) a Gmail
+     filter that labels booking requests and keeps them out of spam; (8) a test request reaches the
+     inbox, and a planted failure raises the alert; (9) the privacy policy names Brevo and the periods.
+     Open with the user: removing the visitor's name from the subject line (Claude recommends it).
+   - **Knowing when a booking request goes missing (the user: among the most important points,
+     2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
+     service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
+     it holds visitors' details, 10.2), a failure alert that does not depend on email, a Gmail rule so
+     requests skip spam, and a test request on a schedule. Each is proven with a planted failure.
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are

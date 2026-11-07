@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-07T14:58:00-05:00
+timestamp: 2026-11-07T17:19:00-05:00
 current_branch: step-5e-on-staging
-last_commit: ad7580e
+last_commit: 556a464
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -16,14 +16,19 @@ last_work: >
   "On Stage" look (D23). 5f: the real pages on staging. 5e: the booking form with Contact Form 7 and
   Cloudflare Turnstile, on staging with the user's real keys; the spam check passes and the form
   reports the message sent, but no mail reaches the user yet. The mail service was researched.
-  Pull requests #14 to #18 merged.
+  Pull requests #14 to #18 merged. Later on 2026-11-07: Gmail through Google's API was tried and
+  dropped (publishing needs a public privacy policy, which a site not yet live lacks); the user chose
+  a mail service for this and every site (D24, Brevo). Brevo account created, domain records added at
+  Hostinger and the DMARC record edited; Brevo had not yet confirmed the domain at the pause.
 
 next_action: >
-  Ask the user the waiting question: does the user have, or can the user create, an address at the
-  domain (hPanel, Emails)? That decides the mail service (SMTP2GO if yes; otherwise Brevo, after
-  confirming its branding and limits), with the research in the plan's step 8. Then set it up with
-  FluentSMTP on staging and confirm a test request reaches the user's inbox. Suggest a push: this
-  branch holds ad7580e (the form's hidden widget, sender fix and settings test) and this pause commit.
+  Continue the Brevo setup at the plan's step 8, "Brevo setup, where it stands": first ask whether
+  Brevo now shows howardbuiemusic.com authenticated (on its Domains page,
+  https://app.brevo.com/senders/domain/list); if not, compare its record list with the live DNS
+  (dig) again. Then the remaining items in that entry's order: two-factor login, the sender, an API
+  key, FluentSMTP on staging, retention, the Gmail filter, the test and a planted failure, the privacy
+  policy. Give the user one step at a time, check Brevo's screens against what the user pastes, and
+  never guess its labels. Suggest a push: this branch holds ad7580e and two pause commits.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -33,7 +38,10 @@ verification:
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
   live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
   staging_site: staging.howardbuiemusic.com, site-wide password (also a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
-  staging_mail: the form reports sent, but no mail arrived in Gmail, spam folder not confirmed; FluentSMTP is not on staging
+  staging_mail: the form reports sent, but no mail arrived in Gmail, spam folder not confirmed; FluentSMTP is installed on staging but not connected (its Gmail connection was abandoned)
+  dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs added 2026-11-07; DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com (edited 2026-11-07, one record); all checked live
+  brevo: account created with the user's Gmail address; domain added, not yet authenticated at the pause; no sender, API key or settings yet; login in the user's password notes
+  google_cloud: the project made for the Gmail attempt (Howard Buie Music Site) shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
   checks: bin/check 14 checks; bin/test 4 scenarios + 60 browser tests, all passing on 2026-11-07
   unexplained: one login timeout in the Song List's browser tests, once, not in the nine runs after it; cause not known, test unchanged; if it recurs, keep its trace
@@ -48,9 +56,11 @@ uncommitted_changes: []
 
 pending_decisions:
   - >
-    Whether the user has or can create an address at the domain, which decides the mail service:
-    SMTP2GO if yes (Claude's recommendation; it refuses Gmail signups), otherwise Brevo. Details in the
-    plan's step 8.
+    Removing the visitor's name from the booking email's subject line, so Brevo's records hold less
+    about visitors (Claude recommends it; the user has not said).
+  - >
+    FluentSMTP's log: failures only (Claude's recommendation; copies of arrived requests live in
+    Gmail) or all mail for a period; the user asked about a future CRM and has not confirmed.
   - Which videos to use, and which one on Home (the user goes through them).
   - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).

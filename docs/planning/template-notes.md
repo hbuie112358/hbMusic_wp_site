@@ -34,6 +34,8 @@ template project starts; until then, a list, not a to-do.
 
 - The booking form: `config/booking-form.txt` and `config/booking-form-mail.json`, and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
 
+- Site mail: a mail service through FluentSMTP (plan D24), set up per site with its own account, DNS records and retention rule; it works before a site is live, unlike Gmail through Google's API.
+
 ## Settings
 
 - The ports (the 101xx block): `.env.example` (`DEV_SITE_PORT`) and the project's `CLAUDE.md`. Each
