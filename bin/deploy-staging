@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Deploys the child theme to the staging site (plan step 3g-3), run by the deploy-staging job
-# in .github/workflows/check.yml after every check has passed on main. The key can only write
-# into staging's theme folder: the server forces rsync's daemon mode with one destination
-# (plan step 3g-2), so no setting here can reach the live site.
+# Deploys the child theme and the Song List plugin to the staging site (plan steps 3g-3, 5a), run
+# by the deploy-staging job in .github/workflows/check.yml after every check has passed on main.
+# The key can only write into these staging folders: the server forces rsync's daemon mode with
+# named destinations (plan step 3g-2), so no setting here can reach the live site.
 #
-# Then two checks: the staging folder matches the repository's theme folder file by file
-# (checksums), and a staging page, opened with the check-only login of the site-wide password,
-# shows the child theme active.
+# Then two checks: each staging folder matches the repository's file by file (checksums), and a
+# staging page, opened with the check-only login of the site-wide password, shows the child theme
+# active.
 #
 # Settings, from the GitHub environment "staging" (never from the repository):
 #   DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, DEPLOY_SSH_USER, DEPLOY_SSH_HOST   (secrets, 3g-2)
@@ -16,9 +16,12 @@ set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
-readonly THEME_SOURCE="$REPO_ROOT/themes/hbmusic-child/"
-# The destination the server's rsync settings name (~/.deploy/rsyncd-staging.conf on the server).
-readonly RSYNC_DESTINATION="staging-child-theme"
+# Each "source folder|destination": the destinations are those the server's rsync settings name
+# (~/.deploy/rsyncd-staging.conf on the server).
+readonly DEPLOY_TARGETS=(
+  "themes/hbmusic-child|staging-child-theme"
+  "plugins/song-list|staging-song-list"
+)
 # Hostinger's SSH port, the same for every customer (not a secret).
 readonly SSH_PORT=65002
 readonly REQUIRED_SETTINGS=(
@@ -52,19 +55,26 @@ prepare_ssh() {
   RSYNC_SSH="ssh -p $SSH_PORT -i $SSH_DIR/key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SSH_DIR/known_hosts"
 }
 
-copy_theme() {
-  log "Copying the child theme to staging ($RSYNC_DESTINATION)"
-  # --delete: the staging folder becomes exactly the repository's theme folder.
-  rsync -rt --delete --itemize-changes -e "$RSYNC_SSH" "$THEME_SOURCE" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$RSYNC_DESTINATION/"
+copy_folder() {
+  local source_folder="$1" destination="$2"
+  log "Copying $source_folder to staging ($destination)"
+  # --delete: the staging folder becomes exactly the repository's folder.
+  rsync -rt --delete --itemize-changes -e "$RSYNC_SSH" "$REPO_ROOT/$source_folder/" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$destination/"
 }
 
 # A dry run comparing every file by checksum lists nothing when staging matches the repository.
 expect_identical_files() {
-  local differences
-  differences="$(rsync -rtn --delete --checksum --itemize-changes -e "$RSYNC_SSH" "$THEME_SOURCE" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$RSYNC_DESTINATION/")"
-  [[ -z "$differences" ]] || fail "staging's theme folder differs from the repository after the copy:
+  local source_folder="$1" destination="$2" differences
+  differences="$(rsync -rtn --delete --checksum --itemize-changes -e "$RSYNC_SSH" "$REPO_ROOT/$source_folder/" "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST::$destination/")"
+  [[ -z "$differences" ]] || fail "staging's $destination differs from the repository after the copy:
 $differences"
-  log "staging's theme folder matches the repository, file by file"
+  log "staging's $destination matches the repository, file by file"
+}
+
+deploy_target() {
+  local source_folder="${1%%|*}" destination="${1#*|}"
+  copy_folder "$source_folder" "$destination"
+  expect_identical_files "$source_folder" "$destination"
 }
 
 # The login goes to curl through its configuration on standard input, never on the command
@@ -83,8 +93,10 @@ expect_child_theme_active() {
 main() {
   require_settings
   prepare_ssh
-  copy_theme
-  expect_identical_files
+  local deploy_target
+  for deploy_target in "${DEPLOY_TARGETS[@]}"; do
+    deploy_target "$deploy_target"
+  done
   expect_child_theme_active
 }
 

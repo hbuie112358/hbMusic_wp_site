@@ -4,8 +4,8 @@
 	xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
 	<description>The project's PHP follows the WordPress Coding Standards (plan step 3d).</description>
 
-	<!-- The project's own PHP. The site plugin (step 5a) is added here when it exists: PHPCS
-	     stops with an error on a path that does not exist. -->
+	<!-- The project's own PHP. Plugins are checked by their own rulesets (plugins/*/phpcs.xml.dist),
+	     with their own prefixes, so a shared plugin never depends on this site's names. -->
 	<file>local</file>
 	<file>themes</file>
 

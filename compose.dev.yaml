@@ -23,6 +23,8 @@ x-wordpress-env: &wordpress-env
 # The child theme from the repository, read-only: WordPress can never write into the user's
 # files, and files the user creates on the host stay the user's (the permission check of 3c).
 x-theme-mount: &theme-mount ./themes/hbmusic-child:/var/www/html/wp-content/themes/hbmusic-child:ro
+# The Song List plugin, read-only for the same reasons.
+x-song-list-mount: &song-list-mount ./plugins/song-list:/var/www/html/wp-content/plugins/song-list:ro
 
 services:
   db:
@@ -56,6 +58,7 @@ services:
     volumes:
       - wp_html:/var/www/html
       - *theme-mount
+      - *song-list-mount
       # The security headers (docs/SITE_CHECKLIST.md 3.2), from their one place, read-only.
       - ./config/security-headers.conf:/etc/apache2/conf-enabled/zz-security-headers.conf:ro
 
@@ -73,6 +76,7 @@ services:
     volumes:
       - wp_html:/var/www/html
       - *theme-mount
+      - *song-list-mount
 
 volumes:
   db_data:

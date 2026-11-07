@@ -12,6 +12,7 @@ readonly ENV_FILE="$REPO_ROOT/.env"
 readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
 readonly CHILD_THEME="hbmusic-child"
+readonly SONG_LIST_PLUGIN="song-list"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
@@ -20,6 +21,14 @@ readonly REQUIRED_SETTINGS=(
 # The test pages, in menu order: the old site's page names, so templates and navigation are
 # exercised as the real site will use them; their text is neutral sample text (no real data).
 readonly TEST_PAGES=(Home About Songlist Video Contact)
+# Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
+# shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
+# expects them sorted and escaped. Neutral text, no real data.
+readonly TEST_SONGS=(
+  'Zulu Sample Song|'
+  'Rock & Roll <em>Sample</em>|Sample Artist Two'
+  'Alpha Sample Song|Sample Artist One'
+)
 
 log() { printf '%s [dev-site] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
@@ -93,15 +102,37 @@ remove_unused_code() {
     [[ "$theme" == "$PARENT_THEME_SLUG" || "$theme" == "$CHILD_THEME" ]] && continue
     wp_cli theme delete "$theme"
   done
-  wp_cli plugin delete --all
+  # The Song List plugin is mounted read-only from the repository, so it could not be deleted.
+  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN"
 }
 
 configure_site() {
-  log "Activating $CHILD_THEME, discouraging search engines, setting the live site's permalinks"
+  log "Activating $CHILD_THEME and $SONG_LIST_PLUGIN, discouraging search engines, setting the live site's permalinks"
   wp_cli theme activate "$CHILD_THEME"
+  wp_cli plugin activate "$SONG_LIST_PLUGIN"
   wp_cli option update blog_public 0
   # The WordPress image already writes the standard .htaccess rules this structure needs.
   wp_cli rewrite structure '/%postname%/'
+}
+
+# The block content of one test page: the Songlist page shows the plugin's block.
+test_page_content() {
+  local title="$1"
+  if [[ "$title" == "Songlist" ]]; then
+    printf '%s' '<!-- wp:songlist/song-list /-->'
+    return
+  fi
+  printf '%s' "<!-- wp:paragraph --><p>Sample text for the dev site's $title page. The real content comes with step 2b.</p><!-- /wp:paragraph -->"
+}
+
+create_test_songs() {
+  local song title artist
+  for song in "${TEST_SONGS[@]}"; do
+    title="${song%%|*}"
+    artist="${song#*|}"
+    wp_cli post create --post_type=songlist_song --post_status=publish --post_title="$title" \
+      --meta_input="{\"songlist_artist\":\"$artist\"}" --porcelain >/dev/null
+  done
 }
 
 create_test_content() {
@@ -113,12 +144,12 @@ create_test_content() {
   for title in "${TEST_PAGES[@]}"; do
     position=$((position + 1))
     page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="$title" \
-      --menu_order="$position" --porcelain \
-      --post_content="<!-- wp:paragraph --><p>Sample text for the dev site's $title page. The real content comes with step 2b.</p><!-- /wp:paragraph -->")"
+      --menu_order="$position" --porcelain --post_content="$(test_page_content "$title")")"
     [[ "$title" == "Home" ]] && wp_cli option update page_on_front "$page_id" >/dev/null
   done
   wp_cli option update show_on_front page >/dev/null
   create_navigation_menu
+  create_test_songs
 }
 
 # A real navigation menu with the test pages, as the live site will have. Without one, the

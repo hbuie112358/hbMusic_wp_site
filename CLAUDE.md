@@ -30,8 +30,10 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `db/`: the database dump unpacked to plain `.sql` (WordPress 7.1.4, table prefix `wp_`).
 - `wordpress/`: the old `public_html` exactly as exported. Kept unchanged as the reference copy
   of the old site; new work does not go here.
-- `themes/hbmusic-child/`: the new Twenty Twenty-Five child theme, the only code this repository
-  versions (created when the theme work starts).
+- `themes/hbmusic-child/`: the new Twenty Twenty-Five child theme.
+- `plugins/song-list/`: the Song List plugin (plan D19), which names nothing of this site, so it
+  can be shared; its own prefix `songlist`, text domain `song-list` and `phpcs.xml.dist`.
+- `data/`: not versioned; one-time data, such as the converted song list for the import.
 - `docs/planning/rebuild-plan.md`: the active plan (rolling-wave mode); its Current position
   says where the work stands.
 - `project-state.yaml`: session state for pause and resume, with the open items.
@@ -60,16 +62,17 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   pointed at Mailpit.
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
-  `tools/versions.sh`, the child theme mounted read-only and activated, test pages with
-  neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
+  `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
+  test pages and songs with neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
   backup, so CI can build it too.
 - `bin/test [local|dev]`: the tests in two groups, both without an argument. **local**, against
   the old-site copy: the scenario checks in `tests/scenario/` (bash, sharing `lib.sh`), then the
   browser tests in `tests/e2e/specs/local/` in the official Playwright container (`--network
   host`, seeing only `tests/e2e/`). **dev**, against the dev site: the scenario checks named
-  `tests/scenario/dev-*.sh` (read-only theme mount, an empty PHP debug log), then the browser
-  tests in `tests/e2e/specs/dev/` (child theme active, security headers sent, no CSP violation,
-  no axe accessibility error at WCAG 2.2 AA). A group whose site does not answer fails, never
+  `tests/scenario/dev-*.sh` (read-only theme and plugin mounts, an empty PHP debug log), then the
+  browser tests in `tests/e2e/specs/dev/` (child theme active, security headers sent, no CSP
+  violation, no axe accessibility error at WCAG 2.2 AA, the Song List's page and admin form). A
+  group whose site does not answer fails, never
   skipped. Run it
   after `bin/local-import` or `bin/dev-site`, after every FluentSMTP update, and before every
   commit that touches a site or the theme. Every test runs even after a failure; exit status 1
@@ -84,7 +87,8 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
 - `bin/check`: every code check, in pinned containers (nothing installed on the host):
   Composer install from `composer.lock`, validation and security audit; PHPCS with the
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
-  stubs (`phpstan.neon.dist`), both over `local/` and `themes/`; `theme.json`'s schema
+  stubs (`phpstan.neon.dist`), both over `local/`, `themes/` and `plugins/` (each plugin with its
+  own PHPCS ruleset), and a check that plugins name nothing of this site; `theme.json`'s schema
   matching the pinned WordPress; ShellCheck on `bin/`; both compose files. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
@@ -108,16 +112,16 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
   browser tests (TypeScript, strict).
 - **Scenario checks** (`tests/scenario/`): WP-CLI-level behaviour against the running sites,
   such as mail delivery, the configuration script's and `.env`'s safety stops, and (the
-  `dev-*.sh` checks, against the dev site) the read-only theme mount. Plain bash: the bats
+  `dev-*.sh` checks, against the dev site) the read-only theme and plugin mounts. Plain bash: the bats
   framework would need the Docker socket in its container.
 - **Browser tests** (`tests/e2e/`, Playwright, two projects): `local`, the old-site copy's
   pages, menu and content as a visitor sees them, with expected numbers that are facts of the
   fixed dump in `db/` (plan step 2 inventory); `dev`, the new theme on the dev site, with axe
   (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
-  reports.
-- **PHPUnit** (unit and integration against a separate test database) arrives at plan step 5a
-  with its first real tests; **accessibility checks** (axe) run in the dev browser tests since
-  step 4c.
+  reports, and the Song List's page and admin form, which log in with the dev admin.
+- **PHPUnit** (unit and integration against a separate test database) arrives with the first
+  plugin that has real logic to test; the Song List has almost none. **Accessibility checks**
+  (axe) run in the dev browser tests since step 4c.
 - A new test is shown to fail on a planted fault before it counts as working.
 
 ## Framework
@@ -156,7 +160,7 @@ the **101xx** block: the old-site copy on 10100, its Mailpit inbox on 10101, the
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
-  local scripts, and `themes/hbmusic-child/`). A new path is versioned only by adding it to the
+  local scripts, `themes/hbmusic-child/` and `plugins/song-list/`). A new path is versioned only by adding it to the
   allow-list, with the user's approval.
   *Why:* `wordpress/`, `db/` and `backups/` hold credentials (`wp-config.php`), database dumps
   with user accounts and emails, and the former host's account identifiers.

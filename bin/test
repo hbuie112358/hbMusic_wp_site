@@ -38,15 +38,17 @@ site_answers() {
 # The project (local or dev) names both the tests and the site they run against
 # (tests/e2e/playwright.config.ts); only that site's address is passed in.
 browser_tests() {
-  local project="$1" address_setting
+  local project="$1" project_settings=()
   case "$project" in
-    local) address_setting="BASE_URL=http://localhost:${SITE_PORT}" ;;
-    dev) address_setting="DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" ;;
+    local) project_settings=(-e "BASE_URL=http://localhost:${SITE_PORT}") ;;
+    # By name, so the dev site's generated admin password stays off the command line. It unlocks
+    # only this throwaway site, whose admin screens the tests use.
+    dev) project_settings=(-e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD) ;;
   esac
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    -e "$address_setting" -e LIVE_ADDRESSES -e PROJECT="$project" \
+    "${project_settings[@]}" -e LIVE_ADDRESSES -e PROJECT="$project" \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test --project="$PROJECT"'
 }
 
