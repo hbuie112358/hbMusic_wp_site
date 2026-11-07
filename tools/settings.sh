@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# The local settings in .env, shared by bin/local-import (the old-site copy) and bin/dev-site
-# (the dev site): .env is created from .env.example with random secrets, new settings are
-# appended, and every setting a script needs is checked. Sourced, never run.
+# The local settings in .env, used by bin/dev-site: .env is created from .env.example with random
+# secrets, new settings are appended, and every setting the script needs is checked. Sourced,
+# never run.
 #
 # The sourcing script defines REPO_ROOT, ENV_FILE, REQUIRED_SETTINGS (an array), log and fail.
 
-# Both sites' databases keep the passwords they were first started with, and both sets of
-# passwords live in the one .env, so a new .env is refused while either database exists.
-readonly SETTINGS_DATABASE_VOLUMES=(hbmusic_db_data hbmusic-dev_db_data)
+# The dev site's database keeps the passwords it was first started with, so a new .env is refused
+# while that database exists.
+readonly SETTINGS_DATABASE_VOLUMES=(hbmusic-dev_db_data)
 
 random_secret() { od -An -N24 -tx1 /dev/urandom | tr -d ' \n'; }
 
@@ -32,7 +32,7 @@ create_env_file() {
   local volumes
   volumes="$(existing_database_volumes)"
   if [[ -n "$volumes" ]]; then
-    fail "there is no .env, but these databases still have the passwords of an earlier one: ${volumes}. Restore that .env, or remove the site whose database it is (docker compose down -v, with -f compose.dev.yaml for the dev site), then run again."
+    fail "there is no .env, but these databases still have the passwords of an earlier one: ${volumes}. Restore that .env, or remove the site (docker compose -f compose.dev.yaml down -v), then run again."
   fi
   log "Creating .env from .env.example with new random secrets"
   local line

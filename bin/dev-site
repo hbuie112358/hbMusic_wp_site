@@ -2,8 +2,8 @@
 # Builds or rebuilds the dev site (plan step 4b): a fresh WordPress with the child theme from
 # themes/hbmusic-child/ (mounted read-only), the parent theme at its pinned version and
 # fingerprint, and scripted test content; no real data. Each run starts from an empty
-# database, so the site is the same every time. Runs alone: no backup and no old-site copy
-# needed, so CI can build it too (step 4d).
+# database, so the site is the same every time. Runs alone: no backup needed, so CI can build it
+# too (step 4d).
 set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,7 +39,7 @@ trap 'rm -rf "$DOWNLOAD_DIR"' EXIT
 
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
-# .env: creating it, adding new settings, loading and checking them (shared with bin/local-import).
+# .env: creating it, adding new settings, loading and checking them.
 # shellcheck source=tools/settings.sh
 source "$REPO_ROOT/tools/settings.sh"
 
@@ -176,7 +176,10 @@ main() {
   ensure_env_file
   load_env
   require_settings
-  compose up -d db wordpress
+  compose up -d db
+  # A new container each run: a running one keeps pointing at a mounted folder that git has since
+  # removed and recreated (when switching branches), and then shows that folder as empty.
+  compose up -d --force-recreate --no-deps wordpress
   wait_for_wordpress_files
   install_wordpress
   install_parent_theme

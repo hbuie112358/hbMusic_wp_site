@@ -6,11 +6,8 @@
 
 	<!-- The project's own PHP. Plugins are checked by their own rulesets (plugins/*/phpcs.xml.dist),
 	     with their own prefixes, so a shared plugin never depends on this site's names. -->
-	<file>local</file>
 	<file>themes</file>
 
-	<!-- Stubs describe other projects' code for PHPStan; their style follows those projects. -->
-	<exclude-pattern>/tools/phpstan/stubs/*</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>

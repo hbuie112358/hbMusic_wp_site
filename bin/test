@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-# Runs the tests (plan steps 3e, 4b) in two groups:
-#   local  the old-site copy (bin/local-import): the scenario checks in tests/scenario/ and the
-#          browser tests in tests/e2e/, in the official Playwright container;
-#   dev    the dev site (bin/dev-site): the scenario checks named tests/scenario/dev-*.sh and
-#          the browser tests in tests/e2e/specs/dev/.
-# Usage: bin/test [local|dev]; without an argument, both groups. A group whose site does not
-# answer fails, it is never skipped. Every test runs even after a failure; the exit status is
-# 1 if any failed.
+# Runs the tests against the dev site (bin/dev-site): the scenario checks named
+# tests/scenario/dev-*.sh, then the browser tests in tests/e2e/specs/dev/. If the site does not
+# answer, the run fails; it is never skipped. Every test runs even after a failure; the exit
+# status is 1 if any failed.
 set -Euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,7 +15,7 @@ FAILED_TESTS=()
 log() { printf '%s [test] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 
 load_settings() {
-  [[ -f "$REPO_ROOT/.env" ]] || { log "no .env; run bin/local-import or bin/dev-site first"; exit 1; }
+  [[ -f "$REPO_ROOT/.env" ]] || { log "no .env; run bin/dev-site first"; exit 1; }
   set -a
   # shellcheck source=/dev/null
   source "$REPO_ROOT/.env"
@@ -27,29 +23,21 @@ load_settings() {
 }
 
 site_answers() {
-  local port="$1" how_to_start="$2"
-  curl -fsS -o /dev/null --max-time 10 "http://localhost:${port}/" && return 0
-  log "nothing answers on port ${port}; start it with ${how_to_start}"
+  curl -fsS -o /dev/null --max-time 10 "http://localhost:${DEV_SITE_PORT}/" && return 0
+  log "nothing answers on port ${DEV_SITE_PORT}; start it with bin/dev-site"
   return 1
 }
 
 # The container sees only tests/e2e/. Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
-# The project (local or dev) names both the tests and the site they run against
-# (tests/e2e/playwright.config.ts); only that site's address is passed in.
+# The admin login goes by name, so the dev site's generated password stays off the command line.
+# It unlocks only this throwaway site, whose admin screens the tests use.
 browser_tests() {
-  local project="$1" project_settings=()
-  case "$project" in
-    local) project_settings=(-e "BASE_URL=http://localhost:${SITE_PORT}") ;;
-    # By name, so the dev site's generated admin password stays off the command line. It unlocks
-    # only this throwaway site, whose admin screens the tests use.
-    dev) project_settings=(-e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD) ;;
-  esac
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    "${project_settings[@]}" -e LIVE_ADDRESSES -e PROJECT="$project" \
-    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test --project="$PROJECT"'
+    -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
 }
 
 run_test() {
@@ -74,38 +62,18 @@ report() {
   return 1
 }
 
-local_group() {
-  run_test "Old-site copy answers on port ${SITE_PORT}" site_answers "$SITE_PORT" "'docker compose start' or bin/local-import" || return 0
-  local scenario name
-  for scenario in "$REPO_ROOT"/tests/scenario/*.sh; do
-    name="$(basename "$scenario" .sh)"
-    [[ "$name" == "lib" || "$name" == dev-* ]] && continue
-    run_test "Scenario: $name" bash "$scenario"
-  done
-  run_test "Browser tests (Playwright, local)" browser_tests local
-}
-
-dev_group() {
-  run_test "Dev site answers on port ${DEV_SITE_PORT}" site_answers "$DEV_SITE_PORT" "bin/dev-site" || return 0
+run_all_tests() {
+  run_test "Dev site answers on port ${DEV_SITE_PORT}" site_answers || return 0
   local scenario
   for scenario in "$REPO_ROOT"/tests/scenario/dev-*.sh; do
-    run_test "Scenario (dev): $(basename "$scenario" .sh)" bash "$scenario"
+    run_test "Scenario: $(basename "$scenario" .sh)" bash "$scenario"
   done
-  run_test "Browser tests (Playwright, dev)" browser_tests dev
+  run_test "Browser tests (Playwright)" browser_tests
 }
 
 main() {
-  local groups=("$@")
-  ((${#groups[@]} > 0)) || groups=(local dev)
   load_settings
-  local group
-  for group in "${groups[@]}"; do
-    case "$group" in
-      local) local_group ;;
-      dev) dev_group ;;
-      *) log "unknown test group '$group'; use local or dev"; exit 2 ;;
-    esac
-  done
+  run_all_tests
   report
 }
 

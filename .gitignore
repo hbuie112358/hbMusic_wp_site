@@ -5,11 +5,9 @@
 !/.gitignore
 !/project-state.yaml
 !/docs/
-!/compose.yaml
 !/compose.dev.yaml
 !/.env.example
 !/bin/
-!/local/
 !/config/
 !/tools/
 !/tests/

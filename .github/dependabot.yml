@@ -1,6 +1,6 @@
 # Dependabot proposes updates of the pinned tools as pull requests (plan step 3f follow-up).
 # It never merges: each pull request runs the `check` workflow and waits for the user's decision.
-# Not covered, updated by hand: the container images in tools/versions.sh and compose.yaml, and
+# Not covered, updated by hand: the container images in tools/versions.sh and compose.dev.yaml, and
 # Playwright, whose package must match its image (bin/tools-update; bin/check compares them).
 version: 2
 

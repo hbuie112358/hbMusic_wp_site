@@ -8,15 +8,15 @@ template project starts; until then, a list, not a to-do.
 
 ## The site's name and prefix
 
-- `hbmusic` and `hbmusic-dev`, the Compose project names: `compose.yaml` and
-  `compose.dev.yaml` (`name:`), and the database volume names derived from them in
-  `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`).
+- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), and the database volume
+  name derived from it in `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`) and
+  `tests/scenario/dev-settings-guard.sh`.
 - The dev site's title, test pages and admin: `bin/dev-site` (`TEST_PAGES`, the title in
   `install_wordpress`) and `.env.example` (`DEV_*`); the browser tests' list of the same pages,
   `TEST_PATHS` in `tests/e2e/specs/dev/theme.spec.ts`.
 - The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and
-  `@package` tag in `local/wp-cli/` and `tools/phpstan/stubs/`.
+  `@package` tag in the theme.
 - The package names: `composer.json` (`hbmusic/site-tools`), `tests/e2e/package.json` and its
   lock file (`hbmusic-e2e`).
 - The cache volumes: `tools/versions.sh` (`hbmusic_composer_cache`, `hbmusic_npm_cache`).
@@ -32,20 +32,15 @@ template project starts; until then, a list, not a to-do.
 
 ## Settings
 
-- The ports (the 101xx block): `.env.example` (`SITE_PORT`, `MAIL_UI_PORT`) and the project's
-  `CLAUDE.md`. Each project takes its own block.
-- The live addresses replaced on import: `.env.example` (`LIVE_ADDRESSES`).
+- The ports (the 101xx block): `.env.example` (`DEV_SITE_PORT`) and the project's `CLAUDE.md`. Each
+  project takes its own block.
 - The time zone used by the time report: `~/.claude/TIME_TRACKING.md` (the user's, not the site's).
 
 ## Belongs to a site moved from an old host
 
-- `bin/local-import` builds the local copy from an old site's export (`wordpress/`, `db/`): a
-  new site has none. The fresh-install path a template needs exists since step 4b:
-  `bin/dev-site` with `compose.dev.yaml`, which runs without any export.
-- `.env.example`: `LOCAL_DISABLED_PLUGINS` and `LOCAL_EMPTIED_TABLES` name this site's plugins
-  (Wordfence, UpdraftPlus) and their tables.
-- `tests/e2e/specs/local-import.spec.ts` checks facts of this site's dump (the menu, 108 songs,
-  `PUBLIC_PATHS`); the template keeps the kinds of checks, not the values.
+- The local copy of an old site (`compose.yaml`, `bin/local-import`, its tests) was removed at plan
+  step 5a-2 (D20); it remains in this repository's history, if a moved site ever needs one. A
+  template needs only the fresh-install path: `bin/dev-site` with `compose.dev.yaml`.
 - Plan step 0 (securing an old live site) and the step 2 inventory are a moving-site checklist,
   a possible part of the template's plan for sites that are moved rather than new.
 
@@ -55,8 +50,6 @@ template project starts; until then, a list, not a to-do.
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
 - `config/security-headers.conf` (each site adds its own outside sources, with their reasons),
   and the theme's `functions.php` switching off WordPress's emoji script.
-- Mail through FluentSMTP into Mailpit (D13), with `local/wp-cli/configure-fluentsmtp-mailpit.php`
-  apart from its prefix.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
 
 ## To build in

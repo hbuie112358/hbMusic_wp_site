@@ -39,10 +39,8 @@ in_analysis() {
     -v "$REPO_ROOT/vendor:/app/vendor:ro" \
     -v "$REPO_ROOT/phpcs.xml.dist:/app/phpcs.xml.dist:ro" \
     -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
-    -v "$REPO_ROOT/local:/app/local:ro" \
     -v "$REPO_ROOT/themes:/app/themes:ro" \
     -v "$REPO_ROOT/plugins:/app/plugins:ro" \
-    -v "$REPO_ROOT/tools:/app/tools:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
 
@@ -89,27 +87,15 @@ playwright_versions_match() {
   return 1
 }
 
-# theme.json's schema must describe the WordPress version the site runs (compose.yaml): an older
-# schema hides settings the site has, a newer one offers settings it silently ignores.
+# theme.json's schema must describe the WordPress version the site runs (compose.dev.yaml): an
+# older schema hides settings the site has, a newer one offers settings it silently ignores.
 theme_json_schema_matches_wordpress() {
   local wordpress_version schema_version
-  wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.yaml")"
+  wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.dev.yaml")"
   # [$] matches the literal "$schema" key without looking like a shell variable.
   schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$REPO_ROOT/themes/hbmusic-child/theme.json")"
   [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
-  log "themes/hbmusic-child/theme.json uses the ${schema_version:-(no recognised)} schema; compose.yaml runs WordPress ${wordpress_version:-(not found)}"
-  return 1
-}
-
-# The old-site copy and the dev site must run the same database, WordPress and WP-CLI, or the
-# theme is built against different versions than it is checked against.
-compose_images_match() {
-  local old_site_images dev_site_images
-  old_site_images="$(grep -E '^\s*image:' "$REPO_ROOT/compose.yaml" | grep -v mailpit | sed -E 's/^\s*image:\s*//' | sort)"
-  dev_site_images="$(grep -E '^\s*image:' "$REPO_ROOT/compose.dev.yaml" | sed -E 's/^\s*image:\s*//' | sort)"
-  [[ -n "$dev_site_images" && "$old_site_images" == "$dev_site_images" ]] && return 0
-  log "compose.yaml and compose.dev.yaml pin different images:"
-  diff <(printf '%s\n' "$old_site_images") <(printf '%s\n' "$dev_site_images") | sed 's/^/  /' >&2
+  log "themes/hbmusic-child/theme.json uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
   return 1
 }
 
@@ -133,12 +119,9 @@ actionlint_workflows() {
   docker run --rm -w /repo -v "$REPO_ROOT/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
 }
 
-compose_files_are_valid() {
-  local compose_file
-  for compose_file in compose.yaml compose.dev.yaml; do
-    docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/$compose_file" \
-      --env-file "$REPO_ROOT/.env.example" config --quiet || return 1
-  done
+compose_file_is_valid() {
+  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" \
+    --env-file "$REPO_ROOT/.env.example" config --quiet
 }
 
 run_check() {
@@ -174,11 +157,10 @@ main() {
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
-  run_check "Both sites pin the same images" compose_images_match
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
-  run_check "Compose files" compose_files_are_valid
+  run_check "Compose file" compose_file_is_valid
   report
 }
 
