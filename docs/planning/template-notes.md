@@ -32,6 +32,8 @@ template project starts; until then, a list, not a to-do.
   `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry
   in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync settings.
 
+- The booking form: `config/booking-form.txt` and `config/booking-form-mail.json`, and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
+
 ## Settings
 
 - The ports (the 101xx block): `.env.example` (`DEV_SITE_PORT`) and the project's `CLAUDE.md`. Each

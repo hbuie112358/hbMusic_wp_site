@@ -13,15 +13,18 @@ readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
 readonly CHILD_THEME="hbmusic-child"
 readonly SONG_LIST_PLUGIN="song-list"
+readonly FORM_PLUGIN="contact-form-7"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
-  DEV_SITE_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
+  DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
   DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL
 )
 # The test pages as "title|address", in menu order: the new site's pages (plan D22), so templates
 # and navigation are exercised as the real site will use them; their text is neutral sample text
 # (no real data).
-readonly TEST_PAGES=('Home|home' 'Music|music' 'Songs|songlist' 'About|about' 'Book|book')
+readonly TEST_PAGES=('Home|home' 'Music|music' 'Songs|songlist' 'About|about' 'Book|book' 'Privacy Policy|privacy-policy')
+# Linked from the footer, not the menu.
+readonly PAGE_OUTSIDE_MENU="Privacy Policy"
 # Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
 # shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
 # expects them sorted and escaped. Neutral text, no real data.
@@ -104,7 +107,7 @@ remove_unused_code() {
     wp_cli theme delete "$theme"
   done
   # The Song List plugin is mounted read-only from the repository, so it could not be deleted.
-  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN"
+  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$FORM_PLUGIN"
 }
 
 configure_site() {
@@ -124,6 +127,20 @@ create_test_songs() {
     wp_cli post create --post_type=songlist_song --post_status=publish --post_title="$title" \
       --meta_input="{\"songlist_artist\":\"$artist\"}" --porcelain >/dev/null
   done
+}
+
+# The booking form as the real sites have it, from its files in config/, with stand-in Turnstile
+# keys that only the dev site's stand-in for Cloudflare accepts.
+install_booking_form() {
+  log "Installing $FORM_PLUGIN $CONTACT_FORM_7_VERSION and the booking form"
+  wp_cli plugin install "$FORM_PLUGIN" --version="$CONTACT_FORM_7_VERSION" --force --activate
+  wp_cli plugin verify-checksums "$FORM_PLUGIN"
+  local form_id
+  form_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=wpcf7_contact_form --post_status=publish \
+    --post_title="Booking form" --porcelain)"
+  wp_cli post meta update "$form_id" _form "$(cat "$REPO_ROOT/config/booking-form.txt")" >/dev/null
+  wp_cli post meta update "$form_id" _mail "$(cat "$REPO_ROOT/config/booking-form-mail.json")" --format=json >/dev/null
+  wp_cli eval 'WPCF7::update_option( "turnstile", array( "dev-site-key" => "dev-secret-key" ) );'
 }
 
 create_test_content() {
@@ -158,6 +175,7 @@ create_navigation_menu() {
   local test_page title links="" address
   for test_page in "${TEST_PAGES[@]}"; do
     title="${test_page%%|*}"
+    [[ "$title" == "$PAGE_OUTSIDE_MENU" ]] && continue
     address="$(wp_cli post list --post_type=page --title="$title" --field=url)"
     links+="<!-- wp:navigation-link {\"label\":\"$title\",\"url\":\"$address\",\"kind\":\"post-type\",\"type\":\"page\"} /-->"
   done
@@ -181,7 +199,7 @@ main() {
   ensure_env_file
   load_env
   require_settings
-  compose up -d db
+  compose up -d db mailpit
   # A new container each run: a running one keeps pointing at a mounted folder that git has since
   # removed and recreated (when switching branches), and then shows that folder as empty.
   compose up -d --force-recreate --no-deps wordpress
@@ -191,6 +209,7 @@ main() {
   install_parent_theme
   remove_unused_code
   configure_site
+  install_booking_form
   create_test_content
   clear_debug_log
   log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"
