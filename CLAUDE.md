@@ -33,7 +33,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `themes/hbmusic-child/`: the new Twenty Twenty-Five child theme.
 - `plugins/song-list/`: the Song List plugin (plan D19), which names nothing of this site, so it
   can be shared; its own prefix `songlist`, text domain `song-list` and `phpcs.xml.dist`.
-- `data/`: not versioned; one-time data, such as the converted song list for the import.
+- `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
+  wording and import file, and the photos.
 - `docs/planning/rebuild-plan.md`: the active plan (rolling-wave mode); its Current position
   says where the work stands.
 - `project-state.yaml`: session state for pause and resume, with the open items.
@@ -58,7 +59,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
   `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
-  test pages and songs with neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
+  test pages (`tests/dev-content/`) and songs with neutral text, a dev admin (`devadmin`, password `DEV_ADMIN_PASSWORD` in `.env`). Needs no
   backup, so CI can build it too.
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
