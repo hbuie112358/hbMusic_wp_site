@@ -89,7 +89,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   Composer install from `composer.lock`, validation and security audit; PHPCS with the
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
   stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
-  ruleset), and a check that plugins name nothing of this site; `theme.json`'s schema matching
+  ruleset), and checks that plugins name nothing of this site and that each declares
+  `Update URI: false`; `theme.json`'s schema matching
   the pinned WordPress; ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
