@@ -841,7 +841,39 @@ new findings added as steps.
      names it does not know, so a misspelled or renamed setting passed. The build now stops on a
      name Yoast does not know and reads the values back in a separate run; a planted misspelling
      stopped it ("Yoast has no setting enable_ai_generatr"). Staging: Yoast SEO → Settings → Site
-     features → AI tools → "Yoast AI" off, by the user. Status: `[~]`
+     features → AI tools → "Yoast AI" off, by the user (done 2026-11-09). Status: `[x]` d780942
+   - **8h. Local visibility (the user, 2026-11-09):** being found for searches such as "acoustic
+     guitar player Fayetteville". Search results are personal (place, history, device) and change
+     daily, so a single search proves nothing either way; the proof is Google's own figures over
+     weeks. Yoast's free version stays (switching would redo the setup for little gain; The SEO
+     Framework and Slim SEO noted as free alternatives); none of Yoast Premium's features is needed
+     for five pages. Parts:
+     - **Search Console:** whether the user already has access (the DNS holds a
+       `google-site-verification` record from an earlier verification, account not known); if not,
+       a Domain property verified by a new TXT record in hPanel. Before go-live: a baseline of the
+       old site's searches and positions (it names the old service area, so likely none for
+       Fayetteville). At go-live: submit Yoast's sitemap and ask Google to re-check the main pages.
+       **Done 2026-11-09:** the user had no access in the business Google account, so a Domain
+       property was added there and verified by a new `google-site-verification` TXT record on `@`
+       (Claude checked it at both name servers and public resolvers). The other verified owner is
+       the user's own other Google account, which the older verification record belongs to; it
+       stays (removing that owner and that record later is optional). **Baseline (the last 3 months
+       to 2026-11-09):** 84 impressions, 6 clicks; the only query listed is a phonetic misspelling
+       of the user's name (Google hides rare queries). People find the site when they already know
+       the user's name; none find it for a service in a place. The aim after go-live: queries for a
+       guitar player or guitarist in Fayetteville, Southern Pines or nearby appearing, with rising
+       impressions.
+     - **Google Business Profile** (the user, outside the site): name, service area (Fayetteville,
+       Southern Pines and surroundings, D22), contact and website the same as on the site;
+       verified by Google (phone, video or postcard); reviews from people who hired the user.
+     - **Local structured data:** the page data names a performer and the areas served, added in
+       code that extends Yoast's own (its Local SEO add-on is paid), tested on the dev site.
+     - **The redirects of D22** (`/video/`, `/audio/`, `/contact/`) in code or a free plugin, not
+       Yoast Premium's redirect manager.
+     - **After go-live:** Search Console's searches, impressions, positions and clicks recorded
+       here at about 2, 4, 8 and 12 weeks; rankings take weeks to months to settle, and changes in
+       between are noise.
+     Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
