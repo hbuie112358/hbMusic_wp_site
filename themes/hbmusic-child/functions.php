@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
  * Removes WordPress's emoji support: the detection script, its styles and the image swaps.
  *
  * Every current browser shows emoji itself. The detection script starts a worker from a blob:
- * address, which the site's Content-Security-Policy refuses (config/security-headers.conf), and
+ * address, which the site's Content-Security-Policy refuses (the Site Hardening plugin), and
  * where it decides a browser needs help it loads emoji images from WordPress.org's servers,
  * sending visitors' addresses there (docs/SITE_CHECKLIST.md 3.2, 8.4). The hooks are WordPress
  * 7.1's own (wp-includes/default-filters.php, wp-admin/includes/admin-filters.php).
@@ -32,6 +32,29 @@ function hbmusic_remove_emoji_support(): void {
 	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 }
 add_action( 'init', 'hbmusic_remove_emoji_support' );
+
+/**
+ * Adds the outside sources this site's pages need to the Site Hardening plugin's
+ * Content-Security-Policy (plan D26; docs/SITE_CHECKLIST.md 3.2), each with its reason:
+ * - Cloudflare Turnstile's script and its widget frame protect the booking form (plan 5e);
+ * - the site's videos always play from YouTube (plan D19): WordPress's embeds use youtube.com,
+ *   the privacy-enhanced player youtube-nocookie.com.
+ *
+ * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
+ * @return array<string, list<string>> The sources with this site's.
+ */
+function hbmusic_add_outside_sources( array $outside_sources ): array {
+	$outside_sources['script-src'] = array_merge(
+		$outside_sources['script-src'] ?? array(),
+		array( 'https://challenges.cloudflare.com' )
+	);
+	$outside_sources['frame-src']  = array_merge(
+		$outside_sources['frame-src'] ?? array(),
+		array( 'https://www.youtube.com', 'https://www.youtube-nocookie.com', 'https://challenges.cloudflare.com' )
+	);
+	return $outside_sources;
+}
+add_filter( 'sitehardening_csp_sources', 'hbmusic_add_outside_sources' );
 
 /**
  * Tells whether the page being shown has the booking form.

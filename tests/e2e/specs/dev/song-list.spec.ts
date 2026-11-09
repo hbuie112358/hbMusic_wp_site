@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { logIn } from './admin-login';
 
 // Protects the Song List plugin (plan step 5a): the block shows songs sorted and escaped, the
 // editor offers the block, and the admin form saves an artist only with a valid nonce. The
@@ -7,19 +8,6 @@ import { expect, test, type Page } from '@playwright/test';
 const SONGLIST_PATH = '/songlist/';
 const ARTIST_FIELD = '#songlist-artist';
 const NONCE_FIELD = '#songlist-artist-nonce';
-
-async function logIn(page: Page): Promise<void> {
-	const user = process.env.DEV_ADMIN_USER;
-	const password = process.env.DEV_ADMIN_PASSWORD;
-	if (!user || !password) {
-		throw new Error('DEV_ADMIN_USER and DEV_ADMIN_PASSWORD must be set; run through bin/test.');
-	}
-	await page.goto('/wp-login.php');
-	await page.locator('#user_login').fill(user);
-	await page.locator('#user_pass').fill(password);
-	await page.locator('#wp-submit').click();
-	await page.waitForURL(/\/wp-admin\//);
-}
 
 // A unique title for each run, so a rerun cannot mistake an earlier song for this one.
 async function addSong(page: Page, artist: string): Promise<string> {

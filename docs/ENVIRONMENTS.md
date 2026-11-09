@@ -26,5 +26,5 @@ counts as drift.
 | Wordfence | not installed | installed, auto-updates on (3g-1) | installed (D25) | A firewall and login limits protect sites the internet can reach. | Staging: 3g-1. |
 | Hostinger's auto-updates plugin | not installed | installed (mu-plugin, 3g-2) | installed (D15) | It belongs to the host. | |
 | Backups | none: rebuilt by `bin/dev-site` | none: code from `main`, content from `data/` | Hostinger daily, plus UpdraftPlus off-site (D25, step 8) | Only live holds content that exists nowhere else. | Live: a restore at step 9 (checklist 12.3). |
-| Security headers | `config/security-headers.conf`, read by the dev site's Apache | not recorded; checked at step 8 | the same lines, at step 8 | One file for every site. | Dev: `theme.spec.ts`. Live: step 8. |
+| Security headers | the Site Hardening plugin (D26) | the same plugin, deployed (8a) | the same plugin, at step 9 | Same everywhere: the plugin deploys with the code. | Dev: `theme.spec.ts`. Staging: after the deploy (8a). Live: step 9. |
 | Plugin versions | pinned in `tools/versions.sh` (Contact Form 7 6.2.4.1, Yoast SEO 28.8) | as installed and updated there | as installed and updated there | The dev site must be the same every run. | Open: how the pins follow live's updates is decided with updates at step 8. |

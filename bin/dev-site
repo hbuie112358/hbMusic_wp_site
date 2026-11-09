@@ -13,6 +13,7 @@ readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
 readonly CHILD_THEME="hbmusic-child"
 readonly SONG_LIST_PLUGIN="song-list"
+readonly SITE_HARDENING_PLUGIN="site-hardening"
 readonly FORM_PLUGIN="contact-form-7"
 readonly SEO_PLUGIN="wordpress-seo"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
@@ -107,14 +108,14 @@ remove_unused_code() {
     [[ "$theme" == "$PARENT_THEME_SLUG" || "$theme" == "$CHILD_THEME" ]] && continue
     wp_cli theme delete "$theme"
   done
-  # The Song List plugin is mounted read-only from the repository, so it could not be deleted.
-  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
+  # The project's own plugins are mounted read-only from the repository, so they could not be deleted.
+  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$SITE_HARDENING_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
 }
 
 configure_site() {
-  log "Activating $CHILD_THEME and $SONG_LIST_PLUGIN, discouraging search engines, setting the live site's permalinks"
+  log "Activating $CHILD_THEME, $SONG_LIST_PLUGIN and $SITE_HARDENING_PLUGIN, discouraging search engines, setting the live site's permalinks"
   wp_cli theme activate "$CHILD_THEME"
-  wp_cli plugin activate "$SONG_LIST_PLUGIN"
+  wp_cli plugin activate "$SONG_LIST_PLUGIN" "$SITE_HARDENING_PLUGIN"
   wp_cli option update blog_public 0
   # The WordPress image already writes the standard .htaccess rules this structure needs.
   wp_cli rewrite structure '/%postname%/'

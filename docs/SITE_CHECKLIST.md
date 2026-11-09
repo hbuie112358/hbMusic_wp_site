@@ -129,7 +129,7 @@ a nonce-based policy is used where a site handles payments or accounts. Also
   WordPress updates that add inline code keep working.
 - Check: the response headers carry the policy and the other headers, and the browser tests
   fail on any CSP violation, so an update that needs a new source shows up on staging first.
-- Kind: general · Status: partly: the policy and the other headers are sent on the dev site's visitor pages from `config/security-headers.conf`, and the browser tests fail on a missing header or any violation (4c; WordPress's emoji script, which the policy refused, is switched off in the theme); the admin pages and the live server at step 8.
+- Kind: general · Status: partly: the policy and the other headers are sent on visitor pages by the Site Hardening plugin (8a, D26; before, by the dev site's Apache), and the browser tests fail on a missing header, a loosened strict rule or any violation (4c, 8a; WordPress's emoji script, which the policy refused, is switched off in the theme); staging after 8a's deploy, the admin pages at step 8, live at step 9.
 
 **3.3 A PHP version under active security support, that the WordPress version in use supports;
 set per site where the host allows it, with staging on the same version as live, and a new
@@ -161,7 +161,8 @@ and `license.txt`, and the `readme.txt` of every plugin and theme.**
   tell attackers which known holes to try.
 - Check: a request for each kind returns 403 or 404.
 - Kind: WordPress · Status: partly: the live site's leftover files return 404 since they were
-  deleted (0c); the general rules and the version files at step 8.
+  deleted (0c); Yoast SEO's version comment in the pages is removed by the Site Hardening plugin
+  (8a); the general rules and the version files at step 8.
 
 **3.7 Only the site's files are in the web root: no local-development leftovers, archives, dumps
 or a second install (open items 1 and 2).**
@@ -219,8 +220,9 @@ logins; no account named `admin`.**
 **4.4 XML-RPC disabled unless a feature needs it.**
 - Why: a common target for password guessing.
 - Check: a request to `/xmlrpc.php` is refused.
-- Kind: WordPress · Status: partly: unreachable on staging behind its password (3g-1); live at
-  step 8.
+- Kind: WordPress · Status: partly: unreachable on staging behind its password (3g-1); refused
+  with 403 by the Site Hardening plugin on the dev site, tested (8a); staging after 8a's deploy,
+  live at step 9.
 
 **4.5 Usernames are not exposed: the REST `users` endpoint and `?author=` lookups do not reveal
 login names to visitors.**
@@ -240,7 +242,8 @@ unless a feature or service needs them; then only for the account that needs the
 plan.**
 - Why: they allow logins to the REST API that bypass two-factor login.
 - Check: the user profile shows no Application Passwords section.
-- Kind: WordPress · Status: planned: step 8 (live and staging).
+- Kind: WordPress · Status: partly: switched off by the Site Hardening plugin's filter on the dev
+  site, tested (8a); staging after 8a's deploy, live at step 9.
 
 **4.8 Comments, pingbacks, trackbacks and user registration are off unless the site uses them.**
 - Why: each one is a door for spam and attacks that nobody watches.

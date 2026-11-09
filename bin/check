@@ -154,6 +154,7 @@ main() {
   run_check "npm security audit (browser tests)" npm_audit
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
   run_check "WordPress Coding Standards (Song List plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/song-list/phpcs.xml.dist --basepath=plugins/song-list plugins/song-list
+  run_check "WordPress Coding Standards (Site Hardening plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/site-hardening/phpcs.xml.dist --basepath=plugins/site-hardening plugins/site-hardening
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match

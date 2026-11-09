@@ -82,6 +82,7 @@ new findings added as steps.
 | D23 | The site's look is "On Stage" (the user, 2026-11-07, chosen from three looks built on the real photo, logo and draft wording): a black page in which the photo blends, warm white text, and green from the logo for buttons and the booking band, using the parent's Manrope font. It lives in the child theme's `theme.json` and `parts/`. Wording is refined later in the admin. The current 885-pixel photo is used, without upscaling. | The user preferred it to the warm cream and black-and-white looks. Styles stay in `theme.json` (checklist 6.1), so no separate CSS file and no Stylelint yet; a CSS file would bring that up again. |
 | D24 | Site mail goes through a mail service, Brevo, connected by FluentSMTP (D13), for this site and as the pattern for every site (the user, 2026-11-07). Brevo's retention rule is set to 3 months and its email previews stay off. FluentSMTP keeps copies of failed mail only; requests that arrive are kept in the user's Gmail. | Gmail through Google's API was tried first: publishing the Google app needs a public home page and privacy policy, which a site that is not yet live does not have, and a Google project per site. A mail service needs only DNS records, the same before and after launch. Brevo over SMTP2GO: its delivery records are kept as long as the retention rule says, where SMTP2GO's free plan shows 5 days. |
 | D25 | The plugin set for go-live (the user, 2026-11-09): Wordfence stays; Yoast SEO stays, and also runs on staging and on the dev site (pinned and checked against WordPress.org's checksums, like Contact Form 7), with tests of what it is set to do; UpdraftPlus stays as the off-site backup, its destination, schedule and encryption set at step 8; Hostinger's auto-updates plugin and mu-plugin stay while the site is at Hostinger (D15); FluentSMTP (D13, D24), Contact Form 7 (5e) and Song List (5a) as chosen. | Wordfence alone gives two-factor login and the firewall. Keeping Yoast keeps its settings if step 9 updates the live site in place; on staging and the dev site it is checked before live, like every other plugin. Hostinger backs up the live site daily (the user, 2026-11-09), but at Hostinger, and checklist 12.1 wants a copy off the server. |
+| D26 | The security headers and the small hardening settings come from a generic plugin, `plugins/site-hardening/` (option B, the user, 2026-11-09), not from the server's `.htaccess` (option A): the headers on visitor pages (checklist 3.2), Yoast's version comment off (3.6), XML-RPC refused (4.4), Application Passwords off (4.7), and `Update URI: false`. The policy's outside sources are a setting each site adds (here, in the child theme), each with its reason; a malformed one is left out and reported. The dev site sends its headers only through the plugin; `config/security-headers.conf` is removed. PHPUnit still waits (the user: not yet); the refusal is tested through the dev site. | It deploys with the code, follows a host move unchanged, and the dev site tests the same path live uses; `.htaccess` lines would be pasted by hand on each site, outside the deploy, and LiteSpeed's support for the file's conditions was never confirmed. Security belongs in a plugin, not the theme (checklist 5.4). Static files (images, CSS) get no policy, which matters little since they run no code; the REST API sends its own `nosniff`. |
 | D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 
 ## Steps
@@ -728,6 +729,26 @@ new findings added as steps.
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
      it holds visitors' details, 10.2), a failure alert that does not depend on email, a Gmail rule so
      requests skip spam, and a test request on a schedule. Each is proven with a planted failure.
+   - **8a. The site hardening plugin (D26), 2026-11-09:** `plugins/site-hardening/`, generic like
+     Song List, mounted read-only on the dev site and deployed to staging through a new server
+     destination, `staging-site-hardening`, which the user adds before the merge. The child theme
+     adds the policy's outside sources (Cloudflare, YouTube). Before the change the dev site sent
+     the policy from Apache and answered `xmlrpc.php` with 200; the plugin must send the same
+     headers, byte for byte, and refuse XML-RPC. WordPress sends `X-Pingback` only on single posts
+     that allow pings (`wp-includes/class-wp.php`), so its test creates such a post. Built
+     2026-11-09: the headers match the recorded Apache ones byte for byte on three pages, each sent
+     once; new tests `tests/scenario/dev-site-hardening.sh` (XML-RPC 403 for POST and GET, no
+     `X-Pingback` on a post that allows pings, no Yoast comment while its tags are there) and
+     `hardening.spec.ts` (no Application Passwords on the profile page); `theme.spec.ts` now also
+     checks the policy's strict rules and that it has no `'unsafe-eval'` or wildcard. Six planted
+     faults caught: XML-RPC answering, `X-Pingback` back, Yoast's comment back, Application
+     Passwords back, a weaker policy (all six pages), and three malformed sources (left out of the
+     header, one debug-log notice each, failing `dev-no-php-notices`). The dev site no longer
+     switches on Apache's headers module. Left: the server destination (the user), the merge and
+     staging checked from outside. Status: `[~]`
+   - **8b. Song List gets `Update URI: false`** (found in 8a): without it, a plugin published on
+     WordPress.org under the name `song-list` (none existed on 2026-11-09) would be offered to the
+     site as an update of this one. Status: `[ ]`
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are
