@@ -14,6 +14,7 @@ readonly WAIT_INTERVAL_SECONDS=2
 readonly CHILD_THEME="hbmusic-child"
 readonly SONG_LIST_PLUGIN="song-list"
 readonly FORM_PLUGIN="contact-form-7"
+readonly SEO_PLUGIN="wordpress-seo"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
@@ -107,7 +108,7 @@ remove_unused_code() {
     wp_cli theme delete "$theme"
   done
   # The Song List plugin is mounted read-only from the repository, so it could not be deleted.
-  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$FORM_PLUGIN"
+  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
 }
 
 configure_site() {
@@ -141,6 +142,25 @@ install_booking_form() {
   wp_cli post meta update "$form_id" _form "$(cat "$REPO_ROOT/config/booking-form.txt")" >/dev/null
   wp_cli post meta update "$form_id" _mail "$(cat "$REPO_ROOT/config/booking-form-mail.json")" --format=json >/dev/null
   wp_cli eval 'WPCF7::update_option( "turnstile", array( "dev-site-key" => "dev-secret-key" ) );'
+}
+
+# Yoast SEO as live runs it (D25), with the settings every site of the user's has, saved through
+# Yoast's own code so its checks apply: author archives off, since WordPress otherwise forwards
+# /?author=1 to an address holding the login name (checklist 4.5); usage tracking off, stored
+# rather than left to Yoast's default, so a later default cannot switch it on (AI_SECURITY.md,
+# section 5). Staging and live get the same two settings in Yoast's admin screens.
+install_seo_plugin() {
+  log "Installing $SEO_PLUGIN $YOAST_SEO_VERSION, author archives and usage tracking off"
+  wp_cli plugin install "$SEO_PLUGIN" --version="$YOAST_SEO_VERSION" --force --activate
+  wp_cli plugin verify-checksums "$SEO_PLUGIN"
+  # shellcheck disable=SC2016 # PHP code: its $ variables are PHP's, kept from the shell on purpose
+  wp_cli eval '
+    foreach ( array( "disable-author" => true, "tracking" => false ) as $setting => $wanted ) {
+      WPSEO_Options::set( $setting, $wanted );
+      if ( WPSEO_Options::get( $setting ) !== $wanted ) {
+        WP_CLI::error( "Yoast did not save $setting" );
+      }
+    }'
 }
 
 create_test_content() {
@@ -210,6 +230,7 @@ main() {
   remove_unused_code
   configure_site
   install_booking_form
+  install_seo_plugin
   create_test_content
   clear_debug_log
   log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"
