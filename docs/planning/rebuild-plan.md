@@ -32,16 +32,21 @@ new findings added as steps.
   checked (#20); 8c, a last debug-log check in `bin/test`; 8d, the browser tests log in once,
   without the login screen (#21; it explains the login timeout of 2026-11-07); 8e, the
   logged-in view: the toolbar's icon font allowed, avatars off, a logged-in policy test (#22);
-  8b, `Update URI: false` on every plugin, enforced by `bin/check` (#23).
-- **Next:** the rest of step 8 that needs no mail, starting with backups (UpdraftPlus's off-site
-  destination, its weekly schedule, and the encryption question of checklist 12.2), then the
-  update routine, the Yoast decisions (AI, llms.txt, the Schema endpoint), Wordfence on live,
-  the admin pages' policy, and the server-level items (version files, no PHP in uploads,
-  permissions). Or the user's 5f choices (videos, wording); the user picks. The mail service
-  (D24, Brevo) waits on Brevo's support: the domain does not
-  authenticate although all four records verify and are correct in public DNS, and transactional
-  sending needs Brevo's activation (one ticket for both, opened by the user on 2026-11-09); then
-  continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
+  8b, `Update URI: false` on every plugin, enforced by `bin/check` (#23). After the resume: 8f,
+  backups by hand (D27), UpdraftPlus and its old backups removed from live; 8g, Yoast's AI
+  generator off, and the build stops on a Yoast setting name it does not know (#24); 8h, local
+  visibility planned, Search Console set up with a baseline; 8i, Wordfence on live (two-factor
+  required for administrators, XML-RPC logins off, the firewall found in Extended Protection).
+- **Next:** the update routine (step 8): the user is to look at live's Plugins page, the
+  "Automatic Updates" column, then choose A (automatic everywhere, plus a weekly GitHub check of
+  the dev site's pinned versions against WordPress.org; Claude's recommendation) or B (checklist
+  5.3 as written: security automatic, other plugins by hand, staging first). Then: 8h's code parts
+  (local structured data, the D22 redirects), the admin pages' policy, the server-level items
+  (version files, no PHP in uploads, permissions), and the login-limit test on staging (4.3). Or
+  the user's 5f choices (videos, wording); the user picks. The mail service (D24, Brevo) waits on
+  Brevo's support: transactional sending is active, but the domain does not authenticate although
+  all four records are correct at the domain's own name servers; the user replied with the DNS
+  zone export on 2026-11-09; then continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
