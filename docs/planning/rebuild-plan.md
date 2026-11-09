@@ -746,6 +746,11 @@ new findings added as steps.
      header, one debug-log notice each, failing `dev-no-php-notices`). The dev site no longer
      switches on Apache's headers module. Left: the server destination (the user), the merge and
      staging checked from outside. Status: `[~]`
+   - **8c. A last debug-log check in `bin/test`** (found in 8a's review, MEDIUM): the log was checked
+     only by `dev-no-php-notices.sh`, early in the run, so a notice caused by a later scenario or a
+     browser test went unseen; 8a's XML-RPC refusal logged one that way. The check moves into
+     `tests/scenario/lib.sh`, and `tests/scenario/final-debug-log.sh` runs it after the browser
+     tests. Status: `[~]`
    - **8b. Song List gets `Update URI: false`** (found in 8a): without it, a plugin published on
      WordPress.org under the name `song-list` (none existed on 2026-11-09) would be offered to the
      site as an update of this one. Status: `[ ]`
