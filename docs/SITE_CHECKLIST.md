@@ -533,19 +533,25 @@ weekly for a site whose content rarely changes, at least daily once it collects 
   much would be lost.
 - Check: the backup log shows the expected rhythm, and the latest backup is present in the
   off-site store.
-- Kind: general · Status: planned: step 8; until then, manual backups downloaded into
-  `backups/` (0f).
+- Kind: general · Status: deliberately not met as written for this site (plan D27): Hostinger
+  backs up daily at the host, and the off-site copy is kept by hand, the content exported into
+  `data/` after changes and at least monthly; revisited when several sites make that
+  unmanageable.
 
 **12.2 Backups encrypted, and access to them limited like production access.**
 - Why: backups hold the same secrets as the site.
 - Check: the backup tool shows encryption on, and only the user can reach the off-site store.
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: deliberately not met as written for this site (plan D27): the
+  off-site copy is a content export, which holds no passwords, keys or two-factor secrets (it does
+  hold the author's login name and email); it lives in `data/` on the user's computer, not
+  versioned, and in the user's own backup of that folder. The free UpdraftPlus could not encrypt.
 
 **12.3 A restore is tested before go-live, then once a year and before major changes.**
 - Why: an untested backup is not a backup.
 - Check: a restore onto a local or staging copy works, with its date recorded in the plan.
-- Kind: general · Status: partly: the local copy is rebuilt from the backup by
-  `bin/local-import` (3a); a restore from the new backup tool at step 9.
+- Kind: general · Status: planned: step 9, both ways of D27: the latest content export imported
+  into a fresh site, and a Hostinger restore tried on staging. (The local copy of 3a, rebuilt from
+  the host's export by `bin/local-import`, was removed at 5a-2.)
 
 ## 13. Deployment and migration
 

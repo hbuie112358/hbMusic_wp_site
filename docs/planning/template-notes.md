@@ -35,6 +35,7 @@ template project starts; until then, a list, not a to-do.
 - The booking form: `config/booking-form.txt` and `config/booking-form-mail.json`, and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
 
 - Site mail: a mail service through FluentSMTP (plan D24), set up per site with its own account, DNS records and retention rule; it works before a site is live, unlike Gmail through Google's API.
+- Backups (plan D27): the host's own backups plus content exported by hand into the site's data folder. Fine for one site; with several, each site's export habit multiplies, which is the trigger to move every site to an encrypted, automatic tool (UpdraftPlus Premium, or Duplicator) at once.
 
 ## Settings
 
