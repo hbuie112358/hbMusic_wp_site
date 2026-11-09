@@ -765,7 +765,8 @@ new findings added as steps.
      users' email addresses going to Gravatar. New test `admin-view.spec.ts`: every test page,
      viewed with the admin's saved login and the toolbar present, causes no violation; before the
      fixes it failed on all six pages with exactly staging's two violations. The policy recorder is
-     shared in `csp-violations.ts`. Status: `[~]`
+     shared in `csp-violations.ts`. Checked on staging after #22's deploy: the console, logged in,
+     shows no violation. Status: `[x]` a9d552c
    - **8c. A last debug-log check in `bin/test`** (found in 8a's review, MEDIUM): the log was checked
      only by `dev-no-php-notices.sh`, early in the run, so a notice caused by a later scenario or a
      browser test went unseen; 8a's XML-RPC refusal logged one that way. The check moves into
@@ -791,7 +792,9 @@ new findings added as steps.
      Status: `[~]`
    - **8b. Song List gets `Update URI: false`** (found in 8a): without it, a plugin published on
      WordPress.org under the name `song-list` (none existed on 2026-11-09) would be offered to the
-     site as an update of this one. Status: `[ ]`
+     site as an update of this one. Done 2026-11-09: the header added, and `bin/check` now fails
+     for any plugin in `plugins/` whose main file lacks it (shown failing on Song List before the
+     fix). Status: `[~]`
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are

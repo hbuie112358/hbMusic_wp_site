@@ -8,6 +8,10 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       song-list
+ * Update URI:        false
+ *
+ * "Update URI: false" keeps WordPress from offering a plugin of the same name from WordPress.org
+ * as an update of this one, which would replace the site's code with a stranger's.
  *
  * @package song-list
  */

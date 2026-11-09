@@ -51,6 +51,20 @@ plugins_name_nothing_of_this_site() {
   ! grep -rniE 'hbmusic|howard|buie|hostinger' "$REPO_ROOT/plugins"
 }
 
+# Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
+# would offer a WordPress.org plugin of the same name as an update and replace the site's code
+# with a stranger's (plan step 8b).
+plugins_never_updated_from_wordpress_org() {
+  local plugin_folder main_file missing=0
+  for plugin_folder in "$REPO_ROOT"/plugins/*/; do
+    main_file="$plugin_folder$(basename "$plugin_folder").php"
+    grep -qE '^ \* Update URI: +false$' "$main_file" 2>/dev/null && continue
+    log "${main_file#"$REPO_ROOT"/} has no \"Update URI: false\" header"
+    missing=1
+  done
+  return "$missing"
+}
+
 require_lock_file() {
   [[ -f "$REPO_ROOT/composer.lock" ]] && return 0
   log "composer.lock is missing; bin/tools-update creates it"
@@ -156,6 +170,7 @@ main() {
   run_check "WordPress Coding Standards (Song List plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/song-list/phpcs.xml.dist --basepath=plugins/song-list plugins/song-list
   run_check "WordPress Coding Standards (Site Hardening plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/site-hardening/phpcs.xml.dist --basepath=plugins/site-hardening plugins/site-hardening
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
+  run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
