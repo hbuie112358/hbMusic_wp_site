@@ -25,13 +25,16 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** the mail service (D24, Brevo), mid-way: continue at "Brevo setup, where it stands" in
-  step 8. Then the rest of 5e, step 6 and the rest of 8. 5f's pages are on staging; the user's video choices and wording follow.
+- **Next:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests, then on
+  staging. The mail service (D24, Brevo) waits on Brevo's support: the domain does not
+  authenticate although all four records verify and are correct in public DNS, and transactional
+  sending needs Brevo's activation (one ticket for both, opened by the user on 2026-11-09); then
+  continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
-- **Order of the coming steps (D19, replacing D11's):** the mail service (8) → the rest of 5e → 6 →
-  the rest of 8 → 9 → 10.
+- **Order of the coming steps (D19, replacing D11's; 6 moved first on 2026-11-09 while Brevo's
+  support answers):** 6 → the mail service (8) → the rest of 5e → the rest of 8 → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -75,6 +78,7 @@ new findings added as steps.
 | D21 | The template project starts when a second site has a date, not now (the user, 2026-11-07). `template-notes.md` keeps collecting what it must set differently. | Built after go-live, it starts with the plugin setup, live deploy and mail already proven, without 2-3 hours of carrying them over and a second repository to keep updated. Plugins in their own folders keep separation easy later. |
 | D23 | The site's look is "On Stage" (the user, 2026-11-07, chosen from three looks built on the real photo, logo and draft wording): a black page in which the photo blends, warm white text, and green from the logo for buttons and the booking band, using the parent's Manrope font. It lives in the child theme's `theme.json` and `parts/`. Wording is refined later in the admin. The current 885-pixel photo is used, without upscaling. | The user preferred it to the warm cream and black-and-white looks. Styles stay in `theme.json` (checklist 6.1), so no separate CSS file and no Stylelint yet; a CSS file would bring that up again. |
 | D24 | Site mail goes through a mail service, Brevo, connected by FluentSMTP (D13), for this site and as the pattern for every site (the user, 2026-11-07). Brevo's retention rule is set to 3 months and its email previews stay off. FluentSMTP keeps copies of failed mail only; requests that arrive are kept in the user's Gmail. | Gmail through Google's API was tried first: publishing the Google app needs a public home page and privacy policy, which a site that is not yet live does not have, and a Google project per site. A mail service needs only DNS records, the same before and after launch. Brevo over SMTP2GO: its delivery records are kept as long as the retention rule says, where SMTP2GO's free plan shows 5 days. |
+| D25 | The plugin set for go-live (the user, 2026-11-09): Wordfence stays; Yoast SEO stays, and also runs on staging and on the dev site (pinned and checked against WordPress.org's checksums, like Contact Form 7), with tests of what it is set to do; UpdraftPlus stays as the off-site backup, its destination, schedule and encryption set at step 8; Hostinger's auto-updates plugin and mu-plugin stay while the site is at Hostinger (D15); FluentSMTP (D13, D24), Contact Form 7 (5e) and Song List (5a) as chosen. | Wordfence alone gives two-factor login and the firewall. Keeping Yoast keeps its settings if step 9 updates the live site in place; on staging and the dev site it is checked before live, like every other plugin. Hostinger backs up the live site daily (the user, 2026-11-09), but at Hostinger, and checklist 12.1 wants a copy off the server. |
 | D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 
 ## Steps
@@ -593,7 +597,12 @@ new findings added as steps.
    Hostinger's auto-updates plugin and mu-plugin (open item 3), or keep them while the site is at
    Hostinger. FluentSMTP is already chosen
    (D13); its email log holds visitors' addresses, so its retention is set here
-   (`docs/SITE_CHECKLIST.md` 10.2). Status: `[ ]`
+   (`docs/SITE_CHECKLIST.md` 10.2). Decided 2026-11-09 (D25): every plugin above stays; Contact
+   Form 7 and Song List join them; FluentSMTP keeps failed mail only (D24). Left: Yoast SEO on the
+   dev site, pinned in `tools/versions.sh` and checked like Contact Form 7, with tests (author
+   archives closed, checklist 4.5; one canonical address per page; no policy or accessibility
+   error), each shown to fail on a planted fault; then on staging, set up as the inventory lists
+   (a musician, a sharing image, author archives off). Status: `[~]`
 7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
    Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
@@ -661,6 +670,11 @@ new findings added as steps.
      filter that labels booking requests and keeps them out of spam; (8) a test request reaches the
      inbox, and a planted failure raises the alert; (9) the privacy policy names Brevo and the periods.
      Open with the user: removing the visitor's name from the subject line (Claude recommends it).
+     **2026-11-09:** after more than two days, Brevo still shows "Your records don't match yet" above
+     four records marked "success"; Claude checked all four on two public resolvers (1.1.1.1,
+     8.8.8.8), all as Brevo wants. Brevo's help pages, as shown in search results, also say
+     transactional sending needs a separate activation by its support. The user opened one ticket
+     for both. Added before (3): (2a) transactional sending activated by Brevo.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
@@ -669,7 +683,9 @@ new findings added as steps.
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are
-     weekly or daily depending on the plan, which the user checks.
+     weekly or daily depending on the plan: daily on the live site (the user, 2026-11-09), but kept
+     at Hostinger, so UpdraftPlus stays for the off-site copy (12.1, D25); weekly is enough while
+     the site stores no requests.
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
