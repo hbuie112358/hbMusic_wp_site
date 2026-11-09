@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Scenario (dev site): the child theme and the Song List plugin reach WordPress read-only, and
+# Scenario (dev site): the child theme and the project's plugins reach WordPress read-only, and
 # the files stay the user's (plan steps 4b and 5a, the permission check folded in from 3c):
 # neither WordPress's user nor the container's root can write into their folders, and on the
 # host every file there belongs to the user and none is writable by others.
@@ -8,7 +8,7 @@ set -Eeuo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # Each folder under wp-content/ in the container, and under the repository on the host.
-readonly CODE_FOLDERS=(themes/hbmusic-child plugins/song-list)
+readonly CODE_FOLDERS=(themes/hbmusic-child plugins/song-list plugins/site-hardening)
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
 
 # A write that succeeds is removed again at once, so a failing check leaves no file behind.

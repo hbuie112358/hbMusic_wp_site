@@ -7,6 +7,8 @@ import { TEST_PATHS } from './test-pages';
 // has no accessibility errors (docs/SITE_CHECKLIST.md 3.2, 6.7, 7.1).
 // WordPress marks the active child theme on <body> (wp-child-theme-<folder>).
 const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
+// The policy's rules that no outside source may loosen (checklist 3.2; the Site Hardening plugin).
+const STRICT_POLICY_RULES = ["default-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'self'"];
 // WCAG 2.2 level AA and the levels it includes (checklist 7.1).
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
@@ -76,8 +78,13 @@ for (const path of TEST_PATHS) {
 
 		test('carries the security headers', async ({ request }) => {
 			const headers = (await request.get(path)).headers();
-			// The policy must be sent at all, or the violation check below would pass on nothing.
-			expect(headers['content-security-policy'], 'Content-Security-Policy').toContain("object-src 'none'");
+			// The policy must be sent at all, or the violation check below would pass on nothing; and
+			// its strict rules must hold (checklist 3.2), whatever outside sources the site adds.
+			const policy = headers['content-security-policy'] ?? '';
+			for (const strictRule of STRICT_POLICY_RULES) {
+				expect(policy, `Content-Security-Policy: ${strictRule}`).toContain(strictRule);
+			}
+			expect(policy, 'Content-Security-Policy: no eval, no wildcard source').not.toMatch(/'unsafe-eval'|\s\*(\s|;|$)/);
 			expect(headers['x-content-type-options'], 'X-Content-Type-Options').toBe('nosniff');
 			expect(headers['referrer-policy'], 'Referrer-Policy').toBeTruthy();
 			expect(headers['permissions-policy'], 'Permissions-Policy').toBeTruthy();

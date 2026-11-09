@@ -33,6 +33,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `themes/hbmusic-child/`: the new Twenty Twenty-Five child theme.
 - `plugins/song-list/`: the Song List plugin (plan D19), which names nothing of this site, so it
   can be shared; its own prefix `songlist`, text domain `song-list` and `phpcs.xml.dist`.
+- `plugins/site-hardening/`: the Site Hardening plugin (plan D26), shared the same way; prefix
+  `sitehardening`, text domain `site-hardening`.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
   wording and import file, and the photos.
 - `docs/planning/rebuild-plan.md`: the active plan (rolling-wave mode); its Current position
@@ -98,10 +100,11 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
   differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling of
   `bin/dev-site`.
-- `config/security-headers.conf`: the site's security headers (Content-Security-Policy and the
-  others, `docs/SITE_CHECKLIST.md` 3.2), in one place: the dev site's Apache reads it, and the
-  live server gets the same lines at plan step 8. Each outside source added to the policy is
-  listed there with its reason.
+- `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,
+  `docs/SITE_CHECKLIST.md` 3.2), XML-RPC refused, Application Passwords off and no version
+  comments (plan D26), in a generic plugin that names nothing of this site, with its own prefix
+  `sitehardening` and `phpcs.xml.dist`. It deploys like Song List. The policy's outside sources
+  are this site's setting, added in the child theme's `functions.php`, each with its reason.
 
 ## Testing
 

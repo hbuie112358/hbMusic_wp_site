@@ -54,8 +54,9 @@ template project starts; until then, a list, not a to-do.
 
 - `bin/check`, `bin/test`, `bin/tools-update`, `tools/versions.sh` (apart from the names above),
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
-- `config/security-headers.conf` (each site adds its own outside sources, with their reasons),
-  and the theme's `functions.php` switching off WordPress's emoji script.
+- `plugins/site-hardening/` (plan D26) as it is; each site adds its own outside sources, with
+  their reasons, through the `sitehardening_csp_sources` filter in its theme. The theme's
+  `functions.php` switching off WordPress's emoji script.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
 
 ## To build in

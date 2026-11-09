@@ -21,6 +21,7 @@ readonly REPO_ROOT
 readonly DEPLOY_TARGETS=(
   "themes/hbmusic-child|staging-child-theme"
   "plugins/song-list|staging-song-list"
+  "plugins/site-hardening|staging-site-hardening"
 )
 # Hostinger's SSH port, the same for every customer (not a secret).
 readonly SSH_PORT=65002
