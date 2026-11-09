@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { answerOutsideServices, recordCspViolations, recordedCspViolations } from './csp-violations';
 import { TEST_PATHS } from './test-pages';
 
 // Protects the child theme on the dev site (plan step 4c): every test page loads through the
@@ -12,36 +13,10 @@ const STRICT_POLICY_RULES = ["default-src 'self'", "object-src 'none'", "base-ur
 // WCAG 2.2 level AA and the levels it includes (checklist 7.1).
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
-type CspViolation = { directive: string; blockedURI: string; sourceFile: string };
-
-declare global {
-	interface Window {
-		cspViolations?: CspViolation[];
-	}
-}
-
-// Registered before any of the page's own code runs, so no violation can happen unrecorded.
-async function recordCspViolations(page: Page): Promise<void> {
-	await page.addInitScript(() => {
-		window.cspViolations = [];
-		document.addEventListener('securitypolicyviolation', (event) => {
-			window.cspViolations?.push({
-				directive: event.effectiveDirective,
-				blockedURI: event.blockedURI,
-				sourceFile: event.sourceFile,
-			});
-		});
-	});
-}
-
 for (const path of TEST_PATHS) {
 	test.describe(`the page ${path}`, () => {
-		// The Music page plays a video from YouTube, and the Book page loads Cloudflare's script.
-		// Answered here, so the tests need no network and no outside site, while the browser still
-		// applies the policy to both.
 		test.beforeEach(async ({ page }) => {
-			await page.route(/youtube\.com\/embed/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>video</title>' }));
-			await page.route(/challenges\.cloudflare\.com/, (route) => route.fulfill({ contentType: 'text/javascript', body: '' }));
+			await answerOutsideServices(page);
 		});
 
 		test('loads through the child theme', async ({ page }) => {
@@ -93,8 +68,7 @@ for (const path of TEST_PATHS) {
 		test('causes no Content-Security-Policy violation', async ({ page }) => {
 			await recordCspViolations(page);
 			await page.goto(path, { waitUntil: 'networkidle' });
-			const violations = await page.evaluate(() => window.cspViolations ?? []);
-			expect(violations, 'violations reported by the browser').toEqual([]);
+			expect(await recordedCspViolations(page), 'violations reported by the browser').toEqual([]);
 		});
 
 		test('has no accessibility errors', async ({ page }) => {

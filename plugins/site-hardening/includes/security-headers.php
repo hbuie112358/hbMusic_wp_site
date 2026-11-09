@@ -22,25 +22,34 @@ defined( 'ABSPATH' ) || exit;
  *   default-src 'self'        anything not listed below: the site itself only
  *   script-src, style-src     the site, and inline code WordPress and block styles write
  *   img-src 'self' data:      data: for small inline images WordPress uses
- *   font-src, connect-src     the site only (fonts self-hosted; background requests to the site)
+ *   font-src 'self' data:     fonts are self-hosted; data: for the icon font WordPress embeds in
+ *                             its toolbar's styles, shown to logged-in users (a font runs no code)
+ *   connect-src 'self'        background requests only to the site (REST API)
  *   frame-src 'self'          frames from the site; video players are added by the site
  *   object-src 'none'         no plugins such as Flash
  *   base-uri 'self'           the page's base address cannot be redirected
  *   form-action 'self'        forms are sent only to the site
  *   frame-ancestors 'self'    no other site may frame these pages (clickjacking)
  */
+// The policy's keywords and schemes, named once. The quotes are part of a keyword ('self'); a
+// scheme (data:) has none.
+const SITEHARDENING_CSP_SELF          = "'self'";
+const SITEHARDENING_CSP_NONE          = "'none'";
+const SITEHARDENING_CSP_UNSAFE_INLINE = "'unsafe-inline'";
+const SITEHARDENING_CSP_DATA_SCHEME   = 'data:';
+
 const SITEHARDENING_CSP_CORE = array(
-	'default-src'     => array( "'self'" ),
-	'script-src'      => array( "'self'", "'unsafe-inline'" ),
-	'style-src'       => array( "'self'", "'unsafe-inline'" ),
-	'img-src'         => array( "'self'", 'data:' ),
-	'font-src'        => array( "'self'" ),
-	'connect-src'     => array( "'self'" ),
-	'frame-src'       => array( "'self'" ),
-	'object-src'      => array( "'none'" ),
-	'base-uri'        => array( "'self'" ),
-	'form-action'     => array( "'self'" ),
-	'frame-ancestors' => array( "'self'" ),
+	'default-src'     => array( SITEHARDENING_CSP_SELF ),
+	'script-src'      => array( SITEHARDENING_CSP_SELF, SITEHARDENING_CSP_UNSAFE_INLINE ),
+	'style-src'       => array( SITEHARDENING_CSP_SELF, SITEHARDENING_CSP_UNSAFE_INLINE ),
+	'img-src'         => array( SITEHARDENING_CSP_SELF, SITEHARDENING_CSP_DATA_SCHEME ),
+	'font-src'        => array( SITEHARDENING_CSP_SELF, SITEHARDENING_CSP_DATA_SCHEME ),
+	'connect-src'     => array( SITEHARDENING_CSP_SELF ),
+	'frame-src'       => array( SITEHARDENING_CSP_SELF ),
+	'object-src'      => array( SITEHARDENING_CSP_NONE ),
+	'base-uri'        => array( SITEHARDENING_CSP_SELF ),
+	'form-action'     => array( SITEHARDENING_CSP_SELF ),
+	'frame-ancestors' => array( SITEHARDENING_CSP_SELF ),
 );
 
 // The directives a site may add outside sources to. The others protect against attacks that no

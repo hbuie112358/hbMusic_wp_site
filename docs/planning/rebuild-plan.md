@@ -546,7 +546,9 @@ new findings added as steps.
      YouTube frames. The dev site has neutral pages with the same layouts
      (`tests/dev-content/`), and tests check the logo and one main heading per page; each shown to
      fail on a planted fault. Left: the import on staging, the user's video choices (Home and
-     Music), the wording, and the form in place of its stand-in (5e). Status: `[~]`
+     Music), the wording, and the form in place of its stand-in (5e). Once a real video is on
+     staging's Music page, the browser console is checked there for policy violations, since
+     YouTube was not yet exercised on staging (8a). Status: `[~]`
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test
@@ -744,8 +746,26 @@ new findings added as steps.
      faults caught: XML-RPC answering, `X-Pingback` back, Yoast's comment back, Application
      Passwords back, a weaker policy (all six pages), and three malformed sources (left out of the
      header, one debug-log notice each, failing `dev-no-php-notices`). The dev site no longer
-     switches on Apache's headers module. Left: the server destination (the user), the merge and
-     staging checked from outside. Status: `[~]`
+     switches on Apache's headers module. On staging (2026-11-09): the user added the
+     `staging-site-hardening` destination (the settings file backed up first); the deploy after #21
+     copied and verified the plugin; the user activated it. Checked by the user with `curl` behind
+     the site-wide password (its own login, typed at the prompt): the four headers identical to the
+     dev site's, `xmlrpc.php` 403, no Yoast comment. The server adds a second policy,
+     `upgrade-insecure-requests`, to every response (`docs/ENVIRONMENTS.md`). In the browser console:
+     for visitors nothing of ours is blocked on Home, Music and Book; logged in, the toolbar's
+     embedded icon font and Gravatar pictures were blocked (8e). Cloudflare's frame on Book reports
+     refusals under its own policy, not this site's. Music had no video, so YouTube is not yet
+     checked on staging (5f). Status: `[x]` 5a1bfb9
+   - **8e. The logged-in view of the site's pages (2026-11-09, found on staging in 8a):** WordPress's
+     toolbar, shown to logged-in users, embeds its icon font as `data:` and shows avatars from
+     Gravatar; the policy blocked both, and the dev tests, viewing as visitors, never saw it. Fixes:
+     `font-src 'self' data:` in the plugin's core (a font runs no code); avatars off ("Show
+     Avatars", Settings → Discussion), set by the user on staging, by `bin/dev-site` on the dev site,
+     and on live at step 9: the site has no comments, and it stops a code derived from logged-in
+     users' email addresses going to Gravatar. New test `admin-view.spec.ts`: every test page,
+     viewed with the admin's saved login and the toolbar present, causes no violation; before the
+     fixes it failed on all six pages with exactly staging's two violations. The policy recorder is
+     shared in `csp-violations.ts`. Status: `[~]`
    - **8c. A last debug-log check in `bin/test`** (found in 8a's review, MEDIUM): the log was checked
      only by `dev-no-php-notices.sh`, early in the run, so a notice caused by a later scenario or a
      browser test went unseen; 8a's XML-RPC refusal logged one that way. The check moves into
@@ -803,6 +823,9 @@ new findings added as steps.
      stored off, Site features as on staging, the Organization with its logo, the Site image
      renamed `howard-buie-share.png`, and the Site Title "Howard Buie Music"; then each page's
      source checked as on staging;
+   - the Site Hardening plugin through the pipeline (a live destination, as 8a's), activated, and
+     checked as on staging: the headers, `xmlrpc.php` 403, and the browser console on the pages,
+     logged out and logged in; avatars off (Settings → Discussion → "Show Avatars", 8e);
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
