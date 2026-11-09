@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runs the tests against the dev site (bin/dev-site): the scenario checks named
-# tests/scenario/dev-*.sh, then the browser tests in tests/e2e/specs/dev/. If the site does not
+# tests/scenario/dev-*.sh, then the browser tests in tests/e2e/specs/dev/, then a last check that
+# WordPress's debug log is still empty (tests/scenario/final-debug-log.sh). If the site does not
 # answer, the run fails; it is never skipped. Every test runs even after a failure; the exit
 # status is 1 if any failed.
 set -Euo pipefail
@@ -70,6 +71,8 @@ run_all_tests() {
     run_test "Scenario: $(basename "$scenario" .sh)" bash "$scenario"
   done
   run_test "Browser tests (Playwright)" browser_tests
+  # Last, so it sees what every test before it caused.
+  run_test "Debug log empty after all tests" bash "$REPO_ROOT/tests/scenario/final-debug-log.sh"
 }
 
 main() {

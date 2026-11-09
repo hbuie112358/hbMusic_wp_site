@@ -41,6 +41,18 @@ assert_status() {
   fail "$context: expected exit status $expected, got $RUN_STATUS. Output: $RUN_OUTPUT"
 }
 
+# WordPress's debug log on the dev site: any PHP error, warning, notice or deprecation lands here
+# (docs/SITE_CHECKLIST.md 6.9).
+readonly DEBUG_LOG="/var/www/html/wp-content/debug.log"
+
+expect_empty_debug_log() {
+  local entries
+  entries="$(dev_compose exec -T wordpress sh -c "[ -f '$DEBUG_LOG' ] && cat '$DEBUG_LOG' || true")"
+  [[ -z "$entries" ]] || fail "WordPress's debug log is not empty:
+$entries"
+  log "the debug log is empty"
+}
+
 # Error messages are checked for the name of the offending setting, never for their wording.
 assert_output_names() {
   local name="$1" context="$2"

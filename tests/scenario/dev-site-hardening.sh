@@ -47,21 +47,15 @@ expect_no_version_comment() {
   log "Yoast SEO's tags are there, its version comment is not"
 }
 
-# The debug-log scenario runs before this one (bin/test runs them in name order), so the requests
-# made here are checked here: a refusal must not cost a PHP notice.
-expect_debug_log_empty() {
-  run_capturing dev_compose exec -T wordpress sh -c 'cat /var/www/html/wp-content/debug.log 2>/dev/null || true'
-  [[ -z "$RUN_OUTPUT" ]] || fail "WordPress's debug log is not empty after these requests: $RUN_OUTPUT"
-  log "these requests left WordPress's debug log empty"
-}
-
 main() {
   load_settings
   expect_xml_rpc_refused POST
   expect_xml_rpc_refused GET
   expect_no_pingback_header
   expect_no_version_comment
-  expect_debug_log_empty
+  # Checked here as well as at the end of bin/test, so a refusal that costs a PHP notice is
+  # named by this scenario.
+  expect_empty_debug_log
   log "PASSED"
 }
 
