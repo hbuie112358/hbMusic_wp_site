@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-09T11:46:24-05:00
+timestamp: 2026-11-09T18:25:40-05:00
 current_branch: step-8h-local-visibility
-last_commit: 5cc46b8
+last_commit: ac353ec
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -36,16 +36,25 @@ last_work: >
   up under the business Google account (new DNS record), baseline 84 impressions and 6 clicks in
   three months, found only by a misspelling of the user's name. 8i: on live, two-factor login
   required for administrators (tested), XML-RPC logins off, the firewall found in Extended
-  Protection.
+  Protection. Evening of 2026-11-09: Brevo's support completed the domain's verification; the
+  user set up Brevo (two-factor login, sender website@howardbuiemusic.com, the Gmail sender
+  deleted, a restricted API key, retention 3 months with no previews, anonymous tracking) and
+  connected FluentSMTP on staging: a test arrived in the inbox with SPF, DKIM and DMARC passing.
+  Failure alerts by Pushover, proven with a planted failure (Brevo's IP blocking): the alert came,
+  FluentSMTP kept only the failed request, and sending was restored and checked. Recorded in plan
+  step 8, "Brevo setup, where it stands".
 
 next_action: >
-  The update routine (plan step 8): ask the user what live's Plugins page shows in the "Automatic
-  Updates" column for each plugin, then let the user choose A (automatic everywhere, plus a weekly
-  GitHub check of the dev site's pinned versions; Claude's recommendation) or B (checklist 5.3 as
-  written). Also ask whether Brevo's support has replied to the zone export; if the domain
-  authenticates, continue at "Brevo setup, where it stands" in step 8. Push the two unpushed
-  documentation commits (8h, 8i) with the next code change. Before any test run after switching
-  branches, rebuild the dev site with bin/dev-site (stale bind mounts, plan 5a-2).
+  Mail first (plan step 8, the end of "Brevo setup, where it stands"): ask the user (1) phone,
+  email or both for a new "sending failed" message on the booking form, and whether Claude's split
+  is fine (real details typed into Contact Form 7 on staging and live; placeholder details in
+  config/ for the dev site, with a test, listed in docs/ENVIRONMENTS.md); (2) whether to remove the
+  visitor's name from the email subject (Claude recommends it; the name also reaches Pushover
+  alerts); (3) whether to leave Brevo's IP blocking on (Claude recommends it). Then propose the
+  wording and the config change before editing. After that: the Gmail filter, one successful
+  booking request, the privacy policy, the monthly test; or the update routine (live's "Automatic
+  Updates" column, then A or B). Push the unpushed commits with the next code change. Before any
+  test run after switching branches, rebuild the dev site with bin/dev-site (stale bind mounts).
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -59,9 +68,9 @@ verification:
   live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
   staging_site: staging.howardbuiemusic.com, site-wide password (hPanel Password Protect Directories; the user's own login and a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
-  staging_mail: the form reports sent, but no mail arrived in Gmail; FluentSMTP is installed on staging but not connected
+  staging_mail: FluentSMTP connected to Brevo (sender website@howardbuiemusic.com, log off, failed emails kept anyway); a test arrived in the inbox with SPF, DKIM and DMARC passing (2026-11-09); failure alerts by Pushover, proven with a planted failure; the 2026-11-07 mails had gone through Hostinger's relay into spam, failing DMARC; staging's admin email change to the business Gmail address not confirmed
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
-  brevo: account under the user's Gmail address, validated, transactional sending active (support, 2026-11-09); domain records all "success" but still "not authenticated" after a re-check; the user replied to support with the DNS zone export and asked whether SPF must name Brevo; no sender, API key or settings yet; login in the user's password notes
+  brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
   checks: bin/check 16 checks; bin/test 5 scenarios + 76 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-09
@@ -76,8 +85,14 @@ uncommitted_changes: []
 
 pending_decisions:
   - >
-    Removing the visitor's name from the booking email's subject line, so Brevo's records hold less
-    about visitors (Claude recommends it; the user has not said).
+    Removing the visitor's name from the booking email's subject line, so Brevo's records and
+    Pushover alerts hold less about visitors (Claude recommends it; the user has not said).
+  - >
+    The booking form's "sending failed" message offering another way to reach the user (the user
+    likes it): phone, email or both; and Claude's split (real details by hand on staging and live,
+    placeholders in config/ for the dev site).
+  - >
+    Brevo's IP blocking for API keys: leave it on (Claude recommends it) or off (as now).
   - >
     A memory note on how the user likes explanations (a nutshell first, then plain words): offered
     by Claude on 2026-11-09, not yet answered; nothing written without the user's yes.

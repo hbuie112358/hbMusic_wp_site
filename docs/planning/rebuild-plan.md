@@ -37,16 +37,18 @@ new findings added as steps.
   generator off, and the build stops on a Yoast setting name it does not know (#24); 8h, local
   visibility planned, Search Console set up with a baseline; 8i, Wordfence on live (two-factor
   required for administrators, XML-RPC logins off, the firewall found in Extended Protection).
-- **Next:** the update routine (step 8): the user is to look at live's Plugins page, the
+- **Mail (D24), evening of 2026-11-09:** Brevo authenticated the domain; staging now sends through
+  Brevo with SPF, DKIM and DMARC passing, and a failed booking request raises a Pushover alert
+  (proven with a planted failure). Next for mail: the open choices at the end of "Brevo setup,
+  where it stands" in step 8 (the subject line, a new "sending failed" message, IP blocking), then
+  the Gmail filter, one successful request, the privacy policy and the monthly test.
+- **Next:** the mail choices above, or the update routine (step 8): the user is to look at live's Plugins page, the
   "Automatic Updates" column, then choose A (automatic everywhere, plus a weekly GitHub check of
   the dev site's pinned versions against WordPress.org; Claude's recommendation) or B (checklist
   5.3 as written: security automatic, other plugins by hand, staging first). Then: 8h's code parts
   (local structured data, the D22 redirects), the admin pages' policy, the server-level items
   (version files, no PHP in uploads, permissions), and the login-limit test on staging (4.3). Or
-  the user's 5f choices (videos, wording); the user picks. The mail service (D24, Brevo) waits on
-  Brevo's support: transactional sending is active, but the domain does not authenticate although
-  all four records are correct at the domain's own name servers; the user replied with the DNS
-  zone export on 2026-11-09; then continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
+  the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
@@ -752,6 +754,50 @@ new findings added as steps.
      DMARC record. The user replied with the full DNS zone export (a screenshot would not fit) and
      asked whether SPF must also name Brevo. The zone also holds Hostinger's own DKIM
      (`hostingermail-a/b/c._domainkey`); the "no DKIM" of 2026-11-07 above did not check those names.
+     **Later on 2026-11-09, Brevo's support (by email):** the records were correct; the domain needed
+     a last verification step on Brevo's side, which support completed. SPF stays as it is: Brevo
+     sends from its own bounce domain, and DMARC passes through DKIM. Done the same evening, by the
+     user with Claude: (1) domain "Authenticated" (branding skipped: it only rewrites tracking links
+     for marketing mail); (2) Brevo two-factor login on; (3) sender `website@howardbuiemusic.com`,
+     "Howard Buie Music website", verified without an email to that address (DKIM signed by
+     `howardbuiemusic.com`, DMARC configured); the sender Brevo had made from the signup Gmail
+     address was deleted, since Gmail addresses fail DMARC when sent through Brevo; (4) an API key
+     named for the site: restricted, Transactional email "All", everything else "None", no fixed
+     expiry, **but it expires after 90 days unused**, so the monthly test request below is required,
+     not optional; no Account permission was needed; (5) FluentSMTP on staging connected to Brevo
+     (it encrypts the key with the site's salts, by its own form's statement, not yet read in its
+     code); the email log off, stop-delivering off, plain-text copy off; the first test arrived in
+     the inbox with **SPF, DKIM (`brevo1`, `howardbuiemusic.com`) and DMARC all pass**; (6) retention
+     3 months, all senders, previews never stored; tracking anonymous (the only tracking switch the
+     free plan offers: Brevo still adds an open pixel, rewritten links and an unsubscribe header).
+     **Risk:** clicking "Unsubscribe" or "Report spam" on these emails puts the user's address on
+     Brevo's blocked list for transactional mail, and every booking request after that is dropped
+     without any alert. The user never does either; the monthly test checks arrival, not sending;
+     where Brevo lists blocked transactional addresses is still to be found on the real screen.
+     **Failure alert (5b), proven:** FluentSMTP alerts by Pushover (the user's choice over Slack,
+     Discord and Telegram); an application token per site and the user's key in the password
+     notes. FluentSMTP's code (GitHub, `SchedulerHandler.php`) sends no alert for its own Email
+     Test (`FLUENTMAIL_EMAIL_TESTING`) and at most one per minute. Planted failure: Brevo's
+     Authorized IPs blocking on for API keys, with staging's automatically authorised address
+     removed; a booking request on staging then failed, the visitor saw Contact Form 7's "There was
+     an error trying to send your message. Please try again later.", a high-priority Pushover alert
+     arrived within a minute, and FluentSMTP's Email Logs held the failed request, **only failed
+     ones, with logging off** (D24 as wanted). Undone: the address authorised again, blocking off,
+     an Email Test arrived. The Pushover alert holds the recipient and the subject, so the
+     visitor's name goes to Pushover too while it is in the subject. **Found:** the 2026-11-07
+     booking test and an admin-email confirmation from staging did arrive, in spam: sent through
+     Hostinger's relay, DMARC failed; that is the "no mail delivered" of 5e. Staging's admin email
+     change to the business Gmail address is still unconfirmed.
+     **Open (the user, at the next session):** the visitor's name out of the subject; a new "sending
+     failed" message offering another way to reach the user (the user likes it): phone, email or
+     both, and Claude's proposed split, real details typed into Contact Form 7 on staging and live,
+     placeholder details in `config/` for the dev site with a test, the difference listed in
+     `docs/ENVIRONMENTS.md`; whether to leave Brevo's IP blocking on (Claude recommends it: a stolen
+     key is then useless elsewhere; a changed server address shows as an alert); whether failed
+     entries in FluentSMTP's log are ever deleted while logging is off (until known, the user deletes
+     them by hand; the planted test's entry included). Left: (7) the Gmail filter, never spam and a
+     label; (8) one successful booking request from staging's form; (9) the privacy policy naming
+     Brevo, Pushover and the periods; a monthly test request in the user's calendar.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
