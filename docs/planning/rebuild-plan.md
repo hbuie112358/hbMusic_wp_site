@@ -25,8 +25,11 @@ new findings added as steps.
 - **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
 - **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Next:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests, then on
-  staging. The mail service (D24, Brevo) waits on Brevo's support: the domain does not
+- **Done 2026-11-09:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests
+  (#19), and on staging by hand; `docs/ENVIRONMENTS.md` lists the intended differences between
+  the dev site, staging and live.
+- **Next:** while Brevo's support answers, the parts of step 8 that need no mail, or the user's
+  5f choices (videos, wording); the user picks. The mail service (D24, Brevo) waits on Brevo's support: the domain does not
   authenticate although all four records verify and are correct in public DNS, and transactional
   sending needs Brevo's activation (one ticket for both, opened by the user on 2026-11-09); then
   continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
@@ -619,7 +622,10 @@ new findings added as steps.
    - **Found, for step 8:** Yoast writes its version in a comment on every page ("optimized with
      the Yoast SEO plugin v28.8"), which checklist 3.6 is about; the `wpseo_debug_markers` filter
      removes it. Yoast's AI generator is on by default and contacts Yoast's service only when used
-     in the editor. Both are for step 8 (the user, 2026-11-09).
+     in the editor. Both are for step 8 (the user, 2026-11-09), with two features Yoast's Site
+     features page offers and the user left at their defaults: llms.txt and the Schema aggregation
+     endpoint (offered in a pop-up after activation, not enabled). Any change there is made on the
+     dev site and staging together, so they stay as tested.
    - **Yoast's outgoing requests (read in its 28.8 code, 2026-11-09; not observed as traffic):**
      none from visitor pages. Usage data to `tracking.yoast.com` only if the tracking setting is not
      `false`: stored `false`, its hooks are never registered (`admin/tracking/class-tracking.php`;
@@ -628,7 +634,23 @@ new findings added as steps.
      admin proxy page there for its analysis worker; `ai.yoa.st` when the AI features are used; the
      help beacon on Yoast's admin pages loads `beacon-v2.helpscout.net` and, with tracking off,
      asks for consent first. The sitemap request goes to the site itself.
-   Status: `[~]`
+   - **Yoast on staging (2026-11-09, the user in the admin, Claude checking each screen):** 28.8 from
+     WordPress.org (by Yoast, version checked before installing); the setup wizard not run; the
+     "blocking access to robots" notice dismissed (staging stays out of search results). Settings:
+     author archives off (Advanced → Author archives; `/author/<login>/` then forwards to the home
+     page, checked by the user); usage tracking stored off (Site basics: switched on, saved,
+     switched off, saved); Site features at Yoast's defaults; Site representation an
+     Organization, "Howard Buie Music", no alternate name (the user uses none), logo
+     `data/photos/web/howard-buie-logo-696.png` (cropped by Claude from the original logo, 696×696,
+     transparent corners); Site image `data/photos/web/howard-buie-share-1200x675.png` (the promo
+     photo at its own size on black, bottom-aligned; WordPress stored it with "-1" added, most
+     likely because the name ends like one of its resized copies, so it is renamed
+     `howard-buie-share.png` before the live upload). WordPress's Site Title changed from the
+     address Hostinger's installer set to "Howard Buie Music". Checked in the Songs page's source:
+     `og:image` is the sharing image, the home page uses its own photo, and the Organization names
+     the logo.
+   Status: `[x]` f031a95 (the dev site); staging set by hand on 2026-11-09. UpdraftPlus's setup
+   follows at step 8 (D25).
 7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
    Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
@@ -733,6 +755,10 @@ new findings added as steps.
      From and To for live, and staging's were set by hand in its Mail tab;
    - from outside, after the switch: every page allows indexing and names one canonical address,
      its own, at the live domain (only live can show this, `docs/ENVIRONMENTS.md`, step 6);
+   - Yoast SEO set as on staging (step 6): the version tested, author archives off, usage tracking
+     stored off, Site features as on staging, the Organization with its logo, the Site image
+     renamed `howard-buie-share.png`, and the Site Title "Howard Buie Music"; then each page's
+     source checked as on staging;
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
