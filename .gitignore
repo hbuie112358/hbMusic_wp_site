@@ -33,6 +33,8 @@
 *.log
 wp-config.php
 .env
+# The browser tests' saved dev-admin login (its session cookies), written by admin.setup.ts.
+tests/e2e/.auth/
 
 # Dependencies and build output are installed from lock files, never versioned.
 node_modules/

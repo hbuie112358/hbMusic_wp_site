@@ -750,7 +750,25 @@ new findings added as steps.
      only by `dev-no-php-notices.sh`, early in the run, so a notice caused by a later scenario or a
      browser test went unseen; 8a's XML-RPC refusal logged one that way. The check moves into
      `tests/scenario/lib.sh`, and `tests/scenario/final-debug-log.sh` runs it after the browser
-     tests. Status: `[~]`
+     tests. Status: `[x]` a63642f
+   - **8d. The browser tests log in once, without the login screen** (2026-11-09): after 8a's merge,
+     `main`'s run failed (so staging was not deployed): the login timed out with the password in the
+     user name field and the form never sent. Cause: WordPress's login screen moves the cursor to
+     the user name field 200 ms after it opens (`wp-login.php`, `wp_attempt_focus`); when that came
+     while the test typed the password, the password replaced the user name and the required,
+     empty password field stopped the form. This also explains the unexplained Song List login
+     timeout of 2026-11-07. Proven with a planted script that moves the cursor at that moment: the
+     old screen login failed every time. A request-based login (the form's own request, fields
+     `log` and `pwd`) then showed a second fault: tests logging in at the same moment lost a session
+     (WordPress stores a user's sessions as one list, updated by read, add, write back; after each
+     run one session fewer than the logins, and one test logged out). Fix: `admin.setup.ts` logs in
+     once per run by request and saves the login to `tests/e2e/.auth/` (ignored by git); only the
+     specs that need the admin start from it, so the visitor tests stay logged out. Proven: with the
+     typing race planted, three runs each passed with exactly one stored session; a wrong password
+     fails the setup with a clear message and runs nothing else. The rule for which tests may run in
+     parallel is in the project's `CLAUDE.md` (Testing). On the way, a stale bind mount after a branch
+     switch (5a-2) left the dev site without the plugin's files; `bin/dev-site` rebuilt it.
+     Status: `[~]`
    - **8b. Song List gets `Update URI: false`** (found in 8a): without it, a plugin published on
      WordPress.org under the name `song-list` (none existed on 2026-11-09) would be offered to the
      site as an update of this one. Status: `[ ]`
