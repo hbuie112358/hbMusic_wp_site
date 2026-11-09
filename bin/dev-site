@@ -117,6 +117,10 @@ configure_site() {
   wp_cli theme activate "$CHILD_THEME"
   wp_cli plugin activate "$SONG_LIST_PLUGIN" "$SITE_HARDENING_PLUGIN"
   wp_cli option update blog_public 0
+  # Avatars off, as on staging and live: the site has no comments, and WordPress would otherwise
+  # show logged-in users' pictures from Gravatar, which the policy refuses and which sends a code
+  # derived from their email address to an outside service (plan step 8e).
+  wp_cli option update show_avatars 0
   # The WordPress image already writes the standard .htaccess rules this structure needs.
   wp_cli rewrite structure '/%postname%/'
 }
