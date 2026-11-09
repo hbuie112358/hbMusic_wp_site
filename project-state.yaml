@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-09T09:38:09-05:00
-current_branch: pause-2026-11-09
-last_commit: 2d916cf
+timestamp: 2026-11-09T11:46:24-05:00
+current_branch: step-8h-local-visibility
+last_commit: 5cc46b8
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -26,30 +26,42 @@ last_work: >
   script and a lost-session race between parallel logins, and explains the 2026-11-07 timeout; 8e
   the logged-in view (icon font allowed, avatars off, a logged-in policy test) (#22); 8b
   Update URI false on every plugin, enforced by bin/check (#23). Pull requests #19 to #23 merged,
-  each deployed to staging.
+  each deployed to staging. Later on 2026-11-09 (after a resume): Brevo's AI support agent
+  answered that transactional sending is already active and to re-run the domain check, which
+  still failed; Claude confirmed all four records at the domain's own name servers; the user
+  replied to support with the DNS zone export. 8f: backups by hand (D27; the free UpdraftPlus
+  cannot encrypt), UpdraftPlus deleted from live with old backup files found in its folder. 8g:
+  Yoast's AI generator off on the dev site and staging, and the build now stops on an unknown
+  Yoast setting name (#24, merged and deployed). 8h: local visibility planned; Search Console set
+  up under the business Google account (new DNS record), baseline 84 impressions and 6 clicks in
+  three months, found only by a misspelling of the user's name. 8i: on live, two-factor login
+  required for administrators (tested), XML-RPC logins off, the firewall found in Extended
+  Protection.
 
 next_action: >
-  Ask whether Brevo's support has answered (the ticket covers the domain authentication and
-  transactional sending's activation); if so, continue at "Brevo setup, where it stands" in step 8.
-  Otherwise the rest of step 8 that needs no mail, starting with backups (UpdraftPlus's off-site
-  destination, a weekly schedule, and the encryption question of checklist 12.2; Hostinger already
-  backs up the live site daily, at Hostinger), unless the user picks the 5f choices (videos,
-  wording) instead. Before any test run after switching branches, rebuild the dev site with
-  bin/dev-site (stale bind mounts, plan 5a-2).
+  The update routine (plan step 8): ask the user what live's Plugins page shows in the "Automatic
+  Updates" column for each plugin, then let the user choose A (automatic everywhere, plus a weekly
+  GitHub check of the dev site's pinned versions; Claude's recommendation) or B (checklist 5.3 as
+  written). Also ask whether Brevo's support has replied to the zone export; if the domain
+  authenticates, continue at "Brevo setup, where it stands" in step 8. Push the two unpushed
+  documentation commits (8h, 8i) with the next code change. Before any test run after switching
+  branches, rebuild the dev site with bin/dev-site (stale bind mounts, plan 5a-2).
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
   live_php: 8.4.27
   staging_php: 8.4.27 (set per website; step 0f corrected)
-  live_plugins: wordfence 9.0.2, wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f)
+  live_plugins: wordfence 9.0.2, wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); their automatic-update settings not yet looked at
+  live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10)
+  search_console: Domain property under the business Google account, verified 2026-11-09 by a new google-site-verification TXT record; the other owner is the user's other Google account (the older TXT record); baseline in plan 8h
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
   live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
   live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
-  staging_site: staging.howardbuiemusic.com, site-wide password (hPanel Password Protect Directories; the user's own login and a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
+  staging_site: staging.howardbuiemusic.com, site-wide password (hPanel Password Protect Directories; the user's own login and a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
   staging_mail: the form reports sent, but no mail arrived in Gmail; FluentSMTP is installed on staging but not connected
-  dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8
-  brevo: account under the user's Gmail address; domain added, records all "success", still "not authenticated" after two days; support ticket opened 2026-11-09 for that and for transactional sending's activation; no sender, API key or settings yet; login in the user's password notes
+  dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
+  brevo: account under the user's Gmail address, validated, transactional sending active (support, 2026-11-09); domain records all "success" but still "not authenticated" after a re-check; the user replied to support with the DNS zone export and asked whether SPF must name Brevo; no sender, API key or settings yet; login in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
   checks: bin/check 16 checks; bin/test 5 scenarios + 76 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-09
@@ -69,11 +81,19 @@ pending_decisions:
   - >
     A memory note on how the user likes explanations (a nutshell first, then plain words): offered
     by Claude on 2026-11-09, not yet answered; nothing written without the user's yes.
+  - >
+    The update routine (plan step 8): A, automatic updates everywhere plus a weekly GitHub check of
+    the dev site's pinned versions (Claude's recommendation), or B, checklist 5.3 as written
+    (security automatic, other plugins by hand, staging first). Waiting on the user's look at live's
+    "Automatic Updates" column first.
+  - >
+    Optional tidy-up: keep Search Console in the business Google account only (remove the other
+    account as owner, then the older google-site-verification TXT record); harmless to leave.
   - Which videos to use, and which one on Home (the user goes through them).
   - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).
   - The new host (step 10, before the Hostinger plan ends in 2028).
-  - Decided when the step is reached, noted in the plan - step 8 (backups and their encryption, the update routine, the Yoast AI/llms.txt/Schema endpoint settings, Wordfence on live, the admin pages' policy, cache, server-level items), step 9 (updating the site in place or a fresh install).
+  - Decided when the step is reached, noted in the plan - step 8 (the admin pages' policy, cache, server-level items), step 9 (updating the site in place or a fresh install).
 
 open_items:
   - id: 1
