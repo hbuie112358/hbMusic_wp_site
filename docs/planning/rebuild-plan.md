@@ -831,7 +831,17 @@ new findings added as steps.
      deleted them on 2026-11-09, then deleted the plugin and the folder; checked from outside:
      `/wp-content/updraft/` and the plugin's files answer 404, like a folder that never existed.
      The first content export and the restore test (12.3) belong to go-live (step 9).
-     Status: `[x]` (documents in the commit that records it)
+     Status: `[x]` 61bbe5b
+   - **8g. Yoast's AI and data features (the user, 2026-11-09):** read in Yoast 28.8's code: the AI
+     generator is on by default and sends page text to `ai.yoa.st` only when used; llms.txt and the
+     Schema aggregation endpoint are off by default. The user turned the AI generator off, so no page
+     text can go to Yoast's AI service, and left llms.txt and the Schema endpoint off. `bin/dev-site`
+     sets it with the other Yoast settings. Found while adding it: the build's Yoast check compared
+     within one run, where Yoast's in-memory copy answers with the value just set, and Yoast ignores
+     names it does not know, so a misspelled or renamed setting passed. The build now stops on a
+     name Yoast does not know and reads the values back in a separate run; a planted misspelling
+     stopped it ("Yoast has no setting enable_ai_generatr"). Staging: Yoast SEO → Settings → Site
+     features → AI tools → "Yoast AI" off, by the user. Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -854,7 +864,8 @@ new findings added as steps.
    - from outside, after the switch: every page allows indexing and names one canonical address,
      its own, at the live domain (only live can show this, `docs/ENVIRONMENTS.md`, step 6);
    - Yoast SEO set as on staging (step 6): the version tested, author archives off, usage tracking
-     stored off, Site features as on staging, the Organization with its logo, the Site image
+     stored off, Site features as on staging (the AI generator off, llms.txt and the Schema
+     endpoint off, 8g), the Organization with its logo, the Site image
      renamed `howard-buie-share.png`, and the Site Title "Howard Buie Music"; then each page's
      source checked as on staging;
    - backups as D27 says: the first content export into `data/exports/` right after go-live, and

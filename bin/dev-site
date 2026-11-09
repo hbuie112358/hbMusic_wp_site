@@ -153,19 +153,27 @@ install_booking_form() {
 # Yoast's own code so its checks apply: author archives off, since WordPress otherwise forwards
 # /?author=1 to an address holding the login name (checklist 4.5); usage tracking off, stored
 # rather than left to Yoast's default, so a later default cannot switch it on (AI_SECURITY.md,
-# section 5). Staging and live get the same two settings in Yoast's admin screens.
+# section 5); the AI generator off, so no page text can go to Yoast's AI service (the user,
+# plan step 8g). Staging and live get the same three settings in Yoast's admin screens.
+# As a PHP array, shared by the step that saves the settings and the one that checks them.
+readonly YOAST_SETTINGS_PHP='array( "disable-author" => true, "tracking" => false, "enable_ai_generator" => false )'
+
 install_seo_plugin() {
-  log "Installing $SEO_PLUGIN $YOAST_SEO_VERSION, author archives and usage tracking off"
+  log "Installing $SEO_PLUGIN $YOAST_SEO_VERSION; author archives, usage tracking and the AI generator off"
   wp_cli plugin install "$SEO_PLUGIN" --version="$YOAST_SEO_VERSION" --force --activate
   wp_cli plugin verify-checksums "$SEO_PLUGIN"
-  # shellcheck disable=SC2016 # PHP code: its $ variables are PHP's, kept from the shell on purpose
-  wp_cli eval '
-    foreach ( array( "disable-author" => true, "tracking" => false ) as $setting => $wanted ) {
-      WPSEO_Options::set( $setting, $wanted );
-      if ( WPSEO_Options::get( $setting ) !== $wanted ) {
-        WP_CLI::error( "Yoast did not save $setting" );
-      }
-    }'
+  # A name Yoast does not know stops the build: Yoast ignores unknown names, so a setting renamed
+  # in a new version would otherwise stop applying without a sign (plan step 8g).
+  wp_cli eval "\$known = WPSEO_Options::get_all();
+    foreach ( $YOAST_SETTINGS_PHP as \$setting => \$wanted ) {
+      if ( ! array_key_exists( \$setting, \$known ) ) { WP_CLI::error( \"Yoast has no setting \$setting\" ); }
+      WPSEO_Options::set( \$setting, \$wanted );
+    }"
+  # Read back in a separate run: within the saving run, Yoast's in-memory copy answers with the
+  # value just set, whether it was saved or not.
+  wp_cli eval "foreach ( $YOAST_SETTINGS_PHP as \$setting => \$wanted ) {
+      if ( WPSEO_Options::get( \$setting ) !== \$wanted ) { WP_CLI::error( \"Yoast did not save \$setting\" ); }
+    }"
 }
 
 create_test_content() {
