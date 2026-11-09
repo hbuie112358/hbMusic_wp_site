@@ -678,6 +678,7 @@ new findings added as steps.
    for the live site: whether Wordfence's firewall is optimized (it edits `.htaccess`; with a
    backup, and the site checked afterwards); two-factor login required for the Administrator
    role, as on staging; and Wordfence's auto-updates, decided with the rest of the updates.
+   (Done 2026-11-09 as 8i, below, apart from the auto-updates.)
    - **The mail service, researched 2026-11-07, waiting on the user's answer:** does the user have, or
      can the user create, an address at the domain (hPanel, Emails)? If yes, SMTP2GO, which refuses
      signups from Gmail: free for 1,000 mails a month, native in FluentSMTP, three CNAME records with
@@ -874,6 +875,18 @@ new findings added as steps.
        here at about 2, 4, 8 and 12 weeks; rankings take weeks to months to settle, and changes in
        between are noise.
      Status: `[~]`
+   - **8i. Wordfence on live (2026-11-09, the user in the admin, Claude checking each screen):**
+     Login Security showed two-factor login Optional for Administrator (Required for every other
+     role, which no account has): set to Required; logging out and in asked for the code.
+     Wordfence's recovery codes are in the user's password notes (the user, 2026-11-09). Wordfence's own note says two-factor
+     covers only username and password logins, so "Disable XML-RPC authentication" was switched
+     on; Application Passwords were already disabled by Wordfence. The firewall was found already in
+     Extended Protection (all PHP requests through the firewall first). Its warning: before a move
+     to a new host or location, Extended Protection must be removed (Wordfence → Firewall → Manage WAF),
+     or the site shows "file not found" errors; noted in step 10. The emergency way in, should
+     two-factor fail: rename `wp-content/plugins/wordfence` in hPanel's File Manager, log in, rename
+     it back. Left: Wordfence's auto-updates (the update routine), and testing that repeated failed
+     logins are blocked, on staging (checklist 4.3). Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -924,5 +937,8 @@ new findings added as steps.
     pipeline's address, key and folder secrets, deploy, move the database and media, point the
     domain; then close the Hostinger account (pointing the domain elsewhere leaves the old site,
     the staging install and both databases running there, unmaintained) and check that the old
-    copy is really gone, also through Hostinger's own temporary address if it has one.
+    copy is really gone, also through Hostinger's own temporary address if it has one. Before
+    moving the site's files: remove Wordfence's Extended Protection (Wordfence → Firewall →
+    Manage WAF), which names the old location's exact path, and optimize the firewall again at
+    the new host (8i).
     Status: `[ ]`
