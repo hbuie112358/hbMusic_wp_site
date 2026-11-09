@@ -208,14 +208,14 @@ logins; no account named `admin`.**
 **4.2 Two-factor authentication for every account that can publish or administer.**
 - Why: a leaked password alone is not enough.
 - Check: each such account shows two-factor login on.
-- Kind: WordPress · Status: done on live (0a) and staging, where it is required for
-  administrators (3g-1); required on live at step 8.
+- Kind: WordPress · Status: done: on for the only account on live (0a) and staging, and required
+  for administrators on staging (3g-1) and on live (8i, 2026-11-09, the login tested).
 
 **4.3 Login attempts limited, and a web application firewall active (Wordfence, or the host's).**
 - Why: stops password guessing and common attacks.
 - Check: the firewall shows as active, and repeated failed logins are blocked after the limit.
-- Kind: WordPress · Status: partly: Wordfence active on live and staging; its firewall
-  optimization and a test of the limit at step 8.
+- Kind: WordPress · Status: partly: Wordfence active on live and staging; live's firewall runs
+  in Extended Protection (found already set, 8i); the test of the limit, on staging, at step 8.
 
 **4.4 XML-RPC disabled unless a feature needs it.**
 - Why: a common target for password guessing.
