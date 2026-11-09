@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { logIn } from './admin-login';
+import { ADMIN_STORAGE_STATE } from './admin-session';
 
 // Protects what the Site Hardening plugin does in the admin (plan step 8a, D26): Application
 // Passwords are off, so no program can log in to the REST API around two-factor login
@@ -8,8 +8,10 @@ import { logIn } from './admin-login';
 // WordPress's own id for the section on the profile page (wp-admin/user-edit.php, 7.1).
 const APPLICATION_PASSWORDS_SECTION = '#application-passwords-section';
 
+// Starts with the dev admin's login, saved once per run by admin.setup.ts.
+test.use({ storageState: ADMIN_STORAGE_STATE });
+
 test('the profile page offers no Application Passwords', async ({ page }) => {
-	await logIn(page);
 	await page.goto('/wp-admin/profile.php');
 	// The page itself must have loaded, or the missing section would prove nothing.
 	await expect(page.locator('#your-profile'), 'the profile form').toBeVisible();

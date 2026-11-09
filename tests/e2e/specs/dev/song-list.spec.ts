@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { logIn } from './admin-login';
+import { ADMIN_STORAGE_STATE } from './admin-session';
 
 // Protects the Song List plugin (plan step 5a): the block shows songs sorted and escaped, the
 // editor offers the block, and the admin form saves an artist only with a valid nonce. The
@@ -51,10 +51,8 @@ test.describe('a visitor', () => {
 
 test.describe('the admin', () => {
 	test.describe.configure({ mode: 'serial' });
-
-	test.beforeEach(async ({ page }) => {
-		await logIn(page);
-	});
+	// Starts with the dev admin's login, saved once per run by admin.setup.ts.
+	test.use({ storageState: ADMIN_STORAGE_STATE });
 
 	test('is offered the Song List block in the editor', async ({ page }) => {
 		await page.goto('/wp-admin/post-new.php?post_type=page');

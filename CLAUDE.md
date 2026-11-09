@@ -122,6 +122,17 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   plugin that has real logic to test; the Song List has almost none. **Accessibility checks**
   (axe) run in the dev browser tests since step 4c.
 - A new test is shown to fail on a planted fault before it counts as working.
+- **Tests share one dev site and run in parallel,** so each test is placed by what it changes:
+  a test that only looks runs freely; a test that changes only its own uniquely named data (a
+  song with a unique title, a booking request with a unique word) removes it afterwards and runs
+  freely; a test that changes something shared (a setting, a plugin, the theme, the shared admin
+  account, data other tests read) runs in a serial group or as a scenario check. No test logs
+  out or changes the admin account, since the admin specs share one login: `admin.setup.ts` logs
+  in once per run, without the login screen, and saves it to `tests/e2e/.auth/` (ignored by git),
+  and only the specs that need the admin start from it (`test.use({ storageState })`).
+  *Why:* WordPress loses data when two requests update the same stored value at the same moment:
+  parallel logins as the same user lost a session, and that test found itself logged out (plan
+  8d, 2026-11-09).
 
 ## Framework
 
