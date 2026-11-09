@@ -602,7 +602,33 @@ new findings added as steps.
    dev site, pinned in `tools/versions.sh` and checked like Contact Form 7, with tests (author
    archives closed, checklist 4.5; one canonical address per page; no policy or accessibility
    error), each shown to fail on a planted fault; then on staging, set up as the inventory lists
-   (a musician, a sharing image, author archives off). Status: `[~]`
+   (a musician, a sharing image, author archives off).
+   - **Yoast on the dev site (2026-11-09):** 28.8, checked against WordPress.org's checksums,
+     author archives and usage tracking off through Yoast's own settings code (tracking is off by
+     default; stored so a later default cannot switch it on). Yoast writes no canonical link on a
+     page that asks not to be indexed (its `canonical-presenter.php`), and every copy but live
+     does (checklist 9.5), so the planned canonical test became (the user's choice): each page is
+     `noindex`, has no canonical link, and Yoast's `og:url` is its own address; the canonical
+     itself is checked on live at step 9. `seo.spec.ts` also checks that `/?author=1` and
+     `/author/<login>/` forward nowhere that names the login. Four planted faults caught (author
+     archives on; search engines allowed; a second canonical; another host's `og:url`). The
+     existing policy, accessibility and debug-log checks pass with Yoast's output in the pages.
+   - **The intended differences between the dev site, staging and live** are listed in
+     `docs/ENVIRONMENTS.md` (the user, 2026-11-09: not everything can or should be the same; each
+     difference is deliberate, with its reason and where it is tested).
+   - **Found, for step 8:** Yoast writes its version in a comment on every page ("optimized with
+     the Yoast SEO plugin v28.8"), which checklist 3.6 is about; the `wpseo_debug_markers` filter
+     removes it. Yoast's AI generator is on by default and contacts Yoast's service only when used
+     in the editor. Both are for step 8 (the user, 2026-11-09).
+   - **Yoast's outgoing requests (read in its 28.8 code, 2026-11-09; not observed as traffic):**
+     none from visitor pages. Usage data to `tracking.yoast.com` only if the tracking setting is not
+     `false`: stored `false`, its hooks are never registered (`admin/tracking/class-tracking.php`;
+     an unset value takes another branch, which is why it is stored). `my.yoast.com` for the
+     account check only when a Yoast add-on is installed (`inc/class-addon-manager.php`), and an
+     admin proxy page there for its analysis worker; `ai.yoa.st` when the AI features are used; the
+     help beacon on Yoast's admin pages loads `beacon-v2.helpscout.net` and, with tracking off,
+     asks for consent first. The sitemap request goes to the site itself.
+   Status: `[~]`
 7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
    Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
@@ -705,6 +731,8 @@ new findings added as steps.
      theme is switched, and the deploy key cannot run WP-CLI, so content goes through the admin;
    - the booking form's plugin and Turnstile keys (Contact → Integration, 5e); the import file sets its
      From and To for live, and staging's were set by hand in its Mail tab;
+   - from outside, after the switch: every page allows indexing and names one canonical address,
+     its own, at the live domain (only live can show this, `docs/ENVIRONMENTS.md`, step 6);
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.

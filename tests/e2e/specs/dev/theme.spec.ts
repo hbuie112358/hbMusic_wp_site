@@ -1,13 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { TEST_PATHS } from './test-pages';
 
 // Protects the child theme on the dev site (plan step 4c): every test page loads through the
 // child theme, carries the security headers, causes no Content-Security-Policy violation and
 // has no accessibility errors (docs/SITE_CHECKLIST.md 3.2, 6.7, 7.1).
-//
-// The paths of the test pages bin/dev-site creates (TEST_PAGES; "Home" is the front page).
-// Fixed here, not read from the site's menu: a page missing from the menu must still fail.
-const TEST_PATHS = ['/', '/music/', '/songlist/', '/about/', '/book/', '/privacy-policy/'];
 // WordPress marks the active child theme on <body> (wp-child-theme-<folder>).
 const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
 // WCAG 2.2 level AA and the levels it includes (checklist 7.1).
