@@ -27,9 +27,18 @@ new findings added as steps.
   5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
 - **Done 2026-11-09:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests
   (#19), and on staging by hand; `docs/ENVIRONMENTS.md` lists the intended differences between
-  the dev site, staging and live.
-- **Next:** while Brevo's support answers, the parts of step 8 that need no mail, or the user's
-  5f choices (videos, wording); the user picks. The mail service (D24, Brevo) waits on Brevo's support: the domain does not
+  the dev site, staging and live. In step 8: 8a, the Site Hardening plugin (D26: the security
+  headers, XML-RPC refused, Application Passwords off, no version comments), on staging and
+  checked (#20); 8c, a last debug-log check in `bin/test`; 8d, the browser tests log in once,
+  without the login screen (#21; it explains the login timeout of 2026-11-07); 8e, the
+  logged-in view: the toolbar's icon font allowed, avatars off, a logged-in policy test (#22);
+  8b, `Update URI: false` on every plugin, enforced by `bin/check` (#23).
+- **Next:** the rest of step 8 that needs no mail, starting with backups (UpdraftPlus's off-site
+  destination, its weekly schedule, and the encryption question of checklist 12.2), then the
+  update routine, the Yoast decisions (AI, llms.txt, the Schema endpoint), Wordfence on live,
+  the admin pages' policy, and the server-level items (version files, no PHP in uploads,
+  permissions). Or the user's 5f choices (videos, wording); the user picks. The mail service
+  (D24, Brevo) waits on Brevo's support: the domain does not
   authenticate although all four records verify and are correct in public DNS, and transactional
   sending needs Brevo's activation (one ticket for both, opened by the user on 2026-11-09); then
   continue at "Brevo setup, where it stands" in step 8. 5f's pages are on staging; the user's video choices and wording follow.
@@ -789,12 +798,12 @@ new findings added as steps.
      fails the setup with a clear message and runs nothing else. The rule for which tests may run in
      parallel is in the project's `CLAUDE.md` (Testing). On the way, a stale bind mount after a branch
      switch (5a-2) left the dev site without the plugin's files; `bin/dev-site` rebuilt it.
-     Status: `[~]`
+     Status: `[x]` f4cc62c
    - **8b. Song List gets `Update URI: false`** (found in 8a): without it, a plugin published on
      WordPress.org under the name `song-list` (none existed on 2026-11-09) would be offered to the
      site as an update of this one. Done 2026-11-09: the header added, and `bin/check` now fails
      for any plugin in `plugins/` whose main file lacks it (shown failing on Song List before the
-     fix). Status: `[~]`
+     fix). Status: `[x]` 2d916cf
    Found in the review of 2026-11-07, for this step:
    - **Backups:** UpdraftPlus's free version does not encrypt database backups, so checklist 12.2
      cannot be met as written without paying or changing the item; Hostinger's own backups are
