@@ -45,8 +45,9 @@ new findings added as steps.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
-- **Order of the coming steps (D19, replacing D11's; 6 moved first on 2026-11-09 while Brevo's
-  support answers):** 6 → the mail service (8) → the rest of 5e → the rest of 8 → 9 → 10.
+- **Order of the coming steps (D19, replacing D11's; 6 done first on 2026-11-09 while Brevo's
+  support answered):** the rest of 8, with the mail service (8) when Brevo authenticates → the
+  rest of 5e → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -90,8 +91,9 @@ new findings added as steps.
 | D21 | The template project starts when a second site has a date, not now (the user, 2026-11-07). `template-notes.md` keeps collecting what it must set differently. | Built after go-live, it starts with the plugin setup, live deploy and mail already proven, without 2-3 hours of carrying them over and a second repository to keep updated. Plugins in their own folders keep separation easy later. |
 | D23 | The site's look is "On Stage" (the user, 2026-11-07, chosen from three looks built on the real photo, logo and draft wording): a black page in which the photo blends, warm white text, and green from the logo for buttons and the booking band, using the parent's Manrope font. It lives in the child theme's `theme.json` and `parts/`. Wording is refined later in the admin. The current 885-pixel photo is used, without upscaling. | The user preferred it to the warm cream and black-and-white looks. Styles stay in `theme.json` (checklist 6.1), so no separate CSS file and no Stylelint yet; a CSS file would bring that up again. |
 | D24 | Site mail goes through a mail service, Brevo, connected by FluentSMTP (D13), for this site and as the pattern for every site (the user, 2026-11-07). Brevo's retention rule is set to 3 months and its email previews stay off. FluentSMTP keeps copies of failed mail only; requests that arrive are kept in the user's Gmail. | Gmail through Google's API was tried first: publishing the Google app needs a public home page and privacy policy, which a site that is not yet live does not have, and a Google project per site. A mail service needs only DNS records, the same before and after launch. Brevo over SMTP2GO: its delivery records are kept as long as the retention rule says, where SMTP2GO's free plan shows 5 days. |
-| D25 | The plugin set for go-live (the user, 2026-11-09): Wordfence stays; Yoast SEO stays, and also runs on staging and on the dev site (pinned and checked against WordPress.org's checksums, like Contact Form 7), with tests of what it is set to do; UpdraftPlus stays as the off-site backup, its destination, schedule and encryption set at step 8; Hostinger's auto-updates plugin and mu-plugin stay while the site is at Hostinger (D15); FluentSMTP (D13, D24), Contact Form 7 (5e) and Song List (5a) as chosen. | Wordfence alone gives two-factor login and the firewall. Keeping Yoast keeps its settings if step 9 updates the live site in place; on staging and the dev site it is checked before live, like every other plugin. Hostinger backs up the live site daily (the user, 2026-11-09), but at Hostinger, and checklist 12.1 wants a copy off the server. |
+| D25 | The plugin set for go-live (the user, 2026-11-09): Wordfence stays; Yoast SEO stays, and also runs on staging and on the dev site (pinned and checked against WordPress.org's checksums, like Contact Form 7), with tests of what it is set to do; UpdraftPlus stays as the off-site backup, its destination, schedule and encryption set at step 8; Hostinger's auto-updates plugin and mu-plugin stay while the site is at Hostinger (D15); FluentSMTP (D13, D24), Contact Form 7 (5e) and Song List (5a) as chosen. | Wordfence alone gives two-factor login and the firewall. Keeping Yoast keeps its settings if step 9 updates the live site in place; on staging and the dev site it is checked before live, like every other plugin. Hostinger backs up the live site daily (the user, 2026-11-09), but at Hostinger, and checklist 12.1 wants a copy off the server. **UpdraftPlus is replaced by D27 (2026-11-09):** backups by hand, and UpdraftPlus removed. |
 | D26 | The security headers and the small hardening settings come from a generic plugin, `plugins/site-hardening/` (option B, the user, 2026-11-09), not from the server's `.htaccess` (option A): the headers on visitor pages (checklist 3.2), Yoast's version comment off (3.6), XML-RPC refused (4.4), Application Passwords off (4.7), and `Update URI: false`. The policy's outside sources are a setting each site adds (here, in the child theme), each with its reason; a malformed one is left out and reported. The dev site sends its headers only through the plugin; `config/security-headers.conf` is removed. PHPUnit still waits (the user: not yet); the refusal is tested through the dev site. | It deploys with the code, follows a host move unchanged, and the dev site tests the same path live uses; `.htaccess` lines would be pasted by hand on each site, outside the deploy, and LiteSpeed's support for the file's conditions was never confirmed. Security belongs in a plugin, not the theme (checklist 5.4). Static files (images, CSS) get no policy, which matters little since they run no code; the REST API sends its own `nosniff`. |
+| D27 | Backups (the user, 2026-11-09), replacing D25's UpdraftPlus: Hostinger's daily backups for everyday trouble (a bad edit or update), and an off-site copy kept by hand: after content changes, and at least monthly, the user exports the live site's content (Tools → Export → All content) into `data/exports/`, saves new pictures' originals into `data/photos/`, and keeps `data/` itself backed up off the computer. Every setting is recorded in the plan as it is made, so a rebuild can redo it. UpdraftPlus is removed from live, with its old backups. Revisited when several sites make the habit unmanageable: then UpdraftPlus Premium (about $70-95 a year for 2-10 sites, per its pricing pages) or Duplicator across all of them. | The free UpdraftPlus does not encrypt (its settings page offers encryption only with Premium, and nothing in it answers its encryption hook), so its off-site copy would carry the site's password hashes, two-factor secrets and keys unencrypted. The content export holds no keys or passwords. The site's code is on GitHub and its pages, songs and photos in `data/`, so a total loss of Hostinger costs a few hours of rebuilding, not the site; Premium was not worth it for one site. Checklist 12.1 (automatic) and 12.2 (encrypted) are deliberately not met as written. |
 | D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 
 ## Steps
@@ -735,6 +737,15 @@ new findings added as steps.
      8.8.8.8), all as Brevo wants. Brevo's help pages, as shown in search results, also say
      transactional sending needs a separate activation by its support. The user opened one ticket
      for both. Added before (3): (2a) transactional sending activated by Brevo.
+     **Brevo's answer (2026-11-09, its AI support agent):** the account is validated and
+     transactional sending is already active, so (2a) is done and that reading of the help pages
+     was wrong for this account. For the domain: run Authenticate → "Authenticate the domain
+     yourself" → "Authenticate this email domain" again; the user did, with the same "records don't
+     match yet". Claude checked the records at the domain's own name servers (ns1/ns2.dns-parking.com)
+     and public resolvers: all four as Brevo wants, both DKIM names resolving to Brevo's keys, one
+     DMARC record. The user replied with the full DNS zone export (a screenshot would not fit) and
+     asked whether SPF must also name Brevo. The zone also holds Hostinger's own DKIM
+     (`hostingermail-a/b/c._domainkey`); the "no DKIM" of 2026-11-07 above did not check those names.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
@@ -809,7 +820,18 @@ new findings added as steps.
      cannot be met as written without paying or changing the item; Hostinger's own backups are
      weekly or daily depending on the plan: daily on the live site (the user, 2026-11-09), but kept
      at Hostinger, so UpdraftPlus stays for the off-site copy (12.1, D25); weekly is enough while
-     the site stores no requests.
+     the site stores no requests. **Replaced by 8f and D27.**
+   - **8f. Backups (D27), 2026-11-09:** read in UpdraftPlus 1.26.14's code: its free version
+     offers database encryption only with Premium. Compared with BackWPup, WPvivid and Duplicator
+     (free versions): none is automatic, encrypted and off-site to the user's own storage at once;
+     Duplicator Lite encrypts but has no schedule and no third-party storage. The user chose
+     backups by hand (D27). UpdraftPlus on live had made one manual backup (2025-01-09, no remote
+     destination, no schedule), but its folder `wp-content/updraft/` held old backup files, about
+     two years old, locked (403) but database copies in the web root (checklist 3.7): the user
+     deleted them on 2026-11-09, then deleted the plugin and the folder; checked from outside:
+     `/wp-content/updraft/` and the plugin's files answer 404, like a folder that never existed.
+     The first content export and the restore test (12.3) belong to go-live (step 9).
+     Status: `[x]` (documents in the commit that records it)
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -835,6 +857,9 @@ new findings added as steps.
      stored off, Site features as on staging, the Organization with its logo, the Site image
      renamed `howard-buie-share.png`, and the Site Title "Howard Buie Music"; then each page's
      source checked as on staging;
+   - backups as D27 says: the first content export into `data/exports/` right after go-live, and
+     the restore test of checklist 12.3 both ways (that export imported into a fresh site; a
+     Hostinger restore tried on staging), with its date recorded here;
    - the Site Hardening plugin through the pipeline (a live destination, as 8a's), activated, and
      checked as on staging: the headers, `xmlrpc.php` 403, and the browser console on the pages,
      logged out and logged in; avatars off (Settings → Discussion → "Show Avatars", 8e);

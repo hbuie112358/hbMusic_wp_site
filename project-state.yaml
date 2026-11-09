@@ -41,10 +41,10 @@ verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
   live_php: 8.4.27
   staging_php: 8.4.27 (set per website; step 0f corrected)
-  live_plugins: wordfence 9.0.2, wordpress-seo 28.8, updraftplus 1.26.14; twentytwentyfive 1.5
+  live_plugins: wordfence 9.0.2, wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f)
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
   live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
-  live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger
+  live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
   staging_site: staging.howardbuiemusic.com, site-wide password (hPanel Password Protect Directories; the user's own login and a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
   staging_mail: the form reports sent, but no mail arrived in Gmail; FluentSMTP is installed on staging but not connected
