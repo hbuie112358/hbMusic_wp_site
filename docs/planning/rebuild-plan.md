@@ -46,6 +46,9 @@ new findings added as steps.
   (`docs/ROUTINES.md`) and the privacy policy naming Brevo. The mail setup is done.
 - **Updates (8j, 2026-11-10):** Hostinger manages all updates; A chosen, waiting on a test of
   Hostinger's timing with Wordfence 9.1.0 on live, deadline 2026-11-17.
+- **Staging's site-wide password (2026-11-10):** it stopped accepting logins because hPanel
+  writes password entries the server cannot verify; fixed by hand, and users are added only by
+  hand until Hostinger fixes it (3g-1).
 - **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
   confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
@@ -333,6 +336,22 @@ new findings added as steps.
        to 8.4.27 like live (step 0f corrected: the version is per website). HTTPS: a Let's
        Encrypt certificate for the subdomain, valid until 2027-02-01. The live site answered as
        before throughout. Status: `[x]`
+       - **The site-wide password stopped working (2026-11-10):** every login was refused
+         (401), new users included. Cause, found by Claude and confirmed by Hostinger's
+         specialist: hPanel's Password Protect Directories now writes SHA-512 (`$6$`) entries
+         into `.htpasswd`, which this server cannot verify; the older APR1 (`$apr1$`) entries
+         work (a test user: 401 with hPanel's entry, 200 with an APR1 entry of the same
+         password). Hostinger passed it to its team. Found on the way: `.htaccess` held
+         duplicate and stale `PWPROTECTID` blocks (Hostinger's agent left one), a malformed
+         `.htpasswd` line, and File Manager's editor showing an old copy of a file (reopen it
+         before editing). **Until Hostinger fixes it, no user is added or changed through
+         Password Protect Directories:** the user makes the line on the user's own computer
+         with `openssl passwd -apr1` or `htpasswd -n <name>` (both ask for the password
+         unseen; never `htpasswd -nb`, which puts it on the command line) and pastes it into
+         `.htpasswd` in File Manager. The user's own login and `github-check` were remade
+         that way, the test user removed; Claude checked from outside: 401 without a
+         password, 401 for the removed test user, 403 for `/.htpasswd` and `/.htaccess`, and
+         the user's login works through to WordPress and two-factor.
      - 3g-2. **A restricted deploy key.** The user creates the key on the user's own machine, so
        the private key never passes through Claude or the chat. Its public key is added to the
        server's `authorized_keys` limited to `rsync` into the staging site's theme and plugin
@@ -393,7 +412,7 @@ new findings added as steps.
        password, shows the child theme active. The marker file was dropped: since 3g-2 the
        server decides the only destination, so no setting in GitHub can reach the live site.
        The check-only login (`github-check`, added by the user in Password Protect
-       Directories; secrets `STAGING_CHECK_USER`, `STAGING_CHECK_PASSWORD`; the address as the
+       Directories, remade as an APR1 line on 2026-11-10, see 3g-1; secrets `STAGING_CHECK_USER`, `STAGING_CHECK_PASSWORD`; the address as the
        environment variable `STAGING_URL`, so the workflow names no domain) passes only the
        outer lock, not WordPress's login; it lives as long as the staging site and goes with
        it (step 10), and is replaced if exposed. Proof planned without a test-only switch
