@@ -81,7 +81,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
   List's page and admin form, the booking form's mail (no visitor's name in the subject), its
   message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only
-  where it appears; the Site Hardening plugin's refusals; then, last, a check that the PHP debug
+  where it appears; the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
   Run it after `bin/dev-site` and before every commit that touches the site, the theme or a
