@@ -39,9 +39,10 @@ new findings added as steps.
   required for administrators, XML-RPC logins off, the firewall found in Extended Protection).
 - **Mail (D24), evening of 2026-11-09:** Brevo authenticated the domain; staging now sends through
   Brevo with SPF, DKIM and DMARC passing, and a failed booking request raises a Pushover alert
-  (proven with a planted failure). Next for mail: the open choices at the end of "Brevo setup,
-  where it stands" in step 8 (the subject line, a new "sending failed" message, IP blocking), then
-  the Gmail filter, one successful request, the privacy policy and the monthly test.
+  (proven with a planted failure). 2026-11-10: the visitor's name out of the subject, a new
+  "sending failed" message (both on the dev site with tests, typed in by hand on staging after
+  the merge), Brevo's IP blocking on. Next for mail: the Gmail filter, one successful request,
+  the privacy policy and the monthly test.
 - **Next:** the mail choices above, or the update routine (step 8): the user is to look at live's Plugins page, the
   "Automatic Updates" column, then choose A (automatic everywhere, plus a weekly GitHub check of
   the dev site's pinned versions against WordPress.org; Claude's recommendation) or B (checklist
@@ -798,6 +799,20 @@ new findings added as steps.
      them by hand; the planted test's entry included). Left: (7) the Gmail filter, never spam and a
      label; (8) one successful booking request from staging's form; (9) the privacy policy naming
      Brevo, Pushover and the periods; a monthly test request in the user's calendar.
+     **Decided 2026-11-10 (the user):** (a) the visitor's name leaves the subject, which becomes
+     "[_site_title] booking request"; the body keeps it; (b) a new "sending failed" message, "Sorry,
+     your request could not be sent. Please email Howard or send him a message on Facebook, using
+     the links below." Contact Form 7 strips HTML from its messages (`filter_message()`) and shows
+     them as plain text, so the message cannot link anywhere; it points to the Book page's existing
+     email and Facebook links just below the form, so it names no contact details and is the same
+     everywhere: `config/booking-form-messages.json` for the dev site, typed in by hand on staging
+     and live; Claude's split is not needed; (c) Brevo's IP blocking for API keys is **on**, with
+     staging's address authorised; an Email Test arrived afterwards. **At go-live (step 9), live's
+     server address must be on Brevo's Authorized IPs list**, or live's mail is refused (the alert
+     would show it). Built on the dev site: the build merges the message into Contact Form 7's own
+     (a missing message shows nothing at all; a misspelt name stops the build), Mailpit's chaos mode
+     lets a serial test make it refuse mail, and `booking-form.spec.ts` checks the subject, the body
+     and the visitor's message; each check shown to fail on a planted fault.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as

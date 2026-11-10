@@ -32,7 +32,7 @@ template project starts; until then, a list, not a to-do.
   `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry
   in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync settings.
 
-- The booking form: `config/booking-form.txt` and `config/booking-form-mail.json`, and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
+- The booking form: `config/booking-form.txt`, `config/booking-form-mail.json` and `config/booking-form-messages.json` (its "sending failed" text points to the contact links below the form on this site's Book page), and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
 
 - Site mail: a mail service through FluentSMTP (plan D24), set up per site with its own account, DNS records and retention rule; it works before a site is live, unlike Gmail through Google's API.
 - Backups (plan D27): the host's own backups plus content exported by hand into the site's data folder. Fine for one site; with several, each site's export habit multiplies, which is the trigger to move every site to an encrypted, automatic tool (UpdraftPlus Premium, or Duplicator) at once.
