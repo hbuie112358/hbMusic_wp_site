@@ -49,6 +49,9 @@ new findings added as steps.
 - **Staging's site-wide password (2026-11-10):** it stopped accepting logins because hPanel
   writes password entries the server cannot verify; fixed by hand, and users are added only by
   hand until Hostinger fixes it (3g-1).
+- **Server hardening (8k, 2026-11-10):** on staging, the version files refused and no PHP in
+  `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
+  Site Hardening plugin. Permissions and HSTS left.
 - **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
   confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
@@ -1028,6 +1031,41 @@ new findings added as steps.
      site's pins (`tools/versions.sh`) with WordPress.org and opens an issue when one is behind; the
      monthly check (`docs/ROUTINES.md`) adds a look at live's Plugins page for an update waiting
      more than a week or two. Status: `[~]`
+   - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
+     requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
+     dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are
+     refused or empty. Found: the plugins' and themes' `readme.txt` (Wordfence's naming 9.0.2),
+     `readme.html` and `license.txt` answered 200, and every PHP response named the PHP version
+     (`X-Powered-By`). Done, by the user in File Manager on staging, Claude checking from outside
+     before and after:
+     - **The version files refused (`docs/SITE_CHECKLIST.md` 3.6):** at the top of staging's
+       `.htaccess`, outside the site password's block and WordPress's, with a backup of the file
+       on the user's computer first:
+       ```apache
+       # Refuse the files that reveal versions (docs/SITE_CHECKLIST.md 3.6).
+       <FilesMatch "(?i)^(readme\.(html|txt|md)|license\.txt|changelog\.(txt|md))$">
+       	Require all denied
+       </FilesMatch>
+       ```
+       `readme.html`, `license.txt` and Wordfence's `readme.txt` answer 403, before the site
+       password; the lock, the login and the admin as before.
+     - **No PHP in `uploads/` (3.5):** a new `wp-content/uploads/.htaccess` (there was none):
+       ```apache
+       # No PHP runs from uploads (docs/SITE_CHECKLIST.md 3.5): an uploaded file can never run as code.
+       <FilesMatch "(?i)\.(php[0-9]?|phtml|phar|phps)$">
+       	Require all denied
+       </FilesMatch>
+       ```
+       Proven with a test file: `php runs` before, 403 after (seen by the user, logged in; here
+       the site password answers first), then removed; the Media Library's images still load.
+       Hostinger's File Manager has no "new file" button: the files were made on the user's
+       computer and uploaded, a dotfile under a plain name and renamed.
+     - **The PHP version header removed** by the Site Hardening plugin
+       (`includes/php-version.php`, at `plugins_loaded` priority 0, ahead of its own XML-RPC
+       refusal, which ends the request), checked on seven kinds of response in
+       `tests/scenario/dev-site-hardening.sh`; a server setting (`expose_php`) would not move with
+       the code.
+     Left: permissions (2.6, 3.4) by the user over SSH; HSTS (3.1) at step 9. Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -1043,6 +1081,10 @@ new findings added as steps.
      no account has it;
    - Brevo's Authorized IPs list holds live's server address (8, Brevo), and the old addresses'
      redirects are checked on live (8h);
+   - live gets staging's two server rules (8k): the version files refused at the top of its
+     `.htaccess` (a backup first; Wordfence's firewall optimization edits the same file), and
+     `wp-content/uploads/.htaccess` with no PHP; both checked from outside as on staging, the
+     uploads rule with a test file placed and removed;
    - how the new site reaches the live address, a gap found in the review of 2026-11-07 and not yet
      decided: updating the existing WordPress in place (keeps URLs and the Yoast and Wordfence
      settings, with old plugin tables and revisions to clean up; Claude's recommendation then) or a
