@@ -8,6 +8,17 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * This site's old page addresses and the pages that replaced them (plan D22): the old site's
+ * Video and Audio pages became Music, its Contact page became Book. Search engines and old links
+ * still point at the old addresses. A site without old addresses leaves this list empty.
+ */
+const HBMUSIC_OLD_ADDRESSES = array(
+	'video'   => 'music',
+	'audio'   => 'music',
+	'contact' => 'book',
+);
+
+/**
  * Removes WordPress's emoji support: the detection script, its styles and the image swaps.
  *
  * Every current browser shows emoji itself. The detection script starts a worker from a blob:
@@ -82,3 +93,25 @@ function hbmusic_remove_turnstile_script_without_form(): void {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'hbmusic_remove_turnstile_script_without_form', 11 );
+
+/**
+ * Forwards a request for an old page address to the page that replaced it, permanently (301), so
+ * visitors arrive on the right page and search engines move the old page's standing to the new one.
+ *
+ * It runs before anything is shown, at priority 1, ahead of WordPress's own redirects
+ * (redirect_canonical() and wp_old_slug_redirect(), both at 10 in wp-includes/default-filters.php):
+ * an old page left in the database must not be shown instead. WordPress's request
+ * path is relative to the site's address, and home_url() builds the target, so the theme names no
+ * domain (plan D7).
+ */
+function hbmusic_redirect_old_address(): void {
+	global $wp;
+	$requested_path = $wp instanceof WP ? strtolower( $wp->request ) : '';
+	$new_path       = HBMUSIC_OLD_ADDRESSES[ $requested_path ] ?? null;
+	if ( null === $new_path ) {
+		return;
+	}
+	wp_safe_redirect( home_url( '/' . $new_path . '/' ), 301 );
+	exit;
+}
+add_action( 'template_redirect', 'hbmusic_redirect_old_address', 1 );

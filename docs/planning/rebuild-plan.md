@@ -47,9 +47,10 @@ new findings added as steps.
 - **Updates (8j, 2026-11-10):** Hostinger manages all updates; A chosen, waiting on a test of
   Hostinger's timing with Wordfence 9.1.0 on live, deadline 2026-11-17.
 - **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
-  confirmed, the weekly GitHub check of the dev site's pins. Meanwhile: 8h's code parts
-  (local structured data, the D22 redirects), the admin pages' policy, the server-level items
-  (version files, no PHP in uploads, permissions), and the login-limit test on staging (4.3). Or
+  confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
+  staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
+  files, no PHP in uploads, permissions), the admin pages' policy, cache (with Hostinger's CDN,
+  on for live), and 8h's local structured data. Or
   the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
@@ -953,7 +954,15 @@ new findings added as steps.
      - **Local structured data:** the page data names a performer and the areas served, added in
        code that extends Yoast's own (its Local SEO add-on is paid), tested on the dev site.
      - **The redirects of D22** (`/video/`, `/audio/`, `/contact/`) in code or a free plugin, not
-       Yoast Premium's redirect manager.
+       Yoast Premium's redirect manager. **Built 2026-11-10 (option A, the user):** in the child
+       theme, `hbmusic_redirect_old_address()` with the list `HBMUSIC_OLD_ADDRESSES`, a permanent
+       redirect (301) to `home_url()`'s page, at `template_redirect` priority 1, before WordPress's
+       own redirects, so an old page left in the database is not shown instead (checked by hand
+       with a published "contact" page on the dev site). Option B, the free Redirection plugin, was
+       not taken: its settings live in the database where no test reaches them, and it logs
+       visitors' addresses by default. Tested by `redirects.spec.ts` (each old address, a mixed-case
+       one, and an address never a page staying 404), shown to fail on an empty list and on a
+       redirect-everything fault. Left: checked on staging after the deploy.
      - **After go-live:** Search Console's searches, impressions, positions and clicks recorded
        here at about 2, 4, 8 and 12 weeks; rankings take weeks to months to settle, and changes in
        between are noise.
@@ -969,7 +978,20 @@ new findings added as steps.
      or the site shows "file not found" errors; noted in step 10. The emergency way in, should
      two-factor fail: rename `wp-content/plugins/wordfence` in hPanel's File Manager, log in, rename
      it back. Left: Wordfence's auto-updates (the update routine, 8j), and testing that repeated failed
-     logins are blocked, on staging (checklist 4.3). Status: `[~]`
+     logins are blocked, on staging (checklist 4.3). **Login protection, 2026-11-10 (checklist
+     4.3):** the lockout itself was not tested (the user: Wordfence's own code; this project tests
+     its setup). Instead, on staging and live, by the user: Brute Force Protection on, lockout after
+     5 failed logins or 5 password-reset attempts within 4 hours, for 4 hours; invalid usernames
+     not locked out at once (the user's choice, against a typo locking the user out); leaked
+     passwords refused for admins; strong passwords, hidden user names, no 'admin' registration,
+     no username discovery, no application passwords, POST requests without User-Agent and
+     Referer blocked. Names blocked at once: `admin`, `administrator`, `root`, `test`, `user`,
+     `wordpress` on staging; on live the same without `admin`, and the old admin account's name is
+     added there at step 9, once that account is gone. IP detection: staging uses `REMOTE_ADDR`;
+     live sits behind Hostinger's CDN (on for live, off for staging), Wordfence had chosen
+     `X-Real-IP`, and since the server already puts the visitor's address in `REMOTE_ADDR` (both
+     showed the user's own), live was set to `REMOTE_ADDR`, which a visitor cannot fake; it still
+     matches. Done for 4.3.
    - **8j. The update routine (2026-11-10):** live's and staging's Plugins pages have no
      "Automatic Updates" column, not even under Screen Options. hPanel shows "Smart auto-updates"
      selected: "Hostinger will manage updates for WordPress core, themes, and plugins. A must-use
@@ -997,7 +1019,11 @@ new findings added as steps.
 9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
-     one is short and was in the exposed `local.sql`);
+     one is short and was in the exposed `local.sql`); once the old account is removed, its name
+     goes on Wordfence's list of names blocked at once (8i, login protection), and `admin` too, if
+     no account has it;
+   - Brevo's Authorized IPs list holds live's server address (8, Brevo), and the old addresses'
+     redirects are checked on live (8h);
    - how the new site reaches the live address, a gap found in the review of 2026-11-07 and not yet
      decided: updating the existing WordPress in place (keeps URLs and the Yoast and Wordfence
      settings, with old plugin tables and revisions to clean up; Claude's recommendation then) or a

@@ -59,6 +59,8 @@ template project starts; until then, a list, not a to-do.
   their reasons, through the `sitehardening_csp_sources` filter in its theme. The theme's
   `functions.php` switching off WordPress's emoji script.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
+- The old-address redirects (plan D22, 8h): the function in the theme's `functions.php` is generic;
+  the list `HBMUSIC_OLD_ADDRESSES` is the site's, empty for a new site, filled for a moved one.
 
 ## To build in
 
