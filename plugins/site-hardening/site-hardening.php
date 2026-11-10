@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Site Hardening
- * Description:       Sends a Content-Security-Policy and the other security headers on visitor pages, refuses XML-RPC, turns Application Passwords off and hides version comments. Each site adds the outside sources its pages need.
+ * Description:       Sends a Content-Security-Policy and the other security headers on visitor pages, refuses XML-RPC, turns Application Passwords off and hides version comments and the PHP version. Each site adds the outside sources its pages need.
  * Version:           0.1.0
  * Requires at least: 7.0
  * Requires PHP:      8.4
@@ -21,3 +21,4 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/includes/security-headers.php';
 require_once __DIR__ . '/includes/xml-rpc.php';
 require_once __DIR__ . '/includes/login-surface.php';
+require_once __DIR__ . '/includes/php-version.php';
