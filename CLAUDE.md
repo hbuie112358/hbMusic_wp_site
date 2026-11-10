@@ -42,6 +42,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
+- `docs/ROUTINES.md`: the recurring care of the site (the monthly site check: a booking test and
+  the content export), with what to do when the test fails.
 
 The old site, as exported:
 - Active theme: the parent `music-lite` 1.5 (unmaintained). A `music-lite-child` theme is
