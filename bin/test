@@ -29,15 +29,18 @@ site_answers() {
   return 1
 }
 
-# The container sees only tests/e2e/. Host networking lets it reach the site on localhost, as
+# The container sees only tests/e2e/ and, read-only, the booking form's messages, which a test
+# expects the visitor to see. Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
 # The admin login goes by name, so the dev site's generated password stays off the command line.
 # It unlocks only this throwaway site, whose admin screens the tests use.
 browser_tests() {
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
+    -v "$REPO_ROOT/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e "DEV_MAIL_URL=http://localhost:${DEV_MAIL_UI_PORT}" \
+    -e BOOKING_FORM_MESSAGES=/config/booking-form-messages.json \
     -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD -e DEV_ADMIN_EMAIL \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
 }

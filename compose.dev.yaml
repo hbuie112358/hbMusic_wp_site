@@ -65,6 +65,10 @@ services:
   # Catches the site's mail, so none ever leaves this computer. Bound to this computer only.
   mailpit:
     image: axllent/mailpit:v1.33.0
+    environment:
+      # Lets a test make Mailpit refuse mail through its API, to show what a visitor sees when
+      # the site cannot send (booking-form.spec.ts). Off until a test turns it on.
+      MP_ENABLE_CHAOS: "true"
     ports:
       - "127.0.0.1:${DEV_MAIL_UI_PORT:?set in .env}:8025"
 

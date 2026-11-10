@@ -146,7 +146,25 @@ install_booking_form() {
     --post_title="Booking form" --porcelain)"
   wp_cli post meta update "$form_id" _form "$(cat "$REPO_ROOT/config/booking-form.txt")" >/dev/null
   wp_cli post meta update "$form_id" _mail "$(cat "$REPO_ROOT/config/booking-form-mail.json")" --format=json >/dev/null
+  set_booking_form_messages "$form_id"
   wp_cli eval 'WPCF7::update_option( "turnstile", array( "dev-site-key" => "dev-secret-key" ) );'
+}
+
+# Replaces only the messages named in config/booking-form-messages.json and keeps Contact Form 7's
+# others: it shows nothing at all for a message the form does not hold (WPCF7_ContactForm::message()).
+# A name the form does not know stops the build, as a misspelt one would otherwise change nothing.
+set_booking_form_messages() {
+  local form_id="$1"
+  [[ "$form_id" =~ ^[0-9]+$ ]] || fail "the booking form's ID is not a number: $form_id"
+  # The file arrives on standard input, so its text never becomes part of the PHP code.
+  wp_cli eval "\$form = wpcf7_contact_form( $form_id );
+    \$messages = \$form->prop( 'messages' );
+    \$wanted = json_decode( file_get_contents( 'php://stdin' ), true, 512, JSON_THROW_ON_ERROR );
+    foreach ( \$wanted as \$name => \$text ) {
+      if ( ! array_key_exists( \$name, \$messages ) ) { WP_CLI::error( \"Contact Form 7 has no message \$name\" ); }
+    }
+    \$form->set_properties( array( 'messages' => array_merge( \$messages, \$wanted ) ) );
+    \$form->save();" <"$REPO_ROOT/config/booking-form-messages.json"
 }
 
 # Yoast SEO as live runs it (D25), with the settings every site of the user's has, saved through

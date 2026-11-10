@@ -65,6 +65,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
   Contact Form 7 at the version in `tools/versions.sh`, checked against WordPress.org's checksums,
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
+  and its "sending failed" message from `config/booking-form-messages.json` (merged into Contact
+  Form 7's own messages; staging and live get the same text typed in by hand),
   test pages (`tests/dev-content/`) and songs with neutral text, a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`). `config/dev-mu-plugins/`, on the dev site only and never
   deployed, sends mail to Mailpit and answers for Cloudflare. Needs no backup, so CI can build it
@@ -72,9 +74,11 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
   PHP debug log, the `.env` safety stop), then the browser tests in `tests/e2e/specs/dev/` in the
-  official Playwright container (`--network host`, seeing only `tests/e2e/`): child theme active,
+  official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
+  `config/booking-form-messages.json`): child theme active,
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
-  List's page and admin form, the booking form's mail and refusals, and its files loading only
+  List's page and admin form, the booking form's mail (no visitor's name in the subject), its
+  message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only
   where it appears; the Site Hardening plugin's refusals; then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
