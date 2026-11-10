@@ -42,12 +42,12 @@ new findings added as steps.
   (proven with a planted failure). 2026-11-10: the visitor's name out of the subject, a new
   "sending failed" message (both on the dev site with tests, typed in by hand on staging after
   the merge), Brevo's IP blocking on; on staging, the same text, a real request in the inbox
-  without the visitor's name in the subject, and a Gmail filter. Next for mail: the privacy
-  policy and the monthly test.
-- **Next:** the mail choices above, or the update routine (step 8): the user is to look at live's Plugins page, the
-  "Automatic Updates" column, then choose A (automatic everywhere, plus a weekly GitHub check of
-  the dev site's pinned versions against WordPress.org; Claude's recommendation) or B (checklist
-  5.3 as written: security automatic, other plugins by hand, staging first). Then: 8h's code parts
+  without the visitor's name in the subject, and a Gmail filter; the monthly site check
+  (`docs/ROUTINES.md`) and the privacy policy naming Brevo. The mail setup is done.
+- **Updates (8j, 2026-11-10):** Hostinger manages all updates; A chosen, waiting on a test of
+  Hostinger's timing with Wordfence 9.1.0 on live, deadline 2026-11-17.
+- **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
+  confirmed, the weekly GitHub check of the dev site's pins. Meanwhile: 8h's code parts
   (local structured data, the D22 redirects), the admin pages' policy, the server-level items
   (version files, no PHP in uploads, permissions), and the login-limit test on staging (4.3). Or
   the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
@@ -125,8 +125,9 @@ new findings added as steps.
      period of an exposure that lasted since at least 2025-01.
    - 0f. Plugin updates on the live site (found 2026-11-02): WordPress 7.1.4 is current, but
      Wordfence 8.0.5 (latest 9.0.2), Yoast SEO 28.1 (28.8), UpdraftPlus 1.26.13 (1.26.14) and
-     the inactive Twenty Twenty-Five 1.2 (1.5) are behind; Hostinger's updater updates
-     only WordPress itself. Then the PHP version: hPanel shows 8.1 (2026-11-02), without
+     the inactive Twenty Twenty-Five 1.2 (1.5) are behind; ~~Hostinger's updater updates
+     only WordPress itself~~ (corrected 2026-11-10, 8j: hPanel's "Smart auto-updates" manage
+     WordPress, themes and plugins, and turn off WordPress's own updates). Then the PHP version: hPanel shows 8.1 (2026-11-02), without
      security fixes since the end of 2025 and no longer selectable once changed; ~~the version
      applies to every website on the plan, so the staging site (3g) shares it~~ (corrected
      2026-11-03 in 3g-1: each website has its own version; the new staging site started on 8.3
@@ -677,7 +678,7 @@ new findings added as steps.
 7. ~~**Staging install.** Decide whether `wordpress/staging/` is needed (open item 2).~~
    Settled by step 0g: the old copy was removed; the new staging site comes with 3g.
 8. **Set up the site at Hostinger for go-live (D15):** how updates and backups run there (the
-   Hostinger updater updates only WordPress itself, open item 3), and the authenticated mail
+   ~~Hostinger updater updates only WordPress itself~~ Hostinger's updates, open item 3, 8j), and the authenticated mail
    service with its DNS records (`docs/SITE_CHECKLIST.md` 11.1, 11.2). Outgoing ports there are
    all open except 0 and 25, so FluentSMTP can use the service's SMTP (587/465) or its API. The
    mail service must work before the booking form (5e) goes live. Also to evaluate here:
@@ -820,8 +821,12 @@ new findings added as steps.
      forces only the address), so (8) is done; (7) done: a Gmail filter on
      `from:website@howardbuiemusic.com`, never spam, label "Booking requests". The monthly test
      request and D27's monthly content export are one routine, `docs/ROUTINES.md` (the user,
-     2026-11-10), with a monthly reminder in the user's calendar. Left: (9) the privacy policy
-     naming Brevo, Pushover and the periods; where Brevo lists blocked transactional addresses.
+     2026-11-10), with a monthly reminder in the user's calendar. (9) done 2026-11-10: the privacy
+     policy names Brevo, its three months, failed messages kept until dealt with, and requests kept
+     in the user's inbox as long as needed (`data/content/build_pages.py`, pasted into staging by
+     the user; live gets it from the import file at step 9). Pushover is not named: since the
+     subject no longer names the visitor, its alerts carry no visitor details. Left: where Brevo
+     lists blocked transactional addresses.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
@@ -963,8 +968,25 @@ new findings added as steps.
      to a new host or location, Extended Protection must be removed (Wordfence → Firewall → Manage WAF),
      or the site shows "file not found" errors; noted in step 10. The emergency way in, should
      two-factor fail: rename `wp-content/plugins/wordfence` in hPanel's File Manager, log in, rename
-     it back. Left: Wordfence's auto-updates (the update routine), and testing that repeated failed
+     it back. Left: Wordfence's auto-updates (the update routine, 8j), and testing that repeated failed
      logins are blocked, on staging (checklist 4.3). Status: `[~]`
+   - **8j. The update routine (2026-11-10):** live's and staging's Plugins pages have no
+     "Automatic Updates" column, not even under Screen Options. hPanel shows "Smart auto-updates"
+     selected: "Hostinger will manage updates for WordPress core, themes, and plugins. A must-use
+     plugin will be installed to turn off native WordPress updates." So step 0f and open item 3
+     ("updates only WordPress itself") were wrong, and staging's "Wordfence auto-updates on"
+     (3g-1) has no effect. The plugin list shows "Hostinger Smart Auto Updates" twice, both
+     inactive; the updates run from Hostinger's must-use plugin. Wordfence 9.1.0 (released
+     2026-11-09; its changelog names no security fix) was on neither site: staging was updated by
+     hand and works (pages, login with two-factor). **Chosen: A (the user), waiting on a test of
+     Hostinger's timing:** live stays on 9.0.2 to see when Hostinger updates it; the user looks
+     every few days and notes the date. Deadline 2026-11-17: if still 9.0.2, the user updates by
+     hand, and A needs a reminder in the monthly check, or B (updates by hand, staging first) is
+     chosen. A newer Wordfence version marked as a security fix before then is installed by hand at
+     once. A, once confirmed: Hostinger updates both sites; a weekly GitHub check compares the dev
+     site's pins (`tools/versions.sh`) with WordPress.org and opens an issue when one is behind; the
+     monthly check (`docs/ROUTINES.md`) adds a look at live's Plugins page for an update waiting
+     more than a week or two. Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
