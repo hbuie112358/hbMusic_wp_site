@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Scenario (dev site): what the Site Hardening plugin refuses or removes outside the admin (plan
 # step 8a, D26): xmlrpc.php is refused (docs/SITE_CHECKLIST.md 4.4), no page points to it with an
-# X-Pingback header, and Yoast SEO's version comment is gone (3.6). The headers on every page are
+# X-Pingback header, Yoast SEO's version comment is gone, and no response names the PHP version
+# (3.6). The headers on every page are
 # checked in tests/e2e/specs/dev/theme.spec.ts, Application Passwords in hardening.spec.ts.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
@@ -38,6 +39,21 @@ expect_no_pingback_header() {
   log "a post that allows pings sends no X-Pingback header"
 }
 
+# Every kind of response WordPress builds with PHP: a page, the login page, the admin (which
+# forwards to the login), the REST API, AJAX, the feed and XML-RPC's refusal. Each must answer,
+# or a missing header would prove nothing.
+readonly PHP_RESPONSE_PATHS=(/ /wp-login.php /wp-admin/ /wp-json/ /wp-admin/admin-ajax.php "/?feed=rss2" /xmlrpc.php)
+
+expect_no_php_version_header() {
+  local path headers
+  for path in "${PHP_RESPONSE_PATHS[@]}"; do
+    headers="$(curl -sS -D - -o /dev/null --max-time 10 "$(site_url "$path")")"
+    [[ "$headers" == HTTP/* ]] || fail "$path did not answer: $headers"
+    ! grep -qi '^x-powered-by:' <<<"$headers" || fail "$path names the PHP version in X-Powered-By"
+  done
+  log "no response names the PHP version (${#PHP_RESPONSE_PATHS[@]} kinds checked)"
+}
+
 # Yoast's other tags must still be there, or a missing comment would prove nothing.
 expect_no_version_comment() {
   local page
@@ -53,6 +69,7 @@ main() {
   expect_xml_rpc_refused GET
   expect_no_pingback_header
   expect_no_version_comment
+  expect_no_php_version_header
   # Checked here as well as at the end of bin/test, so a refusal that costs a PHP notice is
   # named by this scenario.
   expect_empty_debug_log
