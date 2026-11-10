@@ -152,7 +152,7 @@ that sanitizes them.**
 - Why: an uploaded file can then never run as code; an SVG file can carry scripts.
 - Check: a test `.php` file in uploads is refused, then removed; an SVG upload is refused or
   sanitized.
-- Kind: WordPress · Status: planned: step 8.
+- Kind: WordPress · Status: partly: PHP refused in `uploads/` on staging, proven with a test file (8k); live at step 9; the SVG upload check not done yet (WordPress refuses SVG unless a plugin allows it).
 
 **3.6 The web server refuses dotfiles (`.git`, `.env`, `.htaccess`), `.sql`, `.zip`, `.log`,
 `.json` config and backup files, and the files that reveal versions: WordPress's `readme.html`
@@ -162,7 +162,9 @@ and `license.txt`, and the `readme.txt` of every plugin and theme.**
 - Check: a request for each kind returns 403 or 404.
 - Kind: WordPress · Status: partly: the live site's leftover files return 404 since they were
   deleted (0c); Yoast SEO's version comment in the pages is removed by the Site Hardening plugin
-  (8a); the general rules and the version files at step 8.
+  (8a); the PHP version header by the same plugin (8k); on staging, `readme.html`, `license.txt`
+  and every `readme.txt` refused by a server rule (8k), on live at step 9; the dotfiles, backups,
+  the debug log and archives were already refused on live (checked 2026-11-10).
 
 **3.7 Only the site's files are in the web root: no local-development leftovers, archives, dumps
 or a second install (open items 1 and 2).**
