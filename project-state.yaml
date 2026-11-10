@@ -45,22 +45,18 @@ last_work: >
   step 8, "Brevo setup, where it stands".
 
 next_action: >
-  Mail first (plan step 8, the end of "Brevo setup, where it stands"): ask the user (1) phone,
-  email or both for a new "sending failed" message on the booking form, and whether Claude's split
-  is fine (real details typed into Contact Form 7 on staging and live; placeholder details in
-  config/ for the dev site, with a test, listed in docs/ENVIRONMENTS.md); (2) whether to remove the
-  visitor's name from the email subject (Claude recommends it; the name also reaches Pushover
-  alerts); (3) whether to leave Brevo's IP blocking on (Claude recommends it). Then propose the
-  wording and the config change before editing. After that: the Gmail filter, one successful
-  booking request, the privacy policy, the monthly test; or the update routine (live's "Automatic
-  Updates" column, then A or B). Push the unpushed commits with the next code change. Before any
-  test run after switching branches, rebuild the dev site with bin/dev-site (stale bind mounts).
+  Ask whether live's Wordfence has moved past 9.0.2, and on which date (the Hostinger timing test,
+  plan 8j, deadline 2026-11-17). Then the rest of step 8, the user choosing the order: 8h's code
+  parts (local structured data, the D22 redirects), the admin pages' policy, the server-level
+  items, the login-limit test on staging (4.3), cache; or the user's 5f choices. Once A is
+  confirmed: the weekly GitHub check of the dev site's pins. Before any test run after switching
+  branches, rebuild the dev site with bin/dev-site (stale bind mounts).
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
   live_php: 8.4.27
   staging_php: 8.4.27 (set per website; step 0f corrected)
-  live_plugins: wordfence 9.0.2, wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); their automatic-update settings not yet looked at
+  live_plugins: wordfence 9.0.2 (kept for the Hostinger timing test, 8j), wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); updates by Hostinger's Smart auto-updates (8j)
   live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10)
   search_console: Domain property under the business Google account, verified 2026-11-09 by a new google-site-verification TXT record; the other owner is the user's other Google account (the older TXT record); baseline in plan 8h
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
@@ -96,10 +92,11 @@ pending_decisions:
     A memory note on how the user likes explanations (a nutshell first, then plain words): offered
     by Claude on 2026-11-09, not yet answered; nothing written without the user's yes.
   - >
-    The update routine (plan step 8): A, automatic updates everywhere plus a weekly GitHub check of
-    the dev site's pinned versions (Claude's recommendation), or B, checklist 5.3 as written
-    (security automatic, other plugins by hand, staging first). Waiting on the user's look at live's
-    "Automatic Updates" column first.
+    The update routine (plan 8j): A chosen, waiting on a test. Live keeps Wordfence 9.0.2 (9.1.0
+    released 2026-11-09, no security fix named) to see when Hostinger updates it; the user looks
+    every few days and notes the date. By 2026-11-17, if still 9.0.2: the user updates by hand,
+    and A gets a reminder in the monthly check, or B is chosen. A security release before then is
+    installed by hand at once.
   - >
     Optional tidy-up: keep Search Console in the business Google account only (remove the other
     account as owner, then the older google-site-verification TXT record); harmless to leave.
@@ -121,9 +118,11 @@ open_items:
       live server.
   - id: 3
     item: >
-      Hostinger's auto-updates plugin (plugins/ and mu-plugins/) updates WordPress itself, not
-      the plugins (plan step 0f). Kept while the site is at Hostinger (D15, D25); how plugins are
-      kept current is decided in plan step 8; removed when moving hosts (step 10).
+      Hostinger's Smart auto-updates (hPanel, selected) manage WordPress, themes and plugins, and a
+      must-use plugin turns off WordPress's own updates (plan 8j, 2026-11-10; step 0f's "updates
+      only WordPress itself" was wrong). Kept while the site is at Hostinger (D15, D25); A chosen,
+      waiting on the Wordfence timing test on live (deadline 2026-11-17); removed when moving
+      hosts (step 10).
   - id: 4
     item: >
       Settled (plan step 2): music-lite-child is empty; nothing to carry over.
