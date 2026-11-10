@@ -85,14 +85,13 @@ uncommitted_changes: []
 
 pending_decisions:
   - >
-    Removing the visitor's name from the booking email's subject line, so Brevo's records and
-    Pushover alerts hold less about visitors (Claude recommends it; the user has not said).
-  - >
-    The booking form's "sending failed" message offering another way to reach the user (the user
-    likes it): phone, email or both; and Claude's split (real details by hand on staging and live,
-    placeholders in config/ for the dev site).
-  - >
-    Brevo's IP blocking for API keys: leave it on (Claude recommends it) or off (as now).
+    Later, at the user's request (2026-11-10): the time report counts a gap longer than 10 minutes
+    as zero even while Claude is busy (one long command, or an approval prompt the user is still
+    looking at). Claude's proposal: gaps from a tool call to its result, or within Claude's reply,
+    count in full up to a cap (30 minutes suggested); gaps waiting for the user's next message keep
+    the 10-minute break rule; fix "longer than 7 minutes" in the same file. It changes the shared
+    ~/.claude/TIME_TRACKING.md and tools/time-report/ with tests, so it needs the user's yes and the
+    cap first. Measured 2026-11-10: no time had been lost (32 min 54 s of 32 min 54 s counted).
   - >
     A memory note on how the user likes explanations (a nutshell first, then plain words): offered
     by Claude on 2026-11-09, not yet answered; nothing written without the user's yes.

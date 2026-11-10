@@ -41,8 +41,9 @@ new findings added as steps.
   Brevo with SPF, DKIM and DMARC passing, and a failed booking request raises a Pushover alert
   (proven with a planted failure). 2026-11-10: the visitor's name out of the subject, a new
   "sending failed" message (both on the dev site with tests, typed in by hand on staging after
-  the merge), Brevo's IP blocking on. Next for mail: the Gmail filter, one successful request,
-  the privacy policy and the monthly test.
+  the merge), Brevo's IP blocking on; on staging, the same text, a real request in the inbox
+  without the visitor's name in the subject, and a Gmail filter. Next for mail: the privacy
+  policy and the monthly test.
 - **Next:** the mail choices above, or the update routine (step 8): the user is to look at live's Plugins page, the
   "Automatic Updates" column, then choose A (automatic everywhere, plus a weekly GitHub check of
   the dev site's pinned versions against WordPress.org; Claude's recommendation) or B (checklist
@@ -812,7 +813,14 @@ new findings added as steps.
      would show it). Built on the dev site: the build merges the message into Contact Form 7's own
      (a missing message shows nothing at all; a misspelt name stops the build), Mailpit's chaos mode
      lets a serial test make it refuse mail, and `booking-form.spec.ts` checks the subject, the body
-     and the visitor's message; each check shown to fail on a planted fault.
+     and the visitor's message; each check shown to fail on a planted fault. The same subject and
+     message typed into staging's form by the user; a real request from staging's Book page then
+     arrived in the inbox as "Howard Buie Music booking request", the visitor's details in the body,
+     sent as "Howard Buie Music" (Contact Form 7 names the sender from the site title; FluentSMTP
+     forces only the address), so (8) is done; (7) done: a Gmail filter on
+     `from:website@howardbuiemusic.com`, never spam, label "Booking requests". Left: (9) the privacy
+     policy naming Brevo, Pushover and the periods; the monthly test request in the user's calendar;
+     where Brevo lists blocked transactional addresses.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
