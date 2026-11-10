@@ -818,9 +818,10 @@ new findings added as steps.
      arrived in the inbox as "Howard Buie Music booking request", the visitor's details in the body,
      sent as "Howard Buie Music" (Contact Form 7 names the sender from the site title; FluentSMTP
      forces only the address), so (8) is done; (7) done: a Gmail filter on
-     `from:website@howardbuiemusic.com`, never spam, label "Booking requests". Left: (9) the privacy
-     policy naming Brevo, Pushover and the periods; the monthly test request in the user's calendar;
-     where Brevo lists blocked transactional addresses.
+     `from:website@howardbuiemusic.com`, never spam, label "Booking requests". The monthly test
+     request and D27's monthly content export are one routine, `docs/ROUTINES.md` (the user,
+     2026-11-10), with a monthly reminder in the user's calendar. Left: (9) the privacy policy
+     naming Brevo, Pushover and the periods; where Brevo lists blocked transactional addresses.
    - **Knowing when a booking request goes missing (the user: among the most important points,
      2026-11-07):** today neither the user nor the visitor can tell. The setup must show it: the mail
      service's delivery record, FluentSMTP's log as a copy of each request (with a retention period, as
@@ -941,6 +942,9 @@ new findings added as steps.
      - **Google Business Profile** (the user, outside the site): name, service area (Fayetteville,
        Southern Pines and surroundings, D22), contact and website the same as on the site;
        verified by Google (phone, video or postcard); reviews from people who hired the user.
+       **Optional, the user undecided (2026-11-10):** the user worried about who else could find
+       them. Discussed: the address can stay hidden for a business that travels to its customers,
+       contact can be the website only, but reviews cannot be switched off. Nothing waits on it.
      - **Local structured data:** the page data names a performer and the areas served, added in
        code that extends Yoast's own (its Local SEO add-on is paid), tested on the dev site.
      - **The redirects of D22** (`/video/`, `/audio/`, `/contact/`) in code or a free plugin, not
