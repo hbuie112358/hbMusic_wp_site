@@ -63,10 +63,9 @@ last_work: >
 
 next_action: >
   The rest of step 8, the checklist items still marked for it (plan Current position, "Next"):
-  DISALLOW_FILE_EDIT (2.2), debug settings (2.3), FORCE_SSL_ADMIN and the site's options (2.4),
-  the database user (2.5), FTP (3.x), pingbacks and staging's discussion settings (4.8),
-  checksums on live (5.4), the mail-tester score (11.2), the domain (11.3), CAA and DNSSEC
-  (11.4), monitoring (14.1-14.3); or the user's 5f choices. Contact Form 7 6.2.5 not onto staging
+  the mail-tester score (11.2), monitoring (14.1-14.3); 8m did the rest on
+  2026-11-11. Remind the user to delete ~/wp-config.live-before-2026-11-11.php on the server
+  (it holds live's database password) once live has run a few days. Or the user's 5f choices. Contact Form 7 6.2.5 not onto staging
   before 2026-11-17. The local dev site still runs Contact Form 7 6.2.4.1: rebuild it with
   bin/dev-site before any local test run. Ask whether GitHub's emails for the versions check
   arrive (the user was to set Watch -> Custom -> Pull requests and Issues).

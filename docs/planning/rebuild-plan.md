@@ -59,13 +59,10 @@ new findings added as steps.
   9.1.1 on both sites), and the weekly versions check built and proven end to end
   (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
   merged by the user on 2026-11-11, earlier than the week agreed).
-- **Next:** the rest of step 8, the checklist items still marked for it (all listed
-  2026-11-11): `DISALLOW_FILE_EDIT` on live and staging (2.2), the debug settings (2.3),
-  `FORCE_SSL_ADMIN` and the site's options (2.4), the database user's rights (2.5), FTP (3.x),
-  pingbacks and staging's discussion settings (4.8), checksums on live (5.4), the mail-tester
-  score (11.2), the domain's lock, renewal and two-factor (11.3), a CAA record and DNSSEC
-  (11.4), uptime monitoring (14.1), certificate and domain expiry alerts (14.2), Wordfence's
-  scans and alerts (14.3). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
+- **Next:** the rest of step 8 (8m): the mail-tester score (11.2), uptime
+  monitoring with certificate and domain alerts (14.1, 14.2), Wordfence's scans and alerts
+  (14.3). Done in 8m on 2026-11-11: 2.2-2.5, 3.8, 4.8, 5.4, 11.3, 11.4. Delete live's wp-config
+  backup in the home folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
   earlier than 2026-11-17, a week after its release. Or
   the user's 5f choices (videos, wording, and from the inventory a song search, WebP photos and
   a site icon); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
@@ -1164,6 +1161,28 @@ new findings added as steps.
      address; the logo has none. So a changed picture gets a new file name
      (`docs/ROUTINES.md`). Measured on the old site; step 9 checks the new one shows `DYNAMIC`
      too. No page cache unless the speed check (checklist 8.1) asks for one. Status: `[x]`
+   - **8m. The checklist items left for step 8 (2026-11-11):** checked by Claude from outside
+     (DNS, certificates, the registry) and by the user in hPanel and over SSH with read-only,
+     masked commands. **Domain (11.3):** at Hostinger, transfer lock, auto-renewal (expiry
+     2027-04-16), privacy protection and two-factor login all on. **CAA and DNSSEC (11.4):**
+     Hostinger's agent advised against a CAA record (no fixed authority for its SSL and CDN);
+     DNSSEC cannot work with Hostinger's DNS, whose nameservers sign nothing (no DNSKEY, no RRSIG;
+     the agent's offer to enter DS values would have broken the domain). **Certificates:** Let's
+     Encrypt, live to 2027-01-03, staging to 2027-02-01, renewed by Hostinger. **wp-config and
+     options (2.2-2.4, 4.8):** debugging off and no log files on both; `siteurl` and `home`
+     `https://`; `FORCE_SSL_ADMIN` left out (a redirect loop risk behind live's CDN, the
+     server's forward does the job); `DISALLOW_FILE_EDIT` and closed comments and pingbacks set
+     with WP-CLI on both. On live the constant first had no effect: the old site had left a
+     comment open (`/*define( 'WP_ENVIRONMENT_TYPE', 'local' );`, closed only by the "stop
+     editing" line), and WP-CLI wrote inside it. Fixed by making the two old lines `//`
+     comments (a backup `~/wp-config.live-before-2026-11-11.php` first, outside the web folder,
+     mode kept; `php -l` clean; live refuses `theme-editor.php`). The backup holds live's
+     database password and is deleted once live has run a few days. **Database (2.5):** each
+     site's own user, for its own database only (WP-CLI cannot query: `proc_open` is disabled
+     at Hostinger). **Checksums (5.4):** WordPress and every WordPress.org plugin verify on both
+     sites. **FTP (3.8):** one account, Hostinger's main one (cannot be removed), not used by
+     anything or by the user; its password is SSH's. Left: the mail-tester score (11.2),
+     monitoring (14.1-14.3). Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
