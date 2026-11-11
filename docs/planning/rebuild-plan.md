@@ -53,7 +53,8 @@ new findings added as steps.
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
   Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
   both. HSTS at step 9.
-- **Next:** the weekly pins check's proof after its merge (8j); Wordfence 9.1.1 on both sites
+- **Next:** the versions check's last proof (8j): its pull request for Contact Form 7 6.2.5,
+  approved and tested, merged by the user from 2026-11-17; Wordfence 9.1.1 on both sites
   since 2026-11-11. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
   files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
@@ -1029,7 +1030,10 @@ new findings added as steps.
      `X-Real-IP`, and since the server already puts the visitor's address in `REMOTE_ADDR` (both
      showed the user's own), live was set to `REMOTE_ADDR`, which a visitor cannot fake; it still
      matches. Done for 4.3.
-   - **8j. The update routine (2026-11-10):** live's and staging's Plugins pages have no
+   - **8j. The update routine (2026-11-10)** *(settled 2026-11-11, further down: Hostinger
+     installs security updates only, the monthly check the rest by hand, staging first; the
+     timing test below was dropped, and the weekly check was built as the versions check):*
+     live's and staging's Plugins pages have no
      "Automatic Updates" column, not even under Screen Options. hPanel shows "Smart auto-updates"
      selected: "Hostinger will manage updates for WordPress core, themes, and plugins. A must-use
      plugin will be installed to turn off native WordPress updates." So step 0f and open item 3
@@ -1056,12 +1060,14 @@ new findings added as steps.
      and the monthly check updates the rest by hand, staging first, then live
      (`docs/ROUTINES.md`); not "all updates", which would bring new releases to live without
      staging seeing them first. The weekly GitHub check of the dev site's pins stays planned, as
-     the early notice. Live's Wordfence updated by hand on 2026-11-11 (pages and login with
+     the early notice (built the same day, below). Live's Wordfence updated by hand on 2026-11-11 (pages and login with
      two-factor checked by the user): it got 9.1.1 (2026-11-10, only its bundled certificate list,
      `cacert.pem`), newer than staging's 9.1.0 of the day before, since "Update now" installs the
      newest release; staging then updated to 9.1.1 as well. So the monthly check updates staging
      and live in the same sitting and checks that the versions match first. Status: `[x]`
-     **The weekly pins check (2026-11-11):** the user first questioned it (the monthly check
+     **The weekly pins check (2026-11-11)** *(renamed the same day to the versions check:
+     `bin/versions-check`, `.github/workflows/versions.yml`, branches `versions/…`; this paragraph
+     keeps the names used at the time):* the user first questioned it (the monthly check
      already shows waiting updates), then kept it with several sites in mind, where looking by
      eye does not scale; it runs on GitHub's clock, with no session and no computer. Design agreed
      with the user: `bin/pins-check` asks WordPress.org's API (`api.wordpress.org`, its only
@@ -1088,6 +1094,19 @@ new findings added as steps.
      script now removes a `pins/…` branch that has no pull request before making it again. The
      6.2.5 pull request, once open, waits until 2026-11-17 (a week after the release) before
      the user merges it.
+     **Then, with the leftover branch planted by hand:** the run removed it, made it again and
+     opened #33. Its tests started through "Run workflow" passed (`check`, `dev-site`) but #33
+     stayed blocked: GitHub counts for a pull request only the runs that belong to it, and that
+     one, the `pull_request` run, waited for approval ("action_required"). **Chosen (the user):
+     the user clicks "Approve and run"** on each proposal, rather than a stored key (a
+     fine-grained token: write access as a secret, renewed at least yearly on every site) or a
+     GitHub App (the cleanest automatic route, but much setup; worth it if more is automated
+     across many sites later). The script no longer starts the extra run, and the workflow
+     drops its `actions: write` right. **Renamed (the user):** "versions check", since it covers
+     the theme too: `bin/versions-check`, `.github/workflows/versions.yml` (the "versions"
+     workflow), proposal branches `versions/<slug>-<version>`; the names above are as they were
+     then. #33, on the old branch name, is closed and the renamed check run once with no wait, so
+     the first pull request under the final design shows "Approve and run".
    - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
      requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
      dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are

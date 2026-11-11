@@ -55,7 +55,7 @@ template project starts; until then, a list, not a to-do.
 
 - `bin/check`, `bin/test`, `bin/tools-update`, `tools/versions.sh` (apart from the names above),
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
-- The weekly pins check (plan 8j): `bin/pins-check` and `.github/workflows/pins.yml` are generic;
+- The weekly versions check (plan 8j): `bin/versions-check` and `.github/workflows/versions.yml` are generic;
   the list `PINS` at the top of the script names each site's pinned plugins and theme. Kept for
   many sites, where checking every site's Plugins page by eye does not scale.
 - `plugins/site-hardening/` (plan D26) as it is; each site adds its own outside sources, with

@@ -68,14 +68,17 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 
 Every Monday GitHub compares the dev site's pinned versions with WordPress.org (plan 8j). A
 plugin released at least a week ago arrives as an email about a pull request, such as "raise
-Contact Form 7 to 6.2.5", and the tests run on it by themselves (a few minutes). Nothing else is
-needed on the user's computer, and no session with Claude:
+Contact Form 7 to 6.2.5". Nothing else is needed on the user's computer, and no session with
+Claude:
 
 1. Open the pull request from the email, or the repository's **Pull requests** tab on GitHub.
-2. **Green ticks** for `check` and `dev-site`: the new version passed the dev site's tests.
-3. **Rebase and merge**, then **Delete branch**. GitHub allows the merge only once the checks
+2. Click **Approve and run** on its page. GitHub holds the tests of a pull request that its own
+   token opened until a person approves them (plan 8j chose this click over a stored key).
+3. About 4 minutes later, **green ticks** for `check` and `dev-site`: the new version passed the
+   dev site's tests.
+4. **Rebase and merge**, then **Delete branch**. GitHub allows the merge only once the checks
    pass.
-4. The new version reaches staging and live in the next monthly check (step 6), now as a tested
+5. The new version reaches staging and live in the next monthly check (step 6), now as a tested
    one.
 
 **Red crosses:** the new version breaks something the tests protect. Nothing is merged, and

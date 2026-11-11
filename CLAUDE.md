@@ -104,11 +104,12 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `wordpress/`; `composer.lock` is read-only to them.
 - GitHub runs `bin/check` on every push to `main` and every pull request
   (`.github/workflows/check.yml`); a pull request merges only when it passes.
-- `bin/pins-check`: compares the dev site's pinned plugins and theme (`tools/versions.sh`) with
+- `bin/versions-check`: compares the dev site's pinned plugins and theme (`tools/versions.sh`) with
   WordPress.org and reports what is behind, changing nothing. Every Monday GitHub runs it with
-  `--act` (`.github/workflows/pins.yml`, plan 8j): a plugin released at least 7 days ago gets a
-  pull request raising its pin, with the tests started on it; the theme gets an issue only. The
-  user merges such a pull request on GitHub once its checks pass (`docs/ROUTINES.md`).
+  `--act` (`.github/workflows/versions.yml`, plan 8j): a plugin released at least 7 days ago gets a
+  pull request raising its pin; the theme gets an issue only. The user clicks "Approve and run"
+  on the pull request, which GitHub requires before testing a pull request its own token opened,
+  and merges it on GitHub once its checks pass (`docs/ROUTINES.md`).
 - `bin/tools-update`: the deliberate way to update the tools, `composer.lock` and
   `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
@@ -176,8 +177,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   *Why:* one text cannot drift from another; the commits credit both the user (author) and
   Claude (co-author), so a pull request line crediting only Claude would misstate the work.
   Exception: Dependabot's update commits keep the messages Dependabot writes
-  (`.github/dependabot.yml` shapes their subject line), and so do the pins check's
-  (`bin/pins-check`, as GitHub Actions' bot); they are neither the user's nor Claude's work.
+  (`.github/dependabot.yml` shapes their subject line), and so do the versions check's
+  (`bin/versions-check`, as GitHub Actions' bot); they are neither the user's nor Claude's work.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the

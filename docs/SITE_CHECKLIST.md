@@ -117,7 +117,8 @@ HSTS once HTTPS is confirmed stable.**
 - Check: SSL Labs grades the site A or better, and `curl -I` shows the redirect and the HSTS
   header.
 - Kind: general · Status: partly: HTTPS with automatically renewed certificates and the redirect
-  on live and staging (3g-1); no HSTS header yet (checked 2026-11-03), set at step 8 or 9.
+  on live and staging (3g-1); no HSTS header yet (checked 2026-11-03), set at step 9, once the
+  domain's HTTPS setup is final (decided in 8k, 2026-11-10).
 
 **3.2 Security headers: a `Content-Security-Policy` that limits where code may come from and go
 to: scripts, styles and frames only from the site itself and the outside sources listed in the
@@ -217,7 +218,9 @@ logins; no account named `admin`.**
 - Why: stops password guessing and common attacks.
 - Check: the firewall shows as active, and repeated failed logins are blocked after the limit.
 - Kind: WordPress · Status: partly: Wordfence active on live and staging; live's firewall runs
-  in Extended Protection (found already set, 8i); the test of the limit, on staging, at step 8.
+  in Extended Protection (found already set, 8i); the limit's settings read on staging and live
+  instead of a lockout test (the user, 2026-11-10: Wordfence's own code; plan 8i, login
+  protection).
 
 **4.4 XML-RPC disabled unless a feature needs it.**
 - Why: a common target for password guessing.
@@ -289,7 +292,9 @@ where one exists. On a shop, WooCommerce and its extensions never update automat
 - Check: the Updates screen shows nothing pending for longer than a week, and the update log
   shows staging before live.
 - Kind: WordPress · Status: partly: the live site was brought current (0f) and Wordfence updates
-  itself on staging (3g-1); how updates run on live is decided at step 8.
+  itself on staging (3g-1, without effect: Hostinger's must-use plugin turns WordPress's own
+  updates off); decided in 8j (2026-11-11): Hostinger installs security updates only on both
+  sites, the monthly check (`docs/ROUTINES.md`) the rest by hand, staging first.
 
 **5.4 The site's changes live only in the child theme (or a small site plugin for features that
 must survive a theme change), never in the parent theme or core.**
@@ -507,7 +512,8 @@ visitors' location requires.**
 - Why: server mail is often lost as spam.
 - Check: a test message arrives and passes SPF and DKIM.
 - Kind: WordPress · Status: partly: FluentSMTP sends through Mailpit locally (3b); the mail
-  service at step 8 (the live site's mail is unreliable today).
+  service, Brevo through FluentSMTP, on staging since 2026-11-09 with SPF, DKIM and DMARC
+  passing (plan step 8, D24); live at step 9.
 
 **11.2 SPF, DKIM and DMARC records for the domain.**
 - Why: stops others from sending mail as the domain.
