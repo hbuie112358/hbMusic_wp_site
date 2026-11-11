@@ -100,6 +100,7 @@ propose_plugin_pull_request() {
     log "$name: a pull request for $newest exists already"
     return 0
   fi
+  remove_leftover_branch "$branch"
   git -C "$REPO_ROOT" fetch --quiet origin main
   git -C "$REPO_ROOT" switch --quiet -c "$branch" origin/main
   raise_pin "$variable" "$pinned" "$newest"
@@ -112,6 +113,15 @@ propose_plugin_pull_request() {
   gh workflow run check.yml --ref "$branch"
   git -C "$REPO_ROOT" switch --quiet -
   log "$name: pull request for $newest opened, its tests started"
+}
+
+# A proposal branch without a pull request is what a run stopped half-way leaves behind (pushed,
+# then the pull request refused); it is made again from main rather than pushed over.
+remove_leftover_branch() {
+  local branch="$1"
+  git -C "$REPO_ROOT" ls-remote --exit-code --heads origin "$branch" >/dev/null || return 0
+  log "$branch exists without a pull request, left by an earlier run; removing it to start again"
+  git -C "$REPO_ROOT" push --quiet origin --delete "$branch"
 }
 
 # Changes exactly the one line, and proves it changed.

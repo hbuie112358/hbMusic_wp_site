@@ -1077,6 +1077,17 @@ new findings added as steps.
      merge, since GitHub offers the button only for a workflow on `main`: the theme's pin lowered
      on a trial branch (an issue expected, then closed), and a run on `main` with no wait (the
      pull request for 6.2.5, its checks counted for the merge).
+     **Proof, 2026-11-11:** on the trial branch (theme pin 1.4) the run opened issue #31, a second
+     run found it and opened none, Contact Form 7 waited (1 of 7 days); the issue was closed and
+     the branch deleted. The run on `main` with no wait pushed `pins/contact-form-7-6.2.5`, then
+     GitHub refused the pull request: "GitHub Actions is not permitted to create or approve pull
+     requests", a repository setting off by default. Switched on by Claude with the user's yes
+     (`gh api …/actions/permissions/workflow`: `can_approve_pull_request_reviews` true, the
+     default token still `read`); approving changes nothing here, since `main` requires checks,
+     not reviews. The run had left its branch behind, which the next push would have hit, so the
+     script now removes a `pins/…` branch that has no pull request before making it again. The
+     6.2.5 pull request, once open, waits until 2026-11-17 (a week after the release) before
+     the user merges it.
    - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
      requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
      dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are
