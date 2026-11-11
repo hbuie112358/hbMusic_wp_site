@@ -29,6 +29,19 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    got: "Update now" always installs the newest release, so one published in between would reach
    live untried (it happened with Wordfence 9.1.1, plan 8j).
 
+   **Has the dev site tested it?** The versions the dev site's tests ran are in
+   [`tools/versions.sh`](https://github.com/hbuie112358/hbMusic_wp_site/blob/main/tools/versions.sh)
+   (`CONTACT_FORM_7_VERSION`, `YOAST_SEO_VERSION`, `PARENT_THEME_VERSION` for Twenty Twenty-Five).
+   For each update waiting on staging:
+   - **The same version as there:** tested; update staging, then live.
+   - **Newer than there:** not tested yet. Wait until the version there is raised and its tests
+     pass, or ask Claude in a session to raise it and run the tests first.
+   - **Not in that file** (Wordfence, FluentSMTP, which the dev site does not run): staging is the
+     test, as above.
+
+   A security fix Hostinger installs by itself does not wait for the dev site: closing a hole comes
+   first, and the version in `tools/versions.sh` is raised to it afterwards.
+
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
   which a failure alert alone cannot: a request Brevo accepts but does not deliver raises no
