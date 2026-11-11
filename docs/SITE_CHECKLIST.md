@@ -72,8 +72,8 @@ store. Never in mail, chat or the repository.**
 **2.2 `DISALLOW_FILE_EDIT` set to `true`.**
 - Why: a stolen admin login cannot then edit PHP from the dashboard.
 - Check: Appearance → Theme File Editor and Plugins → Plugin File Editor are absent.
-- Kind: WordPress · Status: partly: set in the local copy (3a); live and staging checked at
-  step 8.
+- Kind: WordPress · Status: partly: set on the dev site (`compose.dev.yaml`); live and staging
+  checked at step 8.
 
 **2.3 `WP_DEBUG` off in production; if logging is needed, `WP_DEBUG_LOG` writes outside the web
 root and `WP_DEBUG_DISPLAY` is off.**
@@ -107,7 +107,9 @@ a cron job at the host), not by visits.**
   late or missed tasks.
 - Check: `DISABLE_WP_CRON` is set, the host's cron job runs `wp-cron.php` every 5–15 minutes,
   and a scheduled test task runs on time.
-- Kind: WordPress · Status: planned: staging when 5b's expiring links need it, live at step 8.
+- Kind: WordPress · Status: not needed now: since D19 moved 5b's expiring links to a future
+  plugin, nothing on the site must run at a set time, and WordPress's own scheduler is enough;
+  planned with 5b if it is built.
 
 ## 3. Server and hosting
 
@@ -340,7 +342,10 @@ capability; every REST route has a `permission_callback`.**
 - Why: prevents injection, cross-site request forgery and open endpoints.
 - Check: the WPCS security sniffs pass, and code review finds no route without a permission
   check.
-- Kind: WordPress · Status: planned: steps 5b and 5d (the forms).
+- Kind: WordPress · Status: in force: the booking form's checks are Contact Form 7's own (5e);
+  the Song List's admin form checks a nonce and the user's right to edit the song and cleans its
+  input (`song-admin.php`, read 2026-11-11); the site adds no REST routes; the WPCS security
+  sniffs run in `bin/check`. Future plugins (5b, 5d) bring their own forms and checks.
 
 **6.5 Database queries go through WordPress APIs or `$wpdb->prepare()`.**
 - Why: prevents SQL injection.
@@ -431,7 +436,9 @@ static files; compression (Brotli or gzip).**
   then fails a day later.
 - Check: the response headers show caching on ordinary pages and none on form pages; a form
   submitted a day after its page was cached still works.
-- Kind: WordPress · Status: planned: step 8 (the caching decision), with 5b's form.
+- Kind: WordPress · Status: decided in 8l: no page cache, so no page holds an old nonce;
+  static files carry 7 days of browser caching from the server; responses are compressed by
+  the host (Brotli, `content-encoding: br`, seen on staging 2026-11-10).
 
 **8.4 Fonts self-hosted or from the theme, limited to the weights in use; no render-blocking
 third-party scripts.**
@@ -475,8 +482,8 @@ where present.**
 - Why: duplicates do not compete with the real site.
 - Check: the live `robots.txt` allows crawling, and every other copy has "discourage search
   engines" on.
-- Kind: WordPress · Status: done for the local copy (3a) and staging (3g-1); the live site
-  allows search engines (step 2).
+- Kind: WordPress · Status: done for the dev site (`bin/dev-site`) and staging (3g-1); the live
+  site allows search engines (step 2).
 
 ## 10. Privacy and legal
 
@@ -484,20 +491,27 @@ where present.**
 why.**
 - Why: required by privacy law in many places; builds trust.
 - Check: the page exists, matches what the site collects, and is linked in the footer.
-- Kind: general · Status: planned: step 5b (before the request form goes live).
+- Kind: general · Status: done on staging: the policy (2026-11-10) names the booking form,
+  Brevo with its 3-month retention, failed messages and the inbox; the theme's footer links it on
+  every page (checked by the user, 2026-11-11). Live at step 9.
 
 **10.2 Collect only what is needed; no analytics or tracking cookies without the consent the
 visitors' location requires.**
 - Why: privacy law (GDPR and similar).
 - Check: the cookies set on a first visit, before any choice, are only the necessary ones.
-- Kind: general · Status: planned: step 5b (the form) and step 6 (FluentSMTP's email log
-  retention).
+- Kind: general · Status: done on staging (2026-11-11, the user in a private window, Home and
+  Book): only two session cookies, `hcdn` (Hostinger's delivery layer) and
+  `wordpress_test_cookie` (WordPress), none from Cloudflare's spam check, no analytics; Brevo's
+  tracking anonymous, FluentSMTP keeps only failed mail (D24). The dev site sets none. Live at
+  step 9.
 
 **10.3 Contact and sign-up forms protected against spam without hurting accessibility.**
 - Why: spam floods the inbox and the database.
 - Check: a test submission arrives, a scripted spam submission is stopped, and the form passes
   the accessibility checks.
-- Kind: general · Status: planned: step 5b.
+- Kind: general · Status: done: the booking form has Cloudflare Turnstile (5e), tested on the
+  dev site (`booking-form.spec.ts`: a failed check is treated as spam and sends nothing) and with
+  axe at WCAG 2.2 AA, and on staging with the real keys (5e).
 
 **10.4 Media on the site is the artist's own or licensed for this use.**
 - Why: copyright.
@@ -511,14 +525,16 @@ visitors' location requires.**
 `mail()`.**
 - Why: server mail is often lost as spam.
 - Check: a test message arrives and passes SPF and DKIM.
-- Kind: WordPress · Status: partly: FluentSMTP sends through Mailpit locally (3b); the mail
+- Kind: WordPress · Status: partly: the dev site sends to Mailpit (`config/dev-mu-plugins/`); the mail
   service, Brevo through FluentSMTP, on staging since 2026-11-09 with SPF, DKIM and DMARC
   passing (plan step 8, D24); live at step 9.
 
 **11.2 SPF, DKIM and DMARC records for the domain.**
 - Why: stops others from sending mail as the domain.
 - Check: DNS lookups show all three, and a mail-tester scores a test message 9/10 or better.
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: partly: SPF, DKIM (`brevo1`) and DMARC (`p=none`) are in DNS and
+  passed on staging's test message (2026-11-09, plan step 8, Brevo); the mail-tester score at
+  step 8.
 
 **11.3 Domain registration locked, auto-renew on, 2FA on the registrar and DNS accounts.**
 - Why: losing the domain loses the site and its mail.
@@ -572,7 +588,8 @@ production; the theme is deployed from the repository, never edited on the serve
 **13.2 URL changes in the database use a tool that handles serialized data (`wp search-replace`).**
 - Why: a plain text replace corrupts serialized options and widgets.
 - Check: after the move, the site and its widgets work and no old address is left.
-- Kind: WordPress · Status: in force in `bin/local-import` (3a); the moves at steps 9 and 10.
+- Kind: WordPress · Status: was used in `bin/local-import` (3a, removed at 5a-2); the moves at
+  steps 9 and 10 use `wp search-replace`.
 
 **13.3 Migration has a written checklist, a fresh backup taken just before it, and a way back
 (DNS to the previous target, or restore).**

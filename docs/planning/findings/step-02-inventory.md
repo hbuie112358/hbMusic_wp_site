@@ -81,30 +81,40 @@ categories). Wordfence's own tables hold its logs. None of this is carried to th
 
 ## What the new site must cover
 
+The list as written on 2026-11-02, with what became of each item (updated 2026-11-11). D19
+(2026-11-07) moved song requests, clips and setlist preferences to future plugins, and D22 set the
+five pages.
+
 From the content:
-- [ ] Home: bio and a clear way to book.
-- [ ] About: the longer bio.
-- [ ] Contact: email and Facebook (and the request form, below).
-- [ ] Songlist: all 108 songs with their artists.
-- [ ] Video: the three YouTube videos, with their decades.
-- [ ] A way to find a song or video (today: the sidebar search).
-- [ ] The main photos, resized and in a modern format.
+- [x] Home: bio and a clear way to book (2b, D22; on staging since 5f).
+- [x] About: the longer bio (2b, D22; on staging).
+- [x] Contact: became the Book page (D22), with the booking form (5e) and the email and Facebook
+  links; `/contact/` forwards to it (8h). The request form went to a future plugin (D19).
+- [x] Songlist: all 108 songs with their artists (5a, on staging).
+- [~] Video: became the Music page (D22, on staging); which videos, and which on Home, is the
+  user's choice (5f).
+- [ ] A way to find a song or video (today: the sidebar search): the sidebar is gone (D22); a
+  search on the Songs page is not decided.
+- [~] The main photos: the 885-pixel photo is used as it is (D23) and web copies are in
+  `data/photos/web/`; a modern format (WebP) is not decided.
 
 From the user's requests (plan step 5):
-- [ ] Songs as data, entered in the admin (5a).
-- [ ] Song requests: a checkbox per song, "select all", a request form, and one-click approval
-  that emails expiring links to the clips (5b, D8).
-- [ ] A private audio clip per song, served only through those links (5c).
-- [ ] Setlist preferences for a gig: chosen songs, and a focus by genre and era (5d); every song
-  tagged with genre and era (5a).
+- [x] Songs as data, entered in the admin (5a).
+- [ ] Song requests with emailed clips (5b, D8): a future plugin (D19), not for go-live.
+- [ ] A private audio clip per song (5c): a future plugin (D19).
+- [ ] Setlist preferences (5d), with genre and era per song: a future plugin (D19); 5a stores
+  only the title and artist.
 
 To decide in the content and design session (plan step 2b):
-- [ ] The Audio page: drop it, or replace it with the request page.
-- [ ] The empty "Audio and Video" page: drop it.
-- [ ] The sidebar: keep or drop.
-- [ ] A site icon and a default sharing image.
+- [x] The Audio page: dropped; Music replaces it, and `/audio/` forwards there (D22, 8h).
+- [x] The empty "Audio and Video" page: dropped (D22).
+- [x] The sidebar: dropped (D22).
+- [~] A site icon and a default sharing image: the sharing image is set in Yoast (step 6); a site
+  icon is not decided.
 
 Fixed by the rebuild (`docs/SITE_CHECKLIST.md`):
-- [ ] Links inside content without the domain written out (D7).
-- [ ] Yoast: describe a person or musician, a sharing image, author archives off.
-- [ ] Old plugin leftovers and revisions not carried over.
+- [ ] Links inside content without the domain written out (D7): checked with the content at step 9.
+- [x] Yoast: an Organization (a musician since 8h, `MusicGroup`), a sharing image, author
+  archives off (step 6).
+- [ ] Old plugin leftovers and revisions not carried over: decided with step 9's choice between
+  updating in place and a fresh install.
