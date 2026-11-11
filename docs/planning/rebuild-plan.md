@@ -56,7 +56,7 @@ new findings added as steps.
 - **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
   confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
-  files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), cache (with Hostinger's CDN,
+  files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
   on for live), and 8h's local structured data. Or
   the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
@@ -1076,6 +1076,15 @@ new findings added as steps.
        checked by the user in the admin and by Claude from outside (staging's then answers 403,
        live's still 200 with 0 bytes; why they differ is not known, and neither shows anything).
      HSTS (3.1) at step 9. Status: `[x]`
+   - **8l. Cache after deploys (2026-11-11):** Claude asked live from outside, read-only, each
+     address twice. Hostinger's CDN keeps no copies of pages (`x-hcdn-cache-status: DYNAMIC`), and
+     no cache plugin is installed, so a deploy shows at once. Static files carry `cache-control:
+     public, max-age=604800`: browsers keep them up to 7 days (the CDN answered `MISS` both
+     times). On the new site that matters only for pictures: its styles come from `theme.json`,
+     written into each page, and WordPress's and the plugins' scripts carry `?ver=` in their
+     address; the logo has none. So a changed picture gets a new file name
+     (`docs/ROUTINES.md`). Measured on the old site; step 9 checks the new one shows `DYNAMIC`
+     too. No page cache unless the speed check (checklist 8.1) asks for one. Status: `[x]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -1091,6 +1100,8 @@ new findings added as steps.
      no account has it;
    - Brevo's Authorized IPs list holds live's server address (8, Brevo), and the old addresses'
      redirects are checked on live (8h);
+   - from outside, the new site's pages answer `x-hcdn-cache-status: DYNAMIC`, so deploys show at
+     once (8l);
    - live gets staging's two server rules (8k): the version files refused at the top of its
      `.htaccess` (a backup first; Wordfence's firewall optimization edits the same file), and
      `wp-content/uploads/.htaccess` with no PHP; both checked from outside as on staging, the
