@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-09T18:25:40-05:00
-current_branch: step-8h-local-visibility
-last_commit: ac353ec
+timestamp: 2026-11-11T08:12:32-05:00
+current_branch: pause-2026-11-11
+last_commit: 2322f28
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -43,34 +43,53 @@ last_work: >
   Failure alerts by Pushover, proven with a planted failure (Brevo's IP blocking): the alert came,
   FluentSMTP kept only the failed request, and sending was restored and checked. Recorded in plan
   step 8, "Brevo setup, where it stands".
+  2026-11-10: the booking subject without the visitor's name and a new "sending failed" message
+  (config/booking-form-messages.json, Mailpit's chaos mode in a test), Brevo's IP blocking on,
+  the monthly site check (docs/ROUTINES.md), the privacy policy naming Brevo, the old addresses'
+  redirects in the child theme (8h, checked on staging), login protection read on both sites
+  (4.3), live's Wordfence reading REMOTE_ADDR. Staging's site-wide password stopped working:
+  hPanel writes SHA-512 entries the server cannot verify (Hostinger confirmed); the user's login
+  and github-check were remade as APR1 lines by hand (3g-1). 8k on staging: the version files
+  refused and no PHP in uploads/ (server rules by hand), the PHP version header removed by the
+  Site Hardening plugin (#27). 2026-11-11: permissions on both sites, wp-config.php 600; D28 (no
+  admin policy of the site's own); 8l (cache: nothing to do); 8h's structured data (MusicGroup
+  with the towns served, #28, checked on staging); 8j settled (Hostinger installs security
+  updates only; the monthly check, step 6, does the rest, staging first, versions matched and
+  checked against tools/versions.sh); Wordfence 9.1.1 on both sites; the weekly versions check
+  (bin/versions-check, .github/workflows/versions.yml; a plugin gets a pull request the user
+  approves with "Approve and run" and merges on GitHub, the theme an issue), proven end to end:
+  #35 raised Contact Form 7 to 6.2.5 on the dev site, merged by the user. Pull requests #25 to
+  #36 merged, each deployed to staging.
 
 next_action: >
-  Ask whether live's Wordfence has moved past 9.0.2, and on which date (the Hostinger timing test,
-  plan 8j, deadline 2026-11-17). Then the rest of step 8, the user choosing the order: 8h's code
-  parts (local structured data, the D22 redirects), the admin pages' policy, the server-level
-  items, the login-limit test on staging (4.3), cache; or the user's 5f choices. Once A is
-  confirmed: the weekly GitHub check of the dev site's pins. Before any test run after switching
-  branches, rebuild the dev site with bin/dev-site (stale bind mounts).
+  The rest of step 8, the checklist items still marked for it (plan Current position, "Next"):
+  debug settings (2.3), FORCE_SSL_ADMIN and the site's options (2.4), the server cron job (2.7),
+  FTP (3.x), pingbacks and staging's discussion settings (4.8), checksums on live (5.4); then an
+  uptime service (optional); or the user's 5f choices. Contact Form 7 6.2.5 not onto staging
+  before 2026-11-17. The local dev site still runs Contact Form 7 6.2.4.1: rebuild it with
+  bin/dev-site before any local test run. Ask whether GitHub's emails for the versions check
+  arrive (the user was to set Watch -> Custom -> Pull requests and Issues).
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
   live_php: 8.4.27
+  live_wp_config: mode 600 on live and staging (2026-11-11)
   staging_php: 8.4.27 (set per website; step 0f corrected)
-  live_plugins: wordfence 9.0.2 (kept for the Hostinger timing test, 8j), wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); updates by Hostinger's Smart auto-updates (8j)
-  live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10)
+  live_plugins: wordfence 9.1.1 (by hand, 2026-11-11), wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); Hostinger's Smart auto-updates set to security updates only for core, themes and plugins on both sites; the rest by hand in the monthly check (8j)
+  live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10); visitors' addresses read from REMOTE_ADDR behind Hostinger's CDN (8i); brute-force limits as on staging, read 2026-11-10
   search_console: Domain property under the business Google account, verified 2026-11-09 by a new google-site-verification TXT record; the other owner is the user's other Google account (the older TXT record); baseline in plan 8h
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
   live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
   live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
-  staging_site: staging.howardbuiemusic.com, site-wide password (hPanel Password Protect Directories; the user's own login and a check-only login for GitHub), Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
+  staging_site: staging.howardbuiemusic.com, site-wide password (one PWPROTECTID block in .htaccess; .htpasswd holds APR1 lines made by hand for the user and github-check, since hPanel's SHA-512 entries are refused; no users added through hPanel until Hostinger fixes it), server rules for the version files (top of .htaccess) and uploads/.htaccess (8k), wp-config.php 600, Wordfence 9.1.1, Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
   staging_mail: FluentSMTP connected to Brevo (sender website@howardbuiemusic.com, log off, failed emails kept anyway); a test arrived in the inbox with SPF, DKIM and DMARC passing (2026-11-09); failure alerts by Pushover, proven with a planted failure; the 2026-11-07 mails had gone through Hostinger's relay into spam, failing DMARC; staging's admin email change to the business Gmail address not confirmed
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
   brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 16 checks; bin/test 5 scenarios + 76 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-09
-  github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only
+  checks: bin/check 16 checks; bin/test 5 scenarios + 83 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-11
+  github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; no open pull requests (checked 2026-11-07)
   commit_identity: GitHub noreply address, set in this repository's git config only
@@ -92,19 +111,14 @@ pending_decisions:
     A memory note on how the user likes explanations (a nutshell first, then plain words): offered
     by Claude on 2026-11-09, not yet answered; nothing written without the user's yes.
   - >
-    The update routine (plan 8j): A chosen, waiting on a test. Live keeps Wordfence 9.0.2 (9.1.0
-    released 2026-11-09, no security fix named) to see when Hostinger updates it; the user looks
-    every few days and notes the date. By 2026-11-17, if still 9.0.2: the user updates by hand,
-    and A gets a reminder in the monthly check, or B is chosen. A security release before then is
-    installed by hand at once.
-  - >
     Optional tidy-up: keep Search Console in the business Google account only (remove the other
     account as owner, then the older google-site-verification TXT record); harmless to leave.
   - Which videos to use, and which one on Home (the user goes through them).
   - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).
   - The new host (step 10, before the Hostinger plan ends in 2028).
-  - Decided when the step is reached, noted in the plan - step 8 (the admin pages' policy, cache, server-level items), step 9 (updating the site in place or a fresh install).
+  - Decided when the step is reached, noted in the plan - step 9 (updating the site in place or a fresh install).
+  - Optional, in the admin: Yoast's Other profiles with the Facebook page, so the page data names it (sameAs; staging now, live at step 9).
 
 open_items:
   - id: 1
@@ -120,9 +134,9 @@ open_items:
     item: >
       Hostinger's Smart auto-updates (hPanel, selected) manage WordPress, themes and plugins, and a
       must-use plugin turns off WordPress's own updates (plan 8j, 2026-11-10; step 0f's "updates
-      only WordPress itself" was wrong). Kept while the site is at Hostinger (D15, D25); A chosen,
-      waiting on the Wordfence timing test on live (deadline 2026-11-17); removed when moving
-      hosts (step 10).
+      only WordPress itself" was wrong), set to security updates only for core, themes and
+      plugins on both sites (settled 2026-11-11); the monthly check installs the rest by hand.
+      Kept while the site is at Hostinger (D15, D25); removed when moving hosts (step 10).
   - id: 4
     item: >
       Settled (plan step 2): music-lite-child is empty; nothing to carry over.
