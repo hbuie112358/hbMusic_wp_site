@@ -70,7 +70,13 @@ new findings added as steps.
   the user; `component-styles.spec.ts` proves where each stylesheet loads, shown failing on four
   planted faults). After its deploy, staging's Home, Music, Songs and About pages need the new
   class names in their content (`site-…` instead of `hb-…`); (3) the type and spacing
-  packages, kept in a git stash meanwhile; (4) buttons, menu and texture, one package at a time,
+  packages as the user approved them (done): text weight 400 and line height 1.6, paragraphs in
+  a new light warm grey (`contrast-soft`, 15.6:1 on black), bold h2s and page titles, the
+  features' headings with a short accent rule, one section spacing (`clamp(56px, 8vw, 96px)`),
+  the features' columns aligned at the top, and the "Over 30 years" text at a 65-character
+  measure through WordPress's own content width (an inner group in the page content, so no CSS
+  overrides the layout); the call-to-action band keeps pure white text (5.3:1; the grey would
+  fall below 4.5:1); (4) buttons, menu and texture, one package at a time,
   each shown to the user in screenshots and checked for accessibility.
 - **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
   on staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home

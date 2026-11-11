@@ -43,6 +43,11 @@
 					"color": "#c9c5bb",
 					"name": "Soft grey",
 					"slug": "accent-6"
+				},
+				{
+					"color": "#e2ded5",
+					"name": "Light warm grey",
+					"slug": "contrast-soft"
 				}
 			]
 		},
@@ -58,14 +63,22 @@
 				"heroTop": "32px",
 				"heroTextBottom": "40px",
 				"titleBottom": "20px",
-				"section": "64px",
-				"cta": "72px",
+				"section": "clamp(56px, 8vw, 96px)",
+				"cta": "clamp(56px, 8vw, 96px)",
+				"featuresGap": "clamp(32px, 6vw, 80px)",
+				"accentRuleGap": "16px",
 				"formField": "18px"
 			},
 			"fontSize": {
 				"heroTitle": "clamp(2.4rem, 5vw, 4rem)",
 				"sectionTitle": "clamp(1.8rem, 3.5vw, 2.6rem)",
+				"featureTitle": "1.55rem",
 				"lead": "1.25rem"
+			},
+			"measure": "65ch",
+			"accentRule": {
+				"width": "32px",
+				"height": "2px"
 			},
 			"radius": "4px",
 			"button": {
@@ -75,7 +88,32 @@
 		}
 	},
 	"styles": {
+		"typography": {
+			"fontWeight": "400",
+			"lineHeight": "1.6"
+		},
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"text": "var(--wp--preset--color--contrast-soft)"
+				}
+			},
+			"core/post-title": {
+				"typography": {
+					"fontWeight": "700",
+					"letterSpacing": "-0.02em",
+					"lineHeight": "1.1"
+				}
+			}
+		},
 		"elements": {
+			"h2": {
+				"typography": {
+					"fontWeight": "700",
+					"letterSpacing": "-0.015em",
+					"lineHeight": "1.15"
+				}
+			},
 			"link": {
 				"color": {
 					"text": "var(--wp--preset--color--accent-3)"

@@ -102,7 +102,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
   rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
   packages; the theme's component list in `functions.php` matching the files in
-  `assets/css/components/`, both ways; ShellCheck on `bin/`; the compose file. Runs every check even
+  `assets/css/components/`, both ways, and every `site-…` component shown on a test page in
+  `tests/dev-content/` (so the browser tests see it); ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.

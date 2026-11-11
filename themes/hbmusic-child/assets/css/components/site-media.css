@@ -3,7 +3,8 @@
  * the page's layout is already the final one.
  */
 
-.site-media-placeholder {
+/* Named with its element, so it outranks theme.json's colour for all paragraphs. */
+p.site-media-placeholder {
 	box-sizing: border-box;
 	display: flex;
 	align-items: center;

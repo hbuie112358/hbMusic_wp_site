@@ -133,6 +133,21 @@ component_styles_match_files() {
   return 1
 }
 
+# Every one of the site's own components (named site-…) appears on the dev site's test pages or in
+# the theme's template parts, so the browser tests (accessibility, policy, debug log) see it; a
+# component only on real pages would go untested. Components named after a WordPress block
+# (buttons) are seen wherever that block is. A class counts by its prefix, so site-media covers
+# site-media-placeholder and site-hero covers site-hero__photo.
+components_shown_on_test_pages() {
+  local theme_dir="$REPO_ROOT/themes/hbmusic-child" component missing=0
+  for component in $(sed -n '/^const HBMUSIC_COMPONENT_STYLES/,/^);/p' "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
+    grep -qE "class=\"[^\"]*\\b$component\\b" "$REPO_ROOT"/tests/dev-content/*.html "$theme_dir"/parts/*.html && continue
+    log "$component appears on no test page (tests/dev-content/) or template part; add a neutral example"
+    missing=1
+  done
+  return "$missing"
+}
+
 # Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint); the
 # container sees only the two files.
 npm_audit() {
@@ -210,6 +225,7 @@ main() {
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "Component stylesheets match their list" component_styles_match_files
+  run_check "Components appear on the test pages" components_shown_on_test_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "CSS (Stylelint)" css_lint
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts

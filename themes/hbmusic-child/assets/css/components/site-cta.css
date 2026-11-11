@@ -12,9 +12,24 @@
 	background: var(--wp--preset--color--accent-2);
 }
 
+/* After a section, the section's own padding already separates them. */
+.site-section + .wp-block-group.site-cta {
+	margin-top: 0;
+}
+
 .site-cta h2 {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);
+	color: var(--wp--custom--color--on-cta);
+}
+
+/*
+ * The band's text keeps the band's colour, over theme.json's paragraph colour, which is meant for
+ * the dark page; centred lines stay short enough to read in one sweep.
+ */
+.site-cta p {
+	max-width: var(--wp--custom--measure);
+	margin-inline: auto;
 	color: var(--wp--custom--color--on-cta);
 }
 
