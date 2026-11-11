@@ -61,6 +61,10 @@ template project starts; until then, a list, not a to-do.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
 - The old-address redirects (plan D22, 8h): the function in the theme's `functions.php` is generic;
   the list `HBMUSIC_OLD_ADDRESSES` is the site's, empty for a new site, filled for a moved one.
+- The page data's organization (8h): `hbmusic_describe_organization()` in the theme writes the
+  type (`MusicGroup` here; a plumber's site would use another schema.org type) and the list
+  `HBMUSIC_AREAS_SERVED`, both the site's; the dev site's stand-in organization in `bin/dev-site`
+  (`DEV_ORGANIZATION_NAME`) is generic.
 
 ## To build in
 

@@ -57,7 +57,8 @@ new findings added as steps.
   confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
   files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
-  on for live), and 8h's local structured data. Or
+  on for live), ~~and 8h's local structured data~~ (built 2026-11-11). Left in step 8: an uptime
+  service (optional). Or
   the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
@@ -977,6 +978,16 @@ new findings added as steps.
        contact can be the website only, but reviews cannot be switched off. Nothing waits on it.
      - **Local structured data:** the page data names a performer and the areas served, added in
        code that extends Yoast's own (its Local SEO add-on is paid), tested on the dev site.
+       **Built 2026-11-11:** Google's LocalBusiness documentation requires only a name and lists no
+       service area (a travelling business's area comes from the Business Profile), so the gain is
+       small; the user chose to build it anyway, as it is cheap and repeats the page text. The
+       child theme's `hbmusic_describe_organization()`, on Yoast's `wpseo_schema_organization`,
+       makes the Organization `["Organization", "MusicGroup"]` (schema.org: also a solo musician)
+       with `areaServed` as two `City` entries from `HBMUSIC_AREAS_SERVED`, keeping Yoast's name,
+       logo and links. Yoast builds the piece only for a company with a name and a logo, so
+       `bin/dev-site` gives the dev site a stand-in. Tested in `seo.spec.ts`, shown to fail with
+       the filter off and with an empty town list. Left: staging's page source checked after the
+       deploy.
      - **The redirects of D22** (`/video/`, `/audio/`, `/contact/`) in code or a free plugin, not
        Yoast Premium's redirect manager. **Built 2026-11-10 (option A, the user):** in the child
        theme, `hbmusic_redirect_old_address()` with the list `HBMUSIC_OLD_ADDRESSES`, a permanent

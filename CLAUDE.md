@@ -69,7 +69,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
   and its "sending failed" message from `config/booking-form-messages.json` (merged into Contact
   Form 7's own messages; staging and live get the same text typed in by hand),
-  test pages (`tests/dev-content/`) and songs with neutral text, a dev admin (`devadmin`, password
+  test pages (`tests/dev-content/`) and songs with neutral text, a stand-in Yoast organization
+  (a neutral name and the theme's logo), a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`). `config/dev-mu-plugins/`, on the dev site only and never
   deployed, sends mail to Mailpit and answers for Cloudflare. Needs no backup, so CI can build it
   too.
