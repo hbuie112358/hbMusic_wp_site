@@ -41,6 +41,9 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 
    A security fix Hostinger installs by itself does not wait for the dev site: closing a hole comes
    first, and the version in `tools/versions.sh` is raised to it afterwards.
+7. **Log into HetrixTools** (the uptime monitor, plan 8m) and glance at the monitor: up, and the
+   certificate and domain dates moving on after each renewal. A free account not logged into for
+   90 days has its monitors stopped.
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
@@ -51,6 +54,8 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
   passwords, and the code is on GitHub.
 - Step 6 keeps the site from falling behind: an old version stops getting fixes, and a later
   security fix may then come only in a newer version that "security updates only" skips.
+- Step 7 keeps the uptime monitor running; without the login it stops silently after 90 days,
+  apart from a warning email.
 
 ## If the test fails
 
@@ -63,6 +68,23 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
   unblock the address, is still to be found on the real screen and written in here.
 - **The email is in spam despite the filter:** it is marked "Not spam", and the Gmail filter
   (`from:website@howardbuiemusic.com`, never spam, label "Booking requests") is checked.
+
+## When HetrixTools sends an alert
+
+- **Site down:** open the site in a browser, on the phone's mobile data as well as at home.
+  - It loads: a short blip or a problem between some networks and the site; the "back up" alert
+    normally follows within minutes. If such alerts repeat, bring them to a session with Claude.
+  - It does not load, or shows an error or a host's page: hPanel first (the website's status,
+    and Hostinger's status page for outages), then Hostinger's support if the cause is theirs.
+    If the site shows its pages but not the words "Howard Buie Music", the monitor's keyword
+    failed: something replaced the page, which is looked at with Claude at once.
+- **Certificate expires in 15 days:** Hostinger's automatic renewal failed. hPanel → the
+  website → SSL shows the certificate's state; Hostinger's support renews it if hPanel cannot.
+- **Domain expires in 15 days:** the automatic renewal failed, most often because of the payment
+  card. hPanel → Domains → renew by hand, and check the card on the account.
+- **Name servers changed** without the user changing them: the domain may have been taken over.
+  Log into Hostinger (password changed if there is any doubt), check the domain's settings, and
+  contact Hostinger's support at once.
 
 ## When GitHub proposes a new plugin version
 
