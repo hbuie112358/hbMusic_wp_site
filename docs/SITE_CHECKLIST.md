@@ -98,7 +98,7 @@ root and `WP_DEBUG_DISPLAY` is off.**
 **2.6 `wp-config.php` is readable only by the site's own account (mode 600 or 640).**
 - Why: other accounts on the server cannot read the credentials.
 - Check: `ls -l` on the server shows mode 600 or 640.
-- Kind: WordPress · Status: planned: step 8 (live and staging).
+- Kind: WordPress · Status: done: 600 on live and staging since 2026-11-11 (8k; it was 644).
 
 **2.7 Wherever something must happen on time (scheduled emails, expiring links, a shop's
 background tasks), WordPress's scheduler is run by a real server cron job (`DISABLE_WP_CRON` and
@@ -144,8 +144,8 @@ version tried on staging first.**
 account.**
 - Why: other processes cannot change site code.
 - Check: `find` for world-writable files on the server returns nothing.
-- Kind: general · Status: partly: the staging folders seen in 3g-2 are 755 and 644; the `find`
-  over both sites at step 8.
+- Kind: general · Status: done: on both sites nothing world-writable or owned by another
+  account, folders 755, files 644, Wordfence's own `wflogs/` files 600 (8k, 2026-11-11).
 
 **3.5 No PHP runs from `wp-content/uploads/`, and SVG uploads are allowed only through a plugin
 that sanitizes them.**

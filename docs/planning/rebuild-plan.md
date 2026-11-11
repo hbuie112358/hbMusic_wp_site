@@ -51,7 +51,8 @@ new findings added as steps.
   hand until Hostinger fixes it (3g-1).
 - **Server hardening (8k, 2026-11-10):** on staging, the version files refused and no PHP in
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
-  Site Hardening plugin. Permissions and HSTS left.
+  Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
+  both. HSTS at step 9.
 - **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
   confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
@@ -1065,7 +1066,15 @@ new findings added as steps.
        refusal, which ends the request), checked on seven kinds of response in
        `tests/scenario/dev-site-hardening.sh`; a server setting (`expose_php`) would not move with
        the code.
-     Left: permissions (2.6, 3.4) by the user over SSH; HSTS (3.1) at step 9. Status: `[~]`
+     - **Permissions (2.6, 3.4), 2026-11-11:** the user ran read-only `find` and `stat` over
+       SSH on both sites, the output masked (`~` for the home folder, `[account]` for the
+       account's name) so it could be pasted: nothing world-writable, nothing owned by another
+       account, every folder 755, every file 644 apart from Wordfence's seven `wflogs/` files at
+       600 (Wordfence's own, stricter); `.htaccess` and `.htpasswd` 644, as the web server must
+       read them. `wp-config.php` was 644; set to 600 by the user, staging first, then live, each
+       checked by the user in the admin and by Claude from outside (staging's then answers 403,
+       live's still 200 with 0 bytes; why they differ is not known, and neither shows anything).
+     HSTS (3.1) at step 9. Status: `[x]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
