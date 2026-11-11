@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "screenshots-fixture",
+    "title": "Screenshots fixture",
+    "template": "",
+    "file": "fixture.html"
+  },
+  {
+    "slug": "screenshots-fixture-two",
+    "title": "Screenshots fixture two",
+    "template": "",
+    "file": "fixture.html"
+  }
+]

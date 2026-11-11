@@ -60,5 +60,9 @@ language: appropriate structure, classes and techniques, enterprise grade, never
 - **Name components by structure, not subject** (`site-hero`, `site-cta`, not `music-hero` or
   `book-band`), so a template serves any kind of site; subject-specific styles live with the
   feature that brings them (the song table's in the Song List plugin).
+- **A visual check must fail on a missing page.** The first screenshot runs "passed" while 20 of
+  24 screenshots showed an error page, matched against an equally broken baseline; each page is
+  now required to answer 200, and outside services are answered locally so a screenshot depends
+  on nothing but the site.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.
