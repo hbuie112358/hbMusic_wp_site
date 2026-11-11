@@ -59,9 +59,10 @@ new findings added as steps.
   9.1.1 on both sites), and the weekly versions check built and proven end to end
   (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
   merged by the user on 2026-11-11, earlier than the week agreed).
-- **Next:** the rest of step 8 (8m): the mail-tester score (11.2), uptime
-  monitoring with certificate and domain alerts (14.1, 14.2), Wordfence's scans and alerts
-  (14.3). Done in 8m on 2026-11-11: 2.2-2.5, 3.8, 4.8, 5.4, 11.3, 11.4. Delete live's wp-config
+- **Next:** the rest of step 8 (8m): uptime monitoring with certificate and domain alerts
+  (14.1, 14.2), and staging's Wordfence alert settings. Done in 8m on 2026-11-11: 2.2-2.5, 3.8,
+  4.8, 5.4, 11.2, 11.3, 11.4, and 14.3 on live (its alerts in spam until step 9, a Gmail filter
+  meanwhile). Delete live's wp-config
   backup in the home folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
   earlier than 2026-11-17, a week after its release. Or
   the user's 5f choices (videos, wording, and from the inventory a song search, WebP photos and
@@ -1181,8 +1182,16 @@ new findings added as steps.
      site's own user, for its own database only (WP-CLI cannot query: `proc_open` is disabled
      at Hostinger). **Checksums (5.4):** WordPress and every WordPress.org plugin verify on both
      sites. **FTP (3.8):** one account, Hostinger's main one (cannot be removed), not used by
-     anything or by the user; its password is SSH's. Left: the mail-tester score (11.2),
-     monitoring (14.1-14.3). Status: `[~]`
+     anything or by the user; its password is SSH's. **Mail score (11.2):** 9.2/10 on
+     mail-tester (FluentSMTP's Email Test from staging through Brevo); DMARC stays `p=none`
+     until a few weeks after go-live. **Wordfence (14.3), on live:** daily scans (last
+     2026-11-10, 0 issues), alerts at every severity to the user's own address; a `wp_mail` test
+     from live (the path Wordfence's alerts take) landed in spam, sent through Hostinger's
+     relay as `wordpress@howardbuiemusic.com`; the user's Gmail filter now keeps that sender out
+     of spam until step 9. A first attempt ran on staging by mistake (a failed `cd`), so a
+     command's site is checked with `wp option get home` first. Left: uptime monitoring with
+     certificate and domain alerts (14.1, 14.2); staging's Wordfence alert settings. Status:
+     `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
@@ -1196,6 +1205,10 @@ new findings added as steps.
      one is short and was in the exposed `local.sql`); once the old account is removed, its name
      goes on Wordfence's list of names blocked at once (8i, login protection), and `admin` too, if
      no account has it;
+   - live's mail through FluentSMTP and Brevo, as staging's; then a `wp_mail` test from live
+     arrives in the inbox without the Gmail filter's help, so Wordfence's alerts are trusted on
+     their own (8m); DMARC goes to `p=quarantine` a few weeks after go-live, once its reports
+     show only the expected senders (11.2);
    - Brevo's Authorized IPs list holds live's server address (8, Brevo), and the old addresses'
      redirects are checked on live (8h);
    - from outside, the new site's pages answer `x-hcdn-cache-status: DYNAMIC`, so deploys show at

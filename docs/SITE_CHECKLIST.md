@@ -548,9 +548,10 @@ visitors' location requires.**
 **11.2 SPF, DKIM and DMARC records for the domain.**
 - Why: stops others from sending mail as the domain.
 - Check: DNS lookups show all three, and a mail-tester scores a test message 9/10 or better.
-- Kind: general · Status: partly: SPF, DKIM (`brevo1`) and DMARC (`p=none`) are in DNS and
-  passed on staging's test message (2026-11-09, plan step 8, Brevo); the mail-tester score at
-  step 8.
+- Kind: general · Status: done (2026-11-11): SPF, DKIM (`brevo1`) and DMARC (`p=none`) in DNS and
+  passing; mail-tester scored staging's message 9.2/10 (sent with FluentSMTP's Email Test through
+  Brevo; the deductions were the test template's HTML). Later, after go-live and a few weeks of
+  DMARC reports showing only Brevo and Hostinger sending as the domain: `p=quarantine`.
 
 **11.3 Domain registration locked, auto-renew on, 2FA on the registrar and DNS accounts.**
 - Why: losing the domain loses the site and its mail.
@@ -656,7 +657,12 @@ only after attempts to misuse it have failed.**
 known-vulnerable plugins.**
 - Why: compromises are found early.
 - Check: scans run on a schedule, the latest result is clean, and alerts go to the user's email.
-- Kind: WordPress · Status: planned: step 8 (Wordfence is installed on live and staging).
+- Kind: WordPress · Status: partly (live, 2026-11-11): Wordfence scans daily at its own time (the last
+  scan 2026-11-10, 0 issues) and emails findings of every severity ("Low") to the user's own
+  address. Live's mail still goes through Hostinger's relay, so a test sent like an alert
+  (`wp_mail`) landed in spam; the user's Gmail filter for `wordpress@howardbuiemusic.com` (never
+  spam) brings the alerts in until step 9 moves live's mail to Brevo. Staging's settings are
+  not checked yet.
 
 **14.4 The PHP error log and the web server log are reviewed after each deployment; between
 deployments, the alerts of 14.1 and 14.3 do the watching.**

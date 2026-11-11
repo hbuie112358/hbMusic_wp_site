@@ -63,7 +63,7 @@ last_work: >
 
 next_action: >
   The rest of step 8, the checklist items still marked for it (plan Current position, "Next"):
-  the mail-tester score (11.2), monitoring (14.1-14.3); 8m did the rest on
+  uptime monitoring (14.1, 14.2) and staging's Wordfence alerts; 8m did the rest on
   2026-11-11. Remind the user to delete ~/wp-config.live-before-2026-11-11.php on the server
   (it holds live's database password) once live has run a few days. Or the user's 5f choices. Contact Form 7 6.2.5 not onto staging
   before 2026-11-17. The local dev site still runs Contact Form 7 6.2.4.1: rebuild it with
