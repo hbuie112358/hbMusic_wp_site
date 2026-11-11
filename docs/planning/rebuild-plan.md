@@ -1050,9 +1050,9 @@ new findings added as steps.
      sets WordPress core, themes and plugins to "Security updates only", on staging and live (seen
      by the user). So Hostinger installs only what it counts as a security fix, and Wordfence 9.1.0
      (no security fix named) was not installed on live in two days (9.0.2, read from outside on
-     2026-11-11). The timing test could never end and is dropped. Whether Customize applies to
-     Smart (it sits beside the Native option on the screen) is not confirmed by Hostinger; the plan
-     assumes it does, the cautious reading. **Chosen (the user): keep "Security updates only"**,
+     2026-11-11). The timing test could never end and is dropped. Customize belongs to Smart: with
+     Native selected, its values change and themes and plugins are not offered at all (seen by the
+     user, nothing saved). **Chosen (the user): keep "Security updates only"**,
      and the monthly check updates the rest by hand, staging first, then live
      (`docs/ROUTINES.md`); not "all updates", which would bring new releases to live without
      staging seeing them first. The weekly GitHub check of the dev site's pins stays planned, as
