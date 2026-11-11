@@ -22,7 +22,7 @@ readonly PARENT_THEME_VERSION="1.5"
 readonly PARENT_THEME_SHA256="f333ce53aaa4049639298247d03480a4bd9b56fa8f0fea0440da262d7d595ba4"
 
 # The booking form's plugin (bin/dev-site, plan step 5e), checked against WordPress.org's checksums.
-readonly CONTACT_FORM_7_VERSION="6.2.4.1"
+readonly CONTACT_FORM_7_VERSION="6.2.5"
 
 # The SEO plugin (bin/dev-site, plan step 6, D25), the version live runs, checked against
 # WordPress.org's checksums.
