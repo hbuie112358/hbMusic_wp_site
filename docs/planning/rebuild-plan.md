@@ -53,7 +53,7 @@ new findings added as steps.
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
   Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
   both. HSTS at step 9.
-- **Next:** the weekly GitHub check of the dev site's pins (8j); Wordfence 9.1.1 on both sites
+- **Next:** the weekly pins check's proof after its merge (8j); Wordfence 9.1.1 on both sites
   since 2026-11-11. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
   files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
@@ -1061,6 +1061,22 @@ new findings added as steps.
      `cacert.pem`), newer than staging's 9.1.0 of the day before, since "Update now" installs the
      newest release; staging then updated to 9.1.1 as well. So the monthly check updates staging
      and live in the same sitting and checks that the versions match first. Status: `[x]`
+     **The weekly pins check (2026-11-11):** the user first questioned it (the monthly check
+     already shows waiting updates), then kept it with several sites in mind, where looking by
+     eye does not scale; it runs on GitHub's clock, with no session and no computer. Design agreed
+     with the user: `bin/pins-check` asks WordPress.org's API (`api.wordpress.org`, its only
+     network destination) for the newest version of each pin; a version must be digits and dots,
+     or the run stops; a release under 7 days old waits (as Dependabot's cooldown). A plugin gets
+     a branch from `main` raising its pin, a pull request, and its tests started with
+     `gh workflow run check.yml`, since GitHub starts no tests for a pull request opened with its
+     own token without an approval click (GitHub's GITHUB_TOKEN docs); the user merges it on
+     GitHub (`docs/ROUTINES.md`). The theme gets an issue only: a SHA-256 computed from the same
+     download would prove nothing. A proposal once opened, even if closed, is not repeated.
+     `.github/workflows/pins.yml` runs it Mondays and by its "Run workflow" button, with the
+     wait as an input. The first real case: Contact Form 7 6.2.5 (2026-11-10). Proof after the
+     merge, since GitHub offers the button only for a workflow on `main`: the theme's pin lowered
+     on a trial branch (an issue expected, then closed), and a run on `main` with no wait (the
+     pull request for 6.2.5, its checks counted for the merge).
    - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
      requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
      dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are

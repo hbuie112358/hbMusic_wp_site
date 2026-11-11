@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Compares the dev site's pinned plugins and theme (tools/versions.sh) with the newest versions on
+# WordPress.org (plan 8j), so the dev site's tests keep testing what staging and live will run.
+#
+#   bin/pins-check          reports what is behind; changes nothing (needs only curl and jq)
+#   bin/pins-check --act    also proposes each change on GitHub (the weekly workflow, pins.yml):
+#                           a plugin as a pull request whose tests it starts, the theme as an
+#                           issue only, since its pin holds a fingerprint taken by hand
+#
+# A release is proposed only once it is PINS_COOLDOWN_DAYS old (default 7): a hijacked release is
+# usually found and pulled within days, the same wait Dependabot keeps here. Security fixes reach
+# staging and live through Hostinger regardless (8j).
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+readonly VERSIONS_FILE="tools/versions.sh"
+readonly API_ROOT="https://api.wordpress.org"
+readonly SECONDS_PER_DAY=86400
+readonly COOLDOWN_DAYS="${PINS_COOLDOWN_DAYS:-7}"
+# What WordPress.org sends is never trusted: a version is digits and dots only, so it cannot carry
+# anything into a branch name, a file or a command.
+readonly VERSION_PATTERN='^[0-9]+(\.[0-9]+){0,3}$'
+
+# kind|WordPress.org slug|variable in tools/versions.sh|name in messages
+readonly PINS=(
+  "plugin|contact-form-7|CONTACT_FORM_7_VERSION|Contact Form 7"
+  "plugin|wordpress-seo|YOAST_SEO_VERSION|Yoast SEO"
+  "theme|twentytwentyfive|PARENT_THEME_VERSION|Twenty Twenty-Five"
+)
+
+log() { printf '%s [pins-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+
+# The newest version and its date, as "version|last_updated". WordPress.org's last_updated is the
+# plugin's latest change, never earlier than the release, so the wait can only come out longer.
+newest_release() {
+  local kind="$1" slug="$2" answer
+  answer="$(curl -fsS --retry 3 --max-time 20 \
+    "$API_ROOT/${kind}s/info/1.2/?action=${kind}_information&request%5Bslug%5D=$slug&request%5Bfields%5D%5Bsections%5D=0")" ||
+    fail "WordPress.org did not answer for $slug"
+  jq -er '[.version, .last_updated] | map(tostring) | join("|")' <<<"$answer" ||
+    fail "WordPress.org's answer for $slug has no version: $(head -c 200 <<<"$answer")"
+}
+
+pinned_version() {
+  local variable="$1" version
+  version="$(sed -nE "s/^readonly $variable=\"([^\"]*)\"$/\1/p" "$REPO_ROOT/$VERSIONS_FILE")"
+  [[ "$version" =~ $VERSION_PATTERN ]] || fail "$VERSIONS_FILE has no usable $variable: '$version'"
+  printf '%s' "$version"
+}
+
+is_newer() { [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n 1)" == "$1" ]]; }
+
+days_since() {
+  local released
+  released="$(date -u -d "$1" +%s)" || fail "WordPress.org's date '$1' cannot be read"
+  printf '%s' $(( ($(date -u +%s) - released) / SECONDS_PER_DAY ))
+}
+
+# Decides one pin; with --act, hands a due one to propose_change.
+check_pin() {
+  local is_acting="$1" kind slug variable name pinned newest updated age
+  IFS='|' read -r kind slug variable name <<<"$2"
+  pinned="$(pinned_version "$variable")"
+  IFS='|' read -r newest updated <<<"$(newest_release "$kind" "$slug")"
+  [[ "$newest" =~ $VERSION_PATTERN ]] || fail "WordPress.org gave $slug the version '$newest'"
+  if [[ "$newest" == "$pinned" ]]; then
+    log "$name: $pinned is current"
+    return 0
+  fi
+  # Older on WordPress.org than here: a release withdrawn, or the plugin closed there.
+  if ! is_newer "$newest" "$pinned"; then
+    log "$name: WordPress.org offers only $newest, older than the pinned $pinned; nothing proposed, worth a look"
+    return 0
+  fi
+  age="$(days_since "$updated")"
+  if (( age < COOLDOWN_DAYS )); then
+    log "$name: $newest is out, $age of $COOLDOWN_DAYS days old; proposed once it is $COOLDOWN_DAYS"
+    return 0
+  fi
+  log "$name: $newest is out ($age days), the dev site pins $pinned"
+  [[ "$is_acting" == "--act" ]] && propose_change "$kind" "$slug" "$variable" "$name" "$pinned" "$newest"
+  return 0
+}
+
+propose_change() {
+  case "$1" in
+    plugin) propose_plugin_pull_request "${@:2}" ;;
+    theme) propose_theme_issue "${@:2}" ;;
+    *) fail "unknown kind $1" ;;
+  esac
+}
+
+# A pull request raising the pin, from main, unless one for this version was ever opened (an open
+# one is waiting; a closed one was declined, and is not proposed again).
+propose_plugin_pull_request() {
+  local slug="$1" variable="$2" name="$3" pinned="$4" newest="$5" branch="pins/$1-$5"
+  if [[ -n "$(gh pr list --head "$branch" --state all --json number --jq '.[].number')" ]]; then
+    log "$name: a pull request for $newest exists already"
+    return 0
+  fi
+  git -C "$REPO_ROOT" fetch --quiet origin main
+  git -C "$REPO_ROOT" switch --quiet -c "$branch" origin/main
+  raise_pin "$variable" "$pinned" "$newest"
+  git -C "$REPO_ROOT" commit --quiet -m "build(dev-site): raise $name to $newest in the dev site's pins" \
+    -m "$(pull_request_text "$name" "$pinned" "$newest")" -- "$VERSIONS_FILE"
+  git -C "$REPO_ROOT" push --quiet origin "$branch"
+  gh pr create --base main --head "$branch" --title "build(dev-site): raise $name to $newest" \
+    --body "$(pull_request_text "$name" "$pinned" "$newest")"
+  # GitHub starts no tests for a pull request opened with its own token; this button does.
+  gh workflow run check.yml --ref "$branch"
+  git -C "$REPO_ROOT" switch --quiet -
+  log "$name: pull request for $newest opened, its tests started"
+}
+
+# Changes exactly the one line, and proves it changed.
+raise_pin() {
+  local variable="$1" pinned="$2" newest="$3"
+  sed -i -E "s/^readonly $variable=\"$pinned\"$/readonly $variable=\"$newest\"/" "$REPO_ROOT/$VERSIONS_FILE"
+  [[ "$(pinned_version "$variable")" == "$newest" ]] || fail "main's $VERSIONS_FILE does not pin $variable at $pinned"
+}
+
+pull_request_text() {
+  printf '%s\n' \
+    "WordPress.org publishes $1 $3; the dev site pinned $2. This raises the pin, so bin/dev-site" \
+    "installs $3 (checked against WordPress.org's checksums) and bin/test runs against it." \
+    "" \
+    "Proposed by the weekly pins check (bin/pins-check, .github/workflows/pins.yml). If the checks" \
+    "pass, \"Rebase and merge\" here; staging and live get $3 in the monthly check (docs/ROUTINES.md," \
+    "step 6). If they fail, the new version breaks something the tests protect: look before" \
+    "updating staging or live."
+}
+
+# An issue only: the theme's pin holds a SHA-256 taken by hand, which a fingerprint computed here
+# from the same download would not prove (tools/versions.sh).
+propose_theme_issue() {
+  local name="$3" pinned="$4" newest="$5" title
+  title="$name $newest is out; the dev site pins $pinned"
+  if [[ -n "$(gh issue list --state all --search "in:title \"$name $newest is out\"" --json title \
+    --jq ".[] | select(.title == \"$title\") | .title")" ]]; then
+    log "$name: an issue for $newest exists already"
+    return 0
+  fi
+  gh issue create --title "$title" --body "$(theme_issue_text "$name" "$pinned" "$newest")"
+  log "$name: issue for $newest opened"
+}
+
+theme_issue_text() {
+  printf '%s\n' \
+    "WordPress.org publishes $1 $3; the dev site pins $2 (tools/versions.sh)." \
+    "" \
+    "Not raised automatically: the pin includes the zip's SHA-256, taken when a version is chosen and" \
+    "compared with WordPress.org's theme repository (tools/versions.sh). Raise it in a session with" \
+    "Claude: download, compare, record the new SHA-256, then bin/dev-site and bin/test." \
+    "" \
+    "Opened by the weekly pins check (bin/pins-check, .github/workflows/pins.yml)."
+}
+
+main() {
+  local is_acting="${1:-}" pin
+  [[ -z "$is_acting" || "$is_acting" == "--act" ]] || fail "unknown option $is_acting (only --act)"
+  [[ "$COOLDOWN_DAYS" =~ ^[0-9]+$ ]] || fail "PINS_COOLDOWN_DAYS must be a whole number of days: '$COOLDOWN_DAYS'"
+  for pin in "${PINS[@]}"; do
+    check_pin "$is_acting" "$pin"
+  done
+}
+
+main "$@"
