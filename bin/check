@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Runs every check the project's code must pass (plan step 3d): installing the tools at the
 # versions in composer.lock, Composer's own validation and its security audit, the WordPress
-# Coding Standards (PHPCS), static analysis (PHPStan), ShellCheck on the scripts, and the
-# compose file. All tools run in pinned containers; nothing is installed on the host.
+# Coding Standards (PHPCS), static analysis (PHPStan), the CSS (Stylelint, D29), ShellCheck on
+# the scripts, and the compose file. All tools run in pinned containers; nothing is installed on the host.
 # Every check runs even after a failure, so one run shows everything; the exit status is 1 if
 # any check failed.
 set -Euo pipefail
@@ -114,12 +114,27 @@ theme_json_schema_matches_wordpress() {
   return 1
 }
 
-# Known vulnerabilities in the browser-test packages; the container sees only the two files.
+# Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint); the
+# container sees only the two files.
 npm_audit() {
+  local package_dir="$1"
   docker run --rm -w /npm \
-    -v "$REPO_ROOT/tests/e2e/package.json:/npm/package.json:ro" \
-    -v "$REPO_ROOT/tests/e2e/package-lock.json:/npm/package-lock.json:ro" \
+    -v "$REPO_ROOT/$package_dir/package.json:/npm/package.json:ro" \
+    -v "$REPO_ROOT/$package_dir/package-lock.json:/npm/package-lock.json:ro" \
     "$PLAYWRIGHT_IMAGE" npm audit --package-lock-only --audit-level=low
+}
+
+# Lints every CSS file of the themes and plugins (plan D29). The linter's folder is writable for
+# npm's node_modules (ignored by git); the code it checks is read-only and mounted outside it, so
+# Docker creates no mount folders inside tools/. An empty set passes, so a theme without
+# stylesheets is not an error.
+css_lint() {
+  docker run --rm -w /lint \
+    -v "$REPO_ROOT/tools/css-lint:/lint" \
+    -v "$REPO_ROOT/themes:/src/themes:ro" \
+    -v "$REPO_ROOT/plugins:/src/plugins:ro" \
+    -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install stylelint --config /lint/stylelint.config.mjs --allow-empty-input "/src/**/*.css"'
 }
 
 # The GitHub workflows (.github/workflows/), checked before they are pushed: a broken workflow
@@ -165,7 +180,8 @@ main() {
   run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
   run_check "Composer validation" in_composer composer validate --strict --no-check-publish
   run_check "Composer security audit" in_composer composer audit --no-interaction
-  run_check "npm security audit (browser tests)" npm_audit
+  run_check "npm security audit (browser tests)" npm_audit tests/e2e
+  run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
   run_check "WordPress Coding Standards (Song List plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/song-list/phpcs.xml.dist --basepath=plugins/song-list plugins/song-list
   run_check "WordPress Coding Standards (Site Hardening plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/site-hardening/phpcs.xml.dist --basepath=plugins/site-hardening plugins/site-hardening
@@ -175,6 +191,7 @@ main() {
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "TypeScript (browser tests)" typescript_check
+  run_check "CSS (Stylelint)" css_lint
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
   run_check "Compose file" compose_file_is_valid

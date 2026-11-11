@@ -68,3 +68,23 @@ updates:
     commit-message:
       prefix: "build"
       include: "scope"
+
+  # The CSS linter (tools/css-lint/package.json and its lock file, plan D29).
+  - package-ecosystem: "npm"
+    directory: "/tools/css-lint"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/New_York"
+    cooldown:
+      default-days: 7
+    # Stylelint, its standard configuration and the formatting plugin are released in step and
+    # must agree on Stylelint's major version, so they are tried together.
+    groups:
+      css-lint-tools:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "build"
+      include: "scope"

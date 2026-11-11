@@ -345,7 +345,8 @@ custom CSS only where these cannot do it.**
 - Why: consistent, reviewable code; the standards include security rules.
 - Check: PHP_CodeSniffer with WPCS passes with no errors.
 - Kind: WordPress · Status: in force for the project's PHP since 3d (`bin/check`); the theme
-  from step 4.
+  from step 4; CSS since 2026-11-11 (Stylelint in `bin/check`, with the WordPress CSS
+  standards' formatting rules, plan D29). No JavaScript of the site's own yet.
 
 **6.3 All output is escaped late, with the function for its context (`esc_html`, `esc_attr`,
 `esc_url`, `wp_kses_post`).**

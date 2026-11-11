@@ -98,7 +98,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
   ruleset), and checks that plugins name nothing of this site and that each declares
   `Update URI: false`; `theme.json`'s schema matching
-  the pinned WordPress; ShellCheck on `bin/`; the compose file. Runs every check even
+  the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
+  rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
+  packages; ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
@@ -110,8 +112,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   pull request raising its pin; the theme gets an issue only. The user clicks "Approve and run"
   on the pull request, which GitHub requires before testing a pull request its own token opened,
   and merges it on GitHub once its checks pass (`docs/ROUTINES.md`).
-- `bin/tools-update`: the deliberate way to update the tools, `composer.lock` and
-  `tests/e2e/package-lock.json`; then `bin/check`, review the lock files' diff, commit.
+- `bin/tools-update`: the deliberate way to update the tools, `composer.lock`,
+  `tests/e2e/package-lock.json` and `tools/css-lint/package-lock.json` (npm only from releases
+  at least 7 days old, install scripts off); then `bin/check`, review the lock files' diff,
+  commit.
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
   theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
   differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling of
