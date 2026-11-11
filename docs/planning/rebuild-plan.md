@@ -44,8 +44,8 @@ new findings added as steps.
   the merge), Brevo's IP blocking on; on staging, the same text, a real request in the inbox
   without the visitor's name in the subject, and a Gmail filter; the monthly site check
   (`docs/ROUTINES.md`) and the privacy policy naming Brevo. The mail setup is done.
-- **Updates (8j, 2026-11-10):** Hostinger manages all updates; A chosen, waiting on a test of
-  Hostinger's timing with Wordfence 9.1.0 on live, deadline 2026-11-17.
+- **Updates (8j, settled 2026-11-11):** Hostinger installs security updates only (hPanel, both
+  sites); the monthly check installs the rest by hand, staging first. The timing test is dropped.
 - **Staging's site-wide password (2026-11-10):** it stopped accepting logins because hPanel
   writes password entries the server cannot verify; fixed by hand, and users are added only by
   hand until Hostinger fixes it (3g-1).
@@ -53,8 +53,8 @@ new findings added as steps.
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
   Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
   both. HSTS at step 9.
-- **Next:** the Wordfence timing test on live runs by itself until 2026-11-17 (8j); once A is
-  confirmed, the weekly GitHub check of the dev site's pins. Done 2026-11-10: login protection on
+- **Next:** live's Wordfence to 9.1.0 by hand (8j); the weekly GitHub check of the dev site's
+  pins. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
   files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
   on for live), ~~and 8h's local structured data~~ (built 2026-11-11). Left in step 8: an uptime
@@ -986,8 +986,10 @@ new findings added as steps.
        with `areaServed` as two `City` entries from `HBMUSIC_AREAS_SERVED`, keeping Yoast's name,
        logo and links. Yoast builds the piece only for a company with a name and a logo, so
        `bin/dev-site` gives the dev site a stand-in. Tested in `seo.spec.ts`, shown to fail with
-       the filter off and with an empty town list. Left: staging's page source checked after the
-       deploy.
+       the filter off and with an empty town list. Staging's page source checked by the user after
+       the deploy (2026-11-11): the types, the real name and logo, both towns. No `sameAs` yet:
+       Yoast's "Other profiles" can add the Facebook page, in the admin (optional; on live at
+       step 9).
      - **The redirects of D22** (`/video/`, `/audio/`, `/contact/`) in code or a free plugin, not
        Yoast Premium's redirect manager. **Built 2026-11-10 (option A, the user):** in the child
        theme, `hbmusic_redirect_old_address()` with the list `HBMUSIC_OLD_ADDRESSES`, a permanent
@@ -1043,7 +1045,18 @@ new findings added as steps.
      once. A, once confirmed: Hostinger updates both sites; a weekly GitHub check compares the dev
      site's pins (`tools/versions.sh`) with WordPress.org and opens an issue when one is behind; the
      monthly check (`docs/ROUTINES.md`) adds a look at live's Plugins page for an update waiting
-     more than a week or two. Status: `[~]`
+     more than a week or two.
+     **Settled 2026-11-11, replacing the timing test:** under Smart auto-updates, hPanel's Customize
+     sets WordPress core, themes and plugins to "Security updates only", on staging and live (seen
+     by the user). So Hostinger installs only what it counts as a security fix, and Wordfence 9.1.0
+     (no security fix named) was not installed on live in two days (9.0.2, read from outside on
+     2026-11-11). The timing test could never end and is dropped. Whether Customize applies to
+     Smart (it sits beside the Native option on the screen) is not confirmed by Hostinger; the plan
+     assumes it does, the cautious reading. **Chosen (the user): keep "Security updates only"**,
+     and the monthly check updates the rest by hand, staging first, then live
+     (`docs/ROUTINES.md`); not "all updates", which would bring new releases to live without
+     staging seeing them first. The weekly GitHub check of the dev site's pins stays planned, as
+     the early notice. Live's Wordfence goes to 9.1.0 by hand now, as staging did. Status: `[x]`
    - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
      requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
      dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are

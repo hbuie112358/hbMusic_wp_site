@@ -21,6 +21,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    Export File. The file goes into the project's `data/exports/`, named with the date
    (for example `2026-12-01-content.xml`). The originals of new photos go into `data/photos/`.
 5. **The data folder's off-computer copy** is brought up to date.
+6. **Updates (plan 8j):** live's Plugins page (and Appearance → Themes, and Dashboard → Updates
+   for WordPress itself). Hostinger installs only security updates; anything else waiting is
+   installed by hand, **on staging first**: update there, open the pages and log in (with
+   two-factor), and only then update live the same way and look at its pages.
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
@@ -29,6 +33,8 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 - The test also uses Brevo's API key every month. The key expires after 90 days without use.
 - Step 4 is the off-site copy D27 chose instead of a backup plugin: the content holds no keys or
   passwords, and the code is on GitHub.
+- Step 6 keeps the site from falling behind: an old version stops getting fixes, and a later
+  security fix may then come only in a newer version that "security updates only" skips.
 
 ## If the test fails
 
