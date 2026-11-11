@@ -94,7 +94,7 @@ From the content:
 - [~] Video: became the Music page (D22, on staging); which videos, and which on Home, is the
   user's choice (5f).
 - [ ] A way to find a song or video (today: the sidebar search): the sidebar is gone (D22); a
-  search on the Songs page is not decided.
+  search on the Songs page comes after go-live (the user, 2026-11-11).
 - [~] The main photos: the 885-pixel photo is used as it is (D23) and web copies are in
   `data/photos/web/`; a modern format (WebP) is not decided.
 
