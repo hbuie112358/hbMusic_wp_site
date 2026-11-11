@@ -72,28 +72,36 @@ store. Never in mail, chat or the repository.**
 **2.2 `DISALLOW_FILE_EDIT` set to `true`.**
 - Why: a stolen admin login cannot then edit PHP from the dashboard.
 - Check: Appearance → Theme File Editor and Plugins → Plugin File Editor are absent.
-- Kind: WordPress · Status: partly: set on the dev site (`compose.dev.yaml`); live and staging
-  checked at step 8.
+- Kind: WordPress · Status: done: set on the dev site (`compose.dev.yaml`), and on staging and
+  live since 2026-11-11 (`wp config set`; both report `true`, and live refuses
+  `theme-editor.php`). On live the line first landed inside a comment the old site had left
+  open (`/*define( 'WP_ENVIRONMENT_TYPE', 'local' );`), so it had no effect until those two old
+  lines became `//` comments (plan 8m).
 
 **2.3 `WP_DEBUG` off in production; if logging is needed, `WP_DEBUG_LOG` writes outside the web
 root and `WP_DEBUG_DISPLAY` is off.**
 - Why: error output reveals paths and code to visitors.
 - Check: a missing page and every template show no PHP notice, and the debug log, if any, is
   outside the web root.
-- Kind: WordPress · Status: partly: no PHP error text on the live site's public pages (0f); the
-  settings themselves checked at step 8.
+- Kind: WordPress · Status: done: `WP_DEBUG` off on staging and live, no `debug.log` or `error_log` in
+  either web folder (2026-11-11); no PHP error text on the live site's public pages (0f).
 
 **2.4 `FORCE_SSL_ADMIN` on; `siteurl` and `home` use `https://`.**
 - Why: logins and cookies never travel unencrypted.
 - Check: both options start with `https://`, and an `http://` request to `/wp-admin/` is
   redirected to `https://`.
-- Kind: WordPress · Status: partly: `http://` is redirected on live and staging (3g-1); the
-  setting and the options checked at step 8.
+- Kind: WordPress · Status: done in effect: `siteurl` and `home` are `https://` on staging and live
+  (2026-11-11), and the server forwards every `http://` request to `https://` (3g-1).
+  `FORCE_SSL_ADMIN` deliberately not set (the user, 2026-11-11): it adds little behind that
+  forward, and behind Hostinger's CDN on live it could lock the admin in a redirect loop if
+  WordPress did not see the request as HTTPS.
 
 **2.5 The database user has rights to this site's database only, with a long random password.**
 - Why: a compromise of the site does not reach other databases.
 - Check: `SHOW GRANTS` for the user lists this site's database only.
-- Kind: general · Status: planned: step 8 (live and staging).
+- Kind: general · Status: done: each site's database has its own user, listed for that database
+  only (hPanel, the user, 2026-11-11); live's password was replaced in 0d, staging's was made by
+  the installer (3g-1).
 
 **2.6 `wp-config.php` is readable only by the site's own account (mode 600 or 640).**
 - Why: other accounts on the server cannot read the credentials.
@@ -183,9 +191,12 @@ unique and used for nothing else, and every key is restricted to its task (13.5)
   the plan, so its password and its keys are the keys to all of them.
 - Check: an FTP connection is refused or no FTP account is in use, the SSH password meets the
   rule, and `authorized_keys` holds only restricted keys.
-- Kind: general · Status: partly: Hostinger cannot disable SSH password logins or limit them by
-  address, so the password was made long and unique, and the only key is restricted (3g-2); FTP
-  checked at step 8.
+- Kind: general · Status: done as far as the host allows: Hostinger cannot disable SSH password
+  logins or limit them by address, so the password was made long and unique, and the only key is
+  restricted (3g-2). FTP (2026-11-11): one account, Hostinger's main one, which comes with the
+  plan and cannot be removed; nothing uses it (deploys and checks go over SSH, edits through
+  hPanel's File Manager over HTTPS; the user confirmed not using FTP). Its password is the SSH
+  password. If FTP is ever needed: SFTP over SSH, or FTPS, never plain FTP.
 
 **3.9 Every copy of the site other than live (staging, previews, tests) sits behind a site-wide
 password at the server, in front of WordPress, from the moment it is created; it has no second,
@@ -256,8 +267,10 @@ plan.**
 - Why: each one is a door for spam and attacks that nobody watches.
 - Check: Settings → Discussion and Settings → General show them off, and a pingback to the site
   is refused.
-- Kind: WordPress · Status: partly: on live, comments are closed by default and registration is
-  off (step 2); pingbacks and staging checked at step 8.
+- Kind: WordPress · Status: done: registration off on both; on staging and live new posts get no
+  comments and no pingbacks, and the sites send none (`default_comment_status` and
+  `default_ping_status` closed, `default_pingback_flag` 0, 2026-11-11); XML-RPC refused on
+  staging (8a) and on live with the Site Hardening plugin at step 9.
 
 **4.9 Before a site is handed over, the provider and the customer agree in writing who may change
 what: content (usually the customer, with the Editor role), plugins, themes, settings and updates
@@ -303,8 +316,11 @@ must survive a theme change), never in the parent theme or core.**
 - Why: updates never overwrite the site's work.
 - Check: `wp core verify-checksums` and `wp plugin verify-checksums --all` report no changed
   files.
-- Kind: WordPress · Status: planned: the child theme at step 4, the site plugin at 5a, the
-  checksums at step 8 and after go-live.
+- Kind: WordPress · Status: done: the site's changes are in the child theme (step 4) and the two
+  plugins (5a, 8a), whose deployed files are compared with the repository on every deploy
+  (3g-3); WordPress's own files and every plugin from WordPress.org verify against their
+  checksums on staging and live (`wp core|plugin verify-checksums`, 2026-11-11). Again after
+  go-live.
 
 **5.5 After every new install, and whenever the host changes something, the plugins, the
 must-use plugins (`wp-content/mu-plugins/`, which the plugin list does not show) and the themes
@@ -540,13 +556,20 @@ visitors' location requires.**
 - Why: losing the domain loses the site and its mail.
 - Check: the registrar shows the lock and auto-renew on, and both accounts ask for a second
   factor at login.
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: done (2026-11-11): registered at Hostinger, transfer lock on
+  (`clientTransferProhibited`), auto-renewal on (expiry 2027-04-16), privacy protection on, and
+  two-factor login on the Hostinger account, which holds the domain and its DNS.
 
 **11.4 A CAA record naming the certificate authority in use; DNSSEC where the registrar offers it
 as a setting.**
 - Why: limits who can issue certificates; protects DNS answers.
 - Check: DNS lookups show the CAA record (and DNSSEC where offered).
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: decided (2026-11-11): **no CAA record**, on Hostinger's advice: its SSL
+  and CDN publish no fixed certificate authority, and a restrictive record could stop automatic
+  renewal. **DNSSEC not possible with Hostinger's DNS:** its nameservers publish no keys and no
+  signatures for the zone (checked from outside), so there are no DS values to enter, and a
+  guessed DS record would make the domain stop resolving. Looked at again with the move to a
+  new host or DNS provider (step 10).
 
 ## 12. Backups and recovery
 
@@ -625,7 +648,9 @@ only after attempts to misuse it have failed.**
 **14.2 Alerts for certificate and domain expiry.**
 - Why: expiry takes the site down without warning.
 - Check: the monitor lists the certificate and the domain with their expiry dates.
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: partly: the dates are known (2026-11-11): the domain expires 2027-04-16
+  with auto-renewal on; the Let's Encrypt certificates (live to 2027-01-03, staging to
+  2027-02-01) are renewed by Hostinger. The alert comes with the uptime monitor (14.1).
 
 **14.3 Security scanning (Wordfence or the host's) with alerts for changed core files and
 known-vulnerable plugins.**
