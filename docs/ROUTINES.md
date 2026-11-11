@@ -42,4 +42,12 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 - **The email is in spam despite the filter:** it is marked "Not spam", and the Gmail filter
   (`from:website@howardbuiemusic.com`, never spam, label "Booking requests") is checked.
 
+## When replacing a picture
+
+A changed picture gets a **new file name** (for example `howard-buie-logo-2027.png`), never the old
+name over the old file. Visitors' browsers keep pictures for up to 7 days (the server's
+`cache-control`, plan 8l), so under the old name some visitors would still see the old picture
+for a week. Pages, styles and scripts need nothing: they arrive fresh or carry a version in their
+address.
+
 Claude helps with any of these when the user brings the symptom to a session.
