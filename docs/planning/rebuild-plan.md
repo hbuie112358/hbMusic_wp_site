@@ -53,13 +53,17 @@ new findings added as steps.
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
   Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
   both. HSTS at step 9.
-- **Next:** the versions check's last proof (8j): its pull request for Contact Form 7 6.2.5,
-  approved and tested, merged by the user from 2026-11-17; Wordfence 9.1.1 on both sites
-  since 2026-11-11. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
-  staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
-  files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
-  on for live), ~~and 8h's local structured data~~ (built 2026-11-11). Left in step 8: an uptime
-  service (optional). Or
+- **Done 2026-11-11:** 8k's permissions (`wp-config.php` 600 on both sites), D28 (no admin
+  policy of the site's own), 8l (cache: nothing to do), 8h's structured data (checked on
+  staging), 8j settled (security updates by Hostinger, the rest in the monthly check; Wordfence
+  9.1.1 on both sites), and the weekly versions check built and proven end to end
+  (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
+  merged by the user on 2026-11-11, earlier than the week agreed).
+- **Next:** the rest of step 8, the checklist items still marked for it: the debug settings
+  (2.3), `FORCE_SSL_ADMIN` and the site's options (2.4), the server cron job (2.7), FTP (3.x),
+  pingbacks and staging's discussion settings (4.8), checksums on live (5.4); then an uptime
+  service (optional). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
+  earlier than 2026-11-17, a week after its release. Or
   the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
