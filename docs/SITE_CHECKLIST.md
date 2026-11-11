@@ -442,8 +442,10 @@ below-the-fold images lazy-loaded.**
 - Why: images are most of a music site's weight.
 - Check: PageSpeed Insights reports no oversized or old-format images, and the page source shows
   width, height and lazy loading where expected.
-- Kind: general · Status: planned: with the content (the inventory found photos up to 12 MB and
-  photos saved as PNG, step 2).
+- Kind: general · Status: partly: the old site's photos (up to 12 MB, some saved as PNG, step 2)
+  are not carried over; the new site's one photo is a 55 KB JPEG, resized at 2b, so WebP would
+  gain nothing visible (plan 5f, 2026-11-11). Width, height and lazy loading are checked in the
+  page source with the speed check (8.1) before go-live.
 
 **8.3 Page caching on the server, except for pages with forms (or their nonce is refreshed when
 the page loads) and, on a shop, the cart, checkout and account pages; browser caching headers on

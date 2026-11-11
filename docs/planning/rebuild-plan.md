@@ -63,8 +63,8 @@ new findings added as steps.
   (14.1, 14.2: the alert proven through Pushover; certificate and domain expiry warned 15 days
   ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
   spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
-- **Next:** the rest of 5f, the user's choices (videos, wording, and from the inventory WebP
-  photos and a site icon); 5f's pages are on staging. Delete live's wp-config backup in the home
+- **Next:** the rest of 5f, the user's choices: the videos and the wording (the site icon set on
+  staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home
   folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs)
   no earlier than 2026-11-17, a week after its release.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
@@ -193,7 +193,8 @@ new findings added as steps.
      Design changes go through the theme's files; a Site Editor trial is copied into them and reset.
    - **The user's answers (2026-11-07):** all kinds of events are welcome; the area stays as in D22;
      no testimonials for now (the user may check Facebook for some later); the user chooses the
-     videos later; a newer photo is coming; the email address stays, and no phone number is shown.
+     videos later; a newer photo is coming (corrected 2026-11-11: there is none; the site keeps its
+     one photo, 5f); the email address stays, and no phone number is shown.
      The Book page's form (5e) emails the user when a visitor sends it, beside the address and
      Facebook link.
    - **Done 2026-11-07:** the pages (D22) and the look (D23). Not versioned: web-sized images in
@@ -595,10 +596,17 @@ new findings added as steps.
      user can swap it; the logo ships with the theme (`patterns/site-logo.php`). The policy allows
      YouTube frames. The dev site has neutral pages with the same layouts
      (`tests/dev-content/`), and tests check the logo and one main heading per page; each shown to
-     fail on a planted fault. Left: the import on staging, the user's video choices (Home and
-     Music), the wording, and the form in place of its stand-in (5e). Once a real video is on
-     staging's Music page, the browser console is checked there for policy violations, since
-     YouTube was not yet exercised on staging (8a). Status: `[~]`
+     fail on a planted fault. Since done: the import on staging, and the form in place of its
+     stand-in (5e). **2026-11-11:** WebP not needed (the inventory's item, checklist 8.2): the
+     new site uses one photo, `howard-buie-guitar.jpg`, already 55 KB after 2b's resizing, and no
+     other is coming; a photo added later is resized before upload (`docs/ROUTINES.md`, "When
+     replacing a picture"). **The site icon:** the logo without its web address, which a 32-pixel
+     tab turns into a smudge (`data/photos/web/howard-buie-icon-696.png`, 696 × 696, transparent
+     corners), chosen by the user from tab-size previews; set on staging under Settings → General
+     → Site Icon and seen in the tab by the user; live at step 9. Left: the user's video choices
+     (Home and Music) and the wording. Once a real video is on staging's Music page, the browser
+     console is checked there for policy violations, since YouTube was not yet exercised on
+     staging (8a). Status: `[~]`
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
      date and message, sent to the user. The form tool is chosen at this step; a maintained
      ready-made plugin first. Needs spam protection, a privacy policy page and a way to test
@@ -1269,6 +1277,8 @@ new findings added as steps.
    - the Site Hardening plugin through the pipeline (a live destination, as 8a's), activated, and
      checked as on staging: the headers, `xmlrpc.php` 403, and the browser console on the pages,
      logged out and logged in; avatars off (Settings → Discussion → "Show Avatars", 8e);
+   - the site icon from `data/photos/web/howard-buie-icon-696.png` (Settings → General → Site
+     Icon, 5f), seen in the browser tab afterwards;
    - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
      which is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
