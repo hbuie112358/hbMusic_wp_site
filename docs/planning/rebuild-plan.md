@@ -77,7 +77,24 @@ new findings added as steps.
   measure through WordPress's own content width (an inner group in the page content, so no CSS
   overrides the layout); the call-to-action band keeps pure white text (5.3:1; the grey would
   fall below 4.5:1); (4) buttons, menu and texture, one package at a time,
-  each shown to the user in screenshots and checked for accessibility.
+  each shown to the user in screenshots and checked for accessibility. **Paused after (3),
+  2026-11-11** (commits d3710e9, 1a0d2f6, 9c69c78 on the branch, not pushed). **Next:** package 3,
+  the buttons: a soft glow in the button's own colour, a hairline highlight along the top edge,
+  a 1-pixel lift on hover with a stronger glow (150 ms, off under `prefers-reduced-motion`), and a
+  green `:focus-visible` ring (checklist 7.2); equal sizes are done. Then package 4 (menu links
+  slightly bolder with a green underline on hover, the current page marked, a hairline under the
+  header, the black strip under the green band on pages like About), then package 5 (a "stage
+  light" glow behind the hero photo, which also hides the photo's dark-grey edge, and a fine grain
+  at about 4% on the hero, features and call-to-action bands, from a small noise image in the
+  theme; `img-src 'self'` allows it). **One push at the end** (the user's preference for a single
+  staging update): after the deploy, staging's Home, Music, Songs and About get their content
+  with the new class names, Home from its own code in the editor (to keep its photo). The helper
+  scripts (screenshots, pixel comparison, preview pages with the real text) are in
+  `data/dev-tools/` (not versioned); a versioned `bin/screenshots` for before/after comparison is
+  a possible later step (the user, option B, not now). Also for 5f: the hero photo's description
+  for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
+  import file; and possibly the photo's background made pure black. Later, after this work: the
+  global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).
 - **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
   on staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home
   folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs)
