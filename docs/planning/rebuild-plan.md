@@ -65,8 +65,8 @@ new findings added as steps.
   meanwhile). Delete live's wp-config
   backup in the home folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
   earlier than 2026-11-17, a week after its release. Or
-  the user's 5f choices (videos, wording, and from the inventory a song search, WebP photos and
-  a site icon); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
+  the user's 5f choices (videos, wording, and from the inventory WebP photos and a site icon);
+  the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
@@ -74,7 +74,7 @@ new findings added as steps.
   support answered):** the rest of 8, with the mail service (8) when Brevo authenticates → the
   rest of 5e → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
-  preferences plugin (5d). **The template (D21)** starts when a second site has a date.
+  preferences plugin (5d); a search on the Songs page (the user, 2026-11-11: after go-live). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
   - the new host (step 10, before 2028-07-16).
 - **Site checklist (D16):** `docs/SITE_CHECKLIST.md` (named `BEST_PRACTICES.md` until
@@ -615,7 +615,9 @@ new findings added as steps.
      (2026-11-07), with the user's real Turnstile keys: the widget stays hidden unless needed (the
      visible "Success" read as if the request had been sent), the spam check passed and the form
      reported the message sent, but no mail reached the user, as the server's own mail is unreliable
-     (Findings). Left: real delivery, with step 8's mail service. Status: `[~]`
+     (Findings). Left: real delivery, with step 8's mail service. **Done 2026-11-10:** staging
+     sends through Brevo (D24), a real request arrived in the inbox without the visitor's name in
+     the subject, and a failed send raises a Pushover alert (step 8, Brevo). Status: `[x]`
    - **Future plugins (D19), not needed for go-live:** 5b and 5c are one clip request plugin; 5d
      is the setlist preferences plugin. Their descriptions below are kept as their design.
      Clips would be short compressed MP3s (about 240-320 KB for 20 seconds).
