@@ -6,3 +6,27 @@
 .site-features {
 	background: var(--wp--preset--color--accent-4);
 }
+
+/* Room between the points, growing with the screen. */
+.site-features .wp-block-columns {
+	column-gap: var(--wp--custom--spacing--features-gap);
+}
+
+/* Each point's heading: a step above its text, so the points scan at a glance. */
+.site-features h3 {
+	margin-top: 0;
+	font-size: var(--wp--custom--font-size--feature-title);
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+
+/* A short rule in the accent colour above each heading ties the points together visually. */
+.site-features h3::before {
+	display: block;
+	width: var(--wp--custom--accent-rule--width);
+	height: var(--wp--custom--accent-rule--height);
+	margin-bottom: var(--wp--custom--spacing--accent-rule-gap);
+	content: "";
+	background: var(--wp--preset--color--accent-1);
+}

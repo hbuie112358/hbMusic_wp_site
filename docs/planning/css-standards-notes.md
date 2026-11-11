@@ -45,6 +45,13 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   (`.wp-block-group.site-section`, `.wp-block-button .wp-block-button__link`): two classes win
   at any load order. The reason is commented where it applies, so the extra class is not taken
   for carelessness.
+- **Site-wide rules belong to the platform's global styles; components carve out exceptions.**
+  The paragraph colour is one theme.json setting for every paragraph; the call-to-action band and
+  the media placeholder set their own, each saying why. A component that re-declares the global
+  colour for its own paragraphs would scatter one decision across many files.
+- **Layout constraints use the framework's layout settings.** A reading measure is a constrained
+  group with the measure token as its content width (WordPress generates the rule), not a
+  max-width fighting the layout's own margins.
 - **Every registry is checked against what it lists.** A list of components that load by name
   fails silently when a name and a file drift apart; `bin/check` compares them both ways.
 - **A restructuring is proven by pixel comparison.** Reference screenshots of every page at two

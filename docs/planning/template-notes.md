@@ -65,7 +65,12 @@ template project starts; until then, a list, not a to-do.
   `site-media-placeholder`, buttons, forms), using only the tokens, so they fit any relatively
   static site without commerce; their loader `HBMUSIC_COMPONENT_STYLES` in `functions.php` (block
   → components) and `component-styles.spec.ts`. A subject's own styles go with the feature that
-  brings them (the song table's in the Song List plugin).
+  brings them (the song table's in the Song List plugin). Every `site-…` component has a neutral
+  example on the dev site's test pages, which `bin/check` enforces.
+- A comfortable line length for text: an inner group whose content width is the measure token,
+  justified left (no CSS needed; WordPress generates the rule). The example is in
+  `tests/dev-content/home.html`; in a block comment, `--` is written `--`, as WordPress's
+  editor saves it.
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.
