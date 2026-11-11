@@ -1,0 +1,10 @@
+{
+	"name": "site-css-lint",
+	"private": true,
+	"description": "Lints the themes' and plugins' CSS (plan D29). Run by bin/check in a container; never deployed.",
+	"devDependencies": {
+		"@stylistic/stylelint-plugin": "5.3.1",
+		"stylelint": "17.16.0",
+		"stylelint-config-standard": "40.0.0"
+	}
+}
