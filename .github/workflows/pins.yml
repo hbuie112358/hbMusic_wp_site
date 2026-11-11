@@ -1,0 +1,49 @@
+# Weekly: compares the dev site's pinned plugins and theme with WordPress.org (bin/pins-check,
+# plan 8j) and proposes each newer one: a plugin as a pull request with its tests started, the
+# theme as an issue. It merges nothing; the user merges on GitHub once the checks pass.
+name: pins
+
+on:
+  # Mondays 06:41 UTC, after Dependabot's run and away from the busy hour mark.
+  schedule:
+    - cron: "41 6 * * 1"
+  # The "Run workflow" button; the wait can be shortened there, for a release needed sooner.
+  workflow_dispatch:
+    inputs:
+      cooldown-days:
+        description: "Days a release must be out before it is proposed"
+        required: false
+        default: "7"
+
+# Exactly what the proposals need: a branch (contents), its pull request, the theme's issue, and
+# starting the tests on the branch (actions). No secrets; the deploy runs only on main.
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
+# Two runs at once could both open the same proposal.
+concurrency:
+  group: pins
+  cancel-in-progress: false
+
+jobs:
+  pins:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Pinned by commit, like check.yml. The token stays for this job's own push of the
+      # proposal branch; nothing else runs here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Commit as GitHub Actions' bot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compare the pins with WordPress.org and propose updates (bin/pins-check --act)
+        run: bin/pins-check --act
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PINS_COOLDOWN_DAYS: ${{ inputs.cooldown-days || '7' }}

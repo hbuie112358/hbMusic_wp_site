@@ -64,6 +64,26 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 - **The email is in spam despite the filter:** it is marked "Not spam", and the Gmail filter
   (`from:website@howardbuiemusic.com`, never spam, label "Booking requests") is checked.
 
+## When GitHub proposes a new plugin version
+
+Every Monday GitHub compares the dev site's pinned versions with WordPress.org (plan 8j). A
+plugin released at least a week ago arrives as an email about a pull request, such as "raise
+Contact Form 7 to 6.2.5", and the tests run on it by themselves (a few minutes). Nothing else is
+needed on the user's computer, and no session with Claude:
+
+1. Open the pull request from the email, or the repository's **Pull requests** tab on GitHub.
+2. **Green ticks** for `check` and `dev-site`: the new version passed the dev site's tests.
+3. **Rebase and merge**, then **Delete branch**. GitHub allows the merge only once the checks
+   pass.
+4. The new version reaches staging and live in the next monthly check (step 6), now as a tested
+   one.
+
+**Red crosses:** the new version breaks something the tests protect. Nothing is merged, and
+staging and live stay on their version until it has been looked at with Claude.
+
+**An issue about Twenty Twenty-Five** instead of a pull request: the theme's pin includes a
+fingerprint taken by hand, so a new theme version is raised in a session with Claude.
+
 ## When replacing a picture
 
 A changed picture gets a **new file name** (for example `howard-buie-logo-2027.png`), never the old
