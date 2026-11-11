@@ -63,8 +63,8 @@ new findings added as steps.
   (14.1, 14.2: the alert proven through Pushover; certificate and domain expiry warned 15 days
   ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
   spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
-- **Next:** the rest of 5f, the user's choices: the videos and the wording (the site icon set on
-  staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home
+- **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
+  on staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home
   folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs)
   no earlier than 2026-11-17, a week after its release.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
@@ -603,8 +603,15 @@ new findings added as steps.
      replacing a picture"). **The site icon:** the logo without its web address, which a 32-pixel
      tab turns into a smudge (`data/photos/web/howard-buie-icon-696.png`, 696 × 696, transparent
      corners), chosen by the user from tab-size previews; set on staging under Settings → General
-     → Site Icon and seen in the tab by the user; live at step 9. Left: the user's video choices
-     (Home and Music) and the wording. Once a real video is on staging's Music page, the browser
+     → Site Icon and seen in the tab by the user; live at step 9. **The wording, finished by the
+     user:** the songs span "six decades" on Home, with the ranges Tom Petty to Pearl Jam and
+     Chris Stapleton to Glen Campbell (all four on the song list), and "1959 to 2022" on Songs (the
+     list's oldest and newest releases; updated if either end changes); a laid-back dinner set to
+     rocking out on Home and Book; Ohio instead of West Virginia in the bands' range, and "sung and
+     played" on Home; "over 30 years" kept everywhere (the old live site's "40 years" goes at
+     go-live). Changed in `data/content/build_pages.py`, whose import file live gets at step 9;
+     pasted on staging paragraph by paragraph, since a whole-page paste would drop Home's photo.
+     Left: the user's video choices (Home and Music). Once a real video is on staging's Music page, the browser
      console is checked there for policy violations, since YouTube was not yet exercised on
      staging (8a). Status: `[~]`
    - 5e. **The booking form (D19),** with the visible parts after 2b: name, email, optional event
