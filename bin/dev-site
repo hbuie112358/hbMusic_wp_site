@@ -194,6 +194,30 @@ install_seo_plugin() {
     }"
 }
 
+# Yoast writes its Organization into the page data only for a company with a name and a logo
+# (its Meta_Tags_Context::generate_site_represents, 28.8), and the child theme extends that piece
+# (plan 8h). The real name and logo are content, set by hand on staging and live
+# (docs/ENVIRONMENTS.md); the dev site gets a neutral name and the theme's own logo, imported into
+# the media library, so the extension has something to extend.
+readonly DEV_ORGANIZATION_NAME="Dev site organization"
+readonly DEV_ORGANIZATION_LOGO="/var/www/html/wp-content/themes/hbmusic-child/assets/images/howard-buie-logo.png"
+
+set_dev_organization() {
+  log "Giving Yoast a stand-in organization: \"$DEV_ORGANIZATION_NAME\" with the theme's logo"
+  local logo_id logo_url
+  logo_id="$(wp_cli media import "$DEV_ORGANIZATION_LOGO" --title="Organization logo" --porcelain)"
+  [[ "$logo_id" =~ ^[0-9]+$ ]] || fail "the logo's import gave no attachment ID: $logo_id"
+  logo_url="$(wp_cli eval "echo wp_get_attachment_url( $logo_id );")"
+  wp_cli eval "WPSEO_Options::set( 'company_or_person', 'company' );
+    WPSEO_Options::set( 'company_name', '$DEV_ORGANIZATION_NAME' );
+    WPSEO_Options::set( 'company_logo_id', $logo_id );
+    WPSEO_Options::set( 'company_logo', '$logo_url' );"
+  # Read back in a separate run, as for the settings above.
+  wp_cli eval "if ( WPSEO_Options::get( 'company_name' ) !== '$DEV_ORGANIZATION_NAME' || (int) WPSEO_Options::get( 'company_logo_id' ) !== $logo_id ) {
+      WP_CLI::error( 'Yoast did not save the stand-in organization' );
+    }"
+}
+
 create_test_content() {
   log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
   local ids position=0 test_page title address page_id
@@ -262,6 +286,7 @@ main() {
   configure_site
   install_booking_form
   install_seo_plugin
+  set_dev_organization
   create_test_content
   clear_debug_log
   log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"

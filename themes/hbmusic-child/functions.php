@@ -19,6 +19,15 @@ const HBMUSIC_OLD_ADDRESSES = array(
 );
 
 /**
+ * The towns this site's musician travels to for events (plan D22), named in the page data for
+ * search engines. The page text names the same towns.
+ */
+const HBMUSIC_AREAS_SERVED = array(
+	'Fayetteville, North Carolina',
+	'Southern Pines, North Carolina',
+);
+
+/**
  * Removes WordPress's emoji support: the detection script, its styles and the image swaps.
  *
  * Every current browser shows emoji itself. The detection script starts a worker from a blob:
@@ -115,3 +124,28 @@ function hbmusic_redirect_old_address(): void {
 	exit;
 }
 add_action( 'template_redirect', 'hbmusic_redirect_old_address', 1 );
+
+/**
+ * Describes the site's organization in Yoast SEO's page data as a musician (schema.org's
+ * MusicGroup, which also covers a solo musician) and names the towns served (plan 8h), so search
+ * engines read the same facts as the page text. Yoast's Local SEO add-on would do this for a fee.
+ *
+ * Yoast builds the Organization only when its settings name a company with a logo; this adds to
+ * that piece and keeps its name, logo and links. Its type is always "Organization" in Yoast 28.8
+ * (src/generators/schema/organization.php), so the pair is written out rather than merged.
+ *
+ * @param array<string, mixed> $organization Yoast's Organization piece.
+ * @return array<string, mixed> The piece as a musician, with the areas served.
+ */
+function hbmusic_describe_organization( array $organization ): array {
+	$organization['@type']      = array( 'Organization', 'MusicGroup' );
+	$organization['areaServed'] = array_map(
+		static fn ( string $town ): array => array(
+			'@type' => 'City',
+			'name'  => $town,
+		),
+		HBMUSIC_AREAS_SERVED
+	);
+	return $organization;
+}
+add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
