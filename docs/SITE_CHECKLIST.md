@@ -644,14 +644,17 @@ only after attempts to misuse it have failed.**
 **14.1 Uptime monitoring with alerts.**
 - Why: outages are noticed before visitors report them.
 - Check: a test alert reaches the user.
-- Kind: general · Status: planned: step 8.
+- Kind: general · Status: done (2026-11-11, plan 8m): HetrixTools checks live's home page every
+  minute from 4 locations, with a keyword, and alerts by Pushover; a planted failure (a keyword
+  not on the page) brought the "down" and "back up" alerts to the user's phone. Staging is not
+  monitored (its site-wide password answers 401).
 
 **14.2 Alerts for certificate and domain expiry.**
 - Why: expiry takes the site down without warning.
 - Check: the monitor lists the certificate and the domain with their expiry dates.
-- Kind: general · Status: partly: the dates are known (2026-11-11): the domain expires 2027-04-16
-  with auto-renewal on; the Let's Encrypt certificates (live to 2027-01-03, staging to
-  2027-02-01) are renewed by Hostinger. The alert comes with the uptime monitor (14.1).
+- Kind: general · Status: done (2026-11-11, plan 8m): the uptime monitor lists live's certificate
+  (2027-01-03) and the domain (2027-04-16), each warned 15 days ahead, after the automatic
+  renewals (Hostinger's, about 30 days before for the certificate) should have happened.
 
 **14.3 Security scanning (Wordfence or the host's) with alerts for changed core files and
 known-vulnerable plugins.**

@@ -59,19 +59,19 @@ new findings added as steps.
   9.1.1 on both sites), and the weekly versions check built and proven end to end
   (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
   merged by the user on 2026-11-11, earlier than the week agreed).
-- **Next:** the rest of step 8 (8m): uptime monitoring with certificate and domain alerts
-  (14.1, 14.2). Done in 8m on 2026-11-11: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's
-  alerts land in spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo). Delete live's wp-config
-  backup in the home folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
-  earlier than 2026-11-17, a week after its release. Or
-  the user's 5f choices (videos, wording, and from the inventory WebP photos and a site icon);
-  the user picks. 5f's pages are on staging; the user's video choices and wording follow.
+- **Step 8 done (2026-11-11):** 8m closed with uptime monitoring by HetrixTools on live
+  (14.1, 14.2: the alert proven through Pushover; certificate and domain expiry warned 15 days
+  ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
+  spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
+- **Next:** the rest of 5f, the user's choices (videos, wording, and from the inventory WebP
+  photos and a site icon); 5f's pages are on staging. Delete live's wp-config backup in the home
+  folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs)
+  no earlier than 2026-11-17, a week after its release.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
 - **Order of the coming steps (D19, replacing D11's; 6 done first on 2026-11-09 while Brevo's
-  support answered):** the rest of 8, with the mail service (8) when Brevo authenticates → the
-  rest of 5e → 9 → 10.
+  support answered; 8 and 5e done by 2026-11-11):** the rest of 5f → 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d); a search on the Songs page (the user, 2026-11-11: after go-live). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
@@ -1193,15 +1193,43 @@ new findings added as steps.
      `website@howardbuiemusic.com` through Brevo, and its own `wp_mail` test (after
      `wp option get home` confirmed the site) reached the inbox with no filter involved. Since a
      failed `cd` once left the terminal's site unclear, a command meant for one site is preceded
-     by `wp option get home`. Staging's alerts: the same address and severity as live's. Left:
-     uptime monitoring with certificate and domain alerts (14.1, 14.2). Status: `[~]`
+     by `wp option get home`. Staging's alerts: the same address and severity as live's.
+     **Uptime monitoring (14.1, 14.2), 2026-11-11: HetrixTools,** chosen by the user after a
+     comparison of the free plans (from the providers' own pages): HetrixTools 15 monitors checked
+     every minute from up to 4 locations, certificate and domain expiry on every HTTPS monitor, every
+     alert channel (Pushover included) and status pages on the free plan; UptimeRobot 50 monitors
+     every 5 minutes and business use explicitly allowed, but free certificate monitoring and
+     Pushover unclear; Better Stack (10 monitors, "free for personal projects", Slack and email
+     only) and StatusCake (10 monitors, 1 certificate, 1 domain) too limited; Uptime Kuma would need
+     a server of its own, away from Hostinger. One account for all the user's sites, under the
+     address the user's Hostinger account uses (not the music site's), with two-factor login.
+     **Two conditions of the free plan:** the account must be logged into at least every 90 days,
+     or its monitors stop (a warning email comes first), so the monthly check includes a login
+     (`docs/ROUTINES.md`); and its terms call free services a "demo/trial" without restricting
+     business use, so the sites the user runs without charging anyone stay on free, and customers' sites
+     move the account to the paid plan (from $9.95 a month). Set up by the user, Claude checking
+     each screen: contact list "Howard - own sites" with Pushover (the user key only; HetrixTools
+     sends through its own Pushover app); one uptime monitor, "howardbuiemusic.com (live)", GET
+     `https://howardbuiemusic.com/` (it answers 200 itself; `www` and `http://` forward to it),
+     keyword `Howard Buie Music` (case sensitive; on the old site's home page 8 times, and the new
+     site's title), from 4 locations (3 in North America, 1 in Europe), every minute, 3 tries per
+     location, down when 3 of 4 locations agree (50% + 1, the lowest allowed), a 10-second
+     timeout, the certificate and its host name verified, the alert at once and not repeated, the
+     public report private. The monitor lists the certificate (2027-01-03) and the domain
+     (2027-04-16), each warned 15 days before expiry: Let's Encrypt renews about 30 days before, so
+     a warning means renewal failed with time left. It also watches the domain's name servers (a
+     change is an early sign of a takeover); its server agent cannot run on shared hosting.
+     **Proven:** the keyword changed to one not on the page brought a "down" alert to the user's
+     phone through Pushover, and setting it back a "back up" alert. Staging is not monitored: its
+     site-wide password answers 401 to every check (`docs/ENVIRONMENTS.md`). Status: `[x]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no
      page cache unless the speed check (8.1) fails, since a cache needs purging after deploys;
      sending the security headers from the theme, so they deploy with the code and follow a host
-     move; an uptime service whose terms are read first (sources conflicted on UptimeRobot).
-   Status: `[ ]`
+     move; an uptime service whose terms are read first (sources conflicted on UptimeRobot;
+     settled in 8m: HetrixTools).
+   Status: `[x]` (2026-11-11; 8h's "after go-live" measurements continue at step 9)
 9. **Go live on Hostinger,** without the local leftovers (open item 1); check afterwards that
    they cannot be downloaded. Also:
    - a new admin account on the new site with a login name that is not easy to guess (the old
