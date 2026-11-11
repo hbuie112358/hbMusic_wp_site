@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-11T08:12:32-05:00
-current_branch: pause-2026-11-11
-last_commit: 2322f28
+timestamp: 2026-11-11T17:30:00-05:00
+current_branch: style/subtle-polish
+last_commit: 9c69c78
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -60,15 +60,31 @@ last_work: >
   approves with "Approve and run" and merges on GitHub, the theme an issue), proven end to end:
   #35 raised Contact Form 7 to 6.2.5 on the dev site, merged by the user. Pull requests #25 to
   #36 merged, each deployed to staging.
+  Afternoon of 2026-11-11 (after a resume): 8m's remaining checklist items (domain, CAA and
+  DNSSEC, certificates, wp-config and options, database, checksums, FTP, mail score 9.2/10,
+  Wordfence alerts); the song search moved to after go-live; uptime monitoring with HetrixTools
+  (free plan, one account for the user's own sites, alerts by Pushover, proven), so step 8 is
+  done; 5f: the site icon set on staging, WebP found not needed, the pages' wording finished and
+  pasted on staging (#37-#41 merged; #41's first check run was stuck at GitHub and was restarted
+  by closing and reopening it). Then D29, the look's subtle polish, held to the coding standards
+  and structured for the template, on the branch style/subtle-polish, three local commits not
+  yet pushed: d3710e9 Stylelint in bin/check (tools/css-lint/, the lean standard config, option B);
+  1a0d2f6 the CSS split into theme.json tokens and generic component stylesheets (site-hero,
+  site-section, site-features, site-cta, site-media, buttons, form) loaded per block, the song
+  table's styles moved into Song List 0.2.0, proven identical by pixel comparison apart from the
+  outlined button, breaking for page content (hb- classes renamed site-); 9c69c78 the type and
+  spacing the user approved. bin/check 20 checks, bin/test 87 browser tests, all passing.
 
 next_action: >
-  The rest of step 8, the checklist items still marked for it (plan Current position, "Next"):
-  uptime monitoring (14.1, 14.2); 8m did the rest on
-  2026-11-11. Remind the user to delete ~/wp-config.live-before-2026-11-11.php on the server
-  (it holds live's database password) once live has run a few days. Or the user's 5f choices. Contact Form 7 6.2.5 not onto staging
-  before 2026-11-17. The local dev site still runs Contact Form 7 6.2.4.1: rebuild it with
-  bin/dev-site before any local test run. Ask whether GitHub's emails for the versions check
-  arrive (the user was to set Watch -> Custom -> Pull requests and Issues).
+  Resume D29 with package 3, the buttons (plan Current position, "In progress"): glow, top
+  highlight, hover lift with a reduced-motion exception, focus ring; then package 4 (menu and
+  header) and 5 (stage light and grain), each shown to the user in screenshots from
+  data/dev-tools/ (run previews.sh after any bin/dev-site) and checked for accessibility; then
+  one push, and the staging content update to the new class names (Home from its own editor
+  code, to keep the photo). Remind the user to delete ~/wp-config.live-before-2026-11-11.php on
+  the server (it holds live's database password) once live has run a few days. Contact Form 7
+  6.2.5 not onto staging or live before 2026-11-17. Ask whether GitHub's emails for the versions
+  check arrive (the user was to set Watch -> Custom -> Pull requests and Issues).
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -81,20 +97,21 @@ verification:
   live_theme: music-lite 1.5 (unmaintained; replaced at step 9)
   live_text: still names the old service area and "40 years"; the user chose to leave it until go-live, since the site has little traffic
   live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
-  staging_site: staging.howardbuiemusic.com, site-wide password (one PWPROTECTID block in .htaccess; .htpasswd holds APR1 lines made by hand for the user and github-check, since hPanel's SHA-512 entries are refused; no users added through hPanel until Hostinger fixes it), server rules for the version files (top of .htaccess) and uploads/.htaccess (8k), wp-config.php 600, Wordfence 9.1.1, Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
+  staging_site: staging.howardbuiemusic.com, site-wide password (one PWPROTECTID block in .htaccess; .htpasswd holds APR1 lines made by hand for the user and github-check, since hPanel's SHA-512 entries are refused; no users added through hPanel until Hostinger fixes it), server rules for the version files (top of .htaccess) and uploads/.htaccess (8k), wp-config.php 600, Wordfence 9.1.1, Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); the site icon (5f, 2026-11-11); the pages' final wording pasted (5f); its page content still uses the hb- classes until the D29 push; Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
   staging_mail: FluentSMTP connected to Brevo (sender website@howardbuiemusic.com, log off, failed emails kept anyway); a test arrived in the inbox with SPF, DKIM and DMARC passing (2026-11-09); failure alerts by Pushover, proven with a planted failure; the 2026-11-07 mails had gone through Hostinger's relay into spam, failing DMARC; staging's admin email change to the business Gmail address not confirmed
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
   brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
-  local_sites: dev site on 10102, its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 16 checks; bin/test 5 scenarios + 83 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-11
+  local_sites: dev site on 10102 (rebuilt 2026-11-11 with Contact Form 7 6.2.5 and the branch's theme; preview pages from data/dev-tools/previews.sh), its Mailpit inbox on 10103; the rest of the 101xx block is free
+  checks: bin/check 20 checks (Stylelint, the component list against its files and against the test pages added by D29); bin/test 5 scenarios + 87 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-11 on style/subtle-polish
   github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
-  dependabot: weekly version updates (action, Composer, npm); alerts and security updates on; no open pull requests (checked 2026-11-07)
+  uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login asked about, not confirmed), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
+  dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter); alerts and security updates on; no open pull requests (checked 2026-11-07)
   commit_identity: GitHub noreply address, set in this repository's git config only
   hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
-  not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
+  not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots, data/dev-tools/ (the D29 helper scripts); only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes: []
 
@@ -119,6 +136,12 @@ pending_decisions:
   - The new host (step 10, before the Hostinger plan ends in 2028).
   - Decided when the step is reached, noted in the plan - step 9 (updating the site in place or a fresh install).
   - Optional, in the admin: Yoast's Other profiles with the Facebook page, so the page data names it (sameAs; staging now, live at step 9).
+  - HetrixTools two-factor login: Claude asked on 2026-11-11 whether it was turned on; not answered. The account will hold customers' sites later.
+  - >
+    After D29 (the user, 2026-11-11: not now): a global CSS rule proposed item by item from
+    docs/planning/css-standards-notes.md; and possibly a versioned bin/screenshots (option B) from
+    the helper scripts in data/dev-tools/.
+  - For 5f: the hero photo's description for screen readers (alt text, checklist 7.4), and whether to make the photo's background pure black.
 
 open_items:
   - id: 1
