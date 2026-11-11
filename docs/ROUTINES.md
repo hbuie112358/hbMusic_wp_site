@@ -24,7 +24,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 6. **Updates (plan 8j):** live's Plugins page (and Appearance → Themes, and Dashboard → Updates
    for WordPress itself). Hostinger installs only security updates; anything else waiting is
    installed by hand, **on staging first**: update there, open the pages and log in (with
-   two-factor), and only then update live the same way and look at its pages.
+   two-factor), and only then update live the same way and look at its pages. Both in the same
+   sitting, and before updating live, its waiting version is checked to be the one staging just
+   got: "Update now" always installs the newest release, so one published in between would reach
+   live untried (it happened with Wordfence 9.1.1, plan 8j).
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),

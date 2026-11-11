@@ -53,8 +53,8 @@ new findings added as steps.
   `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
   Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
   both. HSTS at step 9.
-- **Next:** live's Wordfence to 9.1.0 by hand (8j); the weekly GitHub check of the dev site's
-  pins. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
+- **Next:** the weekly GitHub check of the dev site's pins (8j); Wordfence 9.1.1 on both sites
+  since 2026-11-11. Done 2026-11-11: 8h's structured data, checked on staging's page source. Done 2026-11-10: login protection on
   staging and live (4.3) and the D22 redirects (8h). Meanwhile: the server-level items (version
   files, no PHP in uploads, permissions; done as 8k), ~~the admin pages' policy~~ (none, D28), ~~cache~~ (8l, nothing to do) (with Hostinger's CDN,
   on for live), ~~and 8h's local structured data~~ (built 2026-11-11). Left in step 8: an uptime
@@ -1056,7 +1056,11 @@ new findings added as steps.
      and the monthly check updates the rest by hand, staging first, then live
      (`docs/ROUTINES.md`); not "all updates", which would bring new releases to live without
      staging seeing them first. The weekly GitHub check of the dev site's pins stays planned, as
-     the early notice. Live's Wordfence goes to 9.1.0 by hand now, as staging did. Status: `[x]`
+     the early notice. Live's Wordfence updated by hand on 2026-11-11 (pages and login with
+     two-factor checked by the user): it got 9.1.1 (2026-11-10, only its bundled certificate list,
+     `cacert.pem`), newer than staging's 9.1.0 of the day before, since "Update now" installs the
+     newest release; staging then updated to 9.1.1 as well. So the monthly check updates staging
+     and live in the same sitting and checks that the versions match first. Status: `[x]`
    - **8k. Server hardening (2026-11-10):** Claude checked live from outside, read-only (22
      requests): dotfiles, `wp-config.php` backups, the debug log, the installer, archives and
      dumps are refused or absent; `wp-config.php` runs and sends 0 bytes; the folder listings are
