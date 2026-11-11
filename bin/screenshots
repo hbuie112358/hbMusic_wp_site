@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# A before/after check of the site's look with its real content, for restyling (plan D29). Local
+# only, never a gate: exact pixel comparison holds within one container minutes apart, not across
+# machines or browser updates. It shows what changed and where; whether it looks right stays the
+# user's call.
+#
+#   bin/screenshots previews   shows the site's real pages on the local dev site as preview pages
+#   bin/screenshots baseline   previews, then screenshots every page as the "before" set
+#   bin/screenshots compare    previews, then screenshots again and compares with the baseline
+#
+# Every page is shot at desktop and phone width: the dev site's stand-in pages (tests/dev-content/)
+# and a preview of each real page. The real pages come from the site's content folder, by two
+# conventions any site's page builder follows:
+#   - <content>/pages.json lists the pages: [{"slug", "title", "template", "file"}, ...];
+#   - a photo in a page file is written src="{{photo:<file>}}", a file in the photos folder.
+# A preview is the page at /preview-<slug>/, beside the stand-ins, so the tests' pages stay as they
+# are; the photos are uploaded once and reused. Without a pages.json, only the stand-ins are shot.
+#
+# Settings (environment): SCREENSHOTS_CONTENT_DIR (default data/content), SCREENSHOTS_PHOTOS_DIR
+# (default data/photos/web), SCREENSHOTS_OUTPUT_DIR (default screenshots/, ignored by git): its
+# baseline/ holds the "before" set, latest/ the newest screenshots, differences/ what changed.
+set -Eeuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
+
+readonly CONTENT_DIR="${SCREENSHOTS_CONTENT_DIR:-$REPO_ROOT/data/content}"
+readonly PHOTOS_DIR="${SCREENSHOTS_PHOTOS_DIR:-$REPO_ROOT/data/photos/web}"
+readonly OUTPUT_DIR="${SCREENSHOTS_OUTPUT_DIR:-$REPO_ROOT/screenshots}"
+# A slug or a photo's file name: letters, digits, dots, dashes and underscores only, so neither can
+# reach outside its folder or into a command.
+readonly SAFE_NAME='^[A-Za-z0-9][A-Za-z0-9._-]*$'
+readonly PHOTO_TITLE_PREFIX="screenshots preview photo"
+
+log() { printf '%s [screenshots] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+
+load_settings() {
+  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/dev-site first"
+  set -a
+  # shellcheck source=/dev/null
+  source "$REPO_ROOT/.env"
+  set +a
+  curl -fsS -o /dev/null --max-time 10 "http://localhost:${DEV_SITE_PORT}/" ||
+    fail "nothing answers on port ${DEV_SITE_PORT}; start the dev site with bin/dev-site"
+}
+
+# WP-CLI on the dev site, with the photos folder read-only for uploads. Its input is closed: Compose
+# would otherwise read the caller's input, and inside the loop over the pages it swallowed the rest
+# of the list, so only the first page got a preview.
+wp_cli() {
+  docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" \
+    run --rm -T -v "$PHOTOS_DIR:/photos:ro" cli wp "$@" </dev/null
+}
+
+require_safe_name() {
+  [[ "$1" =~ $SAFE_NAME ]] || fail "$2 '$1' may hold only letters, digits, dots, dashes and underscores"
+}
+
+# The address of a photo on the dev site, uploading it on first use.
+photo_url() {
+  local file_name="$1" attachment_id
+  require_safe_name "$file_name" "photo"
+  [[ -f "$PHOTOS_DIR/$file_name" ]] || fail "photo $file_name is not in $PHOTOS_DIR"
+  attachment_id="$(wp_cli post list --post_type=attachment --title="$PHOTO_TITLE_PREFIX $file_name" --field=ID | head -n 1)"
+  if [[ -z "$attachment_id" ]]; then
+    attachment_id="$(wp_cli media import "/photos/$file_name" --title="$PHOTO_TITLE_PREFIX $file_name" --porcelain)"
+  fi
+  wp_cli eval "echo wp_get_attachment_url( (int) $attachment_id );"
+}
+
+# A page's content with each {{photo:<file>}} replaced by that photo's address on the dev site.
+with_photos() {
+  local content="$1" file_name
+  while IFS= read -r file_name; do
+    [[ -n "$file_name" ]] || continue
+    content="${content//"{{photo:$file_name}}"/$(photo_url "$file_name")}"
+  done < <(grep -oE '\{\{photo:[^}"]+\}\}' <<<"$content" | sort -u | sed -E 's/^\{\{photo:(.*)\}\}$/\1/')
+  printf '%s' "$content"
+}
+
+# Creates the preview page of one listed page, or updates it to the page file's current content.
+show_preview() {
+  local entry="$1" slug title template file content page_id
+  slug="$(jq -er '.slug' <<<"$entry")" || fail "an entry in pages.json has no slug: $entry"
+  title="$(jq -r '.title // .slug' <<<"$entry")"
+  template="$(jq -r '.template // ""' <<<"$entry")"
+  file="$(jq -r ".file // \"$slug.html\"" <<<"$entry")"
+  require_safe_name "$slug" "slug"
+  require_safe_name "$file" "page file"
+  [[ -f "$CONTENT_DIR/$file" ]] || fail "page file $file is not in $CONTENT_DIR"
+  content="$(with_photos "$(<"$CONTENT_DIR/$file")")"
+  page_id="$(wp_cli post list --post_type=page --name="preview-$slug" --post_status=any --field=ID | head -n 1)"
+  if [[ -z "$page_id" ]]; then
+    page_id="$(wp_cli post create --post_type=page --post_status=publish --post_title="Preview: $title" \
+      --post_name="preview-$slug" --post_content="$content" --porcelain)"
+  else
+    wp_cli post update "$page_id" --post_content="$content" >/dev/null
+  fi
+  wp_cli post meta update "$page_id" _wp_page_template "${template:-default}" >/dev/null
+  log "preview of $slug at /preview-$slug/"
+}
+
+show_previews() {
+  local manifest="$CONTENT_DIR/pages.json" entry
+  if [[ ! -f "$manifest" ]]; then
+    log "no $manifest; only the stand-in pages are shot"
+    return 0
+  fi
+  jq -e 'type == "array"' "$manifest" >/dev/null || fail "$manifest is not a list of pages"
+  while IFS= read -r entry; do
+    show_preview "$entry"
+  done < <(jq -c '.[]' "$manifest")
+}
+
+# Every address to shoot, as a JSON list: the stand-in pages, then the previews.
+page_paths() {
+  local paths=() file slug
+  for file in "$REPO_ROOT"/tests/dev-content/*.html; do
+    slug="$(basename "$file" .html)"
+    [[ "$slug" == "home" ]] && paths+=("/") || paths+=("/$slug/")
+  done
+  if [[ -f "$CONTENT_DIR/pages.json" ]]; then
+    while IFS= read -r slug; do paths+=("/preview-$slug/"); done < <(jq -r '.[].slug' "$CONTENT_DIR/pages.json")
+  fi
+  printf '%s\n' "${paths[@]}" | jq -R . | jq -cs .
+}
+
+# Playwright's own screenshot comparison, in its pinned container (tests/e2e/screenshots.config.ts).
+run_playwright() {
+  mkdir -p "$OUTPUT_DIR"
+  docker run --rm --network host -w /e2e \
+    -v "$REPO_ROOT/tests/e2e:/e2e" -v "$OUTPUT_DIR:/screenshots" -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e SCREENSHOTS_DIR=/screenshots \
+    -e "SCREENSHOT_PATHS=$(page_paths)" \
+    "$PLAYWRIGHT_IMAGE" sh -c "npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test --config=screenshots.config.ts $*"
+}
+
+take_baseline() {
+  rm -rf "$OUTPUT_DIR/baseline" "$OUTPUT_DIR/differences"
+  run_playwright --update-snapshots=all
+  log "baseline in $OUTPUT_DIR/baseline/, $(find "$OUTPUT_DIR/baseline" -name '*.png' | wc -l) screenshots"
+}
+
+compare_with_baseline() {
+  [[ -d "$OUTPUT_DIR/baseline" ]] || fail "no baseline yet; run bin/screenshots baseline first"
+  rm -rf "$OUTPUT_DIR/differences"
+  if run_playwright --update-snapshots=none; then
+    log "identical to the baseline; the new screenshots are in $OUTPUT_DIR/latest/"
+    return 0
+  fi
+  # A failed run is a difference only when Playwright marked one; anything else (a page that did
+  # not answer, the site stopping) is reported as the failure it is.
+  local marked
+  marked="$(find "$OUTPUT_DIR/differences" -name '*-diff.png' 2>/dev/null | wc -l)"
+  if ((marked == 0)); then
+    fail "the screenshot run failed without a difference to the baseline; see Playwright's output above"
+  fi
+  log "$marked screenshot(s) differ from the baseline, each marked in $OUTPUT_DIR/differences/; the new screenshots are in $OUTPUT_DIR/latest/"
+}
+
+main() {
+  local command="${1:-}"
+  case "$command" in
+    previews | baseline | compare) ;;
+    *) fail "usage: bin/screenshots previews | baseline | compare" ;;
+  esac
+  load_settings
+  show_previews
+  case "$command" in
+    baseline) take_baseline ;;
+    compare) compare_with_baseline ;;
+    *) ;;
+  esac
+}
+
+main "$@"

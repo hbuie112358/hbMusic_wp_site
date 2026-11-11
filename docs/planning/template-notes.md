@@ -71,6 +71,12 @@ template project starts; until then, a list, not a to-do.
   justified left (no CSS needed; WordPress generates the rule). The example is in
   `tests/dev-content/home.html`; in a block comment, `--` is written `--`, as WordPress's
   editor saves it.
+- `bin/screenshots` (plan D29), the before/after check for restyling, generic by convention: each
+  site's page builder writes one file per page into its `data/content/`, a `pages.json` listing
+  them (slug, title, template, file), and photos as `{{photo:<file>}}` from `data/photos/web/`;
+  the import file for the real site leaves those photos empty, to be chosen in its Media Library.
+  Its parts: `tests/e2e/screenshots.config.ts`, `tests/e2e/screenshots/`, and the scenario check
+  with its neutral fixture.
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.

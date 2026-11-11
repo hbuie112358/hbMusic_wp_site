@@ -88,10 +88,20 @@ new findings added as steps.
   at about 4% on the hero, features and call-to-action bands, from a small noise image in the
   theme; `img-src 'self'` allows it). **One push at the end** (the user's preference for a single
   staging update): after the deploy, staging's Home, Music, Songs and About get their content
-  with the new class names, Home from its own code in the editor (to keep its photo). The helper
-  scripts (screenshots, pixel comparison, preview pages with the real text) are in
-  `data/dev-tools/` (not versioned); a versioned `bin/screenshots` for before/after comparison is
-  a possible later step (the user, option B, not now). Also for 5f: the hero photo's description
+  with the new class names, Home from its own code in the editor (to keep its photo). **Added
+  after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
+  the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
+  before/after check with the real content belongs in the template, built on conventions every
+  site follows (`data/content/pages.json`, `{{photo:<file>}}`), not on knowledge of particular
+  sites. Claude's corrections to its own first idea, accepted by the user: preview pages beside
+  the stand-ins instead of WordPress's importer (same addresses would collide, and no new
+  dependency), Playwright's own comparison instead of Python with an image library, local only
+  and never a gate (exact pixels hold within one container), and it shows changes, not whether
+  they look right. Found while building it: WP-CLI swallowed the loop's input, so only the first
+  page got a preview, and the first runs "passed" on 404 pages; now each page must answer 200,
+  outside services are answered locally, and a scenario check with two neutral fixture pages
+  covers it (shown failing on three planted faults). A planted colour change was reported on
+  exactly the 10 screenshots with the call-to-action band. Also for 5f: the hero photo's description
   for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
   import file; and possibly the photo's background made pure black. Later, after this work: the
   global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).

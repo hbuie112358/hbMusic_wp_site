@@ -79,7 +79,7 @@ next_action: >
   Resume D29 with package 3, the buttons (plan Current position, "In progress"): glow, top
   highlight, hover lift with a reduced-motion exception, focus ring; then package 4 (menu and
   header) and 5 (stage light and grain), each shown to the user in screenshots from
-  data/dev-tools/ (run previews.sh after any bin/dev-site) and checked for accessibility; then
+  bin/screenshots (baseline before, compare after; it makes its own previews) and checked for accessibility; then
   one push, and the staging content update to the new class names (Home from its own editor
   code, to keep the photo). Remind the user to delete ~/wp-config.live-before-2026-11-11.php on
   the server (it holds live's database password) once live has run a few days. Contact Form 7
@@ -103,7 +103,7 @@ verification:
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
   brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
-  local_sites: dev site on 10102 (rebuilt 2026-11-11 with Contact Form 7 6.2.5 and the branch's theme; preview pages from data/dev-tools/previews.sh), its Mailpit inbox on 10103; the rest of the 101xx block is free
+  local_sites: dev site on 10102 (rebuilt 2026-11-11 with Contact Form 7 6.2.5 and the branch's theme; preview pages from bin/screenshots), its Mailpit inbox on 10103; the rest of the 101xx block is free
   checks: bin/check 20 checks (Stylelint, the component list against its files and against the test pages added by D29); bin/test 5 scenarios + 87 browser tests (with the login setup) + the final debug-log check, all passing on 2026-11-11 on style/subtle-polish
   github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
@@ -111,7 +111,7 @@ verification:
   dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter); alerts and security updates on; no open pull requests (checked 2026-11-07)
   commit_identity: GitHub noreply address, set in this repository's git config only
   hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
-  not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots, data/dev-tools/ (the D29 helper scripts); only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
+  not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes: []
 
@@ -139,8 +139,8 @@ pending_decisions:
   - HetrixTools two-factor login: Claude asked on 2026-11-11 whether it was turned on; not answered. The account will hold customers' sites later.
   - >
     After D29 (the user, 2026-11-11: not now): a global CSS rule proposed item by item from
-    docs/planning/css-standards-notes.md; and possibly a versioned bin/screenshots (option B) from
-    the helper scripts in data/dev-tools/.
+    docs/planning/css-standards-notes.md. (The versioned bin/screenshots, option B, was built on
+    2026-11-11 after the resume.)
   - For 5f: the hero photo's description for screen readers (alt text, checklist 7.4), and whether to make the photo's background pure black.
 
 open_items:

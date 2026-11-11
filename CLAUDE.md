@@ -115,6 +115,14 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   pull request raising its pin; the theme gets an issue only. The user clicks "Approve and run"
   on the pull request, which GitHub requires before testing a pull request its own token opened,
   and merges it on GitHub once its checks pass (`docs/ROUTINES.md`).
+- `bin/screenshots previews | baseline | compare` (plan D29): a before/after check of the look with
+  the real content, for restyling; local only, never a gate. It shows each real page from
+  `data/content/` (listed in its `pages.json`; photos written `{{photo:<file>}}` from
+  `data/photos/web/`) on the dev site at `/preview-<slug>/`, beside the stand-ins, shoots every
+  page at desktop and phone width with Playwright's own comparison, and lists what changed
+  since the baseline, with marked images in `screenshots/` (ignored by git). Outside services
+  are answered locally; a page that does not answer 200 fails. Whether a change looks right is
+  the user's call.
 - `bin/tools-update`: the deliberate way to update the tools, `composer.lock`,
   `tests/e2e/package-lock.json` and `tools/css-lint/package-lock.json` (npm only from releases
   at least 7 days old, install scripts off); then `bin/check`, review the lock files' diff,
@@ -134,8 +142,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - **Static checks:** `bin/check` (see Commands), before every commit; it also type-checks the
   browser tests (TypeScript, strict).
 - **Scenario checks** (`tests/scenario/`): behaviour against the running dev site, such as the
-  `.env` safety stop and the read-only theme and plugin mounts. Plain bash: the bats framework
-  would need the Docker socket in its container.
+  `.env` safety stop, the read-only theme and plugin mounts, and `bin/screenshots`'s previews
+  (with a neutral fixture in `tests/scenario/fixtures/screenshots/`). Plain bash: the bats
+  framework would need the Docker socket in its container.
 - **Browser tests** (`tests/e2e/`, Playwright): the new theme on the dev site, with axe
   (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
   reports, and the Song List's page and admin form, which log in with the dev admin.
