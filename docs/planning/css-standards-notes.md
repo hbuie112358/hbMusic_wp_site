@@ -36,5 +36,22 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   phone width.
 - **A text colour change is checked against every background it sits on,** not only the main
   one (the light warm grey was checked on black and on the grey band).
+- **Load order is part of the design; selectors should not depend on it.** Moving rules from one
+  place to another can change which of two equally specific rules wins. In WordPress, block
+  stylesheets print before the global styles, and the global styles write the theme's element
+  styles as `:root :where(…)`, as specific as one class. A dependency on `global-styles` fixed the
+  order but WordPress logs a notice for it (the handle is registered only after the blocks
+  render), so each component's main selector names its block as well
+  (`.wp-block-group.site-section`, `.wp-block-button .wp-block-button__link`): two classes win
+  at any load order. The reason is commented where it applies, so the extra class is not taken
+  for carelessness.
+- **Every registry is checked against what it lists.** A list of components that load by name
+  fails silently when a name and a file drift apart; `bin/check` compares them both ways.
+- **A restructuring is proven by pixel comparison.** Reference screenshots of every page at two
+  widths before, the same after, compared pixel by pixel: "looks the same" is not a check. It
+  found the load-order fault at once.
+- **Name components by structure, not subject** (`site-hero`, `site-cta`, not `music-hero` or
+  `book-band`), so a template serves any kind of site; subject-specific styles live with the
+  feature that brings them (the song table's in the Song List plugin).
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.

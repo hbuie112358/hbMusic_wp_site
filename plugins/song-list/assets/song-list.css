@@ -1,0 +1,25 @@
+/*
+ * The Song List block's table: full width, a line under the column headings and between songs.
+ * Loaded only on pages that show the block (song-list-block.php).
+ *
+ * The lines take the theme's accent and divider colours where the theme defines them (the slugs
+ * accent-1 and accent-5 of WordPress's default themes), and otherwise derive from the text
+ * colour, so the table fits any theme without settings.
+ */
+
+.wp-block-songlist-song-list table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.wp-block-songlist-song-list th {
+	padding: 10px 12px;
+	font-weight: 700;
+	text-align: left;
+	border-bottom: 2px solid var(--wp--preset--color--accent-1, currentcolor);
+}
+
+.wp-block-songlist-song-list td {
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--wp--preset--color--accent-5, color-mix(in srgb, currentcolor 20%, transparent));
+}

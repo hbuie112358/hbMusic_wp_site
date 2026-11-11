@@ -28,6 +28,86 @@ const HBMUSIC_AREAS_SERVED = array(
 );
 
 /**
+ * The theme's component stylesheets (assets/css/components/, plan D29), listed under the block
+ * whose appearance on a page loads them. WordPress then adds a component's styles only to pages
+ * that have that block, and inlines them, so a page costs no extra request. A new component is
+ * one file and its name here.
+ */
+const HBMUSIC_COMPONENT_STYLES = array(
+	'core/template-part' => array( 'site-header', 'site-footer' ),
+	'core/group'         => array( 'site-hero', 'site-section', 'site-features', 'site-cta' ),
+	'core/paragraph'     => array( 'site-media' ),
+	'core/button'        => array( 'buttons' ),
+);
+
+/**
+ * The form stylesheet, which is loaded by page rather than by block: Contact Form 7's forms are
+ * shortcodes, not blocks.
+ */
+const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/form.css';
+
+/**
+ * Registers every component stylesheet with the block it styles.
+ */
+function hbmusic_register_component_styles(): void {
+	foreach ( HBMUSIC_COMPONENT_STYLES as $block_name => $components ) {
+		array_walk(
+			$components,
+			static fn ( string $component ) => hbmusic_register_component_style( $block_name, $component )
+		);
+	}
+}
+
+/**
+ * Registers one component stylesheet with the block it styles.
+ *
+ * Block stylesheets print before WordPress's global styles, so a component's main selector names
+ * its block too (.wp-block-group.site-section): two classes outrank WordPress's one-class layout
+ * rules (.has-global-padding) wherever they print. A dependency on "global-styles" would fix the
+ * order instead, but that handle is registered only after the blocks render, and WordPress logs
+ * a notice for it.
+ *
+ * @param string $block_name The block whose appearance loads the stylesheet.
+ * @param string $component  The component's name, also its file name.
+ */
+function hbmusic_register_component_style( string $block_name, string $component ): void {
+	$stylesheet = 'assets/css/components/' . $component . '.css';
+	wp_enqueue_block_style(
+		$block_name,
+		array(
+			'handle' => 'hbmusic-' . $component,
+			'src'    => get_theme_file_uri( $stylesheet ),
+			'path'   => get_theme_file_path( $stylesheet ),
+			'ver'    => hbmusic_theme_version(),
+		)
+	);
+}
+add_action( 'init', 'hbmusic_register_component_styles' );
+
+/**
+ * Loads the form stylesheet on pages with a form only (see hbmusic_page_has_booking_form()).
+ */
+function hbmusic_enqueue_form_style(): void {
+	if ( ! hbmusic_page_has_booking_form() ) {
+		return;
+	}
+	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_theme_version() );
+	wp_style_add_data( 'hbmusic-form', 'path', get_theme_file_path( HBMUSIC_FORM_STYLESHEET ) );
+}
+add_action( 'wp_enqueue_scripts', 'hbmusic_enqueue_form_style' );
+
+/**
+ * The theme's version from style.css, which versions the stylesheets' addresses: a changed
+ * stylesheet then reaches browsers that kept the old one.
+ *
+ * @return string The version.
+ */
+function hbmusic_theme_version(): string {
+	$version = wp_get_theme()->get( 'Version' );
+	return is_string( $version ) ? $version : '';
+}
+
+/**
  * Removes WordPress's emoji support: the detection script, its styles and the image swaps.
  *
  * Every current browser shows emoji itself. The detection script starts a worker from a blob:

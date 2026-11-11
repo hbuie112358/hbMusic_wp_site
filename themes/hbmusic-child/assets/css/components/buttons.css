@@ -1,0 +1,24 @@
+/*
+ * Buttons: the shape every button shares, and the outline style for secondary actions.
+ *
+ * Written here, not as theme.json element styles: WordPress's own button block CSS gives the
+ * outline style its padding and border with selectors more specific than theme.json's element
+ * styles, which would override the shared shape.
+ */
+
+/*
+ * The button block's wrapper is named too: WordPress prints the theme's element styles as
+ * ":root :where(.wp-block-button__link)", as specific as one class and printed later.
+ */
+.wp-block-button .wp-block-button__link {
+	padding: var(--wp--custom--button--padding-block) var(--wp--custom--button--padding-inline);
+	font-weight: 700;
+	border-radius: var(--wp--custom--radius);
+}
+
+/* The secondary action: the same size as the main one, outlined in the accent colour. */
+.wp-block-button.is-style-outline .wp-block-button__link {
+	color: var(--wp--preset--color--contrast);
+	background: transparent;
+	border: 2px solid var(--wp--preset--color--accent-1);
+}

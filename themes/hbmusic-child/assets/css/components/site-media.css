@@ -1,0 +1,17 @@
+/*
+ * Media placeholder: a 16:9 frame that holds the place of a video or map until it is chosen, so
+ * the page's layout is already the final one.
+ */
+
+.site-media-placeholder {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 16 / 9;
+	padding: var(--wp--custom--spacing--gutter);
+	color: var(--wp--preset--color--accent-6);
+	text-align: center;
+	background: var(--wp--preset--color--accent-5);
+	border-radius: var(--wp--custom--radius);
+}

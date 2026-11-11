@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Song List
  * Description:       Keeps a musician's songs in the WordPress admin and shows them on a page with the Song List block.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 7.0
  * Requires PHP:      8.4
  * License:           GPL-2.0-or-later
@@ -18,9 +18,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// The plugin's version, matching the header above; it versions the stylesheet's address, so a
+// changed stylesheet reaches browsers that kept the old one.
+const SONGLIST_VERSION     = '0.2.0';
+const SONGLIST_PLUGIN_FILE = __FILE__;
+
 // Prefixed, because a shared plugin may run beside others that also have a "song" type.
 const SONGLIST_POST_TYPE       = 'songlist_song';
 const SONGLIST_ARTIST_META_KEY = 'songlist_artist';
+const SONGLIST_STYLE_HANDLE    = 'songlist-song-list';
 
 require_once __DIR__ . '/includes/class-songlist-song.php';
 require_once __DIR__ . '/includes/song-type.php';

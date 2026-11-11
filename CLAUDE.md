@@ -82,7 +82,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
   List's page and admin form, the booking form's mail (no visitor's name in the subject), its
   message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only
-  where it appears; the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
+  where it appears; the stylesheets loading only with what they style (the theme's components,
+  the form's, the song table's from its plugin, plan D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
   Run it after `bin/dev-site` and before every commit that touches the site, the theme or a
@@ -100,7 +101,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `Update URI: false`; `theme.json`'s schema matching
   the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
   rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
-  packages; ShellCheck on `bin/`; the compose file. Runs every check even
+  packages; the theme's component list in `functions.php` matching the files in
+  `assets/css/components/`, both ways; ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.

@@ -1,0 +1,29 @@
+/*
+ * Call to action: the coloured band that ends a page with one clear next step (a heading, a line
+ * of text and one button).
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-cta {
+	margin-top: var(--wp--custom--spacing--section);
+	padding: var(--wp--custom--spacing--cta) var(--wp--custom--spacing--gutter);
+	color: var(--wp--custom--color--on-cta);
+	text-align: center;
+	background: var(--wp--preset--color--accent-2);
+}
+
+.site-cta h2 {
+	margin-top: 0;
+	font-size: var(--wp--custom--font-size--section-title);
+	color: var(--wp--custom--color--on-cta);
+}
+
+.site-cta .wp-block-buttons {
+	justify-content: center;
+}
+
+/* The page's accent button would vanish on the accent band, so here it inverts. */
+.site-cta .wp-block-button__link {
+	color: var(--wp--custom--color--on-cta);
+	background: var(--wp--preset--color--base);
+}

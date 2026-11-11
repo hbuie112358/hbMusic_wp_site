@@ -1,0 +1,60 @@
+/*
+ * Forms made with Contact Form 7 (contact, booking or quote forms): one field per line, labels
+ * above their fields, and a focus ring a keyboard user can follow (docs/SITE_CHECKLIST.md 7.2).
+ * Loaded only on pages with a form (functions.php).
+ */
+
+.wpcf7 label {
+	display: block;
+	margin-bottom: var(--wp--custom--spacing--form-field);
+	font-weight: 600;
+}
+
+.wpcf7 input:not([type="submit"]),
+.wpcf7 textarea {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	margin-top: 6px;
+	padding: 12px;
+	font: inherit;
+	color: var(--wp--preset--color--contrast);
+	background: var(--wp--preset--color--accent-4);
+	border: 1px solid var(--wp--preset--color--accent-6);
+	border-radius: var(--wp--custom--radius);
+
+	/* The browser's own parts of the fields (the date picker) follow the dark page. */
+	color-scheme: dark;
+}
+
+.wpcf7 textarea {
+	height: 9em;
+}
+
+.wpcf7 input:focus,
+.wpcf7 textarea:focus {
+	outline: 2px solid var(--wp--preset--color--accent-1);
+	outline-offset: 2px;
+}
+
+/* The send button looks like the site's other main buttons (buttons.css). */
+.wpcf7 input[type="submit"] {
+	padding: var(--wp--custom--button--padding-block) 32px;
+	font: inherit;
+	font-weight: 700;
+	color: var(--wp--preset--color--base);
+	cursor: pointer;
+	background: var(--wp--preset--color--accent-1);
+	border: 0;
+	border-radius: var(--wp--custom--radius);
+}
+
+.wpcf7 .wpcf7-not-valid-tip {
+	color: var(--wp--custom--color--form-error);
+}
+
+.wpcf7 .wpcf7-response-output {
+	margin: var(--wp--custom--spacing--form-field) 0 0;
+	padding: 12px;
+	border-radius: var(--wp--custom--radius);
+}
