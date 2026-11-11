@@ -59,12 +59,16 @@ new findings added as steps.
   9.1.1 on both sites), and the weekly versions check built and proven end to end
   (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
   merged by the user on 2026-11-11, earlier than the week agreed).
-- **Next:** the rest of step 8, the checklist items still marked for it: the debug settings
-  (2.3), `FORCE_SSL_ADMIN` and the site's options (2.4), the server cron job (2.7), FTP (3.x),
-  pingbacks and staging's discussion settings (4.8), checksums on live (5.4); then an uptime
-  service (optional). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
+- **Next:** the rest of step 8, the checklist items still marked for it (all listed
+  2026-11-11): `DISALLOW_FILE_EDIT` on live and staging (2.2), the debug settings (2.3),
+  `FORCE_SSL_ADMIN` and the site's options (2.4), the database user's rights (2.5), FTP (3.x),
+  pingbacks and staging's discussion settings (4.8), checksums on live (5.4), the mail-tester
+  score (11.2), the domain's lock, renewal and two-factor (11.3), a CAA record and DNSSEC
+  (11.4), uptime monitoring (14.1), certificate and domain expiry alerts (14.2), Wordfence's
+  scans and alerts (14.3). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
   earlier than 2026-11-17, a week after its release. Or
-  the user's 5f choices (videos, wording); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
+  the user's 5f choices (videos, wording, and from the inventory a song search, WebP photos and
+  a site icon); the user picks. 5f's pages are on staging; the user's video choices and wording follow.
   3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
   approval before live). The live site's text still names the old service area (D22); the user
   chose to leave it until go-live, since the site has little traffic (2026-11-07).
@@ -81,11 +85,8 @@ new findings added as steps.
   its check, its kind (general, WordPress or shop) and its status (done, in force, partly,
   planned with its step, or not applicable); a section for shops (WooCommerce, for the template)
   and a list of practices deliberately not used.
-- **Stale documents:** in `docs/SITE_CHECKLIST.md` (2.7, 6.4, 8.3, 10.1-10.3) and
-  `docs/planning/findings/step-02-inventory.md` ("What the new site must cover"), references to
-  5b, 5d and song years, genres and energy predate D19: the form at go-live is now 5e, and the
-  rest is future work. The checklist's and earlier steps' mentions of `bin/local-import`, the
-  local copy and Mailpit describe what was true before 5a-2.
+- **Stale documents:** none. The checklist's statuses and the inventory's list were brought up
+  to date on 2026-11-11 (D19's changes, the old local copy's removal).
 
 ## Decisions
 
