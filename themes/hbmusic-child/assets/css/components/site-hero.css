@@ -1,0 +1,56 @@
+/*
+ * Hero: the opening band of a page, a headline with its lead text and buttons beside a picture.
+ * Markup: a full-width group "site-hero" holding two columns; the picture is an image block
+ * "site-hero__photo" in the second column.
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-hero {
+	padding: var(--wp--custom--spacing--hero-top) var(--wp--custom--spacing--gutter) 0;
+}
+
+/*
+ * The picture stands on the band's bottom edge, so a cut-out figure meets it. The columns block's
+ * own vertical-alignment class is named too, because WordPress's rule for it is equally specific
+ * and would otherwise win by loading order.
+ */
+.site-hero .wp-block-columns,
+.site-hero .wp-block-columns.are-vertically-aligned-center {
+	align-items: flex-end;
+	margin-bottom: 0;
+}
+
+/* The text stays centred beside the picture, with room below it on narrow screens. */
+.site-hero .wp-block-column:first-child {
+	align-self: center;
+	padding-bottom: var(--wp--custom--spacing--hero-text-bottom);
+}
+
+.site-hero .wp-block-column:last-child {
+	align-self: flex-end;
+}
+
+.site-hero h1 {
+	margin: 0 0 var(--wp--custom--spacing--title-bottom);
+	font-size: var(--wp--custom--font-size--hero-title);
+	font-weight: 800;
+	line-height: 1.08;
+	letter-spacing: -0.02em;
+}
+
+.site-hero__photo {
+	margin: 0;
+}
+
+/* A block element without a gap below, so the picture meets the band's edge exactly. */
+.site-hero__photo img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* The lead text: the sentence that says what the page is about, under its headline. */
+.site-lead {
+	font-size: var(--wp--custom--font-size--lead);
+	line-height: 1.5;
+}

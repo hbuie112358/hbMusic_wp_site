@@ -1,0 +1,14 @@
+/*
+ * Section: a full-width band of a page with its own vertical rhythm. Every band between the hero
+ * and the call to action is one, so the page's spacing comes from one token.
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-section {
+	padding: var(--wp--custom--spacing--section) var(--wp--custom--spacing--gutter);
+}
+
+.site-section h2 {
+	margin-top: 0;
+	font-size: var(--wp--custom--font-size--section-title);
+}

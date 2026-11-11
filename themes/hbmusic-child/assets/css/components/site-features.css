@@ -1,0 +1,8 @@
+/*
+ * Features: a section of short points side by side (a columns block inside a "site-section
+ * site-features" group). Its own background sets it apart from the sections around it.
+ */
+
+.site-features {
+	background: var(--wp--preset--color--accent-4);
+}

@@ -28,14 +28,14 @@ for (const path of TEST_PATHS) {
 		// The parent theme's own footer links to a blog, shop and events this site does not have.
 		test("uses the site's own header and footer", async ({ page }) => {
 			await page.goto(path);
-			await expect(page.locator('header.hb-site-header'), 'the header').toHaveCount(1);
-			await expect(page.locator('footer.hb-site-footer'), 'the footer').toHaveCount(1);
+			await expect(page.locator('header.site-header'), 'the header').toHaveCount(1);
+			await expect(page.locator('footer.site-footer'), 'the footer').toHaveCount(1);
 			await expect(page.locator('footer a[href*="/shop"], footer a[href*="/blog"]'), "the parent's footer links").toHaveCount(0);
 		});
 
 		test('shows the logo from the theme', async ({ page }) => {
 			await page.goto(path);
-			const logo = page.locator('header.hb-site-header .hb-site-logo img');
+			const logo = page.locator('header.site-header .site-logo img');
 			await expect(logo, 'the logo').toBeVisible();
 			const hasLoaded = await logo.evaluate((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0);
 			expect(hasLoaded, 'the logo image has loaded').toBe(true);

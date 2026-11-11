@@ -21,8 +21,11 @@ template project starts; until then, a list, not a to-do.
   lock file (`hbmusic-e2e`).
 - The cache volumes: `tools/versions.sh` (`hbmusic_composer_cache`, `hbmusic_npm_cache`).
 - The theme folder: `themes/hbmusic-child/` and its line in `.gitignore`.
-- The site's design and logo: `themes/hbmusic-child/theme.json`, `parts/`, `patterns/site-logo.php`
-  and `assets/images/`; the neutral test pages' layouts in `tests/dev-content/` follow them.
+- The site's design and logo (plan D29, the site layer): `themes/hbmusic-child/theme.json` (the
+  palette, the font and every design token in `settings.custom`), `parts/`, `patterns/site-logo.php`
+  and `assets/images/`; the neutral test pages' layouts in `tests/dev-content/` follow them. A new
+  site changes these, not the component stylesheets.
+- The stylesheet handles' prefix `hbmusic-` in `functions.php`, with the PHP prefix.
 - The theme's header in `themes/hbmusic-child/style.css`: its name ("Howard Buie Music") and
   description; the parent, text domain, versions and licence stay.
 
@@ -57,6 +60,12 @@ template project starts; until then, a list, not a to-do.
 
 ## Generic already, kept as they are
 
+- The component stylesheets, `themes/hbmusic-child/assets/css/components/` (plan D29, the generic
+  layer): named by page structure (`site-hero`, `site-section`, `site-features`, `site-cta`,
+  `site-media-placeholder`, buttons, forms), using only the tokens, so they fit any relatively
+  static site without commerce; their loader `HBMUSIC_COMPONENT_STYLES` in `functions.php` (block
+  → components) and `component-styles.spec.ts`. A subject's own styles go with the feature that
+  brings them (the song table's in the Song List plugin).
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.

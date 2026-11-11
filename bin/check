@@ -114,6 +114,25 @@ theme_json_schema_matches_wordpress() {
   return 1
 }
 
+# The theme's component stylesheets load by name (plan D29): HBMUSIC_COMPONENT_STYLES and
+# HBMUSIC_FORM_STYLESHEET in functions.php name them, and WordPress silently loads nothing for a
+# name without a file. So the names and the files in assets/css/components/ must match, both ways.
+component_styles_match_files() {
+  local theme_dir="$REPO_ROOT/themes/hbmusic-child" listed on_disk
+  listed="$(sed -n '/^const HBMUSIC_COMPONENT_STYLES/,/^);/p' "$theme_dir/functions.php" | grep -oE "'[a-z0-9-]+'" | tr -d "'"
+    sed -nE "s#^const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/([a-z0-9-]+)\.css';#\1#p" "$theme_dir/functions.php")"
+  on_disk="$(find "$theme_dir/assets/css/components" -maxdepth 1 -name '*.css' -printf '%f\n' | sed 's/\.css$//')"
+  if [[ -z "$listed" ]]; then
+    log "functions.php lists no component stylesheets; the list or this check's pattern changed"
+    return 1
+  fi
+  local difference
+  difference="$(diff <(sort -u <<<"$listed") <(sort -u <<<"$on_disk"))" && return 0
+  log "Component names (<) and files in assets/css/components/ (>) differ:"
+  log "$difference"
+  return 1
+}
+
 # Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint); the
 # container sees only the two files.
 npm_audit() {
@@ -190,6 +209,7 @@ main() {
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
+  run_check "Component stylesheets match their list" component_styles_match_files
   run_check "TypeScript (browser tests)" typescript_check
   run_check "CSS (Stylelint)" css_lint
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts

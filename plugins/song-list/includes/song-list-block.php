@@ -8,14 +8,26 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Registers the block in PHP alone.
+ * Registers the block in PHP alone, with its stylesheet.
  *
  * The autoRegister support (WordPress 7.0) makes the editor offer a block that only has a PHP
  * render function, so the plugin needs no JavaScript or build step. The editor's half of this
  * feature still has an unstable internal name, so a browser test checks that the editor offers
  * the block.
+ *
+ * The stylesheet is the block's own "style", so WordPress loads it only on pages that show the
+ * block, and in the editor; its "path" lets WordPress inline it, saving a request.
  */
 function songlist_register_block(): void {
+	$stylesheet = 'assets/song-list.css';
+	wp_register_style(
+		SONGLIST_STYLE_HANDLE,
+		plugins_url( $stylesheet, SONGLIST_PLUGIN_FILE ),
+		array(),
+		SONGLIST_VERSION
+	);
+	wp_style_add_data( SONGLIST_STYLE_HANDLE, 'path', plugin_dir_path( SONGLIST_PLUGIN_FILE ) . $stylesheet );
+
 	register_block_type(
 		'songlist/song-list',
 		array(
@@ -29,6 +41,7 @@ function songlist_register_block(): void {
 				'html'         => false,
 				'align'        => array( 'wide', 'full' ),
 			),
+			'style_handles'   => array( SONGLIST_STYLE_HANDLE ),
 			'render_callback' => 'songlist_render_block',
 		)
 	);

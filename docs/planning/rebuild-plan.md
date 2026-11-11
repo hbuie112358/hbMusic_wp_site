@@ -64,8 +64,12 @@ new findings added as steps.
   ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
   spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
 - **In progress (D29, 2026-11-11):** a subtle polish of the look, on the branch
-  `style/subtle-polish`, in stages: (1) the CSS linter in `bin/check`; (2) the CSS restructured
-  into the site layer and generic components, with no visible change; (3) the type and spacing
+  `style/subtle-polish`, in stages: (1) the CSS linter in `bin/check` (done); (2) the CSS
+  restructured into the site layer and generic components (done: 16 screenshots compared pixel
+  by pixel, identical apart from the outlined button now as large as the main one, accepted by
+  the user; `component-styles.spec.ts` proves where each stylesheet loads, shown failing on four
+  planted faults). After its deploy, staging's Home, Music, Songs and About pages need the new
+  class names in their content (`site-…` instead of `hb-…`); (3) the type and spacing
   packages, kept in a git stash meanwhile; (4) buttons, menu and texture, one package at a time,
   each shown to the user in screenshots and checked for accessibility.
 - **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
