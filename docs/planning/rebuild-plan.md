@@ -60,9 +60,8 @@ new findings added as steps.
   (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
   merged by the user on 2026-11-11, earlier than the week agreed).
 - **Next:** the rest of step 8 (8m): uptime monitoring with certificate and domain alerts
-  (14.1, 14.2), and staging's Wordfence alert settings. Done in 8m on 2026-11-11: 2.2-2.5, 3.8,
-  4.8, 5.4, 11.2, 11.3, 11.4, and 14.3 on live (its alerts in spam until step 9, a Gmail filter
-  meanwhile). Delete live's wp-config
+  (14.1, 14.2). Done in 8m on 2026-11-11: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's
+  alerts land in spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo). Delete live's wp-config
   backup in the home folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs) no
   earlier than 2026-11-17, a week after its release. Or
   the user's 5f choices (videos, wording, and from the inventory WebP photos and a site icon);
@@ -1190,10 +1189,12 @@ new findings added as steps.
      2026-11-10, 0 issues), alerts at every severity to the user's own address; a `wp_mail` test
      from live (the path Wordfence's alerts take) landed in spam, sent through Hostinger's
      relay as `wordpress@howardbuiemusic.com`; the user's Gmail filter now keeps that sender out
-     of spam until step 9. A first attempt ran on staging by mistake (a failed `cd`), so a
-     command's site is checked with `wp option get home` first. Left: uptime monitoring with
-     certificate and domain alerts (14.1, 14.2); staging's Wordfence alert settings. Status:
-     `[~]`
+     of spam until step 9. Both test emails from that sitting came from live: staging sends as
+     `website@howardbuiemusic.com` through Brevo, and its own `wp_mail` test (after
+     `wp option get home` confirmed the site) reached the inbox with no filter involved. Since a
+     failed `cd` once left the terminal's site unclear, a command meant for one site is preceded
+     by `wp option get home`. Staging's alerts: the same address and severity as live's. Left:
+     uptime monitoring with certificate and domain alerts (14.1, 14.2). Status: `[~]`
    - **Scheduled checks can stop:** GitHub disables scheduled runs on a public repository after 60
      days without activity, so the weekly audits need regular activity, such as Dependabot merges.
    - **To consider then:** plugin auto-updates instead of trying each update on staging first; no

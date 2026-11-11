@@ -657,12 +657,12 @@ only after attempts to misuse it have failed.**
 known-vulnerable plugins.**
 - Why: compromises are found early.
 - Check: scans run on a schedule, the latest result is clean, and alerts go to the user's email.
-- Kind: WordPress · Status: partly (live, 2026-11-11): Wordfence scans daily at its own time (the last
+- Kind: WordPress · Status: done (2026-11-11): on live, Wordfence scans daily at its own time (the last
   scan 2026-11-10, 0 issues) and emails findings of every severity ("Low") to the user's own
   address. Live's mail still goes through Hostinger's relay, so a test sent like an alert
   (`wp_mail`) landed in spam; the user's Gmail filter for `wordpress@howardbuiemusic.com` (never
-  spam) brings the alerts in until step 9 moves live's mail to Brevo. Staging's settings are
-  not checked yet.
+  spam) brings the alerts in until step 9 moves live's mail to Brevo. Staging: the same address
+  and severity; its test arrived in the inbox through Brevo as `website@howardbuiemusic.com`.
 
 **14.4 The PHP error log and the web server log are reviewed after each deployment; between
 deployments, the alerts of 14.1 and 14.3 do the watching.**
