@@ -1,7 +1,7 @@
-# Weekly: compares the dev site's pinned plugins and theme with WordPress.org (bin/pins-check,
-# plan 8j) and proposes each newer one: a plugin as a pull request with its tests started, the
-# theme as an issue. It merges nothing; the user merges on GitHub once the checks pass.
-name: pins
+# Weekly: compares the dev site's pinned plugins and theme with WordPress.org (bin/versions-check,
+# plan 8j) and proposes each newer one: a plugin as a pull request, the theme as an issue. It
+# merges nothing; the user approves the pull request's tests and merges on GitHub once they pass.
+name: versions
 
 on:
   # Mondays 06:41 UTC, after Dependabot's run and away from the busy hour mark.
@@ -15,21 +15,21 @@ on:
         required: false
         default: "7"
 
-# Exactly what the proposals need: a branch (contents), its pull request, the theme's issue, and
-# starting the tests on the branch (actions). No secrets; the deploy runs only on main.
+# Exactly what the proposals need: a branch (contents), its pull request and the theme's issue.
+# The pull request's tests start when the user approves them on its page. No secrets; the deploy
+# runs only on main.
 permissions:
   contents: write
   pull-requests: write
   issues: write
-  actions: write
 
 # Two runs at once could both open the same proposal.
 concurrency:
-  group: pins
+  group: versions
   cancel-in-progress: false
 
 jobs:
-  pins:
+  versions:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -42,8 +42,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Compare the pins with WordPress.org and propose updates (bin/pins-check --act)
-        run: bin/pins-check --act
+      - name: Compare the pins with WordPress.org and propose updates (bin/versions-check --act)
+        run: bin/versions-check --act
         env:
           GH_TOKEN: ${{ github.token }}
           PINS_COOLDOWN_DAYS: ${{ inputs.cooldown-days || '7' }}
