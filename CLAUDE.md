@@ -77,7 +77,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
   PHP debug log, the `.env` safety stop, every stylesheet of the theme and the Song List labelled
-  by a fingerprint of its contents, embedded videos' titles read as written), then the browser tests in `tests/e2e/specs/dev/` in the
+  by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
   `config/booking-form-messages.json`): child theme active,
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
@@ -87,7 +87,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   the form's, the song table's from its plugin, plan D29), the bands' texture, the call-to-action panel's green and its button standing out from it, the lead text larger than body text, the hero's text and picture centred on each other with the picture's softened bottom, the features panel's buttons lined up, and the headings' even
   lines; the buttons' keyboard focus ring and
   its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
-  after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, and reduced motion (D29); one frame on every page (the header,
+  after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, several carousels each with their own arrows, a carousel named after a heading directly above it, and reduced motion (D29); one frame on every page (the header,
   footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
   menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, and the slimmer phone header
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug

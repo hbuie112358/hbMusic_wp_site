@@ -9,8 +9,9 @@
  *   the keyboard focus (the theme makes the row focusable; see below) or a video inside it.
  * - Browsers with CSS's native carousel controls (Chrome and Edge since 135; not yet Safari or
  *   Firefox, which ignore these rules) also show previous/next buttons and one dot per slide.
- * - Slides hidden off to the side load their videos only when scrolled near: WordPress gives
- *   embedded videos the browser's lazy loading.
+ * - WordPress gives embedded videos the browser's lazy loading, except the first three images or
+ *   embeds on a page, which it assumes are visible at once (its loading threshold), so those load
+ *   with the page even when hidden off to the side.
  * - No wrap-around from the last slide to the first: that needs a script.
  */
 
@@ -38,7 +39,13 @@
 	 * (well above 3:1) without competing with the buttons.
 	 */
 	scrollbar-color: var(--wp--preset--color--accent-6) var(--wp--preset--color--accent-5);
+
+	/*
+	 * The arrows are placed against the row by this name; scoped to the row, so with several
+	 * carousels on a page each one's arrows stay on it instead of all following the last.
+	 */
 	anchor-name: --site-carousel;
+	anchor-scope: --site-carousel;
 	scroll-marker-group: after;
 }
 

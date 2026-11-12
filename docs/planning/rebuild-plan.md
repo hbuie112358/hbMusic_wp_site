@@ -259,7 +259,22 @@ new findings added as steps.
   scenario check, `dev-embed-titles.sh`, runs WordPress's own function on YouTube-like player code
   (shown failing without the fix; ampersands and quotation marks were never affected and are
   checked so the fix does not break them). WordPress keeps each player's code in its oEmbed cache,
-  so the Music videos are added on staging after this fix is deployed. **Added
+  so the Music videos are added on staging after this fix is deployed. **Pushed and deployed (#49,
+  98040c2).** **Carousels as a component (the user: several per page, such as Rock, Country and
+  Mellow; a heading only when there are several):** a carousel already took any number of slides
+  (the three grey boxes were stand-ins). Several on a page: the arrows were placed by a name all
+  carousels shared (`anchor-name`), so they followed the last one; `anchor-scope` keeps it to each.
+  A carousel directly under a heading is named after it for screen readers (the theme links it to
+  the heading with `aria-labelledby` when the page is rendered, `hbmusic_name_carousels_after_
+  headings()`), one without keeps its label "Videos"; nothing to set in the editor. A "Video
+  carousel" pattern (`patterns/video-carousel.php`, three empty YouTube embeds) adds one from the
+  inserter; duplicating an existing one works too. The test Music page has a second carousel under
+  a heading; tests check each carousel's arrows act on their own row, the naming, and (a scenario
+  check, `dev-patterns.sh`) that the pattern's blocks are the structure the CSS expects; each shown
+  failing on its fault. **Found:** no embedded video is lazy-loaded: WordPress leaves the first
+  three images or embeds of a page eager (its loading threshold), which on Music is all three
+  videos; the carousel's comment had claimed otherwise and was corrected. A fix is proposed
+  separately. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

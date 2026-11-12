@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
+
 /**
  * This site's old page addresses and the pages that replaced them (plan D22): the old site's
  * Video and Audio pages became Music, its Contact page became Book. Search engines and old links
@@ -17,6 +19,11 @@ const HBMUSIC_OLD_ADDRESSES = array(
 	'audio'   => 'music',
 	'contact' => 'book',
 );
+
+/**
+ * The heading tags, as WordPress's tag processor names them (upper case).
+ */
+const HBMUSIC_HEADING_TAGS = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
 
 /**
  * The towns this site's musician travels to for events (plan D22), named in the page data for
@@ -161,6 +168,84 @@ function hbmusic_make_carousel_focusable( string $block_content ): string {
 	return $tags->get_updated_html();
 }
 add_filter( 'render_block_core/group', 'hbmusic_make_carousel_focusable' );
+
+/**
+ * Names each carousel after a heading directly above it, so screen readers announce "Rock" or
+ * "Country" instead of the same "Videos" for every carousel on the page (the user: one carousel
+ * needs no heading, several may each have one). The carousel is linked to the heading
+ * (aria-labelledby), which takes precedence over its own label; a carousel without a heading above
+ * it keeps that label. Applied to the page's content as rendered, since a block does not know its
+ * neighbours.
+ *
+ * @param string $block_content The page content's HTML.
+ * @return string The HTML, with carousels after a heading linked to it.
+ */
+function hbmusic_name_carousels_after_headings( string $block_content ): string {
+	$tags     = new WP_HTML_Tag_Processor( $block_content );
+	$position = Hbmusic_Carousel_Scan::Elsewhere;
+	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+		$position = hbmusic_scan_for_carousel( $tags, $position );
+	}
+	return $tags->get_updated_html();
+}
+add_filter( 'render_block_core/post-content', 'hbmusic_name_carousels_after_headings' );
+
+/**
+ * Advances the scan by the tag at the processor's position, linking a carousel that directly
+ * follows a heading.
+ *
+ * @param WP_HTML_Tag_Processor $tags     The processor, at an opening or closing tag.
+ * @param Hbmusic_Carousel_Scan $position Where the scan stood before this tag.
+ * @return Hbmusic_Carousel_Scan Where it stands after it.
+ */
+function hbmusic_scan_for_carousel( WP_HTML_Tag_Processor $tags, Hbmusic_Carousel_Scan $position ): Hbmusic_Carousel_Scan {
+	if ( in_array( $tags->get_tag(), HBMUSIC_HEADING_TAGS, true ) ) {
+		return hbmusic_scan_heading( $tags );
+	}
+	if ( Hbmusic_Carousel_Scan::InHeading === $position ) {
+		return $position;
+	}
+	if ( Hbmusic_Carousel_Scan::AfterHeading === $position && ! $tags->is_tag_closer() && true === $tags->has_class( 'site-carousel' ) ) {
+		hbmusic_link_carousel_to_heading( $tags );
+	}
+	return Hbmusic_Carousel_Scan::Elsewhere;
+}
+
+/**
+ * At a heading's opening tag, bookmarks it and enters it; at its closing tag, the scan is directly
+ * after it.
+ *
+ * @param WP_HTML_Tag_Processor $tags The processor, at a heading's opening or closing tag.
+ * @return Hbmusic_Carousel_Scan Where the scan stands.
+ */
+function hbmusic_scan_heading( WP_HTML_Tag_Processor $tags ): Hbmusic_Carousel_Scan {
+	if ( $tags->is_tag_closer() ) {
+		return Hbmusic_Carousel_Scan::AfterHeading;
+	}
+	$tags->set_bookmark( 'heading' );
+	return Hbmusic_Carousel_Scan::InHeading;
+}
+
+/**
+ * Links the carousel at the processor's position to the heading bookmarked as "heading": gives
+ * the heading an id if it has none, points the carousel's aria-labelledby at it and removes the
+ * carousel's own label, which the heading replaces.
+ *
+ * @param WP_HTML_Tag_Processor $tags The processor, at the carousel's opening tag.
+ */
+function hbmusic_link_carousel_to_heading( WP_HTML_Tag_Processor $tags ): void {
+	$tags->set_bookmark( 'carousel' );
+	$tags->seek( 'heading' );
+	$heading_id = $tags->get_attribute( 'id' );
+	if ( ! is_string( $heading_id ) || '' === $heading_id ) {
+		$heading_id = wp_unique_id( 'site-carousel-heading-' );
+		$tags->set_attribute( 'id', $heading_id );
+	}
+	$tags->seek( 'carousel' );
+	$tags->set_attribute( 'aria-labelledby', $heading_id );
+	$tags->remove_attribute( 'aria-label' );
+	$tags->release_bookmark( 'carousel' );
+}
 
 /**
  * A link's path within this site, without slashes at either end and in lower case ("" for the home
