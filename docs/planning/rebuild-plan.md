@@ -138,7 +138,14 @@ new findings added as steps.
   (scrollable-region-focusable): `hbmusic_make_carousel_focusable()` adds `tabindex="0"` when the
   page is rendered (an attribute in the content would make the editor flag the block invalid),
   with a focus ring, and the arrow keys scroll it. `carousel.spec.ts` (5 tests), each shown
-  failing on a planted fault. **One push at the end** (the user's preference for a single
+  failing on a planted fault. **Package 7, a calmer green (the user: the solid green band "honked", and
+  so did the green arrows and scrollbar):** green now marks only what can be pressed. The call to
+  action is a black band with a loose green fog (chosen from three, tight, medium and loose,
+  tried on temporary pages; its shape and strength are tokens) and the normal bright green
+  button, so contrast draws the eye, not area; its text has 9.3:1 at the fog's centre (5.3:1 on
+  the old band), the band's white-text token and lift shadow are gone. The carousel's arrows are
+  dark discs that turn green only when pointed at (the user liked that), its scrollbar and dots
+  soft grey, the current dot warm white; every control 9.9:1 or more. A test checks the fog. **One push at the end** (the user's preference for a single
   staging update): after the deploy, staging's Home, Music, Songs and About get their content
   with the new class names, Home from its own code in the editor (to keep its photo). **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing

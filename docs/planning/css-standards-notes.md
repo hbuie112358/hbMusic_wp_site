@@ -125,5 +125,12 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   checked for 3:1 like any control.
 - **Judge in the browsers visitors use.** VS Code's built-in browser behaved differently from
   Chrome; design decisions are checked in Chrome or Edge and Firefox.
+- **An accent colour is for accents.** Green on a whole band and on every control "honked" (the
+  user); used only on what can be pressed, with the band a dark fog, the main button draws more
+  attention, not less, and every text gained contrast.
+- **Show options live, not only as pictures.** Three fog versions on temporary local pages let the
+  user judge in a real browser; the pages were deleted after the choice.
+- **Mock-ups injected after load can catch a transition mid-way.** The first fog mock-ups showed
+  a faded button; the colour fade was still running. A pause before the screenshot fixed it.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.

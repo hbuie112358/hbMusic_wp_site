@@ -27,10 +27,11 @@
 
 	/*
 	 * In browsers without the native buttons (Firefox, Safari) the scrollbar is the only visible
-	 * sign that the row moves sideways; in the accent colour it reads as a control (the user first
-	 * missed Firefox's thin grey one on the dark page).
+	 * sign that the row moves sideways: the user first missed Firefox's default one on the dark
+	 * page, then found a green one too loud. A soft grey thumb on the dark track is visible
+	 * (well above 3:1) without competing with the buttons.
 	 */
-	scrollbar-color: var(--wp--preset--color--accent-1) var(--wp--preset--color--accent-5);
+	scrollbar-color: var(--wp--preset--color--accent-6) var(--wp--preset--color--accent-5);
 	anchor-name: --site-carousel;
 	scroll-marker-group: after;
 }
@@ -67,7 +68,11 @@
 	border: 0;
 }
 
-/* Native previous/next buttons, over the row's left and right edges, where supported. */
+/*
+ * Native previous/next buttons, over the row's left and right edges, where supported: quiet dark
+ * discs that turn green only when pointed at, like the outlined buttons, so green stays for the
+ * page's main action (the user found green arrows too loud).
+ */
 .site-carousel::scroll-button(*) {
 	position: absolute;
 	position-anchor: --site-carousel;
@@ -75,12 +80,21 @@
 	width: var(--wp--custom--carousel--button-size);
 	height: var(--wp--custom--carousel--button-size);
 	font-size: 1.25rem;
-	color: var(--wp--preset--color--base);
+	color: var(--wp--preset--color--contrast);
 	cursor: pointer;
-	background: var(--wp--preset--color--accent-1);
-	border: 0;
+	background: var(--wp--custom--carousel--button-background);
+	border: 1px solid var(--wp--preset--color--accent-6);
 	border-radius: 50%;
-	box-shadow: var(--wp--preset--shadow--button-glow);
+	transition:
+		background-color var(--wp--custom--motion--duration) ease,
+		color var(--wp--custom--motion--duration) ease;
+}
+
+@media (hover: hover) {
+	.site-carousel::scroll-button(*):hover {
+		color: var(--wp--preset--color--base);
+		background: var(--wp--preset--color--accent-1);
+	}
 }
 
 .site-carousel::scroll-button(left) {
@@ -104,7 +118,7 @@
 	outline-offset: var(--wp--custom--focus-ring--offset);
 }
 
-/* One dot per slide, under the row; the current slide's dot is filled. */
+/* One dot per slide, under the row, in soft grey; the current slide's dot is filled in warm white. */
 .site-carousel::scroll-marker-group {
 	display: flex;
 	justify-content: center;
@@ -116,12 +130,13 @@
 	width: var(--wp--custom--carousel--marker-size);
 	height: var(--wp--custom--carousel--marker-size);
 	content: "";
-	border: 2px solid var(--wp--preset--color--accent-1);
+	border: 2px solid var(--wp--preset--color--accent-6);
 	border-radius: 50%;
 }
 
 .site-carousel > *::scroll-marker:target-current {
-	background: var(--wp--preset--color--accent-1);
+	background: var(--wp--preset--color--contrast);
+	border-color: var(--wp--preset--color--contrast);
 }
 
 /* People who ask their device for less motion get an instant jump instead of a glide. */
