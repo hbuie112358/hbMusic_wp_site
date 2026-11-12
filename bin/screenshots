@@ -113,6 +113,17 @@ show_previews() {
   while IFS= read -r entry; do
     show_preview "$entry"
   done < <(jq -c '.[]' "$manifest")
+  list_preview_addresses "$manifest"
+}
+
+# The previews' full addresses, to open in a browser. The site's menu leads to the stand-in pages,
+# not to the previews (the user, 2026-11-11, found the real pages "missing" that way).
+list_preview_addresses() {
+  local slug
+  log "The real pages, to open directly (the menu leads to the stand-in pages instead):"
+  while IFS= read -r slug; do
+    printf '  http://localhost:%s/preview-%s/\n' "$DEV_SITE_PORT" "$slug" >&2
+  done < <(jq -r '.[].slug' "$1")
 }
 
 # Every address to shoot, as a JSON list: the stand-in pages, then the previews.
