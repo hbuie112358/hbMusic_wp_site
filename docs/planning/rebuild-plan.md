@@ -195,7 +195,19 @@ new findings added as steps.
   "Page No Title with call to action". Until then staging's pages show their old bands. After
   this paste, look changes reach the site through the theme folder alone; patterns for the
   sections (a customer inserts them from the block inserter, never the code editor) are the next
-  step. **Added
+  step. **Pushed and deployed (#45, 4eedebd, 2026-11-12);** staging's Home, Music,
+  Songs and About updated by the user (content pasted, templates chosen). **Then, on branch
+  `style/cta-fog` (the user, looking at staging):** the call-to-action panel's green made more
+  prominent: the fog tried at 55% and 65%, then wider toward the sides, then without a fade; the
+  user chose the even green, now one colour token (`custom.color.ctaBackground`, 65% of the
+  palette's green mixed with black) instead of a gradient; contrast computed for each step (80%
+  would have dropped the button's edge below 3:1). The panel's text takes the heading's brighter
+  warm white (7.2:1 instead of 6.0:1, the user asked for more contrast). The lead size had been
+  smaller than body text (20px against 22px; found by measuring when the user asked for larger
+  text): now `clamp(1.25rem, 1rem + 1vw, 1.625rem)`, 20px on a phone to 26px on a computer, its own
+  component `site-lead.css` (on paragraphs; it was inside the hero's file), used by Home's
+  introduction and the panel's line. Tests: the panel's colour is green (not black or missing),
+  the lead larger than body text at two widths, each shown failing on a planted fault. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

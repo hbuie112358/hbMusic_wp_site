@@ -58,8 +58,14 @@ test('the hero, features and call-to-action bands carry their texture', async ({
 	}
 	const heroLayers = await page.locator('.site-hero').evaluate((element) => getComputedStyle(element).backgroundImage);
 	expect(heroLayers, 'the hero\'s stage light').toContain('radial-gradient');
-	const ctaLayers = await page.locator('.site-cta').first().evaluate((element) => getComputedStyle(element).backgroundImage);
-	expect(ctaLayers, 'the call-to-action band\'s green fog').toContain('radial-gradient');
+	// The call-to-action panel's even green (a colour mixed in theme.json): green outweighs red and
+	// blue, and it is not black, which is what a colour that fails to resolve would leave.
+	const ctaColour = await page.locator('.site-cta').first().evaluate((element) => getComputedStyle(element).backgroundColor);
+	const channels = (ctaColour.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+	const scale = Math.max(...channels) <= 1 ? 255 : 1;
+	const [red = 0, green = 0, blue = 0] = channels.map((channel) => channel * scale);
+	expect(green, `the call-to-action panel's green in ${ctaColour}`).toBeGreaterThan(Math.max(red, blue));
+	expect(green, `the call-to-action panel's green in ${ctaColour}`).toBeGreaterThan(40);
 	const grainAddress = /url\("([^"]+grain\.png)"\)/.exec(heroLayers)?.[1] ?? '';
 	expect((await request.get(grainAddress)).status(), `the grain image at ${grainAddress}`).toBe(200);
 });
@@ -71,3 +77,17 @@ test("the song table's styles apply to the table", async ({ page }) => {
 	await expect(heading, 'a column heading').toBeVisible();
 	expect(await heading.evaluate((cell) => getComputedStyle(cell).borderBottomWidth), 'the line under the headings').toBe('2px');
 });
+
+// A lead is the larger opening statement; it was once smaller than body text without anyone
+// noticing. Checked on a computer and a phone, since both sizes grow with the screen.
+for (const width of [1280, 390]) {
+	test(`at ${width}px the lead text is larger than body text`, async ({ page }) => {
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto('/');
+		const fontSize = (selector: string) => page.locator(selector).first().evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+		const lead = await fontSize('.site-lead');
+		const body = await fontSize('.site-features p');
+		expect(body, 'the body text\'s size').toBeGreaterThan(0);
+		expect(lead, `the lead's size against body text of ${body}px`).toBeGreaterThan(body);
+	});
+}

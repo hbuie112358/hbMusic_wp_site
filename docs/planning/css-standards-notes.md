@@ -145,6 +145,11 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   within the component, with `>` where a component holds others' headings, separates the two.
 - **A child theme's lists replace the parent's.** `templateParts` with one new entry dropped the
   header's and footer's areas (rendered as `div`s, the sticky header broke); tests caught it.
+- **A type scale is checked as relations, not values.** The lead token (20px) had fallen below
+  body text (22px, the parent theme's fluid size) without anyone noticing; a test now asserts
+  lead > body at a phone's and a computer's width, not either number.
+- **A trial value is replaced by its proper form before it is kept.** "No fade" was tried as a
+  1000% gradient ellipse; kept, it became one colour token, with the gradient's two settings gone.
 - **One frame, every part:** a full-width band whose colour differs from the page shows where the
   frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,
