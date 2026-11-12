@@ -145,7 +145,20 @@ new findings added as steps.
   button, so contrast draws the eye, not area; its text has 9.3:1 at the fog's centre (5.3:1 on
   the old band), the band's white-text token and lift shadow are gone. The carousel's arrows are
   dark discs that turn green only when pointed at (the user liked that), its scrollbar and dots
-  soft grey, the current dot warm white; every control 9.9:1 or more. A test checks the fog. **One push at the end** (the user's preference for a single
+  soft grey, the current dot warm white; every control 9.9:1 or more. A test checks the fog. **Pushed
+  and deployed (#42, d9abe45, 2026-11-11).** Staging's content update to the new class names: Home
+  done by the user (code pasted from `data/content/for-staging/home.html`, the cut-out chosen in the
+  hero, its alt text asked for); **Music, Songs and About still to paste** from the same folder.
+  **In progress, paused (branch `style/one-frame`, uncommitted):** one frame for every page (the
+  user): a `layout.frame` token (1100px), header and footer content at the frame, the features
+  and call-to-action bands as panels within the frame with rounded corners (`panelRadius` 8px;
+  markup unchanged, so no new paste on staging), the page side padding equal to the gutter. Measured
+  at 1280px: header, hero, sections, both panels and footer all 90-1190. Still to do: the carousel
+  to the frame width with the current video centred and small peeks on both sides (slides sized
+  with container units, spacer pseudo-elements so the first and last can centre); the phone-width
+  check (`frame.js`-style measurement timed out at 3 minutes, run fewer pages); the narrow pages
+  keep their narrow text column but the full-frame header, footer and panel; then the user's
+  look in Chrome, tests, docs, review, commit, push. **One push at the end** (the user's preference for a single
   staging update): after the deploy, staging's Home, Music, Songs and About get their content
   with the new class names, Home from its own code in the editor (to keep its photo). **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing

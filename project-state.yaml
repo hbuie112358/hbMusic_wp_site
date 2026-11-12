@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-11T17:30:00-05:00
-current_branch: style/subtle-polish
-last_commit: 9c69c78
+timestamp: 2026-11-11T21:45:00-05:00
+current_branch: style/one-frame
+last_commit: d9abe45
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -74,17 +74,23 @@ last_work: >
   table's styles moved into Song List 0.2.0, proven identical by pixel comparison apart from the
   outlined button, breaking for page content (hb- classes renamed site-); 9c69c78 the type and
   spacing the user approved. bin/check 20 checks, bin/test 87 browser tests, all passing.
+  Evening of 2026-11-11 (after a resume): bin/screenshots (generic before/after check with the real
+  content, by convention: data/content/pages.json, {{photo:<file>}}); the buttons (depth, hover,
+  focus, equal sizes and widths); the sticky header with the current-page mark; even headings; the
+  hero at 40-60; the stage light, grain and a cut-out photo (data/photos/make_cutout.py); the Music
+  videos in a CSS-only carousel (option A+, no JavaScript); a calmer green (the call to action as a
+  black band with a loose green fog, quiet carousel controls). Merged as #42 (d9abe45) and deployed
+  to staging; staging's Home content updated by the user. bin/check 20 checks, bin/test 110
+  browser tests, all passing on main.
 
 next_action: >
-  Resume D29 with package 3, the buttons (plan Current position, "In progress"): glow, top
-  highlight, hover lift with a reduced-motion exception, focus ring; then package 4 (menu and
-  header) and 5 (stage light and grain), each shown to the user in screenshots from
-  bin/screenshots (baseline before, compare after; it makes its own previews) and checked for accessibility; then
-  one push, and the staging content update to the new class names (Home from its own editor
-  code, to keep the photo). Remind the user to delete ~/wp-config.live-before-2026-11-11.php on
-  the server (it holds live's database password) once live has run a few days. Contact Form 7
-  6.2.5 not onto staging or live before 2026-11-17. Ask whether GitHub's emails for the versions
-  check arrive (the user was to set Watch -> Custom -> Pull requests and Issues).
+  Staging: the user pastes Music, Songs and About from data/content/for-staging/ (Pages, Edit,
+  Code editor, select all, paste, Save); confirm Home's cut-out alt text was set. Then resume the
+  one-frame work on branch style/one-frame (plan Current position, "In progress, paused"): the
+  carousel at the frame width with the current video centred, the phone-width check, the user's
+  look in Chrome (not VS Code's built-in browser), tests, docs, review, commit, push. Remind the
+  user to delete ~/wp-config.live-before-2026-11-11.php on the server. Contact Form 7 6.2.5 not
+  onto staging or live before 2026-11-17.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -113,7 +119,10 @@ verification:
   hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
   not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
-uncommitted_changes: []
+uncommitted_changes:
+  - themes/hbmusic-child/theme.json: the frame token, panel radius and page side padding (one-frame work, unfinished, not reviewed)
+  - themes/hbmusic-child/parts/header.html and footer.html: content width set to the frame (same)
+  - themes/hbmusic-child/assets/css/components/site-features.css and site-cta.css: the bands as panels within the frame (same)
 
 pending_decisions:
   - >
@@ -137,6 +146,7 @@ pending_decisions:
   - Decided when the step is reached, noted in the plan - step 9 (updating the site in place or a fresh install).
   - Optional, in the admin: Yoast's Other profiles with the Facebook page, so the page data names it (sameAs; staging now, live at step 9).
   - HetrixTools two-factor login: Claude asked on 2026-11-11 whether it was turned on; not answered. The account will hold customers' sites later.
+  - Square or rounded panels was settled (rounded, 8px); confirm the look live when the frame work is shown.
   - >
     After D29 (the user, 2026-11-11: not now): a global CSS rule proposed item by item from
     docs/planning/css-standards-notes.md. (The versioned bin/screenshots, option B, was built on
