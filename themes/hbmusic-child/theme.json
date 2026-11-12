@@ -1,6 +1,65 @@
 {
 	"$schema": "https://schemas.wp.org/wp/7.1/theme.json",
 	"version": 3,
+	"customTemplates": [
+		{
+			"name": "page-no-title",
+			"title": "Page No Title",
+			"postTypes": [ "page" ]
+		},
+		{
+			"name": "page-with-call-to-action",
+			"title": "Page with call to action",
+			"postTypes": [ "page" ]
+		},
+		{
+			"name": "page-no-title-with-call-to-action",
+			"title": "Page No Title with call to action",
+			"postTypes": [ "page" ]
+		}
+	],
+	"templateParts": [
+		{
+			"name": "header",
+			"title": "Header",
+			"area": "header"
+		},
+		{
+			"name": "vertical-header",
+			"title": "Vertical site header",
+			"area": "header"
+		},
+		{
+			"name": "header-large-title",
+			"title": "Header with large title",
+			"area": "header"
+		},
+		{
+			"name": "footer",
+			"title": "Footer",
+			"area": "footer"
+		},
+		{
+			"name": "footer-columns",
+			"title": "Footer Columns",
+			"area": "footer"
+		},
+		{
+			"name": "footer-newsletter",
+			"title": "Footer Newsletter",
+			"area": "footer"
+		},
+		{
+			"name": "sidebar",
+			"title": "Sidebar",
+			"area": "uncategorized"
+		},
+		{
+			"name": "call-to-action",
+			"title": "Call to action",
+			"area": "uncategorized"
+		}
+	],
 	"settings": {
 		"color": {
 			"palette": [
@@ -65,6 +124,9 @@
 				}
 			]
 		},
+		"layout": {
+			"wideSize": "1100px"
+		},
 		"custom": {
 			"color": {
 				"formError": "#ffb3b3"
@@ -94,6 +156,7 @@
 				"height": "2px"
 			},
 			"radius": "4px",
+			"panelRadius": "8px",
 			"button": {
 				"paddingBlock": "14px",
 				"paddingInline": "26px",
@@ -113,7 +176,7 @@
 				"focusGap": "8px"
 			},
 			"carousel": {
-				"slideWidth": "min(86%, 860px)",
+				"slideWidth": "min(80cqi, 860px)",
 				"gap": "16px",
 				"markerSize": "10px",
 				"buttonSize": "44px",
@@ -135,6 +198,12 @@
 		}
 	},
 	"styles": {
+		"spacing": {
+			"padding": {
+				"left": "var(--wp--custom--spacing--gutter)",
+				"right": "var(--wp--custom--spacing--gutter)"
+			}
+		},
 		"typography": {
 			"fontWeight": "400",
 			"lineHeight": "1.6"

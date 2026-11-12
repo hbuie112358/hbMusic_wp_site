@@ -1,7 +1,9 @@
 /*
- * Hero: the opening band of a page, a headline with its lead text and buttons beside a picture.
- * Markup: a full-width group "site-hero" holding two columns; the picture is an image block
- * "site-hero__photo" in the second column.
+ * Hero: the opening panel of a page, a headline with its lead text and buttons beside a picture.
+ * Markup: a wide group "site-hero site-panel" holding two columns (site-panel.css sets its
+ * corners, side margins and the space between panels); the picture is an image block
+ * "site-hero__photo" in the second column. As a panel, its lighter stage stops at the frame like
+ * everything else; as a full-width band it reached the screen's edges (the user saw it).
  */
 
 /*
@@ -14,7 +16,7 @@
 .wp-block-group.site-hero {
 	--site-stage-light-position: 72% 75%;
 
-	padding: var(--wp--custom--spacing--hero-top) var(--wp--custom--spacing--gutter) 0;
+	padding-block: var(--wp--custom--spacing--hero-top) 0;
 	background:
 		var(--site-grain, none),
 		radial-gradient(ellipse 38% 75% at var(--site-stage-light-position), var(--wp--custom--texture--stage-light), transparent 70%),
@@ -48,7 +50,8 @@
 	align-self: flex-end;
 }
 
-.site-hero h1 {
+/* The headline, whatever its level (the level follows the page's outline; the look does not). */
+.site-hero .wp-block-heading {
 	margin: 0 0 var(--wp--custom--spacing--title-bottom);
 	font-size: var(--wp--custom--font-size--hero-title);
 	font-weight: 800;

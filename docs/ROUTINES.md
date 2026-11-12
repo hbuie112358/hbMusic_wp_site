@@ -107,7 +107,12 @@ Claude:
 staging and live stay on their version until it has been looked at with Claude.
 
 **An issue about Twenty Twenty-Five** instead of a pull request: the theme's pin includes a
-fingerprint taken by hand, so a new theme version is raised in a session with Claude.
+fingerprint taken by hand, so a new theme version is raised in a session with Claude. In that
+session Claude also compares the new version's `templates/page.html` and
+`templates/page-no-title.html` with the child theme's two "with call to action" templates (plan
+D29), which add only the call-to-action part and the same bottom space, and the new version's
+`templateParts` and `customTemplates` in its `theme.json` with the child's copies of those lists,
+and carries any change over.
 
 ## When replacing a picture
 

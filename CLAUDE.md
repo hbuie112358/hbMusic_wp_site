@@ -69,7 +69,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
   and its "sending failed" message from `config/booking-form-messages.json` (merged into Contact
   Form 7's own messages; staging and live get the same text typed in by hand),
-  test pages (`tests/dev-content/`) and songs with neutral text, a stand-in Yoast organization
+  test pages (`tests/dev-content/`, each with the page template its real page uses) and songs with neutral text, a stand-in Yoast organization
   (a neutral name and the theme's logo), a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`). `config/dev-mu-plugins/`, on the dev site only and never
   deployed, sends mail to Mailpit and answers for Cloudflare. Needs no backup, so CI can build it
@@ -86,8 +86,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   the form's, the song table's from its plugin, plan D29), the bands' texture and the headings' even
   lines; the buttons' keyboard focus ring and
   its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
-  after a tap (D29); the video carousel's row, label, keyboard access, end and reduced motion (D29); the sticky header, a link reached with the keyboard never under it, the
-  menu's current-page mark, no gap under a closing call to action, and the slimmer phone header
+  after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, and reduced motion (D29); one frame on every page (the header,
+  footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
+  menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, and the slimmer phone header
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.

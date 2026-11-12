@@ -120,7 +120,33 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   scrolling row focusable; axe caught it, and the theme adds `tabindex="0"` with a focus ring at
   render time. The assumption that the browser would handle it was wrong.
 - **Snap the last slide to the end.** A last snap point the row can never reach is approximated
-  and can stop a fraction short, which left the "next" button showing in one browser.
+  and can stop a fraction short, which left the "next" button showing in one browser. (Later,
+  with every slide centred: equal spacers before the first and after the last make each
+  centre stop reachable exactly.)
+- **Use the framework's own setting before adding a token.** The page's frame first became a
+  custom token; WordPress's wide width (`settings.layout.wideSize`) already is that value, and its
+  wide blocks follow it with no extra rule. Page content, too, names the variable, never the
+  number: a width repeated in content drifts from the theme the first time the theme changes.
+- **Size a component's parts against the component with container units.** Percentages in a grid
+  refer to the track, not the row; `container-type: inline-size` and `cqi` give the row's own width.
+- **A shared behaviour is one component, joined by a class, not copied.** The three panels first
+  each copied the frame width and corners; their spacing then disagreed and two panels touched.
+  An exception per pair would have patched it; one `site-panel` class and file fixed the cause,
+  and a new panel needs no CSS (the user asked why one would exclude rather than conform).
+- **Page spacing belongs to the template, not to the last block.** Removing the template's
+  padding with `!important` for one kind of last block, then adding the block's own margin,
+  gave each template a different result; the template's own spacing needs no override.
+- **Content names, the theme decides.** Page content that carries sizes or repeated pieces
+  (a width on every band, the same call to action on four pages) needs pasting again whenever
+  the look changes. Content carrying only component names and WordPress's own alignments, with
+  repeated pieces in template parts, takes every later change from the theme folder.
+- **Style by role, not by heading level.** `.site-section h2` tied the look to the level; an
+  editor fixing the outline for screen readers would change the look. `.wp-block-heading`
+  within the component, with `>` where a component holds others' headings, separates the two.
+- **A child theme's lists replace the parent's.** `templateParts` with one new entry dropped the
+  header's and footer's areas (rendered as `div`s, the sticky header broke); tests caught it.
+- **One frame, every part:** a full-width band whose colour differs from the page shows where the
+  frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,
   checked for 3:1 like any control.
 - **Judge in the browsers visitors use.** VS Code's built-in browser behaved differently from

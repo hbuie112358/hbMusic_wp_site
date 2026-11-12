@@ -22,7 +22,9 @@ template project starts; until then, a list, not a to-do.
 - The cache volumes: `tools/versions.sh` (`hbmusic_composer_cache`, `hbmusic_npm_cache`).
 - The theme folder: `themes/hbmusic-child/` and its line in `.gitignore`.
 - The site's design and logo (plan D29, the site layer): `themes/hbmusic-child/theme.json` (the
-  palette, the font and every design token in `settings.custom`), `parts/`, `patterns/site-logo.php`
+  palette, the font, the frame's width as WordPress's `settings.layout.wideSize`, which page
+  content, the header, the footer and the panels follow and never repeat, and every design token
+  in `settings.custom`), `parts/`, `patterns/site-logo.php`
   and `assets/images/`; the neutral test pages' layouts in `tests/dev-content/` follow them. A new
   site changes these, not the component stylesheets.
 - The stylesheet handles' prefix `hbmusic-` in `functions.php`, with the PHP prefix.
@@ -67,6 +69,20 @@ template project starts; until then, a list, not a to-do.
   → components) and `component-styles.spec.ts`. A subject's own styles go with the feature that
   brings them (the song table's in the Song List plugin). Every `site-…` component has a neutral
   example on the dev site's test pages, which `bin/check` enforces.
+- Bands and panels (plan D29): every band of a page is a wide group (WordPress's wide alignment
+  is the frame) naming only its component class; the class `site-panel` next to it draws it as a
+  panel (`site-panel.css`: side margins, corners, the space between panels). A new kind of panel
+  needs only the class. Generic.
+- The call to action (plan D29): `parts/call-to-action.html` holds this site's wording (the site
+  layer, like the header and footer); the templates `templates/page-with-call-to-action.html` and
+  `templates/page-no-title-with-call-to-action.html` (Twenty Twenty-Five 1.5's "Page" and "Page
+  No Title" with the part under the content, and the same bottom space) are generic. When the
+  parent theme updates, its two templates are compared with these (`docs/ROUTINES.md`).
+- `theme.json`'s `customTemplates` and `templateParts` replace the parent's lists instead of
+  adding to them: a child theme repeats the parent's entries (without the header's and footer's,
+  WordPress renders them as plain `div`s), and compares them when the parent updates.
+- The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),
+  which mean the carousel's own width only inside it; it is not a general-purpose length.
 - A comfortable line length for text: an inner group whose content width is the measure token,
   justified left (no CSS needed; WordPress generates the rule). The example is in
   `tests/dev-content/home.html`; in a block comment, `--` is written `--`, as WordPress's

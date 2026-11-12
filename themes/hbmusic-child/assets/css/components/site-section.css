@@ -1,14 +1,30 @@
 /*
- * Section: a full-width band of a page with its own vertical rhythm. Every band between the hero
- * and the call to action is one, so the page's spacing comes from one token.
+ * Section: a band of a page at the frame's width (WordPress's wide alignment) with its own
+ * vertical rhythm. Every band between the hero and the call to action is one, so the page's
+ * spacing comes from one token. Markup: a wide group "site-section".
  */
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
 .wp-block-group.site-section {
-	padding: var(--wp--custom--spacing--section) var(--wp--custom--spacing--gutter);
+	padding-block: var(--wp--custom--spacing--section);
 }
 
-.site-section h2 {
+/*
+ * A plain section that ends the page's content needs no space of its own below: what follows, the
+ * call to action or the page template's own space before the footer, provides it, so a page ending
+ * with a section is spaced like one ending with text. Not a panel (a features panel is a section
+ * too): its padding is inside its background.
+ */
+.wp-block-post-content > .wp-block-group.site-section:not(.site-panel):last-child {
+	padding-bottom: 0;
+}
+
+/*
+ * The section's title: its own heading, whatever its level (the level follows the page's outline
+ * for screen readers; the look does not depend on it). Headings further in, such as a features
+ * panel's points, have their own look.
+ */
+.site-section > .wp-block-heading {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);
 }

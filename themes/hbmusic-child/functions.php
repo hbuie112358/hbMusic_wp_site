@@ -35,7 +35,7 @@ const HBMUSIC_AREAS_SERVED = array(
  */
 const HBMUSIC_COMPONENT_STYLES = array(
 	'core/template-part' => array( 'site-header', 'site-footer' ),
-	'core/group'         => array( 'texture', 'site-hero', 'site-section', 'site-features', 'site-cta', 'site-carousel' ),
+	'core/group'         => array( 'texture', 'site-panel', 'site-hero', 'site-section', 'site-features', 'site-cta', 'site-carousel' ),
 	'core/paragraph'     => array( 'site-media' ),
 	'core/button'        => array( 'buttons' ),
 	'core/heading'       => array( 'headings' ),

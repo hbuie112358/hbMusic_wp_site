@@ -2,10 +2,14 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // Protects the sticky header and the menu (plan D29): the header stays at the top while the page
 // scrolls, a link reached with the keyboard is never hidden under it (WCAG 2.2, 2.4.11), the menu
-// marks the page being shown, the header is slimmer on phones, and a page that ends with the
-// call-to-action band meets the footer without a strip between them.
+// marks the page being shown, the header is slimmer on phones, and a page that ends with a panel
+// has the same space before the footer as a page that ends with text.
 const HEADER = 'header.wp-block-template-part';
 const ABOUT_PATH = '/about/';
+// Ends with a paragraph (tests/dev-content/privacy-policy.html).
+const PAGE_ENDING_WITH_TEXT = '/privacy-policy/';
+// Home uses the "Page No Title" template, About the default "Page" template (bin/dev-site).
+const PAGES_ENDING_WITH_A_PANEL = ['/', ABOUT_PATH];
 const MAXIMUM_TABS = 40;
 
 async function scrollToBottom(page: Page): Promise<void> {
@@ -57,13 +61,34 @@ for (const [path, label] of [
 	});
 }
 
-test('a page that ends with the call-to-action band meets the footer without a gap', async ({ page }) => {
-	await page.goto(ABOUT_PATH);
-	const band = await page.locator('.wp-block-post-content > .site-cta:last-child').boundingBox();
-	const footer = await page.locator('footer.wp-block-template-part').boundingBox();
-	expect(band, 'the band at the end of the page').not.toBeNull();
-	expect(Math.round((footer?.y ?? 0) - ((band?.y ?? 0) + (band?.height ?? 0))), 'the gap in pixels').toBe(0);
-});
+// The space between the page's last block (from its content or its template) and the footer, in
+// whole pixels.
+async function spaceBeforeFooter(page: Page, path: string): Promise<number> {
+	await page.goto(path);
+	return page.evaluate(() => {
+		const blocks = [...document.querySelectorAll('main .wp-block-post-content > *, main .wp-block-template-part')];
+		const footer = document.querySelector('footer.wp-block-template-part');
+		if (blocks.length === 0 || !footer) {
+			return Number.NaN;
+		}
+		const lastBottom = Math.max(...blocks.map((block) => block.getBoundingClientRect().bottom));
+		return Math.round(footer.getBoundingClientRect().top - lastBottom);
+	});
+}
+
+// A page ending with the call-to-action panel (from its "with call to action" template) keeps the
+// template's own space before the footer, the same as a page ending with text, in both templates
+// the pages use: no strip added (the full-width band once had one) and no rule of ours.
+for (const path of PAGES_ENDING_WITH_A_PANEL) {
+	test(`${path} ends with the call-to-action panel and has the same space before the footer as a page that ends with text`, async ({ page }) => {
+		await page.goto(path);
+		await expect(page.locator('main .wp-block-template-part > .site-cta.site-panel'), `the panel ending ${path}`).toHaveCount(1);
+		const afterPanel = await spaceBeforeFooter(page, path);
+		const afterText = await spaceBeforeFooter(page, PAGE_ENDING_WITH_TEXT);
+		expect(afterText, 'the space after text').toBeGreaterThan(0);
+		expect(afterPanel, 'the space after the panel').toBe(afterText);
+	});
+}
 
 test('the header is slimmer on a phone than on a computer', async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 });

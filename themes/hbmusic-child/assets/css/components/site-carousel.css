@@ -3,9 +3,10 @@
  * only (plan D29, option A+ chosen by the user over a scripted carousel). Markup: a group
  * "site-carousel" (a section labelled for screen readers); each direct child is a slide.
  *
- * - The next slide peeks in at the edge, so it is clear there is more.
+ * - The row is as wide as the page's frame (a wide block). The current slide sits in the middle,
+ *   with a small, equal part of its neighbours showing on each side, so it is clear there is more.
  * - Swipe on touch screens, the trackpad or scrollbar with a mouse, the arrow keys once the row has
- *   the keyboard focus (browsers make a scrolling row focusable) or a video inside it.
+ *   the keyboard focus (the theme makes the row focusable; see below) or a video inside it.
  * - Browsers with CSS's native carousel controls (Chrome and Edge since 135; not yet Safari or
  *   Firefox, which ignore these rules) also show previous/next buttons and one dot per slide.
  * - Slides hidden off to the side load their videos only when scrolled near: WordPress gives
@@ -15,8 +16,13 @@
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
 .wp-block-group.site-carousel {
+	/*
+	 * The row is a size container, so its slides and spacers are sized in cqi, hundredths of the
+	 * row's own width. Percentages would refer to the column each grid track sits in, not the row.
+	 */
+	container-type: inline-size;
 	display: grid;
-	grid-auto-columns: var(--wp--custom--carousel--slide-width);
+	grid-auto-columns: max-content;
 	grid-auto-flow: column;
 	gap: var(--wp--custom--carousel--gap);
 	padding-bottom: var(--wp--custom--carousel--gap);
@@ -45,24 +51,27 @@
 	outline-offset: var(--wp--custom--focus-ring--offset);
 }
 
-/* Slides sit side by side: no flow-layout gap above each one, and each snaps to the row's start. */
+/* Slides sit side by side: no flow-layout gap above each one, and each snaps to the row's middle. */
 .wp-block-group.site-carousel > * {
+	width: var(--wp--custom--carousel--slide-width);
 	margin-block: 0;
-	scroll-snap-align: start;
+	scroll-snap-align: center;
 }
 
 /*
- * The last slide snaps to the row's end instead: its start can never reach the row's start, so
- * that stop would be approximated and might end a fraction short of the end, which leaves the
- * "next" button showing (the user saw it at the last video).
+ * An empty spacer before the first slide and after the last, each as wide as one side's peek, so
+ * those two can reach the middle too. With both the same width, the last slide's middle stop is
+ * exactly the end of the row, never an approximation that would leave the "next" button showing
+ * (the user saw that at the last video). Generated content, not slides: no dot, never focused.
  */
-.wp-block-group.site-carousel > :last-child {
-	scroll-snap-align: end;
+.wp-block-group.site-carousel::before,
+.wp-block-group.site-carousel::after {
+	width: calc((100cqi - var(--wp--custom--carousel--slide-width)) / 2 - var(--wp--custom--carousel--gap));
+	content: "";
 }
 
-/* A video fills its slide at the usual 16:9 shape. */
+/* A video is a slide itself, at the usual 16:9 shape. */
 .site-carousel > iframe {
-	width: 100%;
 	height: auto;
 	aspect-ratio: 16 / 9;
 	border: 0;
