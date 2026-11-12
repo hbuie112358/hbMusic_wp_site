@@ -18,8 +18,10 @@ export default defineConfig({
 	outputDir: `${screenshotsDir}/differences`,
 	snapshotPathTemplate: `${screenshotsDir}/baseline/{arg}{ext}`,
 	expect: {
-		// Exact: within one container minutes apart, any changed pixel is a real change.
-		toMatchSnapshot: { maxDiffPixels: 0 },
+		// Exact: within one container minutes apart, any changed pixel is a real change. Both limits
+		// are needed: maxDiffPixels counts pixels, threshold is how far a pixel's colour may move
+		// before it counts at all (Playwright's default 0.2 hid a subtle button gradient and glow).
+		toMatchSnapshot: { maxDiffPixels: 0, threshold: 0 },
 	},
 	use: {
 		...devices['Desktop Chrome'],

@@ -43,7 +43,9 @@ export default {
 		'@stylistic/unit-case': 'lower',
 		'@stylistic/property-case': 'lower',
 		'@stylistic/selector-list-comma-newline-after': 'always',
-		'@stylistic/declaration-colon-space-after': 'always',
+		// Single-line values only: a list such as several transitions is written one item per line,
+		// starting on the line after the colon, as the WordPress standards allow.
+		'@stylistic/declaration-colon-space-after': 'always-single-line',
 		'@stylistic/declaration-colon-space-before': 'never',
 		'@stylistic/block-opening-brace-space-before': 'always',
 		'@stylistic/declaration-block-trailing-semicolon': 'always',
