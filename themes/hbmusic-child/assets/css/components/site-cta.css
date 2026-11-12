@@ -1,16 +1,18 @@
 /*
- * Call to action: the band that ends a page with one clear next step (a heading, a line of text
- * and one button).
+ * Call to action: the panel that ends a page with one clear next step (a heading, a line of text
+ * and one button). Markup: a group "site-cta site-panel", kept once in the theme's template part
+ * parts/call-to-action.html, which the "with call to action" page templates show under the page's
+ * content; site-panel.css sets its corners, side margins and the space between panels.
  *
- * A dark band with a loose green fog in it (the user's choice of three, after the solid green band
- * "honked"): the button, the only strong green there, draws the eye by contrast, not the band by
+ * A dark panel with a loose green fog in it (the user's choice of three, after the solid green band
+ * "honked"): the button, the only strong green there, draws the eye by contrast, not the panel by
  * its area. The fog's shape and strength are theme.json tokens.
  */
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
 .wp-block-group.site-cta {
 	margin-top: var(--wp--custom--spacing--section);
-	padding: var(--wp--custom--spacing--cta) var(--wp--custom--spacing--gutter);
+	padding-block: var(--wp--custom--spacing--cta);
 	text-align: center;
 	background:
 		var(--site-grain, none),
@@ -22,26 +24,16 @@
 		var(--wp--preset--color--base);
 }
 
-/* After a section, the section's own padding already separates them. */
+/*
+ * After a plain section, the section's own padding already separates them. (After another panel,
+ * site-panel.css's more specific rule keeps the space.)
+ */
 .site-section + .wp-block-group.site-cta {
 	margin-top: 0;
 }
 
-/*
- * A page whose content ends with the band ends there, against the footer: the page template's
- * bottom padding and the gap before the footer showed as a black strip under the band. Only on
- * such pages (:has), so a page ending in text keeps its breathing room.
- */
-.wp-block-group:has(> .wp-block-post-content > .site-cta:last-child) {
-	/* stylelint-disable-next-line declaration-no-important -- the parent theme's page template writes this padding as an inline style, which only !important can override */
-	padding-bottom: 0 !important;
-}
-
-.wp-site-blocks > main:has(.wp-block-post-content > .site-cta:last-child) + .wp-block-template-part {
-	margin-block-start: 0;
-}
-
-.site-cta h2 {
+/* Its heading, whatever its level (the level follows the page's outline; the look does not). */
+.site-cta > .wp-block-heading {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);
 }

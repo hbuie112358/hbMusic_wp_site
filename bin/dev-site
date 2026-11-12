@@ -21,10 +21,18 @@ readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
   DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL
 )
-# The test pages as "title|address", in menu order: the new site's pages (plan D22), so templates
-# and navigation are exercised as the real site will use them; their text is neutral sample text
-# (no real data).
-readonly TEST_PAGES=('Home|home' 'Music|music' 'Songs|songlist' 'About|about' 'Book|book' 'Privacy Policy|privacy-policy')
+# The test pages as "title|address|template", in menu order: the new site's pages (plan D22), with
+# the templates the real pages use (empty: WordPress's default), so templates and navigation are
+# exercised as the real site will use them; their text is neutral sample text (no real data). Home
+# opens with its own headline, so it uses a template without WordPress's page title.
+readonly TEST_PAGES=(
+  'Home|home|page-no-title-with-call-to-action'
+  'Music|music|page-with-call-to-action'
+  'Songs|songlist|page-with-call-to-action'
+  'About|about|page-with-call-to-action'
+  'Book|book|'
+  'Privacy Policy|privacy-policy|'
+)
 # Linked from the footer, not the menu.
 readonly PAGE_OUTSIDE_MENU="Privacy Policy"
 # Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
@@ -220,22 +228,23 @@ set_dev_organization() {
 
 create_test_content() {
   log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
-  local ids position=0 test_page title address page_id
+  local ids position=0 test_page title address template page_id
   ids="$(wp_cli post list --post_type=post,page --post_status=any --format=ids)"
   # shellcheck disable=SC2086 # a space-separated list of post IDs
   [[ -n "$ids" ]] && wp_cli post delete $ids --force >/dev/null
   for test_page in "${TEST_PAGES[@]}"; do
-    title="${test_page%%|*}"
-    address="${test_page#*|}"
+    IFS='|' read -r title address template <<<"$test_page"
     position=$((position + 1))
     # As the admin: WordPress strips the Music page's video frame from anyone else's content.
     page_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
       --post_title="$title" --post_name="$address" --menu_order="$position" --porcelain \
       --post_content="$(cat "$REPO_ROOT/tests/dev-content/$address.html")")"
-    [[ "$title" != "Home" ]] && continue
-    # Home opens with its own headline, so WordPress's page title would be a second one.
-    wp_cli post meta update "$page_id" _wp_page_template page-no-title >/dev/null
-    wp_cli option update page_on_front "$page_id" >/dev/null
+    if [[ -n "$template" ]]; then
+      wp_cli post meta update "$page_id" _wp_page_template "$template" >/dev/null
+    fi
+    if [[ "$title" == "Home" ]]; then
+      wp_cli option update page_on_front "$page_id" >/dev/null
+    fi
   done
   wp_cli option update show_on_front page >/dev/null
   create_navigation_menu

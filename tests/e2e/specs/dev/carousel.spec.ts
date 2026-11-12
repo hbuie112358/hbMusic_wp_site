@@ -1,7 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // Protects the CSS-only carousel (plan D29, option A+): its slides sit side by side in one row that
-// scrolls sideways and snaps, it is a labelled region for screen readers, the native "next" button
+// scrolls sideways and snaps, the first and last slides can sit in the middle like the others, it
+// is a labelled region for screen readers, the native "next" button
 // (Chromium, the test browser) brings the row exactly to its end and then hides (the user found it
 // showing at the last video in one browser), and visitors who ask for less motion get no glide.
 const MUSIC_PATH = '/music/';
@@ -27,6 +28,27 @@ test('the carousel\'s slides sit side by side in a row that scrolls sideways and
 	expect(new Set(layout.tops).size, `the slides' tops ${layout.tops.join(', ')}`).toBe(1);
 	expect(layout.overflow, 'the width beyond the visible row').toBeGreaterThan(0);
 	expect(layout.snap, 'the snapping').toContain('mandatory');
+});
+
+// The current video sits in the middle with equal parts of its neighbours showing (the user), the
+// first and last included, which needs the spacers before and after them.
+test('at the start the first slide is centred, and at the end the last one is', async ({ page }) => {
+	const row = await openCarousel(page);
+	for (const end of ['start', 'end'] as const) {
+		const sides = await row.evaluate((element, which) => {
+			element.style.scrollBehavior = 'auto';
+			element.scrollLeft = which === 'start' ? 0 : element.scrollWidth - element.clientWidth;
+			const slide = (which === 'start' ? element.firstElementChild : element.lastElementChild)?.getBoundingClientRect();
+			const visible = element.getBoundingClientRect();
+			return slide === undefined ? null : { left: slide.left - visible.left, right: visible.right - slide.right };
+		}, end);
+		expect(sides, `the slide at the ${end}`).not.toBeNull();
+		if (sides === null) {
+			return;
+		}
+		expect(sides.left, `the space left of the ${end}'s slide`).toBeGreaterThan(0);
+		expect(Math.abs(sides.left - sides.right), `the difference between the sides at the ${end}`).toBeLessThanOrEqual(1);
+	}
 });
 
 test('the carousel is a labelled region for screen readers', async ({ page }) => {

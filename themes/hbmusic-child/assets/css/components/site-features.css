@@ -1,6 +1,7 @@
 /*
- * Features: a section of short points side by side (a columns block inside a "site-section
- * site-features" group). Its own background sets it apart from the sections around it.
+ * Features: a section of short points side by side (a columns block inside a wide "site-section
+ * site-features site-panel" group). Its own background sets it apart from the sections around
+ * it; site-panel.css sets its corners, side margins and the space between panels.
  */
 
 .site-features {
@@ -12,8 +13,11 @@
 	column-gap: var(--wp--custom--spacing--features-gap);
 }
 
-/* Each point's heading: a step above its text, so the points scan at a glance. */
-.site-features h3 {
+/*
+ * Each point's heading: a step above its text, so the points scan at a glance; whatever its level
+ * (the level follows the page's outline for screen readers; the look does not depend on it).
+ */
+.site-features .wp-block-heading {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--feature-title);
 	font-weight: 700;
@@ -22,7 +26,7 @@
 }
 
 /* A short rule in the accent colour above each heading ties the points together visually. */
-.site-features h3::before {
+.site-features .wp-block-heading::before {
 	display: block;
 	width: var(--wp--custom--accent-rule--width);
 	height: var(--wp--custom--accent-rule--height);

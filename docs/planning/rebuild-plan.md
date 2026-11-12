@@ -149,18 +149,53 @@ new findings added as steps.
   and deployed (#42, d9abe45, 2026-11-11).** Staging's content update to the new class names: Home
   done by the user (code pasted from `data/content/for-staging/home.html`, the cut-out chosen in the
   hero, its alt text asked for); **Music, Songs and About still to paste** from the same folder.
-  **In progress, paused (branch `style/one-frame`, uncommitted):** one frame for every page (the
-  user): a `layout.frame` token (1100px), header and footer content at the frame, the features
-  and call-to-action bands as panels within the frame with rounded corners (`panelRadius` 8px;
-  markup unchanged, so no new paste on staging), the page side padding equal to the gutter. Measured
-  at 1280px: header, hero, sections, both panels and footer all 90-1190. Still to do: the carousel
-  to the frame width with the current video centred and small peeks on both sides (slides sized
-  with container units, spacer pseudo-elements so the first and last can centre); the phone-width
-  check (`frame.js`-style measurement timed out at 3 minutes, run fewer pages); the narrow pages
-  keep their narrow text column but the full-frame header, footer and panel; then the user's
-  look in Chrome, tests, docs, review, commit, push. **One push at the end** (the user's preference for a single
-  staging update): after the deploy, staging's Home, Music, Songs and About get their content
-  with the new class names, Home from its own code in the editor (to keep its photo). **Added
+  **One frame for every page (the user, 2026-11-12; branch `style/one-frame`):** the frame is
+  WordPress's own wide width (`settings.layout.wideSize`, 1100px), not a token of ours. Every band
+  of a page (sections, panels, the carousel) is a wide block, so WordPress itself sets its width
+  and centring; the page content names only the component (`site-section`, `site-hero site-panel`
+  and so on), never a size, and no CSS overrides the layout. The header's and footer's content sit
+  at the frame; the page side padding is the gutter. Narrow pages (Songs, About, Book) keep their
+  narrow text column inside the full frame. **Panels (the user's idea, after the review found two
+  panels touching):** the class `site-panel` makes a band a panel, and `site-panel.css` alone owns
+  its side margins, corners (`panelRadius` 8px) and the space between panels; `site-hero`,
+  `site-features` and `site-cta` keep only their own look. A new panel needs only the class.
+  Rejected: an exception for the features panel in the call to action's spacing rule (a patch per
+  pair), and a panel file listing the three by name. The opening panel stands a gutter below the
+  header (as a full-width band its stage light had reached the screen's edges, past everything
+  else, the user saw it). **The call to action lives in the theme (the user: pages should need
+  copying only where there is no other reasonable way):** `parts/call-to-action.html`, shown under
+  the content by two page templates of the theme's own, "Page with call to action" (Music, Songs,
+  About) and "Page No Title with call to action" (Home); a page gets it by choosing the template,
+  and its wording is edited once, in the Site Editor (which then keeps a copy in the database
+  that theme updates no longer reach). Copied into four pages before. The panel stands a
+  section's spacing below the content (a plain section ending the content gives up its bottom
+  padding for that) and the template's own space before the footer, 89px on every page, the same
+  as after text; this removed the call to action's page-end rules and their `!important`. Found
+  while building it: a child theme's `templateParts` and `customTemplates` replace the parent's
+  lists rather than adding to them, which turned the header and footer into plain `div`s (the
+  sticky header's tests failed) and would have hidden "Page No Title"; the child lists repeat the
+  parent's entries. **Headings** are styled by class (`.wp-block-heading` within each component),
+  not by level, so an editor chooses the level for the page's outline without changing the look.
+  **The carousel** fills the frame with the current video centred and small, equal peeks (about
+  100px on a computer, 18px on a phone): slides sized in container units, empty spacers before the
+  first and after the last so they centre too, which also makes the last stop exactly the end.
+  Measured on the real pages at 1920, 1280, 1000, 800 and 390px; the user looked at Home in
+  Chrome (the header's menu looked off to the right while the opening band was full-width;
+  aligned once it became a panel). Tests: `frame.spec.ts` (shared edges on three pages at two
+  widths, every panel at the frame on a wide screen, two panels in a row a section's spacing
+  apart, the call to action a section's spacing below the content on Home and About), the
+  carousel's first and last slides centred, and the space before the footer after the call to
+  action equal to that after text in both templates, each shown failing on a planted fault; 122
+  browser tests. `bin/dev-site` gives each test page its template from its list. **One push at
+  the end** (the user's preference for a single staging update): after the deploy, on staging,
+  Music, Songs and About get their content from `data/content/for-staging/` and the template
+  "Page with call to action"; Home its own code with the changes made by Claude (the user copies
+  it into `data/content/for-staging/home-staging.html`, Claude makes the bands wide, adds
+  `site-panel`, removes the call to action and hands it back, keeping the photo) and the template
+  "Page No Title with call to action". Until then staging's pages show their old bands. After
+  this paste, look changes reach the site through the theme folder alone; patterns for the
+  sections (a customer inserts them from the block inserter, never the code editor) are the next
+  step. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every
