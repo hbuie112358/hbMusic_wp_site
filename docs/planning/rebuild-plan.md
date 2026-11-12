@@ -328,7 +328,14 @@ new findings added as steps.
   250ms whether it moved to another (moving straight from one player to another counts). Any click
   into a player counts as moving to it. Checked with real YouTube players and real clicks (play 1,
   click into 2: 1 paused, 2 playing). The test now clicks into the stand-in players, first into one,
-  then straight into the other, shown failing without the focus handling and without the checking. **Added
+  then straight into the other, shown failing without the focus handling and without the checking. **Pushed and
+  deployed (#53, f0f69da).** **Then (the user, on staging: scrolling down Music to the call to
+  action stopped the video):** scrolling the page never pauses a player, in a carousel or not; a
+  carousel's player pauses only when the carousel moves to another video (or the visitor clicks
+  into another, or stops it). Each carousel's observer measures against the carousel itself
+  (`root`), not the window. Checked with real YouTube (playing, scrolled off screen to the call to
+  action: still playing; "next": paused); a test scrolls the Music page past a carousel's player
+  and checks it got no pause, shown failing when measured against the window. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

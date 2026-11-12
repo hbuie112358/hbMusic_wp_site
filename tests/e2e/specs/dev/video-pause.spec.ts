@@ -2,8 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 // Protects the theme's video script (assets/js/video-pause.js, plan D29): only one YouTube player
 // plays at a time (the user found a carousel's first video still playing after moving on). A
-// player in a carousel that leaves view is paused, one outside a carousel keeps playing while the
-// visitor scrolls, and clicking into one pauses the others. The script loads only
+// player moved out of its carousel's view is paused, scrolling the page never pauses one, and
+// clicking into one pauses the others. The script loads only
 // where there is a player, and each player's address carries YouTube's switch for commands.
 //
 // YouTube itself is not called: each player address is answered with a stand-in player that
@@ -135,4 +135,19 @@ test('a player outside a carousel keeps playing when scrolled out of view', asyn
 	const outOfView = await page.locator(`main iframe[title="${HOME_PLAYER}"]`).evaluate((frame) => frame.getBoundingClientRect().bottom < 0);
 	expect(outOfView, 'the player scrolled out of view').toBe(true);
 	expect(await pausesSince(page, start), 'the players paused by scrolling').not.toContain(HOME_PLAYER);
+});
+
+// Scrolling the page down to the call to action keeps a carousel's video playing (the user: it
+// pauses only when the carousel moves to another video, or when stopped).
+test('a player in a carousel keeps playing when the page is scrolled past it', async ({ page }) => {
+	await openWithStandInPlayers(page, MUSIC_PATH);
+	await loadPlayer(page, FIRST_PLAYER);
+	await page.waitForTimeout(SETTLE_MS);
+	const start = await commandCount(page);
+	await page.setViewportSize({ width: 1280, height: SHORT_WINDOW });
+	await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+	await page.waitForTimeout(SETTLE_MS);
+	const outOfView = await page.locator(`main iframe[title="${FIRST_PLAYER}"]`).evaluate((frame) => frame.getBoundingClientRect().bottom < 0);
+	expect(outOfView, 'the player scrolled out of view').toBe(true);
+	expect(await pausesSince(page, start), 'the players paused by scrolling the page').not.toContain(FIRST_PLAYER);
 });
