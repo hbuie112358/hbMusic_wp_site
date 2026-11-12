@@ -352,15 +352,19 @@ new findings added as steps.
   for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
   import file (the photo's background needs nothing: it is pure black, package 5). Later, after this work: the
   global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).
-- **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
-  on staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home
-  folder after a few days (8m). Contact Form 7 6.2.5 goes onto staging (and live, where it runs)
-  no earlier than 2026-11-17, a week after its release.
-  3i whenever the user chooses. The live deploy's design is recorded in step 9 (option B, the user's
-  approval before live). The live site's text still names the old service area (D22); the user
-  chose to leave it until go-live, since the site has little traffic (2026-11-07).
+- **Next:** step 9, going live (the user, 2026-11-12: "I'm ready to go live"). 5f is done: the
+  videos are on staging (Home's featured video; Music's carousel replaced by the user with the
+  "Video carousel" pattern, its links changed by the user there), and D30 decides that live's
+  content comes from staging's export. Start step 9 by deciding its open question (live's
+  WordPress updated in place or installed fresh), then follow its checklist. Before it, the user:
+  deletes live's wp-config backup in the home folder (8m) and confirms HetrixTools' two-factor
+  login. Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
+  gets the version staging runs. The page generator (`data/content/`) still has the old Music
+  links; only the dev previews use it now (D30), so it is updated when the user sends the new
+  links. 3i whenever the user chooses. The live site's text still names the old service area
+  (D22) until go-live.
 - **Order of the coming steps (D19, replacing D11's; 6 done first on 2026-11-09 while Brevo's
-  support answered; 8 and 5e done by 2026-11-11):** the rest of 5f → 9 → 10.
+  support answered; 8 and 5e done by 2026-11-11; 5f done 2026-11-12):** 9 → 10.
 - **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
   preferences plugin (5d); a search on the Songs page (the user, 2026-11-11: after go-live). **The template (D21)** starts when a second site has a date.
 - **Open decisions waiting on the user:**
