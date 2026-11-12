@@ -129,3 +129,30 @@ test('the features panel\'s buttons line up, each below its own text', async ({ 
 		expect(point.buttonTop, 'a button below its text').toBeGreaterThan(point.textBottom);
 	}
 });
+
+// On the green call-to-action panel the page's green button would vanish, so it inverts to black;
+// its edge must stand out from the panel at 3:1 or more (WCAG 2.2, 1.4.11).
+test('the call-to-action button stands out from its panel', async ({ page }) => {
+	await page.goto('/about/');
+	const ratio = await page.locator('.site-cta').first().evaluate((panel) => {
+		const channels = (colour: string) => {
+			const values = (colour.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+			const scale = Math.max(...values) <= 1 ? 255 : 1;
+			return values.map((value) => value * scale);
+		};
+		const luminance = (colour: string) => {
+			const [red = 0, green = 0, blue = 0] = channels(colour).map((value) => {
+				const share = value / 255;
+				return share <= 0.04045 ? share / 12.92 : ((share + 0.055) / 1.055) ** 2.4;
+			});
+			return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+		};
+		const button = panel.querySelector('.wp-block-button__link');
+		if (!button) {
+			return Number.NaN;
+		}
+		const [lighter, darker] = [luminance(getComputedStyle(panel).backgroundColor), luminance(getComputedStyle(button).backgroundColor)].sort((a, b) => b - a);
+		return ((lighter ?? 0) + 0.05) / ((darker ?? 0) + 0.05);
+	});
+	expect(ratio, 'the contrast between the button and the panel').toBeGreaterThanOrEqual(3);
+});

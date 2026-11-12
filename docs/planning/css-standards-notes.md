@@ -156,6 +156,9 @@ language: appropriate structure, classes and techniques, enterprise grade, never
 - **Compare layouts live, side by side.** A temporary page with one inline style (allowed by the
   site's policy for styles) showed the alternative next to the theme's version; it was deleted
   after the choice.
+- **Keep the hooks when a look is retired.** The solid green panel came back from the history in
+  minutes because the buttons' custom properties (shadow, raised shadow, focus ring) had stayed
+  in `buttons.css` as a generic contract, unused for a while.
 - **One frame, every part:** a full-width band whose colour differs from the page shows where the
   frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,

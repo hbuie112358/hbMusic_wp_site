@@ -121,6 +121,11 @@
 					"name": "Button glow, raised",
 					"slug": "button-glow-raised",
 					"shadow": "inset 0 1px 0 rgb(255 255 255 / 30%), 0 6px 18px color-mix(in srgb, var(--wp--preset--color--accent-1) 40%, transparent)"
+				},
+				{
+					"name": "Button lift on a coloured band",
+					"slug": "button-lift-on-band",
+					"shadow": "0 6px 16px rgb(0 0 0 / 35%)"
 				}
 			]
 		},
@@ -130,7 +135,8 @@
 		"custom": {
 			"color": {
 				"formError": "#ffb3b3",
-				"ctaBackground": "color-mix(in srgb, var(--wp--preset--color--accent-2) 65%, var(--wp--preset--color--base))"
+				"ctaBackground": "var(--wp--preset--color--accent-2)",
+				"onCta": "#ffffff"
 			},
 			"spacing": {
 				"gutter": "24px",
