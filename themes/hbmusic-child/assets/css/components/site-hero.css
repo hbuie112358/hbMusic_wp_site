@@ -74,9 +74,3 @@
 	width: 100%;
 	height: auto;
 }
-
-/* The lead text: the sentence that says what the page is about, under its headline. */
-.site-lead {
-	font-size: var(--wp--custom--font-size--lead);
-	line-height: 1.5;
-}

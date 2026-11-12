@@ -64,7 +64,7 @@ template project starts; until then, a list, not a to-do.
 
 - The component stylesheets, `themes/hbmusic-child/assets/css/components/` (plan D29, the generic
   layer): named by page structure (`site-hero`, `site-section`, `site-features`, `site-cta`,
-  `site-media-placeholder`, buttons, forms), using only the tokens, so they fit any relatively
+  `site-panel`, `site-lead`, `site-carousel`, `site-media-placeholder`, buttons, forms), using only the tokens, so they fit any relatively
   static site without commerce; their loader `HBMUSIC_COMPONENT_STYLES` in `functions.php` (block
   → components) and `component-styles.spec.ts`. A subject's own styles go with the feature that
   brings them (the song table's in the Song List plugin). Every `site-…` component has a neutral

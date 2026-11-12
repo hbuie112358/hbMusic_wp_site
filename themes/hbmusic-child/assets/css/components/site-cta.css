@@ -4,9 +4,10 @@
  * parts/call-to-action.html, which the "with call to action" page templates show under the page's
  * content; site-panel.css sets its corners, side margins and the space between panels.
  *
- * A dark panel with a loose green fog in it (the user's choice of three, after the solid green band
- * "honked"): the button, the only strong green there, draws the eye by contrast, not the panel by
- * its area. The fog's shape and strength are theme.json tokens.
+ * An even, deep green panel under the grain (the user's choice, 2026-11-12, over a fog fading to
+ * black at the sides; the full-strength green band before it "honked"). Darker than the button's
+ * green, so the button still stands out against it. The colour is a theme.json token
+ * (custom.color.ctaBackground), mixed from the palette's green and black.
  */
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
@@ -14,14 +15,7 @@
 	margin-top: var(--wp--custom--spacing--section);
 	padding-block: var(--wp--custom--spacing--cta);
 	text-align: center;
-	background:
-		var(--site-grain, none),
-		radial-gradient(
-			var(--wp--custom--texture--fog-shape),
-			color-mix(in srgb, var(--wp--preset--color--accent-2) var(--wp--custom--texture--fog-strength), transparent),
-			transparent 75%
-		),
-		var(--wp--preset--color--base);
+	background: var(--site-grain, none), var(--wp--custom--color--cta-background);
 }
 
 /*
@@ -38,10 +32,15 @@
 	font-size: var(--wp--custom--font-size--section-title);
 }
 
-/* Centred lines stay short enough to read in one sweep. */
+/*
+ * Centred lines stay short enough to read in one sweep. The text takes the heading's brighter warm
+ * white instead of the paragraphs' softer one: on the green it reads at 7.2:1 instead of 6.0:1 (the
+ * user asked for more contrast), and heading and text read as one.
+ */
 .site-cta p {
 	max-width: var(--wp--custom--measure);
 	margin-inline: auto;
+	color: var(--wp--preset--color--contrast);
 }
 
 .site-cta .wp-block-buttons {

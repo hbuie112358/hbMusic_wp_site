@@ -83,7 +83,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   List's page and admin form, the booking form's mail (no visitor's name in the subject), its
   message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only
   where it appears; the stylesheets loading only with what they style (the theme's components,
-  the form's, the song table's from its plugin, plan D29), the bands' texture and the headings' even
+  the form's, the song table's from its plugin, plan D29), the bands' texture, the call-to-action panel's green, the lead text larger than body text and the headings' even
   lines; the buttons' keyboard focus ring and
   its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
   after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, and reduced motion (D29); one frame on every page (the header,
