@@ -7,7 +7,7 @@
  * styles, which would override the shared shape.
  *
  * A band with its own background can retune buttons inside it without stronger selectors, by
- * setting these custom properties (site-cta.css does):
+ * setting these custom properties (none does today; the call-to-action band did while it was green):
  *   --site-button-shadow          the main button's shadow at rest
  *   --site-button-shadow-raised   its shadow while pointed at
  *   --site-focus-ring-color       the keyboard focus ring, which must stand out from the band

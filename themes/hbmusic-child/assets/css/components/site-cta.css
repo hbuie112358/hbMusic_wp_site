@@ -1,33 +1,25 @@
 /*
- * Call to action: the coloured band that ends a page with one clear next step (a heading, a line
- * of text and one button).
+ * Call to action: the band that ends a page with one clear next step (a heading, a line of text
+ * and one button).
+ *
+ * A dark band with a loose green fog in it (the user's choice of three, after the solid green band
+ * "honked"): the button, the only strong green there, draws the eye by contrast, not the band by
+ * its area. The fog's shape and strength are theme.json tokens.
  */
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
 .wp-block-group.site-cta {
 	margin-top: var(--wp--custom--spacing--section);
 	padding: var(--wp--custom--spacing--cta) var(--wp--custom--spacing--gutter);
-	color: var(--wp--custom--color--on-cta);
 	text-align: center;
-
-	/*
-	 * The grain at half strength (a half-transparent layer of the band's own green over it): white
-	 * text on the brightest specks then keeps about 5:1 instead of 4.7:1, a comfortable margin for
-	 * the page's main call to action.
-	 */
 	background:
-		linear-gradient(color-mix(in srgb, var(--wp--preset--color--accent-2) 50%, transparent)),
 		var(--site-grain, none),
-		var(--wp--preset--color--accent-2);
-
-	/*
-	 * Buttons on the band (buttons.css): a green glow would vanish into the green, so the button
-	 * rests flat and lifts with a dark shadow; a green focus ring would be invisible, so it is the
-	 * band's text colour (5.3:1 on the band).
-	 */
-	--site-button-shadow: none;
-	--site-button-shadow-raised: var(--wp--preset--shadow--button-lift-on-band);
-	--site-focus-ring-color: var(--wp--custom--color--on-cta);
+		radial-gradient(
+			var(--wp--custom--texture--fog-shape),
+			color-mix(in srgb, var(--wp--preset--color--accent-2) var(--wp--custom--texture--fog-strength), transparent),
+			transparent 75%
+		),
+		var(--wp--preset--color--base);
 }
 
 /* After a section, the section's own padding already separates them. */
@@ -52,25 +44,14 @@
 .site-cta h2 {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);
-	color: var(--wp--custom--color--on-cta);
 }
 
-/*
- * The band's text keeps the band's colour, over theme.json's paragraph colour, which is meant for
- * the dark page; centred lines stay short enough to read in one sweep.
- */
+/* Centred lines stay short enough to read in one sweep. */
 .site-cta p {
 	max-width: var(--wp--custom--measure);
 	margin-inline: auto;
-	color: var(--wp--custom--color--on-cta);
 }
 
 .site-cta .wp-block-buttons {
 	justify-content: center;
-}
-
-/* The page's accent button would vanish on the accent band, so here it inverts. */
-.site-cta .wp-block-button__link {
-	color: var(--wp--custom--color--on-cta);
-	background: var(--wp--preset--color--base);
 }

@@ -58,6 +58,8 @@ test('the hero, features and call-to-action bands carry their texture', async ({
 	}
 	const heroLayers = await page.locator('.site-hero').evaluate((element) => getComputedStyle(element).backgroundImage);
 	expect(heroLayers, 'the hero\'s stage light').toContain('radial-gradient');
+	const ctaLayers = await page.locator('.site-cta').first().evaluate((element) => getComputedStyle(element).backgroundImage);
+	expect(ctaLayers, 'the call-to-action band\'s green fog').toContain('radial-gradient');
 	const grainAddress = /url\("([^"]+grain\.png)"\)/.exec(heroLayers)?.[1] ?? '';
 	expect((await request.get(grainAddress)).status(), `the grain image at ${grainAddress}`).toBe(200);
 });
