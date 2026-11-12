@@ -84,5 +84,16 @@ language: appropriate structure, classes and techniques, enterprise grade, never
 - **Judge interaction in a browser, not in still pictures.** The user could not tell much from
   screenshots and judged the buttons live on the dev site; screenshots stay the record of what
   changed.
+- **A sticky element sticks within its parent.** Making the theme's own header sticky did
+  nothing: WordPress wraps it in a template-part element of exactly its height. The wrapper,
+  a direct child of the page, is the one that sticks (`header.wp-block-template-part:has(> …)`).
+- **A sticky header owes the page its height.** `scroll-padding-top` set from the same values
+  that size the header (one custom property for both), so the browser never scrolls a focused
+  link or a jump target under it (WCAG 2.2, 2.4.11); a test reaches a button with Shift+Tab and
+  checks it lands below the header.
+- **An inline style from the parent theme is the one justified `!important`,** scoped with
+  `:has()` to exactly the pages it concerns and with its reason in the required disable comment.
+- **Measure before fixing.** The "black strip" was traced element by element to 70px of template
+  padding plus 19px of footer margin before any rule was written.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.

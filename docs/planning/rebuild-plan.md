@@ -90,9 +90,21 @@ new findings added as steps.
   button now has the same border width). Every state passes WCAG AA (the white ring 5.3:1 on the
   band); `buttons.spec.ts` (6 tests) protects the ring, its contrast against its band, the
   reduced-motion exception, the lift, no stuck hover after a tap on a touch screen (hover effects
-  only under `(hover: hover)`), and the equal heights, each shown failing on a planted fault. **Next:** package 4 (menu links
-  slightly bolder with a green underline on hover, the current page marked, a hairline under the
-  header, the black strip under the green band on pages like About), then package 5 (a "stage
+  only under `(hover: hover)`), and the equal heights, each shown failing on a planted fault.
+  **Package 4, the header and menu (done, the user: "good", after trying it live):** a sticky
+  header (the user's addition), option B, slimmer on phones (logo 40px instead of 56px), over 85%
+  black with a slight blur and a hairline below it; the browser's scroll padding equals the
+  header's height, so a link reached with the keyboard or a jump link never lands under it (WCAG
+  2.2, 2.4.11); logged in, it sits below WordPress's toolbar. Menu links at weight 500 with a
+  green underline on hover and on the current page, which `hbmusic_mark_current_menu_link()`
+  marks with `aria-current="page"` by comparing each menu link's path with the page shown
+  (WordPress marks only links to a page by its ID, and this menu holds addresses). The black
+  strip under the green band (89px: the parent template's bottom padding, an inline style, plus
+  the footer's top margin) removed only on pages whose content ends with the band; the inline
+  style needed the one `!important`, with its reason. The stand-in About page gained the band, so
+  the tests see this. Menu text 13.4:1 even over white passing beneath. `header.spec.ts` (6
+  tests) protects the stickiness, focus not obscured, the current-page mark, no gap, and the
+  slimmer phone header, each shown failing on a planted fault. **Next:** package 5 (a "stage
   light" glow behind the hero photo, which also hides the photo's dark-grey edge, and a fine grain
   at about 4% on the hero, features and call-to-action bands, from a small noise image in the
   theme; `img-src 'self'` allows it). **One push at the end** (the user's preference for a single

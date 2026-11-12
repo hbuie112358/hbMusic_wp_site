@@ -109,6 +109,19 @@
 			"motion": {
 				"duration": "150ms"
 			},
+			"header": {
+				"logoSize": "56px",
+				"logoSizeCompact": "40px",
+				"paddingCompact": "10px",
+				"background": "rgb(0 0 0 / 85%)",
+				"blur": "8px",
+				"layer": "100",
+				"focusGap": "8px"
+			},
+			"navigation": {
+				"underlineThickness": "2px",
+				"underlineOffset": "6px"
+			},
 			"focusRing": {
 				"width": "2px",
 				"offset": "3px"

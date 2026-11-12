@@ -108,6 +108,65 @@ function hbmusic_theme_version(): string {
 }
 
 /**
+ * Marks the menu link to the page being shown as the current page (aria-current="page"), which
+ * the header underlines and screen readers announce (plan D29). WordPress marks only links that
+ * point to a page by its ID; this site's menu links are addresses, so they are compared by path.
+ *
+ * @param string               $block_content The menu link's HTML.
+ * @param array<string, mixed> $block         The menu link block, with its "url" attribute.
+ * @return string The HTML, marked if the link leads to the page being shown.
+ */
+function hbmusic_mark_current_menu_link( string $block_content, array $block ): string {
+	$attributes = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
+	$link_url   = is_string( $attributes['url'] ?? null ) ? $attributes['url'] : '';
+	$link_path  = hbmusic_site_path( $link_url );
+	if ( null === $link_path || hbmusic_requested_path() !== $link_path ) {
+		return $block_content;
+	}
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	if ( $tags->next_tag( array( 'tag_name' => 'a' ) ) ) {
+		$tags->set_attribute( 'aria-current', 'page' );
+	}
+	return $tags->get_updated_html();
+}
+add_filter( 'render_block_core/navigation-link', 'hbmusic_mark_current_menu_link', 10, 2 );
+
+/**
+ * A link's path within this site, without slashes at either end and in lower case ("" for the home
+ * page), or null for an empty link or one to another site.
+ *
+ * @param string $url The link, absolute or starting with "/".
+ * @return string|null The path, or null.
+ */
+function hbmusic_site_path( string $url ): ?string {
+	if ( '' === $url ) {
+		return null;
+	}
+	$link_host = wp_parse_url( $url, PHP_URL_HOST );
+	if ( is_string( $link_host ) && wp_parse_url( home_url(), PHP_URL_HOST ) !== $link_host ) {
+		return null;
+	}
+	$link_path = wp_parse_url( $url, PHP_URL_PATH );
+	$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+	$link_path = is_string( $link_path ) ? $link_path : '/';
+	$home_path = is_string( $home_path ) ? $home_path : '/';
+	if ( str_starts_with( $link_path, $home_path ) ) {
+		$link_path = substr( $link_path, strlen( $home_path ) );
+	}
+	return strtolower( trim( $link_path, '/' ) );
+}
+
+/**
+ * The path of the page being shown, in the same form as hbmusic_site_path().
+ *
+ * @return string The path ("" for the home page).
+ */
+function hbmusic_requested_path(): string {
+	global $wp;
+	return $wp instanceof WP ? strtolower( trim( $wp->request, '/' ) ) : '';
+}
+
+/**
  * Removes WordPress's emoji support: the detection script, its styles and the image swaps.
  *
  * Every current browser shows emoji itself. The detection script starts a worker from a blob:
