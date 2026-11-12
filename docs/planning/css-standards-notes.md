@@ -64,5 +64,25 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   24 screenshots showed an error page, matched against an equally broken baseline; each page is
   now required to answer 200, and outside services are answered locally so a screenshot depends
   on nothing but the site.
+- **An exact visual comparison means exact in every dimension.** Playwright's comparison has a
+  pixel count and a per-pixel colour tolerance; with only the count at zero, a subtle gradient and
+  glow on the buttons passed as "identical". For subtle polish, both are zero.
+- **Components talk through custom properties, not stronger selectors.** A band that needs its
+  buttons different (no glow on green, a white focus ring) sets `--site-button-shadow`,
+  `--site-button-shadow-raised` and `--site-focus-ring-color`; the button component reads them with
+  its own defaults. The contract is written at the top of the component.
+- **Equal size includes the border.** An outlined button beside a filled one was 4px larger
+  because only its padding matched (the user noticed it by pointing at both); every button now
+  carries the same border width, transparent where it should not show, and a test compares
+  their heights.
+- **The parent theme has its own interaction states.** Twenty Twenty-Five turned the main button
+  beige on hover; hover and focus colours are set in `theme.json` (`elements.button` `:hover`,
+  `:focus`), WordPress's own place for them.
+- **Interaction states need their own checks.** axe sees the page at rest; hover, focus and
+  reduced-motion behaviour get browser tests (ring width, ring contrast against its band, no
+  movement with reduced motion), each shown failing on a planted fault.
+- **Judge interaction in a browser, not in still pictures.** The user could not tell much from
+  screenshots and judged the buttons live on the dev site; screenshots stay the record of what
+  changed.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.
