@@ -282,7 +282,19 @@ new findings added as steps.
   and Music is lazy, shown failing without the filter. Checklist 8.5 is partly met: a click-to-load
   player would meet it in full. **Next (the user, 2026-11-12):** a small script of the theme's own,
   its first, so a video stops when it leaves view or another starts (YouTube's player cannot be
-  told from CSS); the carousel stays CSS-only and works without it. **Added
+  told from CSS); the carousel stays CSS-only and works without it. **Pushed and deployed (#51, 2a312b3).**
+  **One pattern with an optional name, and the carousel described (the user, 2026-11-12):** the
+  "Video carousel" pattern starts with an empty heading (hint text "Carousel name (optional)" in the
+  editor only) directly above the carousel; left empty, the theme drops it from the page
+  (`hbmusic_drop_empty_heading()`: an empty heading leaves a gap and is announced as an empty
+  heading, an accessibility error anywhere), and the carousel keeps "Videos"; given text, it names
+  the carousel. Each carousel is described as in the W3C's carousel pattern (WAI-ARIA Authoring
+  Practices): `aria-roledescription="carousel"`, each slide `role="group"`, "slide", "n of m"
+  (`hbmusic_describe_carousel()`, with WordPress's HTML processor, which knows the slides' depth; a
+  bare video frame keeps its own role, and markup it cannot parse is left as it is). The test Music
+  page's first video is wrapped as WordPress renders an Embed block, with the pattern's empty
+  heading above it. Tests check the descriptions, the empty heading's absence and the pattern's
+  two blocks, each shown failing on its fault. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

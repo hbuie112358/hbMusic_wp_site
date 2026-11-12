@@ -4,8 +4,9 @@
 # inserted, so a pattern that drifted from the CSS would put unstyled blocks on every page built
 # from it after the drift.
 #
-# The "Video carousel" pattern (patterns/video-carousel.php): a wide section with the class
-# site-carousel and a label for screen readers, whose direct children are YouTube embeds.
+# The "Video carousel" pattern (patterns/video-carousel.php): an empty heading with hint text (the
+# carousel's optional name), directly followed by a wide section with the class site-carousel and a
+# label for screen readers, whose direct children are YouTube embeds.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -18,9 +19,14 @@ if ( null === $pattern ) {
 	return;
 }
 $blocks = array_values( array_filter( parse_blocks( $pattern["content"] ), static fn ( $block ) => null !== $block["blockName"] ) );
-$group  = $blocks[0] ?? array( "blockName" => null, "attrs" => array(), "innerBlocks" => array() );
-$attrs  = $group["attrs"];
+$empty   = array( "blockName" => null, "attrs" => array(), "innerBlocks" => array(), "innerHTML" => "" );
+$heading = $blocks[0] ?? $empty;
+$group   = $blocks[1] ?? $empty;
+$attrs   = $group["attrs"];
 echo "blocks ", count( $blocks ), PHP_EOL;
+echo "first ", $heading["blockName"], PHP_EOL;
+echo "heading text ", ( "" === trim( wp_strip_all_tags( $heading["innerHTML"] ) ) ? "empty" : "filled" ), PHP_EOL;
+echo "heading hint ", ( "" !== ( $heading["attrs"]["placeholder"] ?? "" ) ? "set" : "missing" ), PHP_EOL;
 echo "outer ", $group["blockName"], PHP_EOL;
 echo "tag ", $attrs["tagName"] ?? "", PHP_EOL;
 echo "align ", $attrs["align"] ?? "", PHP_EOL;
@@ -40,7 +46,10 @@ main() {
   load_settings
   run_capturing dev_compose run --rm -T cli wp eval "$CHECK_PHP"
   assert_status 0 "reading the pattern"
-  expect_line "blocks 1"
+  expect_line "blocks 2"
+  expect_line "first core/heading"
+  expect_line "heading text empty"
+  expect_line "heading hint set"
   expect_line "outer core/group"
   expect_line "tag section"
   expect_line "align wide"
