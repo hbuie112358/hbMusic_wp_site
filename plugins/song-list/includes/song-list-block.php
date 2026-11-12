@@ -8,6 +8,20 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * The stylesheet's version for its address: a fingerprint of its contents, so a changed stylesheet
+ * gets a new address and reaches browsers and caches that kept the old one (the editor loads it by
+ * address), with no version number to remember to raise. A stylesheet that cannot be read is
+ * labelled with the plugin's version instead.
+ *
+ * @param string $path The stylesheet's file path.
+ * @return string The version.
+ */
+function songlist_stylesheet_version( string $path ): string {
+	$fingerprint = md5_file( $path );
+	return false !== $fingerprint ? $fingerprint : SONGLIST_VERSION;
+}
+
+/**
  * Registers the block in PHP alone, with its stylesheet.
  *
  * The autoRegister support (WordPress 7.0) makes the editor offer a block that only has a PHP
@@ -20,13 +34,14 @@ defined( 'ABSPATH' ) || exit;
  */
 function songlist_register_block(): void {
 	$stylesheet = 'assets/song-list.css';
+	$path       = plugin_dir_path( SONGLIST_PLUGIN_FILE ) . $stylesheet;
 	wp_register_style(
 		SONGLIST_STYLE_HANDLE,
 		plugins_url( $stylesheet, SONGLIST_PLUGIN_FILE ),
 		array(),
-		SONGLIST_VERSION
+		songlist_stylesheet_version( $path )
 	);
-	wp_style_add_data( SONGLIST_STYLE_HANDLE, 'path', plugin_dir_path( SONGLIST_PLUGIN_FILE ) . $stylesheet );
+	wp_style_add_data( SONGLIST_STYLE_HANDLE, 'path', $path );
 
 	register_block_type(
 		'songlist/song-list',
