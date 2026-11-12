@@ -236,7 +236,15 @@ new findings added as steps.
   lifts with a dark shadow (`button-lift-on-band`), its focus ring white; the text sizes and the
   panel's shape stay as they are. Contrast: text 5.0:1 at the brightest speck, the button's edge
   4.0:1, its text 21:1. A test checks the button stands out from the panel (3:1), shown failing
-  without the black (2.3:1). **Added
+  without the black (2.3:1). **Pushed and deployed (#47, 221c0bd).** **Then (the user: the Site
+  Editor showed the call to action black with a green button):** a stale copy of the stylesheet,
+  confirmed when Ctrl+Shift+R showed the right look. Every stylesheet's address was labelled with
+  the theme's (or the Song List's) version, 0.2.0 since the CSS was split, so a changed file kept
+  its address; pages inline these stylesheets, the editor loads them by address. Now each
+  stylesheet is labelled by a fingerprint of its contents (`hbmusic_stylesheet_version()`,
+  `songlist_stylesheet_version()`; Song List 0.2.1), so a change reaches browsers and caches by
+  itself. A scenario check, `dev-stylesheet-versions.sh`, compares each registered stylesheet's
+  label with its file's fingerprint computed from the repository, shown failing on both faults. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

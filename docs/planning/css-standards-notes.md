@@ -159,6 +159,10 @@ language: appropriate structure, classes and techniques, enterprise grade, never
 - **Keep the hooks when a look is retired.** The solid green panel came back from the history in
   minutes because the buttons' custom properties (shadow, raised shadow, focus ring) had stayed
   in `buttons.css` as a generic contract, unused for a while.
+- **Version a stylesheet's address by its contents, not by hand.** A theme version that nobody
+  raised kept every changed stylesheet at its old address; pages hid it (WordPress inlines small
+  block stylesheets), the Site Editor did not (it loads them by address). A fingerprint of each
+  file changes exactly when the file does.
 - **One frame, every part:** a full-width band whose colour differs from the page shows where the
   frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,

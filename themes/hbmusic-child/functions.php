@@ -81,7 +81,7 @@ function hbmusic_register_component_style( string $block_name, string $component
 			'handle' => 'hbmusic-' . $component,
 			'src'    => get_theme_file_uri( $stylesheet ),
 			'path'   => get_theme_file_path( $stylesheet ),
-			'ver'    => hbmusic_theme_version(),
+			'ver'    => hbmusic_stylesheet_version( $stylesheet ),
 		)
 	);
 }
@@ -94,20 +94,30 @@ function hbmusic_enqueue_form_style(): void {
 	if ( ! hbmusic_page_has_booking_form() ) {
 		return;
 	}
-	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_theme_version() );
+	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_stylesheet_version( HBMUSIC_FORM_STYLESHEET ) );
 	wp_style_add_data( 'hbmusic-form', 'path', get_theme_file_path( HBMUSIC_FORM_STYLESHEET ) );
 }
 add_action( 'wp_enqueue_scripts', 'hbmusic_enqueue_form_style' );
 
 /**
- * The theme's version from style.css, which versions the stylesheets' addresses: a changed
- * stylesheet then reaches browsers that kept the old one.
+ * A stylesheet's version for its address: a fingerprint of its contents, so a changed stylesheet
+ * gets a new address and reaches browsers and caches that kept the old one, with no version number
+ * to remember to raise. The theme's own version once labelled them all and stayed the same through
+ * many changes, so the Site Editor, which loads these files by address, showed an old look until
+ * the browser's copy was bypassed (the user found it, 2026-11-12). Reading a small file on each
+ * request costs far less than serving a stale look; a stylesheet that cannot be read is labelled
+ * with the theme's version instead.
  *
+ * @param string $stylesheet The stylesheet's path within the theme.
  * @return string The version.
  */
-function hbmusic_theme_version(): string {
-	$version = wp_get_theme()->get( 'Version' );
-	return is_string( $version ) ? $version : '';
+function hbmusic_stylesheet_version( string $stylesheet ): string {
+	$fingerprint = md5_file( get_theme_file_path( $stylesheet ) );
+	if ( false !== $fingerprint ) {
+		return $fingerprint;
+	}
+	$theme_version = wp_get_theme()->get( 'Version' );
+	return is_string( $theme_version ) ? $theme_version : '';
 }
 
 /**
