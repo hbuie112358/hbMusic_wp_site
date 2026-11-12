@@ -84,6 +84,9 @@ template project starts; until then, a list, not a to-do.
   generic; the stage light's colour is a token. A hero photo on a dark page works best as a
   cut-out with transparency; `make_cutout.py` (kept with this site's photos) makes one from a
   photo on pure black.
+- The carousel (plan D29): `site-carousel.css` is generic; a site's content uses it as a group with
+  the class `site-carousel`, as a `section` with an `aria-label` and WordPress's wide alignment,
+  each direct child a slide (`carousel()` in this site's page builder).
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.

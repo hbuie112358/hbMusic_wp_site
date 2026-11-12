@@ -35,7 +35,7 @@ const HBMUSIC_AREAS_SERVED = array(
  */
 const HBMUSIC_COMPONENT_STYLES = array(
 	'core/template-part' => array( 'site-header', 'site-footer' ),
-	'core/group'         => array( 'texture', 'site-hero', 'site-section', 'site-features', 'site-cta' ),
+	'core/group'         => array( 'texture', 'site-hero', 'site-section', 'site-features', 'site-cta', 'site-carousel' ),
 	'core/paragraph'     => array( 'site-media' ),
 	'core/button'        => array( 'buttons' ),
 	'core/heading'       => array( 'headings' ),
@@ -132,6 +132,24 @@ function hbmusic_mark_current_menu_link( string $block_content, array $block ): 
 	return $tags->get_updated_html();
 }
 add_filter( 'render_block_core/navigation-link', 'hbmusic_mark_current_menu_link', 10, 2 );
+
+/**
+ * Makes every carousel (a group with the class site-carousel, site-carousel.css) reachable with the
+ * Tab key, so a keyboard user can scroll it with the arrow keys (WCAG 2.1.1; axe's
+ * scrollable-region-focusable). Added when the page is rendered, because an attribute the group
+ * block does not know would make WordPress's editor flag the block as invalid.
+ *
+ * @param string $block_content The group's HTML.
+ * @return string The HTML, with tabindex="0" on a carousel.
+ */
+function hbmusic_make_carousel_focusable( string $block_content ): string {
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	if ( $tags->next_tag() && $tags->has_class( 'site-carousel' ) && null === $tags->get_attribute( 'tabindex' ) ) {
+		$tags->set_attribute( 'tabindex', '0' );
+	}
+	return $tags->get_updated_html();
+}
+add_filter( 'render_block_core/group', 'hbmusic_make_carousel_focusable' );
 
 /**
  * A link's path within this site, without slashes at either end and in lower case ("" for the home

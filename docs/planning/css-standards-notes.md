@@ -111,5 +111,19 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   `max-content` minimum) keep them the same length at every width, where a breakpoint would not.
 - **A texture is checked for contrast at its brightest speck,** not its average: white text on
   the grainy green band fell to 4.7:1 there, so its grain is at half strength.
+- **New platform features as progressive enhancement.** CSS's native carousel buttons exist only
+  in Chromium so far; the carousel works everywhere without them (snap, swipe, scrollbar), and
+  browsers that have them show them. The decision was checked against MDN's status first.
+- **A linter lagging the language is configured, not silenced in place:** the config names the
+  exact new syntax it does not know yet, with the reason and when to remove it.
+- **A scrolling region needs keyboard access of its own.** Browsers do not reliably make a
+  scrolling row focusable; axe caught it, and the theme adds `tabindex="0"` with a focus ring at
+  render time. The assumption that the browser would handle it was wrong.
+- **Snap the last slide to the end.** A last snap point the row can never reach is approximated
+  and can stop a fraction short, which left the "next" button showing in one browser.
+- **In browsers without native controls, the scrollbar is the control;** coloured in the accent,
+  checked for 3:1 like any control.
+- **Judge in the browsers visitors use.** VS Code's built-in browser behaved differently from
+  Chrome; design decisions are checked in Chrome or Edge and Firefox.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.
