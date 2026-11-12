@@ -78,10 +78,19 @@ new findings added as steps.
   overrides the layout); the call-to-action band keeps pure white text (5.3:1; the grey would
   fall below 4.5:1); (4) buttons, menu and texture, one package at a time,
   each shown to the user in screenshots and checked for accessibility. **Paused after (3),
-  2026-11-11** (commits d3710e9, 1a0d2f6, 9c69c78 on the branch, not pushed). **Next:** package 3,
-  the buttons: a soft glow in the button's own colour, a hairline highlight along the top edge,
-  a 1-pixel lift on hover with a stronger glow (150 ms, off under `prefers-reduced-motion`), and a
-  green `:focus-visible` ring (checklist 7.2); equal sizes are done. Then package 4 (menu links
+  2026-11-11** (commits d3710e9, 1a0d2f6, 9c69c78 on the branch, not pushed). **Package 3, the
+  buttons (done after the resume, kept by the user after trying them live on the dev site):** a
+  soft glow in the button's own colour and a hairline highlight from above (WordPress shadow
+  presets in `theme.json`), a 1-pixel lift on hover with a stronger glow (150 ms, none under
+  `prefers-reduced-motion`), the outlined button filling green, a 2px `:focus-visible` ring with a
+  gap (checklist 7.2), the form's Send button the same; on the call-to-action band no glow, a dark
+  lift shadow and a white ring, through custom properties the button component reads. Found: the
+  parent theme turned the main button beige on hover (its own hover colour now set in
+  `theme.json`), and the user noticed the outlined button was 4px larger than the main one (every
+  button now has the same border width). Every state passes WCAG AA (the white ring 5.3:1 on the
+  band); `buttons.spec.ts` (6 tests) protects the ring, its contrast against its band, the
+  reduced-motion exception, the lift, no stuck hover after a tap on a touch screen (hover effects
+  only under `(hover: hover)`), and the equal heights, each shown failing on a planted fault. **Next:** package 4 (menu links
   slightly bolder with a green underline on hover, the current page marked, a hairline under the
   header, the black strip under the green band on pages like About), then package 5 (a "stage
   light" glow behind the hero photo, which also hides the photo's dark-grey edge, and a fine grain

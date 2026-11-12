@@ -1,9 +1,16 @@
 /*
- * Buttons: the shape every button shares, and the outline style for secondary actions.
+ * Buttons: the shape every button shares, the outline style for secondary actions, and how buttons
+ * respond to the pointer and the keyboard.
  *
  * Written here, not as theme.json element styles: WordPress's own button block CSS gives the
  * outline style its padding and border with selectors more specific than theme.json's element
  * styles, which would override the shared shape.
+ *
+ * A band with its own background can retune buttons inside it without stronger selectors, by
+ * setting these custom properties (site-cta.css does):
+ *   --site-button-shadow          the main button's shadow at rest
+ *   --site-button-shadow-raised   its shadow while pointed at
+ *   --site-focus-ring-color       the keyboard focus ring, which must stand out from the band
  */
 
 /*
@@ -13,12 +20,72 @@
 .wp-block-button .wp-block-button__link {
 	padding: var(--wp--custom--button--padding-block) var(--wp--custom--button--padding-inline);
 	font-weight: 700;
+
+	/*
+	 * Every button has the outline's border width, transparent unless the style colours it, so a
+	 * main button and an outlined one beside it are exactly the same size.
+	 */
+	border: var(--wp--custom--button--border-width) solid transparent;
 	border-radius: var(--wp--custom--radius);
+	transition:
+		background-color var(--wp--custom--motion--duration) ease,
+		color var(--wp--custom--motion--duration) ease,
+		box-shadow var(--wp--custom--motion--duration) ease,
+		transform var(--wp--custom--motion--duration) ease;
+}
+
+/*
+ * The main action: a faint light from above (a gradient and a hairline highlight along the top
+ * edge) and a soft glow in its own colour, so it reads as the thing to press.
+ */
+.wp-block-button:not(.is-style-outline) .wp-block-button__link {
+	background-image: linear-gradient(to bottom, rgb(255 255 255 / 8%), transparent);
+	box-shadow: var(--site-button-shadow, var(--wp--preset--shadow--button-glow));
 }
 
 /* The secondary action: the same size as the main one, outlined in the accent colour. */
 .wp-block-button.is-style-outline .wp-block-button__link {
 	color: var(--wp--preset--color--contrast);
 	background: transparent;
-	border: 2px solid var(--wp--preset--color--accent-1);
+	border-color: var(--wp--preset--color--accent-1);
+}
+
+/*
+ * Keyboard focus: a clear ring with a gap, never removed (docs/SITE_CHECKLIST.md 7.2). Only for
+ * the keyboard (:focus-visible), so a click does not leave a ring behind.
+ */
+.wp-block-button .wp-block-button__link:focus-visible {
+	outline: var(--wp--custom--focus-ring--width) solid var(--site-focus-ring-color, var(--wp--preset--color--accent-1));
+	outline-offset: var(--wp--custom--focus-ring--offset);
+}
+
+/*
+ * Pointed at, a button rises a little, the main one glows more and the outline fills with the
+ * accent colour. Only on devices that really point (a mouse or trackpad): a touch screen keeps the
+ * hover state after a tap, which would leave the button lifted until the visitor taps elsewhere.
+ */
+@media (hover: hover) {
+	.wp-block-button .wp-block-button__link:hover {
+		transform: translateY(var(--wp--custom--button--lift));
+	}
+
+	.wp-block-button:not(.is-style-outline) .wp-block-button__link:hover {
+		box-shadow: var(--site-button-shadow-raised, var(--wp--preset--shadow--button-glow-raised));
+	}
+
+	.wp-block-button.is-style-outline .wp-block-button__link:hover {
+		color: var(--wp--preset--color--base);
+		background: var(--wp--preset--color--accent-1);
+	}
+}
+
+/* People who ask their device for less motion get the colour change only. */
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-button .wp-block-button__link {
+		transition: none;
+	}
+
+	.wp-block-button .wp-block-button__link:hover {
+		transform: none;
+	}
 }

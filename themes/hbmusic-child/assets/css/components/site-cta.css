@@ -10,6 +10,15 @@
 	color: var(--wp--custom--color--on-cta);
 	text-align: center;
 	background: var(--wp--preset--color--accent-2);
+
+	/*
+	 * Buttons on the band (buttons.css): a green glow would vanish into the green, so the button
+	 * rests flat and lifts with a dark shadow; a green focus ring would be invisible, so it is the
+	 * band's text colour (5.3:1 on the band).
+	 */
+	--site-button-shadow: none;
+	--site-button-shadow-raised: var(--wp--preset--shadow--button-lift-on-band);
+	--site-focus-ring-color: var(--wp--custom--color--on-cta);
 }
 
 /* After a section, the section's own padding already separates them. */

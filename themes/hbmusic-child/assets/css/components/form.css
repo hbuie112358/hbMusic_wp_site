@@ -37,16 +37,45 @@
 	outline-offset: 2px;
 }
 
-/* The send button looks like the site's other main buttons (buttons.css). */
+/* The send button looks and responds like the site's other main buttons (buttons.css). */
 .wpcf7 input[type="submit"] {
 	padding: var(--wp--custom--button--padding-block) 32px;
 	font: inherit;
 	font-weight: 700;
 	color: var(--wp--preset--color--base);
 	cursor: pointer;
-	background: var(--wp--preset--color--accent-1);
+	background-color: var(--wp--preset--color--accent-1);
+	background-image: linear-gradient(to bottom, rgb(255 255 255 / 8%), transparent);
 	border: 0;
 	border-radius: var(--wp--custom--radius);
+	box-shadow: var(--wp--preset--shadow--button-glow);
+	transition:
+		box-shadow var(--wp--custom--motion--duration) ease,
+		transform var(--wp--custom--motion--duration) ease;
+}
+
+/* Only on devices that really point; a touch screen would keep it lifted after a tap. */
+@media (hover: hover) {
+	.wpcf7 input[type="submit"]:hover {
+		box-shadow: var(--wp--preset--shadow--button-glow-raised);
+		transform: translateY(var(--wp--custom--button--lift));
+	}
+}
+
+.wpcf7 input[type="submit"]:focus-visible {
+	outline: var(--wp--custom--focus-ring--width) solid var(--wp--preset--color--accent-1);
+	outline-offset: var(--wp--custom--focus-ring--offset);
+}
+
+/* People who ask their device for less motion get no lift. */
+@media (prefers-reduced-motion: reduce) {
+	.wpcf7 input[type="submit"] {
+		transition: none;
+	}
+
+	.wpcf7 input[type="submit"]:hover {
+		transform: none;
+	}
 }
 
 .wpcf7 .wpcf7-not-valid-tip {
