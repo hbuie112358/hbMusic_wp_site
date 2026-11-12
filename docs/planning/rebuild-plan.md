@@ -111,10 +111,20 @@ new findings added as steps.
   A content change (`data/content/build_pages.py`), reaching staging with the class-name update.
   Headings now wrap in lines of even length (`text-wrap: balance`, `headings.css`): below about
   1200px the headline had left "event" alone on its last line; WordPress's own "pretty" on
-  headings first outranked the rule, which a test now catches. **Next:** package 5 (a "stage
-  light" glow behind the hero photo, which also hides the photo's dark-grey edge, and a fine grain
-  at about 4% on the hero, features and call-to-action bands, from a small noise image in the
-  theme; `img-src 'self'` allows it). **One push at the end** (the user's preference for a single
+  headings first outranked the rule, which a test now catches. **Package 5, texture (done, the
+  user: "it all looks fine"):** a warm stage light behind the hero photo and a fine grain (a 128px
+  tile, 14 KB, seed 29, 2.7% on average) on the hero, features and call-to-action bands, half
+  strength on the green band so its white text keeps about 5:1. Claude's earlier "dark-grey edge"
+  of the photo was a misreading: its background is pure black (1 of 255), so that 5f item is
+  struck. Blending the photo with the band was tried first, but the light also lit the black
+  shirt (the user saw it); the photo is now a cut-out with a transparent background,
+  `howard-buie-guitar-cutout.webp` (57 KB), made by `data/photos/make_cutout.py` (flood fill of the
+  black from the top and side edges, so the shirt's enclosed shadows stay solid; reproducible
+  pixel for pixel; for dark pages only, a faint fringe stays around the hair). Staging gets it
+  in place of the JPEG with the content update. Also from the user: two buttons in a row are
+  equally wide and, stacked, the same length at every width (they wrap by column, not by one
+  screen width). Tests: the bands' texture and the grain image, equal button widths at four
+  widths, each shown failing on a planted fault. **One push at the end** (the user's preference for a single
   staging update): after the deploy, staging's Home, Music, Songs and About get their content
   with the new class names, Home from its own code in the editor (to keep its photo). **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
@@ -131,7 +141,7 @@ new findings added as steps.
   covers it (shown failing on three planted faults). A planted colour change was reported on
   exactly the 10 screenshots with the call-to-action band. Also for 5f: the hero photo's description
   for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
-  import file; and possibly the photo's background made pure black. Later, after this work: the
+  import file (the photo's background needs nothing: it is pure black, package 5). Later, after this work: the
   global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).
 - **Next:** the rest of 5f, the user's choice of videos (the wording finished, the site icon set
   on staging and WebP found not needed, 2026-11-11); 5f's pages are on staging. Delete live's wp-config backup in the home

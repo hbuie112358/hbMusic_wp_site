@@ -100,5 +100,16 @@ language: appropriate structure, classes and techniques, enterprise grade, never
 - **Zero specificity can lose.** A `:where()` rule meant to be easy to override was itself
   overridden by WordPress's element rule (`h1 { text-wrap: pretty }`); the block's class is the
   right weight.
+- **Measure an image before treating it.** A "grey edge" around the photo was a misreading of a
+  scaled-down preview; the file and the browser both showed pure black (1 of 255). Sampling
+  pixels settled it in a minute.
+- **Blend modes act on the whole picture.** `mix-blend-mode: lighten` let a stage light through
+  the photo's black background, but also through the black shirt; a cut-out with real
+  transparency puts light behind the figure only.
+- **Lay out by the container, not one screen width.** Two buttons wrapped wherever their column
+  got too narrow (782-900px and on phones); equal flexible widths (`flex: 1 1 0` with a
+  `max-content` minimum) keep them the same length at every width, where a breakpoint would not.
+- **A texture is checked for contrast at its brightest speck,** not its average: white text on
+  the grainy green band fell to 4.7:1 there, so its grain is at half strength.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.

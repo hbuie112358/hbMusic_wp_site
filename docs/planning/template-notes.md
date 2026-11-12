@@ -80,6 +80,10 @@ template project starts; until then, a list, not a to-do.
 - The sticky header and the menu's current-page mark (plan D29): `site-header.css` and
   `hbmusic_mark_current_menu_link()` in `functions.php` are generic (any menu of addresses); the
   logo sizes and header colours are tokens in `theme.json`.
+- The texture (plan D29): `texture.css` and `assets/images/grain.png` (neutral white specks) are
+  generic; the stage light's colour is a token. A hero photo on a dark page works best as a
+  cut-out with transparency; `make_cutout.py` (kept with this site's photos) makes one from a
+  photo on pure black.
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.

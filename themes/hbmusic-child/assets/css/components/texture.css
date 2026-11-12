@@ -1,0 +1,15 @@
+/*
+ * Texture: a fine film grain for bands with their own background (the hero, the features and the
+ * call to action), so large flat areas of black or colour feel printed rather than digital. Text
+ * sections stay plain: grain behind small type looks dirty.
+ *
+ * The grain is a 128px tile of white specks at 0-14 of 255 opacity (2.7% on average), made with a
+ * fixed random seed (plan D29), so it can be regenerated exactly. Bands use it as a background
+ * layer, var(--site-grain, none), so they still work if this stylesheet is not loaded.
+ *
+ * WordPress rewrites this relative address when it inlines the stylesheet into the page.
+ */
+
+:root {
+	--site-grain: url("../../images/grain.png");
+}

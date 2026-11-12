@@ -4,9 +4,27 @@
  * "site-hero__photo" in the second column.
  */
 
-/* Block and component class together outrank WordPress's layout rules at any load order. */
+/*
+ * Block and component class together outrank WordPress's layout rules at any load order.
+ *
+ * The band is a stage: a soft, warm light falls where the picture stands (on phones the picture
+ * sits below the text, so the light moves with it), under a fine grain (texture.css) that keeps
+ * the black from looking flat.
+ */
 .wp-block-group.site-hero {
+	--site-stage-light-position: 72% 75%;
+
 	padding: var(--wp--custom--spacing--hero-top) var(--wp--custom--spacing--gutter) 0;
+	background:
+		var(--site-grain, none),
+		radial-gradient(ellipse 38% 75% at var(--site-stage-light-position), var(--wp--custom--texture--stage-light), transparent 70%),
+		var(--wp--preset--color--base);
+}
+
+@media (width < 782px) {
+	.wp-block-group.site-hero {
+		--site-stage-light-position: 50% 92%;
+	}
 }
 
 /*
@@ -42,7 +60,12 @@
 	margin: 0;
 }
 
-/* A block element without a gap below, so the picture meets the band's edge exactly. */
+/*
+ * A block element without a gap below, so the picture meets the band's edge exactly. The picture
+ * is a cut-out with a transparent background, so the band's light and grain show around the
+ * figure and never on it. (Blending a picture with a black background was tried first: the light
+ * also brightened the dark parts of the figure, the user saw the black shirt glow.)
+ */
 .site-hero__photo img {
 	display: block;
 	width: 100%;
