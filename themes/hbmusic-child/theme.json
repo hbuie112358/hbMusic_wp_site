@@ -184,7 +184,8 @@
 				"buttonBackground": "rgb(0 0 0 / 60%)"
 			},
 			"texture": {
-				"stageLight": "rgb(255 236 214 / 10%)"
+				"stageLight": "rgb(255 236 214 / 10%)",
+				"photoFade": "2px"
 			},
 			"navigation": {
 				"underlineThickness": "2px",

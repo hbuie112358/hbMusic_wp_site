@@ -24,6 +24,7 @@ const HBMUSIC_OLD_ADDRESSES = array(
  */
 const HBMUSIC_AREAS_SERVED = array(
 	'Fayetteville, North Carolina',
+	'Hope Mills, North Carolina',
 	'Southern Pines, North Carolina',
 );
 

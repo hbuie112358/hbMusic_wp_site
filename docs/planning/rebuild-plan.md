@@ -207,7 +207,19 @@ new findings added as steps.
   text): now `clamp(1.25rem, 1rem + 1vw, 1.625rem)`, 20px on a phone to 26px on a computer, its own
   component `site-lead.css` (on paragraphs; it was inside the hero's file), used by Home's
   introduction and the panel's line. Tests: the panel's colour is green (not black or missing),
-  the lead larger than body text at two widths, each shown failing on a planted fault. **Added
+  the lead larger than body text at two widths, each shown failing on a planted fault. **Then (the
+  user: the hero's picture looked vertically off centre):** bottom alignment was built first (the
+  buttons' bottom the picture's bottom, the picture's crop faded out over 18%); when the user
+  changed Home's introduction to "including Hope Mills and Southern Pines", the taller text left a
+  gap above the picture, and the user, shown both on two preview pages, chose centring. The
+  theme now overrides nothing: the hero's columns are centred by their own editor setting (a
+  customer can change it without code). Centred, the picture no longer stands on the panel's edge,
+  so its cropped bottom is softened by a 2px fade (`mask-image`, token `texture.photoFade`; 18%,
+  6% and 5px were tried, and no fade, the user chose 2px). The test Home page's hero now has the
+  real structure (two columns, the theme's logo as a stand-in picture); a test checks the text and
+  picture centred on each other and the softened bottom, shown failing on both faults. Hope Mills
+  added to the towns in the page data for search engines (`HBMUSIC_AREAS_SERVED`), which follow
+  the page text; staging's Home introduction is changed by the user in the editor. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every
