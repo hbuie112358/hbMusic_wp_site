@@ -77,7 +77,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
   PHP debug log, the `.env` safety stop, every stylesheet of the theme and the Song List labelled
-  by a fingerprint of its contents), then the browser tests in `tests/e2e/specs/dev/` in the
+  by a fingerprint of its contents, embedded videos' titles read as written), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
   `config/booking-form-messages.json`): child theme active,
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
