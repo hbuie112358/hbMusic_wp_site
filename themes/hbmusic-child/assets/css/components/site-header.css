@@ -1,15 +1,95 @@
 /*
- * Site header: the logo, the site's name and the menu (parts/header.html).
- * Loaded with the template-part block, so on every page.
+ * Site header: the logo, the site's name and the menu (parts/header.html). Loaded with the
+ * template-part block, so on every page.
+ *
+ * It stays at the top while the page scrolls under it (sticky), slimmer on phones, over a dark
+ * frosted background so whatever passes beneath never competes with the menu.
  */
+
+/*
+ * The header's height, which the page's scroll padding below depends on: the logo, the padding
+ * above and below it, and the hairline. Kept in one place so the two cannot drift apart.
+ */
+:root {
+	--site-header-logo-size: var(--wp--custom--header--logo-size);
+	--site-header-padding-block: var(--wp--custom--spacing--header);
+	--site-header-height: calc(var(--site-header-logo-size) + 2 * var(--site-header-padding-block) + 1px);
+}
+
+/*
+ * Phones: a smaller logo and less padding (the user's choice B), so the header takes less of a
+ * small screen. 600px is where WordPress's navigation turns into its menu button.
+ */
+@media (width < 600px) {
+	:root {
+		--site-header-logo-size: var(--wp--custom--header--logo-size-compact);
+		--site-header-padding-block: var(--wp--custom--header--padding-compact);
+	}
+}
+
+/*
+ * When the browser scrolls something into view (a link reached with Tab, a jump link), it keeps
+ * it below the header instead of under it (WCAG 2.2, 2.4.11 Focus Not Obscured).
+ */
+html {
+	scroll-padding-top: calc(var(--site-header-height) + var(--wp-admin--admin-bar--height, 0px) + var(--wp--custom--header--focus-gap));
+}
+
+/*
+ * WordPress wraps the header part in its own <header>, a direct child of the page; only that
+ * wrapper can stick, since a sticky element stays within its parent. Logged in, it sits below
+ * WordPress's toolbar.
+ */
+header.wp-block-template-part:has(> .site-header) {
+	position: sticky;
+	top: var(--wp-admin--admin-bar--height, 0);
+	z-index: var(--wp--custom--header--layer);
+}
+
+/* Below 600px WordPress's toolbar scrolls away with the page, so the header goes to the very top. */
+@media (width < 600px) {
+	header.wp-block-template-part:has(> .site-header) {
+		top: 0;
+	}
+}
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
 .wp-block-group.site-header {
-	padding: var(--wp--custom--spacing--header) var(--wp--custom--spacing--gutter);
+	padding: var(--site-header-padding-block) var(--wp--custom--spacing--gutter);
+	background: var(--wp--custom--header--background);
+	border-bottom: 1px solid var(--wp--preset--color--accent-5);
+	backdrop-filter: blur(var(--wp--custom--header--blur));
+}
+
+.site-header .site-logo img {
+	display: block;
+	width: var(--site-header-logo-size);
+	height: var(--site-header-logo-size);
 }
 
 /* The site's name reads as a name, not as a link in running text. */
 .site-header .wp-block-site-title a {
 	font-weight: 700;
 	text-decoration: none;
+}
+
+/*
+ * The menu: links a little bolder, with an underline in the accent colour for the page being
+ * shown (marked by functions.php) and for a link pointed at.
+ */
+.site-header .wp-block-navigation-item__content {
+	font-weight: 500;
+	text-decoration-color: var(--wp--preset--color--accent-1);
+	text-decoration-thickness: var(--wp--custom--navigation--underline-thickness);
+	text-underline-offset: var(--wp--custom--navigation--underline-offset);
+}
+
+.site-header .wp-block-navigation-item__content[aria-current="page"] {
+	text-decoration-line: underline;
+}
+
+@media (hover: hover) {
+	.site-header .wp-block-navigation-item__content:hover {
+		text-decoration-line: underline;
+	}
 }

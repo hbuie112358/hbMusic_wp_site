@@ -26,6 +26,20 @@
 	margin-top: 0;
 }
 
+/*
+ * A page whose content ends with the band ends there, against the footer: the page template's
+ * bottom padding and the gap before the footer showed as a black strip under the band. Only on
+ * such pages (:has), so a page ending in text keeps its breathing room.
+ */
+.wp-block-group:has(> .wp-block-post-content > .site-cta:last-child) {
+	/* stylelint-disable-next-line declaration-no-important -- the parent theme's page template writes this padding as an inline style, which only !important can override */
+	padding-bottom: 0 !important;
+}
+
+.wp-site-blocks > main:has(.wp-block-post-content > .site-cta:last-child) + .wp-block-template-part {
+	margin-block-start: 0;
+}
+
 .site-cta h2 {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);

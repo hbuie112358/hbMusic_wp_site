@@ -77,6 +77,9 @@ template project starts; until then, a list, not a to-do.
   the import file for the real site leaves those photos empty, to be chosen in its Media Library.
   Its parts: `tests/e2e/screenshots.config.ts`, `tests/e2e/screenshots/`, and the scenario check
   with its neutral fixture.
+- The sticky header and the menu's current-page mark (plan D29): `site-header.css` and
+  `hbmusic_mark_current_menu_link()` in `functions.php` are generic (any menu of addresses); the
+  logo sizes and header colours are tokens in `theme.json`.
 - The CSS linter, `tools/css-lint/` (its package, lock file and `stylelint.config.mjs`, plan
   D29): it lints every theme's and plugin's CSS and names nothing of a site. The package name
   `site-css-lint` is neutral already.
