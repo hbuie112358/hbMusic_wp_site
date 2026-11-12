@@ -244,7 +244,22 @@ new findings added as steps.
   stylesheet is labelled by a fingerprint of its contents (`hbmusic_stylesheet_version()`,
   `songlist_stylesheet_version()`; Song List 0.2.1), so a change reaches browsers and caches by
   itself. A scenario check, `dev-stylesheet-versions.sh`, compares each registered stylesheet's
-  label with its file's fingerprint computed from the repository, shown failing on both faults. **Added
+  label with its file's fingerprint computed from the repository, shown failing on both faults. **Pushed and deployed (#48, 1003102).** **5f's videos (the user,
+  2026-11-12):** Home's "Hear him play" gets "Live gig 42 song mashup" (https://youtu.be/JfP1oGtCkbI,
+  audio with a still picture); Music's carousel the old site's three, renamed by the user in YouTube
+  Studio ("Two country, one rock", "80's rock", "First several songs of a set"). Each is an Embed
+  block added by the user in the block editor; the page generator has them too. Checked on the dev
+  site with YouTube really loading: the Home video fills its section at 16:9, the carousel's slides
+  are 16:9 and centred with the arrow hiding at the end, and no policy refusal or console error at
+  either width (the first real test of YouTube under the policy). YouTube's automatic captions came
+  on by themselves; the user unpublished the video's automatic caption track in YouTube Studio.
+  **Found:** WordPress 7.1 escapes an apostrophe in an embedded video's title twice, so "80's rock"
+  was read as "80&apos;s rock" (wp_filter_oembed_iframe_title_attribute()); the theme decodes the
+  title first (`hbmusic_decode_embed_title()`, the user chose this over renaming the video), and a
+  scenario check, `dev-embed-titles.sh`, runs WordPress's own function on YouTube-like player code
+  (shown failing without the fix; ampersands and quotation marks were never affected and are
+  checked so the fix does not break them). WordPress keeps each player's code in its oEmbed cache,
+  so the Music videos are added on staging after this fix is deployed. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

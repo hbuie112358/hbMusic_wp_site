@@ -319,3 +319,21 @@ function hbmusic_describe_organization( array $organization ): array {
 	return $organization;
 }
 add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
+
+/**
+ * Decodes an embedded video's title before WordPress escapes it for the player's title attribute,
+ * which screen readers announce as the video's name (docs/SITE_CHECKLIST.md 7.4).
+ *
+ * WordPress 7.1 reads the title from the provider's player code still escaped (YouTube sends
+ * "80&#39;s rock"), turns the apostrophe's entity into "&apos;", which its own escaping does not
+ * recognise, and escapes it again (wp_filter_oembed_iframe_title_attribute()), so browsers read
+ * "80&apos;s rock" (found on the Music page, 2026-11-12). Ampersands and quotation marks were not
+ * affected. Decoded here, WordPress escapes the title once, as it should.
+ *
+ * @param string $title The title as WordPress read it from the player code.
+ * @return string The title as plain text.
+ */
+function hbmusic_decode_embed_title( string $title ): string {
+	return html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+}
+add_filter( 'oembed_iframe_title_attribute', 'hbmusic_decode_embed_title' );
