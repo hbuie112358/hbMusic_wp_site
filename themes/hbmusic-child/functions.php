@@ -436,3 +436,89 @@ function hbmusic_lazy_load_embeds(): string {
 	return 'lazy';
 }
 add_filter( 'wp_iframe_tag_add_loading_attr', 'hbmusic_lazy_load_embeds' );
+
+/**
+ * Leaves a heading without text out of the page. An empty heading takes up space as a blank gap
+ * and is announced by screen readers as a heading with nothing in it (an accessibility error).
+ * The video carousel pattern starts with an empty, optional heading (the user: invisible when
+ * unused), which the editor shows only as its hint text. Removed before the page's content is
+ * rendered as a whole, so a carousel below it keeps its own name.
+ *
+ * @param string $block_content The heading's HTML.
+ * @return string The HTML, or nothing for a heading without text.
+ */
+function hbmusic_drop_empty_heading( string $block_content ): string {
+	$text = html_entity_decode( wp_strip_all_tags( $block_content ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	return '' === trim( $text, " \t\n\r\0\x0B\u{00A0}" ) ? '' : $block_content;
+}
+add_filter( 'render_block_core/heading', 'hbmusic_drop_empty_heading' );
+
+/**
+ * Describes a carousel the way the W3C's carousel pattern does (WAI-ARIA Authoring Practices), so
+ * screen readers announce "Videos, carousel" and, for each slide, "slide 2 of 3" (the user asked
+ * for the carousel to say what it is). Each direct child of the carousel is a slide; a slide that
+ * is a bare video frame keeps its own role, since a frame cannot take another. Markup the HTML
+ * processor cannot parse is left as it is.
+ *
+ * @param string $block_content The group's HTML.
+ * @return string The HTML, with a carousel and its slides described.
+ */
+function hbmusic_describe_carousel( string $block_content ): string {
+	$slide_count = hbmusic_count_carousel_slides( $block_content );
+	if ( 0 === $slide_count ) {
+		return $block_content;
+	}
+	$tags = WP_HTML_Processor::create_fragment( $block_content );
+	if ( null === $tags || ! $tags->next_tag() ) {
+		return $block_content;
+	}
+	/* translators: How a screen reader describes the kind of region a carousel is. */
+	$tags->set_attribute( 'aria-roledescription', __( 'carousel', 'hbmusic' ) );
+	$slide_depth = $tags->get_current_depth() + 1;
+	$slide       = 0;
+	while ( $tags->next_tag() ) {
+		if ( $tags->get_current_depth() === $slide_depth ) {
+			hbmusic_describe_slide( $tags, ++$slide, $slide_count );
+		}
+	}
+	return null === $tags->get_last_error() ? $tags->get_updated_html() : $block_content;
+}
+add_filter( 'render_block_core/group', 'hbmusic_describe_carousel' );
+
+/**
+ * The number of slides (direct children) of the carousel that opens the given HTML, or 0 if the
+ * HTML does not open with a carousel or cannot be parsed.
+ *
+ * @param string $block_content A group's HTML.
+ * @return int The number of slides.
+ */
+function hbmusic_count_carousel_slides( string $block_content ): int {
+	$tags = WP_HTML_Processor::create_fragment( $block_content );
+	if ( null === $tags || ! $tags->next_tag() || true !== $tags->has_class( 'site-carousel' ) ) {
+		return 0;
+	}
+	$slide_depth = $tags->get_current_depth() + 1;
+	$slides      = 0;
+	while ( $tags->next_tag() ) {
+		$slides += $tags->get_current_depth() === $slide_depth ? 1 : 0;
+	}
+	return null === $tags->get_last_error() ? $slides : 0;
+}
+
+/**
+ * Marks the slide at the processor's position as slide n of m.
+ *
+ * @param WP_HTML_Processor $tags        The processor, at a slide's opening tag.
+ * @param int               $position    The slide's position, from 1.
+ * @param int               $slide_count The number of slides.
+ */
+function hbmusic_describe_slide( WP_HTML_Processor $tags, int $position, int $slide_count ): void {
+	if ( 'IFRAME' === $tags->get_tag() ) {
+		return;
+	}
+	$tags->set_attribute( 'role', 'group' );
+	/* translators: How a screen reader describes one item of a carousel. */
+	$tags->set_attribute( 'aria-roledescription', __( 'slide', 'hbmusic' ) );
+	/* translators: 1: the slide's position, 2: the number of slides. */
+	$tags->set_attribute( 'aria-label', sprintf( __( '%1$d of %2$d', 'hbmusic' ), $position, $slide_count ) );
+}

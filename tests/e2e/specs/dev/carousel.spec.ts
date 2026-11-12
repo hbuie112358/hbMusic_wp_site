@@ -128,3 +128,30 @@ test('a carousel under a heading is named after it, one without keeps its own la
 	await expect(named, 'its link to the heading').toHaveAttribute('aria-labelledby', headingId ?? '');
 	await expect(page.getByRole('region', { name: 'Videos' }), 'the carousel without a heading').toHaveCount(1);
 });
+
+// Described as in the W3C's carousel pattern (WAI-ARIA Authoring Practices): the carousel as a
+// carousel, each slide as "slide n of m" (the user asked for it to say what it is).
+test('a carousel is described as a carousel, and each slide as "n of m"', async ({ page }) => {
+	await page.goto(MUSIC_PATH);
+	for (const row of await page.locator(ROW).all()) {
+		await expect(row, 'the carousel\'s description').toHaveAttribute('aria-roledescription', 'carousel');
+		const slides = row.locator(':scope > *');
+		const count = await slides.count();
+		expect(count, 'the slides').toBeGreaterThanOrEqual(2);
+		for (let index = 0; index < count; index++) {
+			const slide = slides.nth(index);
+			await expect(slide, `slide ${index + 1}'s role`).toHaveAttribute('role', 'group');
+			await expect(slide, `slide ${index + 1}'s description`).toHaveAttribute('aria-roledescription', 'slide');
+			await expect(slide, `slide ${index + 1}'s name`).toHaveAttribute('aria-label', `${index + 1} of ${count}`);
+		}
+	}
+});
+
+// The pattern's optional heading, left empty above a carousel, leaves no blank gap and nothing for
+// a screen reader to announce, and the carousel keeps its own label (the user: invisible if unused).
+test('an empty heading above a carousel is left out, and the carousel keeps its own label', async ({ page }) => {
+	await page.goto(MUSIC_PATH);
+	const emptyHeadings = await page.locator('main :is(h1, h2, h3, h4, h5, h6)').evaluateAll((headings) => headings.filter((heading) => heading.textContent?.trim() === '').length);
+	expect(emptyHeadings, 'the empty headings on the page').toBe(0);
+	await expect(page.getByRole('region', { name: 'Videos' }), 'the carousel below the empty heading').toHaveCount(1);
+});
