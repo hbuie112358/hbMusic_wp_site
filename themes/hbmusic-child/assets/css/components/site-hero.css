@@ -16,7 +16,7 @@
 .wp-block-group.site-hero {
 	--site-stage-light-position: 72% 75%;
 
-	padding-block: var(--wp--custom--spacing--hero-top) 0;
+	padding-block: var(--wp--custom--spacing--hero-top) var(--wp--custom--spacing--hero-text-bottom);
 	background:
 		var(--site-grain, none),
 		radial-gradient(ellipse 38% 75% at var(--site-stage-light-position), var(--wp--custom--texture--stage-light), transparent 70%),
@@ -30,24 +30,12 @@
 }
 
 /*
- * The picture stands on the band's bottom edge, so a cut-out figure meets it. The columns block's
- * own vertical-alignment class is named too, because WordPress's rule for it is equally specific
- * and would otherwise win by loading order.
+ * The text and the picture align as the columns are set in the editor (the hero's are centred:
+ * the user chose centring over bottom alignment, which left a gap above the picture once the text
+ * grew), so no rule here overrides WordPress's own vertical alignment.
  */
-.site-hero .wp-block-columns,
-.site-hero .wp-block-columns.are-vertically-aligned-center {
-	align-items: flex-end;
+.site-hero .wp-block-columns {
 	margin-bottom: 0;
-}
-
-/* The text stays centred beside the picture, with room below it on narrow screens. */
-.site-hero .wp-block-column:first-child {
-	align-self: center;
-	padding-bottom: var(--wp--custom--spacing--hero-text-bottom);
-}
-
-.site-hero .wp-block-column:last-child {
-	align-self: flex-end;
 }
 
 /* The headline, whatever its level (the level follows the page's outline; the look does not). */
@@ -64,13 +52,17 @@
 }
 
 /*
- * A block element without a gap below, so the picture meets the band's edge exactly. The picture
+ * A block element without a gap below, so the picture's bottom is the column's bottom. The picture
  * is a cut-out with a transparent background, so the band's light and grain show around the
  * figure and never on it. (Blending a picture with a black background was tried first: the light
- * also brightened the dark parts of the figure, the user saw the black shirt glow.)
+ * also brightened the dark parts of the figure, the user saw the black shirt glow.) Its bottom
+ * fades out quickly: the figure is cropped there and, centred beside the text, no longer stands on
+ * the panel's edge, so a short fade softens the crop line (the user found a long fade too
+ * gradual). The fade's length is a theme.json token.
  */
 .site-hero__photo img {
 	display: block;
 	width: 100%;
 	height: auto;
+	mask-image: linear-gradient(to bottom, #000 calc(100% - var(--wp--custom--texture--photo-fade)), transparent);
 }

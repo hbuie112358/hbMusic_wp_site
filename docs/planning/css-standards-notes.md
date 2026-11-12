@@ -150,6 +150,12 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   lead > body at a phone's and a computer's width, not either number.
 - **A trial value is replaced by its proper form before it is kept.** "No fade" was tried as a
   1000% gradient ellipse; kept, it became one colour token, with the gradient's two settings gone.
+- **Let the editor's own settings decide where they exist.** The hero's columns carried "centre"
+  from the editor; the theme overrode it with bottom alignment. Keeping WordPress's setting
+  removed two rules and lets a customer change the alignment in the editor.
+- **Compare layouts live, side by side.** A temporary page with one inline style (allowed by the
+  site's policy for styles) showed the alternative next to the theme's version; it was deleted
+  after the choice.
 - **One frame, every part:** a full-width band whose colour differs from the page shows where the
   frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,

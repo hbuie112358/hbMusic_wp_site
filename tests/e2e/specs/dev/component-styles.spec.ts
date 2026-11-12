@@ -91,3 +91,23 @@ for (const width of [1280, 390]) {
 		expect(lead, `the lead's size against body text of ${body}px`).toBeGreaterThan(body);
 	});
 }
+
+// The hero's text and picture are centred on each other, as its columns are set in the editor
+// (the user chose centring; the theme once overrode it with bottom alignment, which a stray rule
+// could bring back), and the picture's cropped bottom is softened instead of a hard line.
+test('in the hero, the text and the picture are centred on each other, and the picture\'s bottom is softened', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto('/');
+	const middles = await page.evaluate(() => {
+		const middle = (selector: string) => {
+			const box = document.querySelector(selector)?.getBoundingClientRect();
+			return box === undefined ? Number.NaN : box.top + box.height / 2;
+		};
+		return { text: middle('.site-hero .wp-block-column:has(.wp-block-heading)'), picture: middle('.site-hero__photo img') };
+	});
+	expect(middles.picture, 'the picture\'s middle').not.toBeNaN();
+	expect(middles.text, 'the text\'s middle').not.toBeNaN();
+	expect(Math.abs(middles.text - middles.picture), 'the difference between the text\'s and the picture\'s middles').toBeLessThanOrEqual(1);
+	const mask = await page.locator('.site-hero__photo img').evaluate((element) => getComputedStyle(element).maskImage);
+	expect(mask, 'the picture\'s softened bottom').toContain('linear-gradient');
+});
