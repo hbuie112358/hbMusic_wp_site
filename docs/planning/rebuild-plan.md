@@ -273,8 +273,16 @@ new findings added as steps.
   check, `dev-patterns.sh`) that the pattern's blocks are the structure the CSS expects; each shown
   failing on its fault. **Found:** no embedded video is lazy-loaded: WordPress leaves the first
   three images or embeds of a page eager (its loading threshold), which on Music is all three
-  videos; the carousel's comment had claimed otherwise and was corrected. A fix is proposed
-  separately. **Added
+  videos; the carousel's comment had claimed otherwise and was corrected. **Pushed and deployed
+  (#50, 358b19b).** **Lazy loading (the user: yes):** lowering WordPress's count would not have
+  helped (it skips pictures without a stated size, so a video was the first it counted); the theme
+  returns "lazy" for every embedded frame in a page's content instead
+  (`wp_iframe_tag_add_loading_attr`), pictures keep WordPress's choice. The test Home page has a
+  stand-in video below its picture, like the real one; `media.spec.ts` checks every player on Home
+  and Music is lazy, shown failing without the filter. Checklist 8.5 is partly met: a click-to-load
+  player would meet it in full. **Next (the user, 2026-11-12):** a small script of the theme's own,
+  its first, so a video stops when it leaves view or another starts (YouTube's player cannot be
+  told from CSS); the carousel stays CSS-only and works without it. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every
