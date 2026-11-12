@@ -57,6 +57,14 @@ const HBMUSIC_COMPONENT_STYLES = array(
 const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/form.css';
 
 /**
+ * The script that pauses embedded YouTube players so only one plays at a time (plan D29), loaded
+ * only on pages whose content has one; its handle; and the addresses that count as a player.
+ */
+const HBMUSIC_VIDEO_PAUSE_SCRIPT   = 'assets/js/video-pause.js';
+const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
+const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
+
+/**
  * Registers every component stylesheet with the block it styles.
  */
 function hbmusic_register_component_styles(): void {
@@ -88,7 +96,7 @@ function hbmusic_register_component_style( string $block_name, string $component
 			'handle' => 'hbmusic-' . $component,
 			'src'    => get_theme_file_uri( $stylesheet ),
 			'path'   => get_theme_file_path( $stylesheet ),
-			'ver'    => hbmusic_stylesheet_version( $stylesheet ),
+			'ver'    => hbmusic_asset_version( $stylesheet ),
 		)
 	);
 }
@@ -101,25 +109,25 @@ function hbmusic_enqueue_form_style(): void {
 	if ( ! hbmusic_page_has_booking_form() ) {
 		return;
 	}
-	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_stylesheet_version( HBMUSIC_FORM_STYLESHEET ) );
+	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_asset_version( HBMUSIC_FORM_STYLESHEET ) );
 	wp_style_add_data( 'hbmusic-form', 'path', get_theme_file_path( HBMUSIC_FORM_STYLESHEET ) );
 }
 add_action( 'wp_enqueue_scripts', 'hbmusic_enqueue_form_style' );
 
 /**
- * A stylesheet's version for its address: a fingerprint of its contents, so a changed stylesheet
- * gets a new address and reaches browsers and caches that kept the old one, with no version number
- * to remember to raise. The theme's own version once labelled them all and stayed the same through
+ * A theme asset's version for its address (stylesheets, the video script): a fingerprint of its
+ * contents, so a changed file gets a new address and reaches browsers and caches that kept the old
+ * one, with no version number to remember to raise. The theme's own version once labelled them all and stayed the same through
  * many changes, so the Site Editor, which loads these files by address, showed an old look until
  * the browser's copy was bypassed (the user found it, 2026-11-12). Reading a small file on each
  * request costs far less than serving a stale look; a stylesheet that cannot be read is labelled
  * with the theme's version instead.
  *
- * @param string $stylesheet The stylesheet's path within the theme.
+ * @param string $asset The file's path within the theme.
  * @return string The version.
  */
-function hbmusic_stylesheet_version( string $stylesheet ): string {
-	$fingerprint = md5_file( get_theme_file_path( $stylesheet ) );
+function hbmusic_asset_version( string $asset ): string {
+	$fingerprint = md5_file( get_theme_file_path( $asset ) );
 	if ( false !== $fingerprint ) {
 		return $fingerprint;
 	}
@@ -521,4 +529,59 @@ function hbmusic_describe_slide( WP_HTML_Processor $tags, int $position, int $sl
 	$tags->set_attribute( 'aria-roledescription', __( 'slide', 'hbmusic' ) );
 	/* translators: 1: the slide's position, 2: the number of slides. */
 	$tags->set_attribute( 'aria-label', sprintf( __( '%1$d of %2$d', 'hbmusic' ), $position, $slide_count ) );
+}
+
+/**
+ * Prepares the YouTube players in a page's content for the video script: adds YouTube's switch for
+ * accepting commands from the page (enablejsapi=1) to each player's address, and loads the script
+ * when there is at least one. Added when the page is rendered, so players embedded before this
+ * change get it too, and the editor's content stays as WordPress saved it.
+ *
+ * @param string $block_content The page content's HTML.
+ * @return string The HTML, with each YouTube player able to take commands.
+ */
+function hbmusic_prepare_youtube_players( string $block_content ): string {
+	$tags       = new WP_HTML_Tag_Processor( $block_content );
+	$has_player = false;
+	while ( $tags->next_tag( array( 'tag_name' => 'iframe' ) ) ) {
+		$address = $tags->get_attribute( 'src' );
+		if ( ! is_string( $address ) || ! hbmusic_is_youtube_player( $address ) ) {
+			continue;
+		}
+		$tags->set_attribute( 'src', add_query_arg( 'enablejsapi', '1', $address ) );
+		$has_player = true;
+	}
+	if ( $has_player ) {
+		hbmusic_enqueue_video_pause_script();
+	}
+	return $tags->get_updated_html();
+}
+add_filter( 'render_block_core/post-content', 'hbmusic_prepare_youtube_players' );
+
+/**
+ * Whether an address is a YouTube player's (an embed address on one of YouTube's hosts).
+ *
+ * @param string $address A frame's address.
+ * @return bool Whether it is a YouTube player.
+ */
+function hbmusic_is_youtube_player( string $address ): bool {
+	$host = wp_parse_url( $address, PHP_URL_HOST );
+	$path = wp_parse_url( $address, PHP_URL_PATH );
+	return in_array( $host, HBMUSIC_YOUTUBE_PLAYER_HOSTS, true ) && is_string( $path ) && str_starts_with( $path, '/embed/' );
+}
+
+/**
+ * Loads the video script at the end of the page, deferred, labelled by its contents' fingerprint.
+ */
+function hbmusic_enqueue_video_pause_script(): void {
+	wp_enqueue_script(
+		HBMUSIC_VIDEO_PAUSE_HANDLE,
+		get_theme_file_uri( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
+		array(),
+		hbmusic_asset_version( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
+	);
 }

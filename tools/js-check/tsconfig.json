@@ -1,0 +1,18 @@
+{
+  // Type checking for the theme's browser scripts (plan D29), run by bin/check with the TypeScript
+  // compiler the browser tests already install, so no new tool: the scripts are plain JavaScript,
+  // run as they are, and their JSDoc comments carry the types. Strictness as for the tests.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": [],
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["/theme-js/**/*.js"]
+}

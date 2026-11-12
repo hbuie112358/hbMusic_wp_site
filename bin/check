@@ -92,6 +92,18 @@ typescript_check() {
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
 }
 
+# Type-checks the theme's browser scripts (plan D29) with the compiler installed for the browser
+# tests (tools/js-check/tsconfig.json): no new tool for one small script. The container sees the
+# scripts and the settings read-only.
+theme_scripts_check() {
+  docker run --rm -w /e2e \
+    -v "$REPO_ROOT/tests/e2e:/e2e" \
+    -v "$REPO_ROOT/themes/hbmusic-child/assets/js:/theme-js:ro" \
+    -v "$REPO_ROOT/tools/js-check:/js-check:ro" \
+    -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p /js-check/tsconfig.json'
+}
+
 # The Playwright image and the @playwright/test package must be the same version, or the
 # tests run against browsers the test runner was not built for.
 playwright_versions_match() {
@@ -227,6 +239,7 @@ main() {
   run_check "Component stylesheets match their list" component_styles_match_files
   run_check "Components appear on the test pages" components_shown_on_test_pages
   run_check "TypeScript (browser tests)" typescript_check
+  run_check "Type check (the theme's scripts)" theme_scripts_check
   run_check "CSS (Stylelint)" css_lint
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows

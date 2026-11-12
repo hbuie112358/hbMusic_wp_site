@@ -86,6 +86,8 @@ template project starts; until then, a list, not a to-do.
   and the "Video carousel" pattern adds one with an optional, empty heading (dropped from the
   page if left empty). Each carousel is described for screen readers as a carousel of "n of m"
   slides. Generic; the pattern's label "Videos" suits a site whose carousels hold videos.
+- The video script (plan D29): `assets/js/video-pause.js` with its loading and YouTube's command
+  switch in `functions.php`; generic for any site with YouTube embeds.
 - The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),
   which mean the carousel's own width only inside it; it is not a general-purpose length.
 - A comfortable line length for text: an inner group whose content width is the measure token,

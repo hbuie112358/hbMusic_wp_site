@@ -294,7 +294,41 @@ new findings added as steps.
   bare video frame keeps its own role, and markup it cannot parse is left as it is). The test Music
   page's first video is wrapped as WordPress renders an Embed block, with the pattern's empty
   heading above it. Tests check the descriptions, the empty heading's absence and the pattern's
-  two blocks, each shown failing on its fault. **Added
+  two blocks, each shown failing on its fault. **Pushed and deployed (#52, 72328dd);** the user replaces
+  staging's Music carousel with the pattern, to try it in the real editor. **The theme's first
+  script (the user, 2026-11-12: a good reason for JavaScript):** `assets/js/video-pause.js` keeps one
+  YouTube player playing at a time: a player whose visible share drops below half is paused (an
+  IntersectionObserver, so arrows, dots, swipe, keyboard and page scrolling all count), and when a
+  player reports "playing", the others are paused. YouTube's player takes commands as messages when
+  its address has `enablejsapi=1`, which the theme adds to each YouTube player in a page's content
+  as it is rendered (existing embeds included), and reports its state once told the page listens;
+  messages go only to the player's origin and are taken only from it. The script loads deferred,
+  only on pages with a player, labelled by its contents' fingerprint (`hbmusic_asset_version()`,
+  renamed from `hbmusic_stylesheet_version()`); the carousel stays CSS-only and everything works
+  without it. Checked with real YouTube players on the dev site (play 1, "next": 1 paused; play 2,
+  then 3: 2 paused; no console error). `video-pause.spec.ts` answers the player addresses with a
+  stand-in player that reports the commands it gets: the script and the switch where there is a
+  player, none elsewhere; starting one pauses the other; "next" pauses the one moved out; each
+  shown failing on its own fault (the script not loaded fails all three). The test Music page's
+  second carousel has a stand-in video. **Then (the user):** a player outside a carousel, Home's
+  (music with a still picture), keeps playing while the visitor scrolls; only players in a carousel
+  pause when they leave view; starting any player still pauses the others. Going to another page
+  stops a video anyway (the browser closes the page). A test scrolls Home's player out of view and
+  checks it got no pause, shown failing with every player watched. **A checker for JavaScript (the
+  review found none):** `bin/check` type-checks the theme's scripts with the TypeScript compiler the
+  browser tests already install (`tools/js-check/tsconfig.json`, strict, the scripts' JSDoc carrying
+  the types), no new tool; ESLint was not chosen, WordPress's configuration bringing a large set of
+  packages for one small script. Its first run found 13 loose types in the script (elements used as
+  frames unchecked, messages without a declared shape), fixed; shown failing on a planted one.
+  **Then (the user: why must YouTube tell us anything?):** knowing which player started used a
+  handshake that is only partly documented by YouTube; it is replaced by the browser's focus, which
+  is standard: clicking or tabbing into a player moves the focus into its frame, so the page sees it
+  as its active element and pauses the others with YouTube's documented pause command. The page is
+  told only when the focus first leaves it, so while the focus is inside a player it checks every
+  250ms whether it moved to another (moving straight from one player to another counts). Any click
+  into a player counts as moving to it. Checked with real YouTube players and real clicks (play 1,
+  click into 2: 1 paused, 2 playing). The test now clicks into the stand-in players, first into one,
+  then straight into the other, shown failing without the focus handling and without the checking. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every
