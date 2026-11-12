@@ -29,6 +29,11 @@ export default {
 			{ message: 'Custom properties are lower-case; WordPress double-dash namespacing allowed' },
 		],
 
+		// CSS's native carousel syntax (::scroll-button(left|right), :target-current), newer than
+		// Stylelint 17's knowledge; only these names are allowed. Remove when Stylelint knows them.
+		'selector-type-no-unknown': [ true, { ignoreTypes: [ 'left', 'right' ] } ],
+		'selector-pseudo-class-no-unknown': [ true, { ignorePseudoClasses: [ 'target-current' ] } ],
+
 		// !important starts an escalation with the framework's own styles; where WordPress's
 		// layout forces one, the exception is disabled in place with its reason.
 		'declaration-no-important': true,

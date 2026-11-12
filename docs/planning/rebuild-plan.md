@@ -124,7 +124,21 @@ new findings added as steps.
   in place of the JPEG with the content update. Also from the user: two buttons in a row are
   equally wide and, stacked, the same length at every width (they wrap by column, not by one
   screen width). Tests: the bands' texture and the grain image, equal button widths at four
-  widths, each shown failing on a planted fault. **One push at the end** (the user's preference for a single
+  widths, each shown failing on a planted fault. **Package 6, the videos as a carousel (the
+  user's request, option A+ after weighing it against a scripted carousel; the user did not
+  want JavaScript):** the Music page's videos in a row that scrolls sideways and snaps, CSS only
+  (`site-carousel.css`; a labelled `section` group, WordPress's wide width, slides at most 860px
+  so the next one shows). Chrome and Edge also show CSS's native previous/next buttons and dots
+  (since version 135; MDN: limited availability), Firefox and Safari a green scrollbar (the user
+  first missed Firefox's grey one). No wrap-around (that needs a script). The user saw the "next"
+  button stay at the last video in VS Code's built-in browser; the last slide now snaps to the
+  row's end, and in Chrome it hides. Hidden slides' videos load only when scrolled near
+  (WordPress's lazy loading). Stylelint 17 does not yet know the native carousel syntax; its config
+  allows exactly those names. axe then found the row unreachable by keyboard
+  (scrollable-region-focusable): `hbmusic_make_carousel_focusable()` adds `tabindex="0"` when the
+  page is rendered (an attribute in the content would make the editor flag the block invalid),
+  with a focus ring, and the arrow keys scroll it. `carousel.spec.ts` (5 tests), each shown
+  failing on a planted fault. **One push at the end** (the user's preference for a single
   staging update): after the deploy, staging's Home, Music, Songs and About get their content
   with the new class names, Home from its own code in the editor (to keep its photo). **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing

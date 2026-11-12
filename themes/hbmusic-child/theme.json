@@ -118,6 +118,12 @@
 				"layer": "100",
 				"focusGap": "8px"
 			},
+			"carousel": {
+				"slideWidth": "min(86%, 860px)",
+				"gap": "16px",
+				"markerSize": "10px",
+				"buttonSize": "44px"
+			},
 			"texture": {
 				"stageLight": "rgb(255 236 214 / 10%)"
 			},
