@@ -355,8 +355,8 @@ new findings added as steps.
 - **Next:** step 9, going live (the user, 2026-11-12: "I'm ready to go live"). 5f is done: the
   videos are on staging (Home's featured video; Music's carousel replaced by the user with the
   "Video carousel" pattern, its links changed by the user there), and D30 decides that live's
-  content comes from staging's export. Start step 9 by deciding its open question (live's
-  WordPress updated in place or installed fresh), then follow its checklist. Before it, the user:
+  content comes from staging's export. Live's WordPress is updated in place (D31, the user,
+  2026-11-12); step 9 now follows its order, 9a to 9p, starting with 9a and 9b. Before it, the user:
   deletes live's wp-config backup in the home folder (8m) and confirms HetrixTools' two-factor
   login. Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
   gets the version staging runs. The page generator (`data/content/`) still has the old Music
@@ -412,6 +412,7 @@ new findings added as steps.
 | D29 | The site's CSS is held to the same coding standards as any code (the user, 2026-11-11), and is structured for the template (D18, D21), which serves any relatively static site without commerce. **Two layers:** the site layer is `theme.json` (palette, font, design tokens in `settings.custom`, element and block styles); the generic layer is `themes/hbmusic-child/assets/css/components/`, one commented file per component, named by structure, not subject (`site-hero`, `site-section`, `site-features`, `site-cta`, `site-media`, `site-measure`, `site-form`), using only the tokens and loaded only where its block appears (`wp_enqueue_block_style()`). The song table's styles belong to the Song List plugin, which stays a plugin for musicians. **Linting:** Stylelint 17 with `stylelint-config-standard` and the WordPress CSS standards' formatting rules in `tools/css-lint/stylelint.config.mjs` (option B, the user), run by `bin/check` with an npm audit, kept current by Dependabot and `bin/tools-update`. Replaces D23's "no separate CSS file, so no Stylelint yet". | The first draft was one minified string in `theme.json`: no comments, repeated magic numbers, `!important` against WordPress's layout, everything loaded on every page, and no linter, although every other kind of code here has one; CSS fails silently, so typos and invalid values go unseen without one. `@wordpress/stylelint-config` was not chosen: every release since mid-2026 depends on WordPress's editor packages (React included), 184 packages against 119. `@stylistic/stylelint-plugin` (tab indentation and other formatting) has a single maintainer, accepted because it is pinned, waits 7 days, runs no install scripts and runs only in a container that sees the code read-only; looked at again with each of its updates. Notes towards a global CSS rule collect in `docs/planning/css-standards-notes.md`; proposing it is a to-do after this work. |
 | D28 | The admin and login pages get no Content-Security-Policy of the site's own (the user, 2026-11-11); they keep what WordPress 7.1 sends there (`X-Frame-Options: SAMEORIGIN`, `frame-ancestors 'self'`, a referrer policy). | The admin's script rules would need `'unsafe-inline'` and probably `'unsafe-eval'` (the block editor, Yoast's analysis), which take away most of their protection; the cheap rules (`object-src`, `base-uri`, `form-action`) help only after a script is already running. Wordfence's and FluentSMTP's admin screens exist only on staging and live, so a policy could not be tested on the dev site, and one that breaks after a plugin update can lock the user out of the screen needed to fix it. The one path from a visitor into the admin, failed booking emails shown by FluentSMTP, relies on the plugin escaping them; what protects it is prompt updates (8j), few admins and two-factor login. Looked at again if the site adds accounts or plugins that show visitors' input in the admin. |
 | D30 | Live gets its content from staging (the user, 2026-11-12, option A): staging's pages, songs, menu and booking form are exported there (Tools → Export) and imported into live (Tools → Import), exactly as the user finished them on staging; live's settings (Yoast, the site icon, the booking form's keys and From/To, mail, Wordfence, avatars) are set by hand from step 9's checklist, and the hero photo is uploaded to live once by hand, since live cannot fetch files from password-protected staging. The page generator's import file (`data/content/`) is no longer the source for live; the generator stays a dev tool (previews). Whether live's WordPress is updated in place or installed fresh stays step 9's own question. | Staging is where the content was finished (wording, videos, alt text, templates chosen), so nothing is retyped and the generator's copy cannot bring back what was corrected there. Copying staging's whole database (option B) was declined: it would also carry staging's address (to rewrite everywhere), test entries, staging's mail and spam-protection settings and admin account, and overwrite live's own Wordfence and two-factor setup; more to go wrong, harder to see. Many of live's settings differ from staging's anyway (address, keys, sender). |
+| D31 | Live's WordPress is updated in place, not installed fresh (the user, 2026-11-12, option A): the new theme, plugins and staging's content (D30) go onto the running installation; the old pages are moved to the trash just before the import so their addresses are free, and the old theme, old pages, revisions and the old admin account are removed afterwards. Step 9 runs in four stages: preparation with live untouched, setup on live behind the old look, a short switch, then checks and cleanup. | Keeps live's Wordfence setup (two-factor login, the firewall in Extended Protection, the login limits, the alerts), Hostinger's update plugin and the site's addresses, and the site stays up throughout. A fresh install would redo all of that by hand, take the site down meanwhile, and save only one round of cleanup. |
 
 ## Steps
 
@@ -1560,10 +1561,8 @@ new findings added as steps.
      uploads rule with a test file placed and removed;
    - the content comes from staging (D30, the user, 2026-11-12): exported there and imported into
      live through the admin (the deploy key cannot run WP-CLI), the hero photo uploaded once by hand,
-     the settings set from this checklist; still to decide when this step starts: live's WordPress
-     updated in place (keeps URLs and the Yoast and Wordfence settings, with old plugin tables and
-     revisions to clean up; Claude's recommendation on 2026-11-07) or installed fresh (nothing
-     carried over, more set up again). New page content is ready before the theme is switched;
+     the settings set from this checklist; live's WordPress is updated in place (D31, the user,
+     2026-11-12). New page content is ready before the theme is switched;
    - the booking form's plugin and Turnstile keys (Contact → Integration, 5e); the import file sets its
      From and To for live, and staging's were set by hand in its Mail tab;
    - from outside, after the switch: every page allows indexing and names one canonical address,
@@ -1581,8 +1580,8 @@ new findings added as steps.
      logged out and logged in; avatars off (Settings → Discussion → "Show Avatars", 8e);
    - the site icon from `data/photos/web/howard-buie-icon-696.png` (Settings → General → Site
      Icon, 5f), seen in the browser tab afterwards;
-   - the 108 songs imported from `data/song-list/songs-import.xml` with WordPress's importer,
-     which is deleted again afterwards, as on staging (5a);
+   - the 108 songs come with staging's export (D30), not from `data/song-list/songs-import.xml`;
+     WordPress's importer is deleted again afterwards, as on staging (5a);
    - the deploy pipeline (3g) points at the live site, after the staging site has proven it.
      The design, chosen by the user on 2026-11-04 (option B): a merge to `main` runs the
      checks, then deploys to staging automatically and checks it, as since 3g-3; then GitHub
@@ -1593,6 +1592,67 @@ new findings added as steps.
      required reviewer, its own restricted key and server destination (as 3g-2). The other
      option, live deployed automatically right after staging passes (A), stays possible later,
      once changes are routine.
+
+   **The order (D31).** Each item is ticked here with its date as it is done; anything found on
+   the way becomes a note or a new item, not a detour.
+
+   *Stage A: preparation; live untouched.*
+   - [ ] 9a. The user: live's wp-config backup in the home folder deleted (8m); HetrixTools'
+     two-factor login answered.
+   - [ ] 9b. The live deploy job (the design above), through a pull request with the review gate:
+     a `production` environment with the user as required reviewer, its own restricted key and
+     server destinations for the child theme, Song List and Site Hardening (as 3g-2 and 8a). Its
+     checks afterwards must hold before the switch too (the files in place; the old theme still
+     active). Its first run puts the files on live without activating anything: an inactive theme
+     or plugin runs no code.
+   - [ ] 9c. Staging's content exported (Tools → Export → All content) into `data/exports/`;
+     Claude reads it and lists what it carries (pages with their templates, songs, the menu, the
+     booking form, template parts edited in the Site Editor, media entries) and what it does not.
+   - [ ] 9d. A rehearsal: that export imported into a throwaway WordPress (the dev site's images,
+     without its test pages), to see before live what the importer does with the addresses, the
+     templates, the menu, the form and the template parts, and what must be set by hand after.
+     What it finds also corrects the refresh routine of 9q.
+   - [ ] 9e. Just before stage B: a Hostinger backup of live made by hand (hPanel), and live's old
+     content exported into `data/exports/` (the way back, D27).
+
+   *Stage B: setup on live, behind the old look (visitors see no change).*
+   - [ ] 9f. The new admin account (a name that is not easy to guess, two-factor login with
+     Wordfence); the rest of step 9 done with it.
+   - [ ] 9g. Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
+     Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m).
+   - [ ] 9h. Contact Form 7 at the version staging runs (6.2.5 not before 2026-11-17), Song List
+     activated, WordPress's importer installed.
+
+   *Stage C: the switch (a short window; the old site has little traffic).*
+   - [ ] 9i. The old pages to the trash (the inventory's list, step 2).
+   - [ ] 9j. Staging's export imported, assigned to the new admin; each new page checked at its
+     own address (no `-2`) and with its template as on staging; the importer deleted.
+   - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; the menu,
+     the hero photo uploaded by hand into Home's hero, the site icon, the booking form's Turnstile
+     keys and its Mail tab's From and To; one real booking request arrives.
+
+   *Stage D: checks and cleanup, from outside.*
+   - [ ] 9l. Site Hardening activated and checked as on staging; avatars off; staging's two server
+     rules (8k) and HSTS (3.1).
+   - [ ] 9m. Yoast as on staging, each page indexable with its own canonical address at the live
+     domain; `x-hcdn-cache-status: DYNAMIC`; the old addresses' redirects; the local leftovers
+     still 404; HetrixTools' monitor up with its keyword found.
+   - [ ] 9n. Cleanup: `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
+     removed, the old admin account removed (its content given to the new one) and its name, and
+     `admin`, on Wordfence's list of names blocked at once.
+   - [ ] 9o. Backups (D27): the first content export into `data/exports/`, and the restore test of
+     checklist 12.3 both ways, with its date.
+   - [ ] 9p. From then on, every merge reaches live through the approved deploy job.
+   - [ ] 9q. Staging's content refreshed from live (the user, 2026-11-12), as
+     `docs/ROUTINES.md` ("Refreshing staging's content from live") describes, so staging starts
+     out matching live. Content is edited on live from now on and never sent up from staging;
+     staging is refreshed from live before a major change to the look is judged there, so it is
+     judged on the real pages. Content only: a copy of live's whole database would overwrite
+     staging's own settings and carry visitors' data (D30's reasons). The routine is written
+     provisionally now and confirmed or corrected here with what 9d and this first run find.
+   - Later: DMARC to `p=quarantine` a few weeks after go-live (11.2); Contact Form 7 6.2.5
+     after 2026-11-17, staging first.
+
    Status: `[ ]`
 10. **Move to a new host before 2028-07-16** (when the Hostinger plan ends; auto-renewal off):
     choose the host (SSH access and a supported PHP version required), set it up, change the
