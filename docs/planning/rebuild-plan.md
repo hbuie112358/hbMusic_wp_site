@@ -407,6 +407,7 @@ new findings added as steps.
 | D22 | The site is built around one visitor, someone deciding whether to hire the user for an event (the user, 2026-11-07). Five pages: Home, Music (replaces Video and the empty Audio page), Songs (the address stays `/songlist/`), About, Book (replaces Contact). `/video/`, `/audio/` and `/contact/` redirect to the new pages; the sidebar and the empty "Audio and Video" page go. The service area is now Fayetteville, North Carolina, and surrounding areas, including Southern Pines, not the Mid Ohio Valley. | Every page then helps a visitor hear the user and make contact. The live site's text, tagline and search details still name the old area, and the inventory (step 2) describes that old text. |
 | D29 | The site's CSS is held to the same coding standards as any code (the user, 2026-11-11), and is structured for the template (D18, D21), which serves any relatively static site without commerce. **Two layers:** the site layer is `theme.json` (palette, font, design tokens in `settings.custom`, element and block styles); the generic layer is `themes/hbmusic-child/assets/css/components/`, one commented file per component, named by structure, not subject (`site-hero`, `site-section`, `site-features`, `site-cta`, `site-media`, `site-measure`, `site-form`), using only the tokens and loaded only where its block appears (`wp_enqueue_block_style()`). The song table's styles belong to the Song List plugin, which stays a plugin for musicians. **Linting:** Stylelint 17 with `stylelint-config-standard` and the WordPress CSS standards' formatting rules in `tools/css-lint/stylelint.config.mjs` (option B, the user), run by `bin/check` with an npm audit, kept current by Dependabot and `bin/tools-update`. Replaces D23's "no separate CSS file, so no Stylelint yet". | The first draft was one minified string in `theme.json`: no comments, repeated magic numbers, `!important` against WordPress's layout, everything loaded on every page, and no linter, although every other kind of code here has one; CSS fails silently, so typos and invalid values go unseen without one. `@wordpress/stylelint-config` was not chosen: every release since mid-2026 depends on WordPress's editor packages (React included), 184 packages against 119. `@stylistic/stylelint-plugin` (tab indentation and other formatting) has a single maintainer, accepted because it is pinned, waits 7 days, runs no install scripts and runs only in a container that sees the code read-only; looked at again with each of its updates. Notes towards a global CSS rule collect in `docs/planning/css-standards-notes.md`; proposing it is a to-do after this work. |
 | D28 | The admin and login pages get no Content-Security-Policy of the site's own (the user, 2026-11-11); they keep what WordPress 7.1 sends there (`X-Frame-Options: SAMEORIGIN`, `frame-ancestors 'self'`, a referrer policy). | The admin's script rules would need `'unsafe-inline'` and probably `'unsafe-eval'` (the block editor, Yoast's analysis), which take away most of their protection; the cheap rules (`object-src`, `base-uri`, `form-action`) help only after a script is already running. Wordfence's and FluentSMTP's admin screens exist only on staging and live, so a policy could not be tested on the dev site, and one that breaks after a plugin update can lock the user out of the screen needed to fix it. The one path from a visitor into the admin, failed booking emails shown by FluentSMTP, relies on the plugin escaping them; what protects it is prompt updates (8j), few admins and two-factor login. Looked at again if the site adds accounts or plugins that show visitors' input in the admin. |
+| D30 | Live gets its content from staging (the user, 2026-11-12, option A): staging's pages, songs, menu and booking form are exported there (Tools → Export) and imported into live (Tools → Import), exactly as the user finished them on staging; live's settings (Yoast, the site icon, the booking form's keys and From/To, mail, Wordfence, avatars) are set by hand from step 9's checklist, and the hero photo is uploaded to live once by hand, since live cannot fetch files from password-protected staging. The page generator's import file (`data/content/`) is no longer the source for live; the generator stays a dev tool (previews). Whether live's WordPress is updated in place or installed fresh stays step 9's own question. | Staging is where the content was finished (wording, videos, alt text, templates chosen), so nothing is retyped and the generator's copy cannot bring back what was corrected there. Copying staging's whole database (option B) was declined: it would also carry staging's address (to rewrite everywhere), test entries, staging's mail and spam-protection settings and admin account, and overwrite live's own Wordfence and two-factor setup; more to go wrong, harder to see. Many of live's settings differ from staging's anyway (address, keys, sender). |
 
 ## Steps
 
@@ -899,7 +900,7 @@ new findings added as steps.
      list's oldest and newest releases; updated if either end changes); a laid-back dinner set to
      rocking out on Home and Book; Ohio instead of West Virginia in the bands' range, and "sung and
      played" on Home; "over 30 years" kept everywhere (the old live site's "40 years" goes at
-     go-live). Changed in `data/content/build_pages.py`, whose import file live gets at step 9;
+     go-live). Changed in `data/content/build_pages.py` (live gets staging's content instead, D30);
      pasted on staging paragraph by paragraph, since a whole-page paste would drop Home's photo.
      Left: the user's video choices (Home and Music). Once a real video is on staging's Music page, the browser
      console is checked there for policy violations, since YouTube was not yet exercised on
@@ -1160,7 +1161,7 @@ new findings added as steps.
      2026-11-10), with a monthly reminder in the user's calendar. (9) done 2026-11-10: the privacy
      policy names Brevo, its three months, failed messages kept until dealt with, and requests kept
      in the user's inbox as long as needed (`data/content/build_pages.py`, pasted into staging by
-     the user; live gets it from the import file at step 9). Pushover is not named: since the
+     the user; live gets it from staging's export at step 9, D30). Pushover is not named: since the
      subject no longer names the visitor, its alerts carry no visitor details. Left: where Brevo
      lists blocked transactional addresses.
    - **Knowing when a booking request goes missing (the user: among the most important points,
@@ -1553,12 +1554,12 @@ new findings added as steps.
      `.htaccess` (a backup first; Wordfence's firewall optimization edits the same file), and
      `wp-content/uploads/.htaccess` with no PHP; both checked from outside as on staging, the
      uploads rule with a test file placed and removed;
-   - how the new site reaches the live address, a gap found in the review of 2026-11-07 and not yet
-     decided: updating the existing WordPress in place (keeps URLs and the Yoast and Wordfence
-     settings, with old plugin tables and revisions to clean up; Claude's recommendation then) or a
-     fresh install (nothing carried over, more set up again). Decided when this step is reached,
-     with what the pages and staging have shown by then. New page content is ready before the
-     theme is switched, and the deploy key cannot run WP-CLI, so content goes through the admin;
+   - the content comes from staging (D30, the user, 2026-11-12): exported there and imported into
+     live through the admin (the deploy key cannot run WP-CLI), the hero photo uploaded once by hand,
+     the settings set from this checklist; still to decide when this step starts: live's WordPress
+     updated in place (keeps URLs and the Yoast and Wordfence settings, with old plugin tables and
+     revisions to clean up; Claude's recommendation on 2026-11-07) or installed fresh (nothing
+     carried over, more set up again). New page content is ready before the theme is switched;
    - the booking form's plugin and Turnstile keys (Contact → Integration, 5e); the import file sets its
      From and To for live, and staging's were set by hand in its Mail tab;
    - from outside, after the switch: every page allows indexing and names one canonical address,
