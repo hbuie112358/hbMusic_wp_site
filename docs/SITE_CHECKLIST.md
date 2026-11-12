@@ -469,7 +469,10 @@ third-party scripts.**
 - Why: third-party embeds are heavy and set cookies.
 - Check: on a page with an embed, the network panel shows no request to the provider before the
   player is started.
-- Kind: general · Status: planned: with the Video page, after 2b.
+- Kind: general · Status: partly (2026-11-12): every embedded player in a page's content is
+  lazy-loaded, the first ones included (the child theme's `functions.php`, tested by
+  `media.spec.ts`), so nothing loads from YouTube until the visitor nears a video; a click-to-load
+  player (a picture, YouTube only on play) would meet the item in full and is not built.
 
 ## 9. Search and sharing
 

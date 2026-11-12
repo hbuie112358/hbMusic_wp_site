@@ -422,3 +422,17 @@ function hbmusic_decode_embed_title( string $title ): string {
 	return html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 }
 add_filter( 'oembed_iframe_title_attribute', 'hbmusic_decode_embed_title' );
+
+/**
+ * Lazy-loads every embedded player in a page's content (videos, maps), the first ones included, so
+ * one hidden in a carousel or further down the page loads only as the visitor nears it
+ * (docs/SITE_CHECKLIST.md 8.5). WordPress leaves the first images and embeds of a page eager,
+ * assuming they show at once, which on the Music page was every video. Pictures keep WordPress's
+ * own choice, so the first one, usually the largest at the top, still loads at once.
+ *
+ * @return string The loading value for every embedded frame.
+ */
+function hbmusic_lazy_load_embeds(): string {
+	return 'lazy';
+}
+add_filter( 'wp_iframe_tag_add_loading_attr', 'hbmusic_lazy_load_embeds' );
