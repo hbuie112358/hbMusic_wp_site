@@ -111,3 +111,21 @@ test('in the hero, the text and the picture are centred on each other, and the p
 	const mask = await page.locator('.site-hero__photo img').evaluate((element) => getComputedStyle(element).maskImage);
 	expect(mask, 'the picture\'s softened bottom').toContain('linear-gradient');
 });
+
+// Points side by side whose texts differ in length (the test page's do) still have their buttons
+// on one line, each below its own text (the user asked for the points to look symmetrical).
+test('the features panel\'s buttons line up, each below its own text', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto('/');
+	const points = await page.locator('.site-features .wp-block-column').evaluateAll((columns) => columns.map((column) => ({
+		textBottom: column.querySelector('p')?.getBoundingClientRect().bottom ?? Number.NaN,
+		buttonTop: column.querySelector('.wp-block-button__link')?.getBoundingClientRect().top ?? Number.NaN,
+	})));
+	expect(points.length, 'the points with buttons').toBeGreaterThanOrEqual(2);
+	const tops = points.map((point) => Math.round(point.buttonTop));
+	expect(new Set(tops).size, `the buttons' tops ${tops.join(', ')}`).toBe(1);
+	expect(new Set(points.map((point) => Math.round(point.textBottom))).size, 'the texts\' ends, which must differ for this test to mean anything').toBeGreaterThan(1);
+	for (const point of points) {
+		expect(point.buttonTop, 'a button below its text').toBeGreaterThan(point.textBottom);
+	}
+});
