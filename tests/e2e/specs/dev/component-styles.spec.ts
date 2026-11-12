@@ -38,6 +38,16 @@ test("the song table's styles load only where the song list appears", async ({ p
 	}
 });
 
+// Loading is not enough: WordPress's own "text-wrap: pretty" on headings once won over the theme's
+// rule, so the headings' wrapping is read from the browser.
+test('headings wrap in lines of even length', async ({ page }) => {
+	await page.goto('/');
+	for (const selector of ['h1.wp-block-heading', 'h2.wp-block-heading']) {
+		const wrapping = await page.locator(selector).first().evaluate((heading) => getComputedStyle(heading).textWrapStyle);
+		expect(wrapping, `the wrapping of ${selector}`).toBe('balance');
+	}
+});
+
 // Loading is not enough: the plugin's selectors must still match its own markup.
 test("the song table's styles apply to the table", async ({ page }) => {
 	await page.goto(SONG_LIST_PATH);

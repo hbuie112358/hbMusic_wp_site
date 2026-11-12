@@ -95,5 +95,10 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   `:has()` to exactly the pages it concerns and with its reason in the required disable comment.
 - **Measure before fixing.** The "black strip" was traced element by element to 70px of template
   padding plus 19px of footer margin before any rule was written.
+- **Check a design at the widths people use, not one.** The 40-60 hero looked right at 1280px;
+  the user's narrower window broke the headline differently. A sweep of ten widths showed where.
+- **Zero specificity can lose.** A `:where()` rule meant to be easy to override was itself
+  overridden by WordPress's element rule (`h1 { text-wrap: pretty }`); the block's class is the
+  right weight.
 - **Verify by looking, at more than one width.** Each change was screenshotted at desktop and
   phone width; two layout faults showed only at desktop width.
