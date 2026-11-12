@@ -104,7 +104,14 @@ new findings added as steps.
   style needed the one `!important`, with its reason. The stand-in About page gained the band, so
   the tests see this. Menu text 13.4:1 even over white passing beneath. `header.spec.ts` (6
   tests) protects the stickiness, focus not obscured, the current-page mark, no gap, and the
-  slimmer phone header, each shown failing on a planted fault. **Next:** package 5 (a "stage
+  slimmer phone header, each shown failing on a planted fault. **The hero photo (the user,
+  after package 4):** it sat 87px below the headline; the hero's columns went from 48-52 to 40-60
+  (chosen from four mock-ups), so at 1280px and up the photo is 15% larger, the head level with
+  the headline's top, still standing on the band's edge (its cut-off bottom must sit on an edge).
+  A content change (`data/content/build_pages.py`), reaching staging with the class-name update.
+  Headings now wrap in lines of even length (`text-wrap: balance`, `headings.css`): below about
+  1200px the headline had left "event" alone on its last line; WordPress's own "pretty" on
+  headings first outranked the rule, which a test now catches. **Next:** package 5 (a "stage
   light" glow behind the hero photo, which also hides the photo's dark-grey edge, and a fine grain
   at about 4% on the hero, features and call-to-action bands, from a small noise image in the
   theme; `img-src 'self'` allows it). **One push at the end** (the user's preference for a single

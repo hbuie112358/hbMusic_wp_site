@@ -38,6 +38,8 @@ const HBMUSIC_COMPONENT_STYLES = array(
 	'core/group'         => array( 'site-hero', 'site-section', 'site-features', 'site-cta' ),
 	'core/paragraph'     => array( 'site-media' ),
 	'core/button'        => array( 'buttons' ),
+	'core/heading'       => array( 'headings' ),
+	'core/post-title'    => array( 'headings' ),
 );
 
 /**
