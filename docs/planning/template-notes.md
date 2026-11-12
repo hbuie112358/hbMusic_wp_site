@@ -81,6 +81,10 @@ template project starts; until then, a list, not a to-do.
 - `theme.json`'s `customTemplates` and `templateParts` replace the parent's lists instead of
   adding to them: a child theme repeats the parent's entries (without the header's and footer's,
   WordPress renders them as plain `div`s), and compares them when the parent updates.
+- Carousels (plan D29): any number per page and any number of slides; a heading directly above
+  one names it for screen readers (`hbmusic_name_carousels_after_headings()` in `functions.php`),
+  and the "Video carousel" pattern adds one. Generic; the pattern's label "Videos" suits a site
+  whose carousels hold videos.
 - The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),
   which mean the carousel's own width only inside it; it is not a general-purpose length.
 - A comfortable line length for text: an inner group whose content width is the measure token,

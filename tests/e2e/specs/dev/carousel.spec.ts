@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-// Protects the CSS-only carousel (plan D29, option A+): its slides sit side by side in one row that
+// Protects the CSS-only carousel (plan D29, option A+), of which a page may have several: its
+// slides sit side by side in one row that
 // scrolls sideways and snaps, the first and last slides can sit in the middle like the others, it
 // is a labelled region for screen readers, the native "next" button
 // (Chromium, the test browser) brings the row exactly to its end and then hides (the user found it
@@ -12,7 +13,8 @@ const SLIDE_SETTLE_MS = 800;
 async function openCarousel(page: Page): Promise<Locator> {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(MUSIC_PATH);
-	const row = page.locator(ROW);
+	// The first carousel, which has no heading above it (the test page's second one has).
+	const row = page.locator(ROW).first();
 	await row.scrollIntoViewIfNeeded();
 	return row;
 }
@@ -89,4 +91,40 @@ test('the carousel jumps instead of gliding for visitors who ask for less motion
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	const row = await openCarousel(page);
 	expect(await row.evaluate((element) => getComputedStyle(element).scrollBehavior), 'the scrolling').toBe('auto');
+});
+
+// Several carousels on one page (the user: Rock, Country, Mellow): each one's arrows act on its own
+// row; they were once placed by a name all carousels shared, so they followed the last one.
+test('each carousel\'s "next" button moves its own row and no other', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto(MUSIC_PATH);
+	const rows = page.locator(ROW);
+	await expect(rows, 'the carousels on the test page').toHaveCount(2);
+	for (const index of [0, 1]) {
+		const row = rows.nth(index);
+		await row.evaluate((element) => { element.scrollLeft = 0; });
+		await row.scrollIntoViewIfNeeded();
+		const box = await row.boundingBox();
+		const buttonSize = 44;
+		const gap = 16;
+		await page.mouse.click((box?.x ?? 0) + (box?.width ?? 0) - gap - buttonSize / 2, (box?.y ?? 0) + (box?.height ?? 0) / 2);
+		await page.waitForTimeout(SLIDE_SETTLE_MS);
+		const positions = await rows.evaluateAll((elements) => elements.map((element) => element.scrollLeft));
+		expect(positions[index], `carousel ${index + 1} after its own "next"`).toBeGreaterThan(0);
+		expect(positions[1 - index], `carousel ${2 - index} after the other one's "next"`).toBe(0);
+		await row.evaluate((element) => { element.style.scrollBehavior = 'auto'; element.scrollLeft = 0; });
+	}
+});
+
+// A carousel directly under a heading is named after it for screen readers; one without a heading
+// keeps its own label (the user: a single carousel needs no heading).
+test('a carousel under a heading is named after it, one without keeps its own label', async ({ page }) => {
+	await page.goto(MUSIC_PATH);
+	const named = page.getByRole('region', { name: 'Sample second set' });
+	await expect(named, 'the carousel under the heading').toHaveCount(1);
+	await expect(named, 'the carousel under the heading').toHaveClass(/site-carousel/);
+	const headingId = await page.getByRole('heading', { name: 'Sample second set' }).getAttribute('id');
+	expect(headingId, 'the heading\'s id').toBeTruthy();
+	await expect(named, 'its link to the heading').toHaveAttribute('aria-labelledby', headingId ?? '');
+	await expect(page.getByRole('region', { name: 'Videos' }), 'the carousel without a heading').toHaveCount(1);
 });

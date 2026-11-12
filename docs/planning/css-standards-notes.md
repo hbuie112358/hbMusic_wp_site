@@ -163,6 +163,11 @@ language: appropriate structure, classes and techniques, enterprise grade, never
   raised kept every changed stylesheet at its old address; pages hid it (WordPress inlines small
   block stylesheets), the Site Editor did not (it loads them by address). A fingerprint of each
   file changes exactly when the file does.
+- **A component must work twice on one page.** The carousel's arrows were anchored by a global
+  name (`anchor-name`); one carousel hid it, two broke it. `anchor-scope` limits the name to each
+  instance; a test page with two instances keeps it honest.
+- **A comment's claim is checked like code.** "WordPress lazy-loads the videos" was written as a
+  fact and was not true for the first three embeds; measuring showed it.
 - **One frame, every part:** a full-width band whose colour differs from the page shows where the
   frame ends; the eye then measures everything else (the menu looked misplaced) against it.
 - **In browsers without native controls, the scrollbar is the control;** coloured in the accent,
