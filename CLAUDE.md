@@ -87,7 +87,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   the form's, the song table's from its plugin, plan D29), the bands' texture, the call-to-action panel's green and its button standing out from it, the lead text larger than body text, the hero's text and picture centred on each other with the picture's softened bottom, the features panel's buttons lined up, and the headings' even
   lines; the buttons' keyboard focus ring and
   its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
-  after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, several carousels each with their own arrows, a carousel named after a heading directly above it, described as a carousel with "n of m" slides, an empty heading above it left out, and reduced motion (D29); every embedded player lazy-loaded; one frame on every page (the header,
+  after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, several carousels each with their own arrows, a carousel named after a heading directly above it, described as a carousel with "n of m" slides, an empty heading above it left out, and reduced motion (D29); every embedded player lazy-loaded; the video script (one YouTube player at a time: one in a carousel leaving view, or the visitor clicking into another, pauses it; one outside a carousel keeps playing while scrolling; loaded only where there is a player, with stand-in players instead of YouTube); one frame on every page (the header,
   footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
   menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, and the slimmer phone header
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
@@ -109,7 +109,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
   rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
   packages; the theme's component list in `functions.php` matching the files in
-  `assets/css/components/`, both ways, and every `site-…` component shown on a test page in
+  `assets/css/components/`, both ways; a type check of the theme's browser scripts (`assets/js/`) with
+  the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on a test page in
   `tests/dev-content/` (so the browser tests see it); ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
