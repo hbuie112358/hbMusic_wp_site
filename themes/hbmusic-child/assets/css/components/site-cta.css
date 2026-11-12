@@ -4,10 +4,9 @@
  * parts/call-to-action.html, which the "with call to action" page templates show under the page's
  * content; site-panel.css sets its corners, side margins and the space between panels.
  *
- * An even, deep green panel under the grain (the user's choice, 2026-11-12, over a fog fading to
- * black at the sides; the full-strength green band before it "honked"). Darker than the button's
- * green, so the button still stands out against it. The colour is a theme.json token
- * (custom.color.ctaBackground), mixed from the palette's green and black.
+ * A solid green panel with white text and a black button (the original look, brought back for
+ * the user to compare with the deep green, 2026-11-12). Its colours are theme.json tokens
+ * (custom.color.ctaBackground and onCta).
  */
 
 /* Block and component class together outrank WordPress's layout rules at any load order. */
@@ -15,7 +14,25 @@
 	margin-top: var(--wp--custom--spacing--section);
 	padding-block: var(--wp--custom--spacing--cta);
 	text-align: center;
-	background: var(--site-grain, none), var(--wp--custom--color--cta-background);
+	color: var(--wp--custom--color--on-cta);
+
+	/*
+	 * The grain at half strength (a half-transparent layer of the panel's own green over it): white
+	 * text on the brightest specks then keeps about 5:1 instead of 4.7:1.
+	 */
+	background:
+		linear-gradient(color-mix(in srgb, var(--wp--custom--color--cta-background) 50%, transparent)),
+		var(--site-grain, none),
+		var(--wp--custom--color--cta-background);
+
+	/*
+	 * Buttons on the panel (buttons.css): a green glow would vanish into the green, so the button
+	 * rests flat and lifts with a dark shadow; a green focus ring would be invisible, so it takes
+	 * the panel's text colour.
+	 */
+	--site-button-shadow: none;
+	--site-button-shadow-raised: var(--wp--preset--shadow--button-lift-on-band);
+	--site-focus-ring-color: var(--wp--custom--color--on-cta);
 }
 
 /*
@@ -30,19 +47,25 @@
 .site-cta > .wp-block-heading {
 	margin-top: 0;
 	font-size: var(--wp--custom--font-size--section-title);
+	color: var(--wp--custom--color--on-cta);
 }
 
 /*
- * Centred lines stay short enough to read in one sweep. The text takes the heading's brighter warm
- * white instead of the paragraphs' softer one: on the green it reads at 7.2:1 instead of 6.0:1 (the
- * user asked for more contrast), and heading and text read as one.
+ * Centred lines stay short enough to read in one sweep. The text keeps the panel's colour, over
+ * theme.json's paragraph colour, which is meant for the dark page.
  */
 .site-cta p {
 	max-width: var(--wp--custom--measure);
 	margin-inline: auto;
-	color: var(--wp--preset--color--contrast);
+	color: var(--wp--custom--color--on-cta);
 }
 
 .site-cta .wp-block-buttons {
 	justify-content: center;
+}
+
+/* The page's green button would vanish on the green panel, so here it inverts. */
+.site-cta .wp-block-button__link {
+	color: var(--wp--custom--color--on-cta);
+	background: var(--wp--preset--color--base);
 }
