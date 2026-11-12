@@ -6,6 +6,57 @@ The recurring care the site needs, with what each step protects. Agreed with the
 2026-11-10 (plan step 8). The user keeps a monthly calendar reminder: "Monthly site check, see
 docs/ROUTINES.md".
 
+## Making changes
+
+The site lives in three places (the project's `CLAUDE.md`, Terms). In the terms of a company's
+environments: the **dev site** with GitHub's checks is development and integration testing,
+**staging** is pre-production, where changes are accepted, and **live** is production. Agreed with
+the user on 2026-11-12 (plan D31, 9q).
+
+**Code moves up; content is edited in production.** Code (the theme, the site's own plugins) never
+changes on live: it is tried on the dev site, merged into `main`, deployed to staging by itself,
+accepted there by the user, and only then deployed to live, the same code. Content (page text,
+photos, videos, songs) is data, like the customer records of a business application: it is
+entered straight on live and never sent up from staging. So the three kinds of change go like this:
+
+| The change | Where | How |
+|---|---|---|
+| Content: a word, a paragraph, a photo, a video link, a song | live | The block editor. Revisions allow going back. After real changes, the content export (monthly check, step 4) |
+| The look or behaviour: the theme, the carousel, the call to action, the site's own plugins | dev site → staging → live | In a session with Claude. Staging gets it by itself after the merge; the user looks there and approves the deploy to live |
+| Updates of WordPress and other people's plugins | staging → live | The monthly check, step 6 |
+
+A code change that needs a matching content change (such as a renamed class in the pages) is made
+on staging's content to test it, and the same on live after the deploy; Claude says when this
+applies. A larger rework of a page can also be built on live as a draft and seen with Preview,
+without visitors seeing it.
+
+**Staging's content drifts, and that is fine for small changes.** Before judging a major change to
+the look on staging, its content is brought level with live's, so that the change is judged on
+the real pages (their real lengths, blocks and pictures): see the next section.
+
+## Refreshing staging's content from live (about 20 minutes)
+
+When: once right after go-live (plan 9q), before a major change to the look, and whenever staging
+has drifted far enough to mislead. It copies content only; staging keeps its own settings (the
+site-wide password, mail, spam-protection keys, admin accounts, Wordfence). A copy of live's whole
+database is deliberately not used: it would overwrite all of those and carry visitors' data into a
+test site (the reasons of plan D30, the other way round).
+
+*Provisional until plan 9q: the steps below are written from the go-live rehearsal's plan (9d)
+and are confirmed or corrected with what 9d and 9q find.*
+
+1. **Live:** Tools → Export → All content → Download Export File, into `data/exports/` named with
+   the date. It counts as that month's content export (monthly check, step 4).
+2. **Staging:** the pages, the songs and the menu moved to the trash, so their addresses are free
+   for the imported ones.
+3. **Staging:** WordPress's importer installed, Tools → Import → WordPress, live's export chosen,
+   the content given to staging's admin, and "Download and import file attachments" ticked: live
+   is public, so staging fetches the photos itself.
+4. **Staging, checked:** each page at its own address (none ending in `-2`), with its template;
+   Home as the front page (Settings → Reading); the menu; the Songs page; the booking form's Mail
+   tab still sending as staging should.
+5. **Staging:** the importer deleted, and the trash emptied.
+
 ## Monthly site check (about 10 minutes)
 
 Until go-live, steps 1-3 run on staging; afterwards on live.

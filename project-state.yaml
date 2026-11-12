@@ -157,7 +157,6 @@ pending_decisions:
   - Testimonials, left out for now; the user may check Facebook for some.
   - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).
   - The new host (step 10, before the Hostinger plan ends in 2028).
-  - Step 9's open question, decided when it starts, whether live's WordPress is updated in place or installed fresh (D30 settles the content: from staging's export).
   - Optional, in the admin: Yoast's Other profiles with the Facebook page, so the page data names it (sameAs; staging now, live at step 9).
   - HetrixTools two-factor login: asked on 2026-11-11 and again 2026-11-12; not answered. The account will hold customers' sites later.
   - The page generator's new Music links (the user changed them on staging); for the dev previews only (D30).
