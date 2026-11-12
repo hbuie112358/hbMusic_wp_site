@@ -2,10 +2,10 @@
  * Pauses embedded YouTube players so that only one plays at a time (plan D29; the user found a
  * carousel's first video still playing after moving to the second):
  *
- * - a player in a carousel that leaves view is paused: moved out by the carousel's arrows, dots,
- *   swipe or keyboard, or scrolled off the page with it;
- * - a player outside a carousel keeps playing while the visitor scrolls (the user: Home's video is
- *   music with a still picture, listened to while reading on);
+ * - a player moved out of its carousel's view is paused: by the carousel's arrows, dots, swipe or
+ *   keyboard;
+ * - scrolling the page never pauses a player, in a carousel or not (the user: music keeps playing
+ *   while the visitor reads on, down to the call to action);
  * - when the visitor clicks or tabs into a player, every other player on the page is paused, so
  *   only one ever plays.
  *
@@ -21,8 +21,8 @@
 
 	const PLAYER_SELECTOR = 'iframe[src*="youtube.com/embed/"], iframe[src*="youtube-nocookie.com/embed/"]';
 	const CAROUSEL_SELECTOR = '.site-carousel';
-	// The share of a player that must stay visible for it to keep playing: a carousel's neighbours
-	// peek in at much less than half.
+	// The share of a player its carousel must keep showing for it to keep playing: a carousel's
+	// neighbours peek in at much less than half.
 	const VISIBLE_SHARE = 0.5;
 	// How often, while the focus is inside a player, the page checks whether it moved to another
 	// player: the page is told only when the focus first leaves it, not when it moves on.
@@ -95,15 +95,21 @@
 		currentPlayer = null;
 	} );
 
-	// A player in a carousel that leaves view pauses; the carousel's scrolling counts, since an
-	// observer measures what its scroll box leaves visible.
-	const observer = new IntersectionObserver(
-		( entries ) => entries
-			.filter( ( entry ) => entry.intersectionRatio < VISIBLE_SHARE )
-			.map( ( entry ) => entry.target )
-			.filter( isFrame )
-			.forEach( pause ),
-		{ threshold: [ VISIBLE_SHARE ] }
-	);
-	players.filter( ( player ) => player.closest( CAROUSEL_SELECTOR ) ).forEach( ( player ) => observer.observe( player ) );
+	/**
+	 * Pauses the players its carousel no longer shows enough of.
+	 *
+	 * @param {IntersectionObserverEntry[]} entries What the carousel shows of its players.
+	 */
+	const pauseMovedOut = ( entries ) => entries
+		.filter( ( entry ) => entry.intersectionRatio < VISIBLE_SHARE )
+		.map( ( entry ) => entry.target )
+		.filter( isFrame )
+		.forEach( pause );
+
+	// One observer per carousel, measuring against the carousel itself, not the window: moving to
+	// another slide changes what the carousel shows, scrolling the page does not.
+	document.querySelectorAll( CAROUSEL_SELECTOR ).forEach( ( carousel ) => {
+		const observer = new IntersectionObserver( pauseMovedOut, { root: carousel, threshold: [ VISIBLE_SHARE ] } );
+		players.filter( ( player ) => carousel.contains( player ) ).forEach( ( player ) => observer.observe( player ) );
+	} );
 } )();
