@@ -9,7 +9,16 @@
 	padding: var(--wp--custom--spacing--cta) var(--wp--custom--spacing--gutter);
 	color: var(--wp--custom--color--on-cta);
 	text-align: center;
-	background: var(--wp--preset--color--accent-2);
+
+	/*
+	 * The grain at half strength (a half-transparent layer of the band's own green over it): white
+	 * text on the brightest specks then keeps about 5:1 instead of 4.7:1, a comfortable margin for
+	 * the page's main call to action.
+	 */
+	background:
+		linear-gradient(color-mix(in srgb, var(--wp--preset--color--accent-2) 50%, transparent)),
+		var(--site-grain, none),
+		var(--wp--preset--color--accent-2);
 
 	/*
 	 * Buttons on the band (buttons.css): a green glow would vanish into the green, so the button

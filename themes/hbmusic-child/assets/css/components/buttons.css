@@ -79,6 +79,18 @@
 	}
 }
 
+/*
+ * Two or more buttons in a row share its width equally, and each never gets narrower than its own
+ * label: side by side they are equally wide, and when the column is too narrow for both they wrap
+ * and each takes the full width, so stacked buttons are always the same length (the user saw
+ * "Watch him play" stacked longer than "Book Howard"). Where they wrap depends on the column, not on
+ * one screen width, so this holds at every width. A single button keeps its own width.
+ */
+.wp-block-buttons:has(> .wp-block-button + .wp-block-button) > .wp-block-button {
+	flex: 1 1 0;
+	min-width: max-content;
+}
+
 /* People who ask their device for less motion get the colour change only. */
 @media (prefers-reduced-motion: reduce) {
 	.wp-block-button .wp-block-button__link {

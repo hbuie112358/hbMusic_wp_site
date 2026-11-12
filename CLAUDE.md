@@ -83,8 +83,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   List's page and admin form, the booking form's mail (no visitor's name in the subject), its
   message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only
   where it appears; the stylesheets loading only with what they style (the theme's components,
-  the form's, the song table's from its plugin, plan D29); the buttons' keyboard focus ring and
-  its contrast against its band, equal sizes, no movement with reduced motion and no stuck hover
+  the form's, the song table's from its plugin, plan D29), the bands' texture and the headings' even
+  lines; the buttons' keyboard focus ring and
+  its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
   after a tap (D29); the sticky header, a link reached with the keyboard never under it, the
   menu's current-page mark, no gap under a closing call to action, and the slimmer phone header
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug

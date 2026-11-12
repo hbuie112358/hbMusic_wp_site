@@ -4,7 +4,7 @@
  */
 
 .site-features {
-	background: var(--wp--preset--color--accent-4);
+	background: var(--site-grain, none), var(--wp--preset--color--accent-4);
 }
 
 /* Room between the points, growing with the screen. */

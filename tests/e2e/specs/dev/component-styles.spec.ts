@@ -48,6 +48,20 @@ test('headings wrap in lines of even length', async ({ page }) => {
 	}
 });
 
+// The bands with their own background carry the grain (texture.css), the hero also its stage
+// light, and the grain's image loads; a broken address or a lost layer would leave them flat.
+test('the hero, features and call-to-action bands carry their texture', async ({ page, request }) => {
+	await page.goto('/');
+	for (const band of ['.site-hero', '.site-features', '.site-cta']) {
+		const layers = await page.locator(band).first().evaluate((element) => getComputedStyle(element).backgroundImage);
+		expect(layers, `the background of ${band}`).toContain('grain.png');
+	}
+	const heroLayers = await page.locator('.site-hero').evaluate((element) => getComputedStyle(element).backgroundImage);
+	expect(heroLayers, 'the hero\'s stage light').toContain('radial-gradient');
+	const grainAddress = /url\("([^"]+grain\.png)"\)/.exec(heroLayers)?.[1] ?? '';
+	expect((await request.get(grainAddress)).status(), `the grain image at ${grainAddress}`).toBe(200);
+});
+
 // Loading is not enough: the plugin's selectors must still match its own markup.
 test("the song table's styles apply to the table", async ({ page }) => {
 	await page.goto(SONG_LIST_PATH);

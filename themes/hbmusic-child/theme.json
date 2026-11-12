@@ -118,6 +118,9 @@
 				"layer": "100",
 				"focusGap": "8px"
 			},
+			"texture": {
+				"stageLight": "rgb(255 236 214 / 10%)"
+			},
 			"navigation": {
 				"underlineThickness": "2px",
 				"underlineOffset": "6px"

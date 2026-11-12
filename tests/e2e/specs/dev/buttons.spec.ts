@@ -68,6 +68,23 @@ test('a main button and an outlined button side by side are the same height', as
 	expect(outlined?.height, 'the outlined button\'s height').toBe(main?.height);
 });
 
+// The user saw "Watch him play" stacked longer than "Book Howard". Whether buttons stack depends on
+// the column, not on one screen width, so the pair is measured at widths where they sit side by
+// side and where they stack.
+for (const width of [1280, 900, 600, 390]) {
+	test(`two buttons in a row are the same width at ${width}px`, async ({ page }) => {
+		await page.setViewportSize({ width, height: 900 });
+		await page.goto(HOME_PATH);
+		const widths = await page
+			.locator('.site-hero .wp-block-buttons')
+			.first()
+			.locator('.wp-block-button__link')
+			.evaluateAll((links) => links.map((link) => Math.round(link.getBoundingClientRect().width)));
+		expect(widths.length, 'the buttons in the row').toBeGreaterThanOrEqual(2);
+		expect(new Set(widths).size, `the buttons' widths ${widths.join(', ')}`).toBe(1);
+	});
+}
+
 async function transformWhilePointedAt(page: Page): Promise<string> {
 	await page.goto(HOME_PATH);
 	const button = page.locator('.site-hero .wp-block-button__link').first();
