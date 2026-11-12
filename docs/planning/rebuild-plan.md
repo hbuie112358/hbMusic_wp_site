@@ -219,7 +219,16 @@ new findings added as steps.
   real structure (two columns, the theme's logo as a stand-in picture); a test checks the text and
   picture centred on each other and the softened bottom, shown failing on both faults. Hope Mills
   added to the towns in the page data for search engines (`HBMUSIC_AREAS_SERVED`), which follow
-  the page text; staging's Home introduction is changed by the user in the editor. **Added
+  the page text; staging's Home introduction is changed by the user in the editor. **Then (the
+  user):** a "Book Howard" button under "For any kind of event", for symmetry with "See the song
+  list" and because booking is that point's next step; outlined, so the solid green stays the
+  page's main action (top and end). It is Home's content (a block in the middle of the page, which
+  a theme cannot insert), added by the user in the block editor on staging; the page generator and
+  `data/content/for-staging/home.html` have it too. The theme's part: a features panel's buttons
+  sit at the bottom of their columns, so points side by side line up whatever their texts'
+  lengths (flex columns, an auto margin, the block gap kept as padding). The test page's points
+  now differ clearly in length; a test checks the line-up, shown failing on its fault. The
+  coming "Features" pattern will bring a button under each point. **Added
   after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
   the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
   before/after check with the real content belongs in the template, built on conventions every

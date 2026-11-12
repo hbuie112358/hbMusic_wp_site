@@ -14,6 +14,23 @@
 }
 
 /*
+ * A point that ends with buttons keeps them at the bottom of its column, so the buttons of points
+ * side by side line up whatever the length of each point's text (the user asked for the points to
+ * look symmetrical). The columns are stretched to the row's height; each column stacks its blocks,
+ * and the auto margin takes up the difference, while the padding keeps the usual space between
+ * the text and the buttons in the longest point. Stacked on a phone, nothing changes.
+ */
+.site-features .wp-block-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.site-features .wp-block-column > .wp-block-buttons:last-child {
+	padding-top: var(--wp--style--block-gap);
+	margin-top: auto;
+}
+
+/*
  * Each point's heading: a step above its text, so the points scan at a glance; whatever its level
  * (the level follows the page's outline for screen readers; the look does not depend on it).
  */
