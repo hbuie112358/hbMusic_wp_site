@@ -356,9 +356,15 @@ new findings added as steps.
   videos are on staging (Home's featured video; Music's carousel replaced by the user with the
   "Video carousel" pattern, its links changed by the user there), and D30 decides that live's
   content comes from staging's export. Live's WordPress is updated in place (D31, the user,
-  2026-11-12); step 9 now follows its order, 9a to 9p, starting with 9a and 9b. Before it, the user:
-  deletes live's wp-config backup in the home folder (8m) and confirms HetrixTools' two-factor
-  login. Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
+  2026-11-12); step 9 now follows its order, 9a to 9q; 9a is done (2026-11-12). **Step 9 is paused
+  at 9b** (2026-11-13) while the DTS Operations Handbook is drafted (the project's `CLAUDE.md`,
+  Handbook); this site is classified Fully managed, Brochure, hosted by the customer. On
+  2026-11-13 the handbook's topics 1 to 7 were decided (H1-H30); topics 8 to 12 come next, then
+  version 1. Topic 2 replaces 9b's design: no deploy jobs or server keys on GitHub, `bin/deploy`
+  run from the user's computer with its guards (H8, H9). When step 9 resumes, this site is first
+  compared with the handbook and each difference becomes a plan item or a recorded exception
+  (for example: the deploy path, Simple History, the theme's palette limits, the backups of
+  D27 against H17). Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
   gets the version staging runs. The page generator (`data/content/`) still has the old Music
   links; only the dev previews use it now (D30), so it is updated when the user sends the new
   links. 3i whenever the user chooses. The live site's text still names the old service area
@@ -1490,7 +1496,8 @@ new findings added as steps.
      editing" line), and WP-CLI wrote inside it. Fixed by making the two old lines `//`
      comments (a backup `~/wp-config.live-before-2026-11-11.php` first, outside the web folder,
      mode kept; `php -l` clean; live refuses `theme-editor.php`). The backup holds live's
-     database password and is deleted once live has run a few days. **Database (2.5):** each
+     database password and is deleted once live has run a few days (deleted by the user over SSH
+     on 2026-11-12, plan 9a). **Database (2.5):** each
      site's own user, for its own database only (WP-CLI cannot query: `proc_open` is disabled
      at Hostinger). **Checksums (5.4):** WordPress and every WordPress.org plugin verify on both
      sites. **FTP (3.8):** one account, Hostinger's main one (cannot be removed), not used by
@@ -1597,14 +1604,76 @@ new findings added as steps.
    the way becomes a note or a new item, not a detour.
 
    *Stage A: preparation; live untouched.*
-   - [ ] 9a. The user: live's wp-config backup in the home folder deleted (8m); HetrixTools'
-     two-factor login answered.
+   - [x] 9a. The user: live's wp-config backup in the home folder deleted (8m; done 2026-11-12,
+     over SSH, since hPanel's File Manager shows nothing above `public_html`); HetrixTools'
+     two-factor login on (the user, 2026-11-12).
    - [ ] 9b. The live deploy job (the design above), through a pull request with the review gate:
      a `production` environment with the user as required reviewer, its own restricted key and
      server destinations for the child theme, Song List and Site Hardening (as 3g-2 and 8a). Its
      checks afterwards must hold before the switch too (the files in place; the old theme still
      active). Its first run puts the files on live without activating anything: an inactive theme
      or plugin runs no code.
+
+     **Paused, superseded by the DTS Operations Handbook's topic 2 (2026-11-13),** decided the
+     same day (chapter 2, H8-H11): GitHub keeps and checks the code but never reaches a server;
+     `bin/deploy staging|live` runs from the user's computer, refuses a commit not on GitHub's
+     `main` or without passing checks there, shows the commits it will deploy, and on this site
+     gives live only the commit staging runs. 9b is rewritten from chapter 2 when step 9 resumes,
+     drawing on parts of the design below (the generic page check, the known limit, the order of
+     work); the GitHub environment, the restricted live key and the approval step are dropped.
+
+     **The design, agreed with the user on 2026-11-12** (each step of today's staging deploy
+     examined first; the user's questions found three flaws in Claude's first draft, fixed here):
+     - Kept as it is: the tests on every pull request (the gate before `main`) and again on
+       `main` (the exact commit to be deployed is tested, independent of the branch rule staying
+       on); the secrets only in an environment; the private temporary key folder; the pinned
+       server identity; one deploy at a time, never cancelled (on `main`, runs are never
+       cancelled; GitHub keeps one waiting, the newest); the weekly run; the "Run workflow"
+       button; actions pinned by commit, read-only token; failed tests' traces kept a week.
+     - One program for both places, `bin/deploy staging|live`, replacing `bin/deploy-staging`:
+       each place's destinations and checks are settings. The copy compares by contents
+       (`--checksum`), so the separate file-by-file pass afterwards is dropped (rsync verifies
+       every file it sends).
+     - The page check becomes a generic health check, `bin/site-check <address>` (optional login
+       for staging's outer lock, none for live), knowing nothing of the site: it asks WordPress
+       for its published pages (`/wp-json/wp/v2/pages`, which answers logged-out visitors only
+       with public pages; seen on the dev site 2026-11-12), up to a cap, and requires each to
+       answer 200 within a time limit, with the child theme's body class and without WordPress's
+       critical-error page, retrying up to a deadline (the server's PHP cache notices new files
+       after a few seconds). An unreachable, malformed or empty page list fails, never skips. The
+       cap, time limit and deadline are settings. It runs in `bin/test` against the dev site and
+       is shown failing on planted faults (a broken page, the theme not active, the page list
+       unavailable).
+     - `deploy-live`: after `deploy-staging` in the same run (the same commit, never a copy of
+       staging's files), in the environment `production`: the user as required reviewer,
+       "Prevent self-review" off (the user merges and is the only reviewer), `main` only, no wait
+       timer. Its own key, restricted on the server like staging's
+       (`restrict,command="rsync --server --daemon --config=~/.deploy/rsyncd-live.conf ."`),
+       naming three destinations, `live-child-theme`, `live-song-list` and
+       `live-site-hardening`, each exactly one folder created empty beforehand, so a copy that
+       mirrors its folder cannot touch other themes or plugins. Proven by refusal: the live key
+       cannot open a shell or reach staging, staging's key cannot reach live, a branch other
+       than `main` is refused by the environment.
+     - The user's rule: approve the newest waiting deploy when staging looks right. Rejecting loses
+       nothing (each deploy copies the whole current version), but marks that run failed (GitHub's
+       "Reviewing deployments": "If a job is rejected, the workflow will fail"). Checked in
+       GitHub's documentation on 2026-11-12: a concurrency group holds one running and one waiting
+       job, a newer one replacing the waiting one; whether a job waiting for approval counts as
+       waiting there, and how long it may wait, the pages do not say: seen in the first runs.
+       Approving only the newest makes either case safe (live never gets a version older than one
+       already offered).
+     - Known limit, accepted: during the copy's second or two a visitor may get a page from
+       mixed old and new files; an atomic swap would need server features the restricted keys
+       exclude. The user chooses a quiet moment to approve.
+     - A red deploy: staging failing means live is never offered; live failing is rolled forward
+       (the change reverted on `main`, its deploy approved), an interrupted copy re-run;
+       Hostinger's daily backup as the last resort. Written into `docs/ROUTINES.md`.
+     - Until 9k the user rejects live deploys; at 9k one is approved (its check fails on the old
+       theme as expected), the theme activated, the check re-run.
+     - Order: Claude's read-only checks (the page list on staging and live through Wordfence,
+       GitHub's rule for waiting deployments); the user's key and server setup (a read-only
+       listing first), the refusal tests; the GitHub environment; then the pull request, with
+       `CLAUDE.md`, `docs/ROUTINES.md` and `docs/ENVIRONMENTS.md` updated.
    - [ ] 9c. Staging's content exported (Tools → Export → All content) into `data/exports/`;
      Claude reads it and lists what it carries (pages with their templates, songs, the menu, the
      booking form, template parts edited in the Site Editor, media entries) and what it does not.
