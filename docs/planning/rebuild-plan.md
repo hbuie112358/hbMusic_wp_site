@@ -8,388 +8,45 @@ new findings added as steps.
 
 ## Current position
 
-- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34),
-  3b (local mail into Mailpit through FluentSMTP, f389f76), 3d (code checks, `bin/check`,
-  14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
-  branch protection, and the Dependabot follow-up) done; 3g-1 (the staging site) and 3g-2 (the
-  restricted deploy key) done on 2026-11-03, with the review of `docs/SITE_CHECKLIST.md`, and
-  3g-3 (the deploy to staging after every merge to `main`) on 2026-11-04;
-  step 4 (the child theme, the dev site, its tests, and those tests as a required check on
-  GitHub) done on 2026-11-04; 3h dropped by the user. The old site is still live, secured.
-- **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
-  log shows no break-in; the live site's PHP and plugins are current since step 0f
-  (2026-11-02), and the old staging copy is removed (0g).
-- **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
-  Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
-  theme and plugin folders, and password logins cannot be switched off (3g-2).
-- **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
-- **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
-  5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
-- **Done 2026-11-09:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests
-  (#19), and on staging by hand; `docs/ENVIRONMENTS.md` lists the intended differences between
-  the dev site, staging and live. In step 8: 8a, the Site Hardening plugin (D26: the security
-  headers, XML-RPC refused, Application Passwords off, no version comments), on staging and
-  checked (#20); 8c, a last debug-log check in `bin/test`; 8d, the browser tests log in once,
-  without the login screen (#21; it explains the login timeout of 2026-11-07); 8e, the
-  logged-in view: the toolbar's icon font allowed, avatars off, a logged-in policy test (#22);
-  8b, `Update URI: false` on every plugin, enforced by `bin/check` (#23). After the resume: 8f,
-  backups by hand (D27), UpdraftPlus and its old backups removed from live; 8g, Yoast's AI
-  generator off, and the build stops on a Yoast setting name it does not know (#24); 8h, local
-  visibility planned, Search Console set up with a baseline; 8i, Wordfence on live (two-factor
-  required for administrators, XML-RPC logins off, the firewall found in Extended Protection).
-- **Mail (D24), evening of 2026-11-09:** Brevo authenticated the domain; staging now sends through
-  Brevo with SPF, DKIM and DMARC passing, and a failed booking request raises a Pushover alert
-  (proven with a planted failure). 2026-11-10: the visitor's name out of the subject, a new
-  "sending failed" message (both on the dev site with tests, typed in by hand on staging after
-  the merge), Brevo's IP blocking on; on staging, the same text, a real request in the inbox
-  without the visitor's name in the subject, and a Gmail filter; the monthly site check
-  (`docs/ROUTINES.md`) and the privacy policy naming Brevo. The mail setup is done.
-- **Updates (8j, settled 2026-11-11):** Hostinger installs security updates only (hPanel, both
-  sites); the monthly check installs the rest by hand, staging first. The timing test is dropped.
-- **Staging's site-wide password (2026-11-10):** it stopped accepting logins because hPanel
-  writes password entries the server cannot verify; fixed by hand, and users are added only by
-  hand until Hostinger fixes it (3g-1).
-- **Server hardening (8k, 2026-11-10):** on staging, the version files refused and no PHP in
-  `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
-  Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
-  both. HSTS at step 9.
-- **Done 2026-11-11:** 8k's permissions (`wp-config.php` 600 on both sites), D28 (no admin
-  policy of the site's own), 8l (cache: nothing to do), 8h's structured data (checked on
-  staging), 8j settled (security updates by Hostinger, the rest in the monthly check; Wordfence
-  9.1.1 on both sites), and the weekly versions check built and proven end to end
-  (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
-  merged by the user on 2026-11-11, earlier than the week agreed).
-- **Step 8 done (2026-11-11):** 8m closed with uptime monitoring by HetrixTools on live
-  (14.1, 14.2: the alert proven through Pushover; certificate and domain expiry warned 15 days
-  ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
-  spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
-- **In progress (D29, 2026-11-11):** a subtle polish of the look, on the branch
-  `style/subtle-polish`, in stages: (1) the CSS linter in `bin/check` (done); (2) the CSS
-  restructured into the site layer and generic components (done: 16 screenshots compared pixel
-  by pixel, identical apart from the outlined button now as large as the main one, accepted by
-  the user; `component-styles.spec.ts` proves where each stylesheet loads, shown failing on four
-  planted faults). After its deploy, staging's Home, Music, Songs and About pages need the new
-  class names in their content (`site-…` instead of `hb-…`); (3) the type and spacing
-  packages as the user approved them (done): text weight 400 and line height 1.6, paragraphs in
-  a new light warm grey (`contrast-soft`, 15.6:1 on black), bold h2s and page titles, the
-  features' headings with a short accent rule, one section spacing (`clamp(56px, 8vw, 96px)`),
-  the features' columns aligned at the top, and the "Over 30 years" text at a 65-character
-  measure through WordPress's own content width (an inner group in the page content, so no CSS
-  overrides the layout); the call-to-action band keeps pure white text (5.3:1; the grey would
-  fall below 4.5:1); (4) buttons, menu and texture, one package at a time,
-  each shown to the user in screenshots and checked for accessibility. **Paused after (3),
-  2026-11-11** (commits d3710e9, 1a0d2f6, 9c69c78 on the branch, not pushed). **Package 3, the
-  buttons (done after the resume, kept by the user after trying them live on the dev site):** a
-  soft glow in the button's own colour and a hairline highlight from above (WordPress shadow
-  presets in `theme.json`), a 1-pixel lift on hover with a stronger glow (150 ms, none under
-  `prefers-reduced-motion`), the outlined button filling green, a 2px `:focus-visible` ring with a
-  gap (checklist 7.2), the form's Send button the same; on the call-to-action band no glow, a dark
-  lift shadow and a white ring, through custom properties the button component reads. Found: the
-  parent theme turned the main button beige on hover (its own hover colour now set in
-  `theme.json`), and the user noticed the outlined button was 4px larger than the main one (every
-  button now has the same border width). Every state passes WCAG AA (the white ring 5.3:1 on the
-  band); `buttons.spec.ts` (6 tests) protects the ring, its contrast against its band, the
-  reduced-motion exception, the lift, no stuck hover after a tap on a touch screen (hover effects
-  only under `(hover: hover)`), and the equal heights, each shown failing on a planted fault.
-  **Package 4, the header and menu (done, the user: "good", after trying it live):** a sticky
-  header (the user's addition), option B, slimmer on phones (logo 40px instead of 56px), over 85%
-  black with a slight blur and a hairline below it; the browser's scroll padding equals the
-  header's height, so a link reached with the keyboard or a jump link never lands under it (WCAG
-  2.2, 2.4.11); logged in, it sits below WordPress's toolbar. Menu links at weight 500 with a
-  green underline on hover and on the current page, which `hbmusic_mark_current_menu_link()`
-  marks with `aria-current="page"` by comparing each menu link's path with the page shown
-  (WordPress marks only links to a page by its ID, and this menu holds addresses). The black
-  strip under the green band (89px: the parent template's bottom padding, an inline style, plus
-  the footer's top margin) removed only on pages whose content ends with the band; the inline
-  style needed the one `!important`, with its reason. The stand-in About page gained the band, so
-  the tests see this. Menu text 13.4:1 even over white passing beneath. `header.spec.ts` (6
-  tests) protects the stickiness, focus not obscured, the current-page mark, no gap, and the
-  slimmer phone header, each shown failing on a planted fault. **The hero photo (the user,
-  after package 4):** it sat 87px below the headline; the hero's columns went from 48-52 to 40-60
-  (chosen from four mock-ups), so at 1280px and up the photo is 15% larger, the head level with
-  the headline's top, still standing on the band's edge (its cut-off bottom must sit on an edge).
-  A content change (`data/content/build_pages.py`), reaching staging with the class-name update.
-  Headings now wrap in lines of even length (`text-wrap: balance`, `headings.css`): below about
-  1200px the headline had left "event" alone on its last line; WordPress's own "pretty" on
-  headings first outranked the rule, which a test now catches. **Package 5, texture (done, the
-  user: "it all looks fine"):** a warm stage light behind the hero photo and a fine grain (a 128px
-  tile, 14 KB, seed 29, 2.7% on average) on the hero, features and call-to-action bands, half
-  strength on the green band so its white text keeps about 5:1. Claude's earlier "dark-grey edge"
-  of the photo was a misreading: its background is pure black (1 of 255), so that 5f item is
-  struck. Blending the photo with the band was tried first, but the light also lit the black
-  shirt (the user saw it); the photo is now a cut-out with a transparent background,
-  `howard-buie-guitar-cutout.webp` (57 KB), made by `data/photos/make_cutout.py` (flood fill of the
-  black from the top and side edges, so the shirt's enclosed shadows stay solid; reproducible
-  pixel for pixel; for dark pages only, a faint fringe stays around the hair). Staging gets it
-  in place of the JPEG with the content update. Also from the user: two buttons in a row are
-  equally wide and, stacked, the same length at every width (they wrap by column, not by one
-  screen width). Tests: the bands' texture and the grain image, equal button widths at four
-  widths, each shown failing on a planted fault. **Package 6, the videos as a carousel (the
-  user's request, option A+ after weighing it against a scripted carousel; the user did not
-  want JavaScript):** the Music page's videos in a row that scrolls sideways and snaps, CSS only
-  (`site-carousel.css`; a labelled `section` group, WordPress's wide width, slides at most 860px
-  so the next one shows). Chrome and Edge also show CSS's native previous/next buttons and dots
-  (since version 135; MDN: limited availability), Firefox and Safari a green scrollbar (the user
-  first missed Firefox's grey one). No wrap-around (that needs a script). The user saw the "next"
-  button stay at the last video in VS Code's built-in browser; the last slide now snaps to the
-  row's end, and in Chrome it hides. Hidden slides' videos load only when scrolled near
-  (WordPress's lazy loading). Stylelint 17 does not yet know the native carousel syntax; its config
-  allows exactly those names. axe then found the row unreachable by keyboard
-  (scrollable-region-focusable): `hbmusic_make_carousel_focusable()` adds `tabindex="0"` when the
-  page is rendered (an attribute in the content would make the editor flag the block invalid),
-  with a focus ring, and the arrow keys scroll it. `carousel.spec.ts` (5 tests), each shown
-  failing on a planted fault. **Package 7, a calmer green (the user: the solid green band "honked", and
-  so did the green arrows and scrollbar):** green now marks only what can be pressed. The call to
-  action is a black band with a loose green fog (chosen from three, tight, medium and loose,
-  tried on temporary pages; its shape and strength are tokens) and the normal bright green
-  button, so contrast draws the eye, not area; its text has 9.3:1 at the fog's centre (5.3:1 on
-  the old band), the band's white-text token and lift shadow are gone. The carousel's arrows are
-  dark discs that turn green only when pointed at (the user liked that), its scrollbar and dots
-  soft grey, the current dot warm white; every control 9.9:1 or more. A test checks the fog. **Pushed
-  and deployed (#42, d9abe45, 2026-11-11).** Staging's content update to the new class names: Home
-  done by the user (code pasted from `data/content/for-staging/home.html`, the cut-out chosen in the
-  hero, its alt text asked for); **Music, Songs and About still to paste** from the same folder.
-  **One frame for every page (the user, 2026-11-12; branch `style/one-frame`):** the frame is
-  WordPress's own wide width (`settings.layout.wideSize`, 1100px), not a token of ours. Every band
-  of a page (sections, panels, the carousel) is a wide block, so WordPress itself sets its width
-  and centring; the page content names only the component (`site-section`, `site-hero site-panel`
-  and so on), never a size, and no CSS overrides the layout. The header's and footer's content sit
-  at the frame; the page side padding is the gutter. Narrow pages (Songs, About, Book) keep their
-  narrow text column inside the full frame. **Panels (the user's idea, after the review found two
-  panels touching):** the class `site-panel` makes a band a panel, and `site-panel.css` alone owns
-  its side margins, corners (`panelRadius` 8px) and the space between panels; `site-hero`,
-  `site-features` and `site-cta` keep only their own look. A new panel needs only the class.
-  Rejected: an exception for the features panel in the call to action's spacing rule (a patch per
-  pair), and a panel file listing the three by name. The opening panel stands a gutter below the
-  header (as a full-width band its stage light had reached the screen's edges, past everything
-  else, the user saw it). **The call to action lives in the theme (the user: pages should need
-  copying only where there is no other reasonable way):** `parts/call-to-action.html`, shown under
-  the content by two page templates of the theme's own, "Page with call to action" (Music, Songs,
-  About) and "Page No Title with call to action" (Home); a page gets it by choosing the template,
-  and its wording is edited once, in the Site Editor (which then keeps a copy in the database
-  that theme updates no longer reach). Copied into four pages before. The panel stands a
-  section's spacing below the content (a plain section ending the content gives up its bottom
-  padding for that) and the template's own space before the footer, 89px on every page, the same
-  as after text; this removed the call to action's page-end rules and their `!important`. Found
-  while building it: a child theme's `templateParts` and `customTemplates` replace the parent's
-  lists rather than adding to them, which turned the header and footer into plain `div`s (the
-  sticky header's tests failed) and would have hidden "Page No Title"; the child lists repeat the
-  parent's entries. **Headings** are styled by class (`.wp-block-heading` within each component),
-  not by level, so an editor chooses the level for the page's outline without changing the look.
-  **The carousel** fills the frame with the current video centred and small, equal peeks (about
-  100px on a computer, 18px on a phone): slides sized in container units, empty spacers before the
-  first and after the last so they centre too, which also makes the last stop exactly the end.
-  Measured on the real pages at 1920, 1280, 1000, 800 and 390px; the user looked at Home in
-  Chrome (the header's menu looked off to the right while the opening band was full-width;
-  aligned once it became a panel). Tests: `frame.spec.ts` (shared edges on three pages at two
-  widths, every panel at the frame on a wide screen, two panels in a row a section's spacing
-  apart, the call to action a section's spacing below the content on Home and About), the
-  carousel's first and last slides centred, and the space before the footer after the call to
-  action equal to that after text in both templates, each shown failing on a planted fault; 122
-  browser tests. `bin/dev-site` gives each test page its template from its list. **One push at
-  the end** (the user's preference for a single staging update): after the deploy, on staging,
-  Music, Songs and About get their content from `data/content/for-staging/` and the template
-  "Page with call to action"; Home its own code with the changes made by Claude (the user copies
-  it into `data/content/for-staging/home-staging.html`, Claude makes the bands wide, adds
-  `site-panel`, removes the call to action and hands it back, keeping the photo) and the template
-  "Page No Title with call to action". Until then staging's pages show their old bands. After
-  this paste, look changes reach the site through the theme folder alone; patterns for the
-  sections (a customer inserts them from the block inserter, never the code editor) are the next
-  step. **Pushed and deployed (#45, 4eedebd, 2026-11-12);** staging's Home, Music,
-  Songs and About updated by the user (content pasted, templates chosen). **Then, on branch
-  `style/cta-fog` (the user, looking at staging):** the call-to-action panel's green made more
-  prominent: the fog tried at 55% and 65%, then wider toward the sides, then without a fade; the
-  user chose the even green, now one colour token (`custom.color.ctaBackground`, 65% of the
-  palette's green mixed with black) instead of a gradient; contrast computed for each step (80%
-  would have dropped the button's edge below 3:1). The panel's text takes the heading's brighter
-  warm white (7.2:1 instead of 6.0:1, the user asked for more contrast). The lead size had been
-  smaller than body text (20px against 22px; found by measuring when the user asked for larger
-  text): now `clamp(1.25rem, 1rem + 1vw, 1.625rem)`, 20px on a phone to 26px on a computer, its own
-  component `site-lead.css` (on paragraphs; it was inside the hero's file), used by Home's
-  introduction and the panel's line. Tests: the panel's colour is green (not black or missing),
-  the lead larger than body text at two widths, each shown failing on a planted fault. **Then (the
-  user: the hero's picture looked vertically off centre):** bottom alignment was built first (the
-  buttons' bottom the picture's bottom, the picture's crop faded out over 18%); when the user
-  changed Home's introduction to "including Hope Mills and Southern Pines", the taller text left a
-  gap above the picture, and the user, shown both on two preview pages, chose centring. The
-  theme now overrides nothing: the hero's columns are centred by their own editor setting (a
-  customer can change it without code). Centred, the picture no longer stands on the panel's edge,
-  so its cropped bottom is softened by a 2px fade (`mask-image`, token `texture.photoFade`; 18%,
-  6% and 5px were tried, and no fade, the user chose 2px). The test Home page's hero now has the
-  real structure (two columns, the theme's logo as a stand-in picture); a test checks the text and
-  picture centred on each other and the softened bottom, shown failing on both faults. Hope Mills
-  added to the towns in the page data for search engines (`HBMUSIC_AREAS_SERVED`), which follow
-  the page text; staging's Home introduction is changed by the user in the editor. **Then (the
-  user):** a "Book Howard" button under "For any kind of event", for symmetry with "See the song
-  list" and because booking is that point's next step; outlined, so the solid green stays the
-  page's main action (top and end). It is Home's content (a block in the middle of the page, which
-  a theme cannot insert), added by the user in the block editor on staging; the page generator and
-  `data/content/for-staging/home.html` have it too. The theme's part: a features panel's buttons
-  sit at the bottom of their columns, so points side by side line up whatever their texts'
-  lengths (flex columns, an auto margin, the block gap kept as padding). The test page's points
-  now differ clearly in length; a test checks the line-up, shown failing on its fault. The
-  coming "Features" pattern will bring a button under each point. **Pushed and deployed (#46,
-  6afcf5e, 2026-11-12;** the deploy's last check timed out once at the host and passed on a
-  re-run of that step). **Then (the user, on branch `style/cta-solid`):** the call-to-action panel
-  back to its original look, found in the history (before d9abe45): the palette's solid green with
-  the grain at half strength, pure white text (`onCta`), and the black button that rests flat and
-  lifts with a dark shadow (`button-lift-on-band`), its focus ring white; the text sizes and the
-  panel's shape stay as they are. Contrast: text 5.0:1 at the brightest speck, the button's edge
-  4.0:1, its text 21:1. A test checks the button stands out from the panel (3:1), shown failing
-  without the black (2.3:1). **Pushed and deployed (#47, 221c0bd).** **Then (the user: the Site
-  Editor showed the call to action black with a green button):** a stale copy of the stylesheet,
-  confirmed when Ctrl+Shift+R showed the right look. Every stylesheet's address was labelled with
-  the theme's (or the Song List's) version, 0.2.0 since the CSS was split, so a changed file kept
-  its address; pages inline these stylesheets, the editor loads them by address. Now each
-  stylesheet is labelled by a fingerprint of its contents (`hbmusic_stylesheet_version()`,
-  `songlist_stylesheet_version()`; Song List 0.2.1), so a change reaches browsers and caches by
-  itself. A scenario check, `dev-stylesheet-versions.sh`, compares each registered stylesheet's
-  label with its file's fingerprint computed from the repository, shown failing on both faults. **Pushed and deployed (#48, 1003102).** **5f's videos (the user,
-  2026-11-12):** Home's "Hear him play" gets "Live gig 42 song mashup" (https://youtu.be/JfP1oGtCkbI,
-  audio with a still picture); Music's carousel the old site's three, renamed by the user in YouTube
-  Studio ("Two country, one rock", "80's rock", "First several songs of a set"). Each is an Embed
-  block added by the user in the block editor; the page generator has them too. Checked on the dev
-  site with YouTube really loading: the Home video fills its section at 16:9, the carousel's slides
-  are 16:9 and centred with the arrow hiding at the end, and no policy refusal or console error at
-  either width (the first real test of YouTube under the policy). YouTube's automatic captions came
-  on by themselves; the user unpublished the video's automatic caption track in YouTube Studio.
-  **Found:** WordPress 7.1 escapes an apostrophe in an embedded video's title twice, so "80's rock"
-  was read as "80&apos;s rock" (wp_filter_oembed_iframe_title_attribute()); the theme decodes the
-  title first (`hbmusic_decode_embed_title()`, the user chose this over renaming the video), and a
-  scenario check, `dev-embed-titles.sh`, runs WordPress's own function on YouTube-like player code
-  (shown failing without the fix; ampersands and quotation marks were never affected and are
-  checked so the fix does not break them). WordPress keeps each player's code in its oEmbed cache,
-  so the Music videos are added on staging after this fix is deployed. **Pushed and deployed (#49,
-  98040c2).** **Carousels as a component (the user: several per page, such as Rock, Country and
-  Mellow; a heading only when there are several):** a carousel already took any number of slides
-  (the three grey boxes were stand-ins). Several on a page: the arrows were placed by a name all
-  carousels shared (`anchor-name`), so they followed the last one; `anchor-scope` keeps it to each.
-  A carousel directly under a heading is named after it for screen readers (the theme links it to
-  the heading with `aria-labelledby` when the page is rendered, `hbmusic_name_carousels_after_
-  headings()`), one without keeps its label "Videos"; nothing to set in the editor. A "Video
-  carousel" pattern (`patterns/video-carousel.php`, three empty YouTube embeds) adds one from the
-  inserter; duplicating an existing one works too. The test Music page has a second carousel under
-  a heading; tests check each carousel's arrows act on their own row, the naming, and (a scenario
-  check, `dev-patterns.sh`) that the pattern's blocks are the structure the CSS expects; each shown
-  failing on its fault. **Found:** no embedded video is lazy-loaded: WordPress leaves the first
-  three images or embeds of a page eager (its loading threshold), which on Music is all three
-  videos; the carousel's comment had claimed otherwise and was corrected. **Pushed and deployed
-  (#50, 358b19b).** **Lazy loading (the user: yes):** lowering WordPress's count would not have
-  helped (it skips pictures without a stated size, so a video was the first it counted); the theme
-  returns "lazy" for every embedded frame in a page's content instead
-  (`wp_iframe_tag_add_loading_attr`), pictures keep WordPress's choice. The test Home page has a
-  stand-in video below its picture, like the real one; `media.spec.ts` checks every player on Home
-  and Music is lazy, shown failing without the filter. Checklist 8.5 is partly met: a click-to-load
-  player would meet it in full. **Next (the user, 2026-11-12):** a small script of the theme's own,
-  its first, so a video stops when it leaves view or another starts (YouTube's player cannot be
-  told from CSS); the carousel stays CSS-only and works without it. **Pushed and deployed (#51, 2a312b3).**
-  **One pattern with an optional name, and the carousel described (the user, 2026-11-12):** the
-  "Video carousel" pattern starts with an empty heading (hint text "Carousel name (optional)" in the
-  editor only) directly above the carousel; left empty, the theme drops it from the page
-  (`hbmusic_drop_empty_heading()`: an empty heading leaves a gap and is announced as an empty
-  heading, an accessibility error anywhere), and the carousel keeps "Videos"; given text, it names
-  the carousel. Each carousel is described as in the W3C's carousel pattern (WAI-ARIA Authoring
-  Practices): `aria-roledescription="carousel"`, each slide `role="group"`, "slide", "n of m"
-  (`hbmusic_describe_carousel()`, with WordPress's HTML processor, which knows the slides' depth; a
-  bare video frame keeps its own role, and markup it cannot parse is left as it is). The test Music
-  page's first video is wrapped as WordPress renders an Embed block, with the pattern's empty
-  heading above it. Tests check the descriptions, the empty heading's absence and the pattern's
-  two blocks, each shown failing on its fault. **Pushed and deployed (#52, 72328dd);** the user replaces
-  staging's Music carousel with the pattern, to try it in the real editor. **The theme's first
-  script (the user, 2026-11-12: a good reason for JavaScript):** `assets/js/video-pause.js` keeps one
-  YouTube player playing at a time: a player whose visible share drops below half is paused (an
-  IntersectionObserver, so arrows, dots, swipe, keyboard and page scrolling all count), and when a
-  player reports "playing", the others are paused. YouTube's player takes commands as messages when
-  its address has `enablejsapi=1`, which the theme adds to each YouTube player in a page's content
-  as it is rendered (existing embeds included), and reports its state once told the page listens;
-  messages go only to the player's origin and are taken only from it. The script loads deferred,
-  only on pages with a player, labelled by its contents' fingerprint (`hbmusic_asset_version()`,
-  renamed from `hbmusic_stylesheet_version()`); the carousel stays CSS-only and everything works
-  without it. Checked with real YouTube players on the dev site (play 1, "next": 1 paused; play 2,
-  then 3: 2 paused; no console error). `video-pause.spec.ts` answers the player addresses with a
-  stand-in player that reports the commands it gets: the script and the switch where there is a
-  player, none elsewhere; starting one pauses the other; "next" pauses the one moved out; each
-  shown failing on its own fault (the script not loaded fails all three). The test Music page's
-  second carousel has a stand-in video. **Then (the user):** a player outside a carousel, Home's
-  (music with a still picture), keeps playing while the visitor scrolls; only players in a carousel
-  pause when they leave view; starting any player still pauses the others. Going to another page
-  stops a video anyway (the browser closes the page). A test scrolls Home's player out of view and
-  checks it got no pause, shown failing with every player watched. **A checker for JavaScript (the
-  review found none):** `bin/check` type-checks the theme's scripts with the TypeScript compiler the
-  browser tests already install (`tools/js-check/tsconfig.json`, strict, the scripts' JSDoc carrying
-  the types), no new tool; ESLint was not chosen, WordPress's configuration bringing a large set of
-  packages for one small script. Its first run found 13 loose types in the script (elements used as
-  frames unchecked, messages without a declared shape), fixed; shown failing on a planted one.
-  **Then (the user: why must YouTube tell us anything?):** knowing which player started used a
-  handshake that is only partly documented by YouTube; it is replaced by the browser's focus, which
-  is standard: clicking or tabbing into a player moves the focus into its frame, so the page sees it
-  as its active element and pauses the others with YouTube's documented pause command. The page is
-  told only when the focus first leaves it, so while the focus is inside a player it checks every
-  250ms whether it moved to another (moving straight from one player to another counts). Any click
-  into a player counts as moving to it. Checked with real YouTube players and real clicks (play 1,
-  click into 2: 1 paused, 2 playing). The test now clicks into the stand-in players, first into one,
-  then straight into the other, shown failing without the focus handling and without the checking. **Pushed and
-  deployed (#53, f0f69da).** **Then (the user, on staging: scrolling down Music to the call to
-  action stopped the video):** scrolling the page never pauses a player, in a carousel or not; a
-  carousel's player pauses only when the carousel moves to another video (or the visitor clicks
-  into another, or stops it). Each carousel's observer measures against the carousel itself
-  (`root`), not the window. Checked with real YouTube (playing, scrolled off screen to the call to
-  action: still playing; "next": paused); a test scrolls the Music page past a carousel's player
-  and checks it got no pause, shown failing when measured against the window. **Added
-  after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
-  the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
-  before/after check with the real content belongs in the template, built on conventions every
-  site follows (`data/content/pages.json`, `{{photo:<file>}}`), not on knowledge of particular
-  sites. Claude's corrections to its own first idea, accepted by the user: preview pages beside
-  the stand-ins instead of WordPress's importer (same addresses would collide, and no new
-  dependency), Playwright's own comparison instead of Python with an image library, local only
-  and never a gate (exact pixels hold within one container), and it shows changes, not whether
-  they look right. Found while building it: WP-CLI swallowed the loop's input, so only the first
-  page got a preview, and the first runs "passed" on 404 pages; now each page must answer 200,
-  outside services are answered locally, and a scenario check with two neutral fixture pages
-  covers it (shown failing on three planted faults). A planted colour change was reported on
-  exactly the 10 screenshots with the call-to-action band. Also for 5f: the hero photo's description
-  for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
-  import file (the photo's background needs nothing: it is pure black, package 5). Later, after this work: the
-  global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).
-- **Next:** step 9, going live (the user, 2026-11-12: "I'm ready to go live"). 5f is done: the
-  videos are on staging (Home's featured video; Music's carousel replaced by the user with the
-  "Video carousel" pattern, its links changed by the user there), and D30 decides that live's
-  content comes from staging's export. Live's WordPress is updated in place (D31, the user,
-  2026-11-12); step 9 now follows its order, 9a to 9q; 9a is done (2026-11-12). **Step 9 is paused
-  at 9b** (2026-11-13) while the DTS Operations Handbook is drafted (the project's `CLAUDE.md`,
-  Handbook); this site is classified Fully managed, Brochure, hosted by the customer. On
-  2026-11-13 the handbook's topics 1 to 9 were decided (H1-H44: topic 8 moving a site between
-  hosts, which step 10 will follow; topic 9 handover), and the whole handbook was reviewed for
-  duplication and conflicts. On 2026-11-14 topic 10 (customer-facing, H45-H65: the service
-  agreement, visitors' personal data, the content guide, search titles, the monthly report, with
-  model documents in the handbook's `customer/`) and topic 11 (care plans, H66-H74) were
-  decided, and topic 12 (the site standard, from this site's checklist) was begun: round 1 of 4
-  (H75-H78); rounds 2 to 4 come next, then version 1. Topic 2 replaces 9b's design: no deploy jobs or server keys on GitHub, `bin/deploy`
-  run from the user's computer with its guards (H8, H9). When step 9 resumes, this site is first
-  compared with the handbook and each difference becomes a plan item or a recorded exception
-  (for example: the deploy path, Simple History, the theme's palette limits, the backups of
-  D27 against H17, whose monthly full copy may make the routines' content export unneeded;
-  `docs/SITE_CHECKLIST.md` becoming this site's status sheet against the handbook's chapter 12,
-  with D16 replaced by H16; staging's privacy policy against the handbook's model policy). Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
-  gets the version staging runs. The page generator (`data/content/`) still has the old Music
-  links; only the dev previews use it now (D30), so it is updated when the user sends the new
-  links. 3i whenever the user chooses. The live site's text still names the old service area
-  (D22) until go-live.
-- **Order of the coming steps (D19, replacing D11's; 6 done first on 2026-11-09 while Brevo's
-  support answered; 8 and 5e done by 2026-11-11; 5f done 2026-11-12):** 9 → 10.
-- **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
-  preferences plugin (5d); a search on the Songs page (the user, 2026-11-11: after go-live). **The template (D21)** starts when a second site has a date.
-- **Open decisions waiting on the user:**
-  - the new host (step 10, before 2028-07-16).
-- **Site checklist (D16):** `docs/SITE_CHECKLIST.md` (named `BEST_PRACTICES.md` until
-  2026-11-03) is the draft of WordPress additions for a shared global file; until anything moves
-  there, it is this project's checklist. Reviewed with the user on 2026-11-03 and committed: 89 items, each with
-  its check, its kind (general, WordPress or shop) and its status (done, in force, partly,
-  planned with its step, or not applicable); a section for shops (WooCommerce, for the template)
-  and a list of practices deliberately not used.
-- **Stale documents:** none. The checklist's statuses and the inventory's list were brought up
-  to date on 2026-11-11 (D19's changes, the old local copy's removal).
+- **Where the work stands:** steps 0 to 8 done, with the D29 polish and 5f done and deployed to
+  staging on 2026-11-12 (#42 to #55); their entries hold the details. Step 9 (going live) is under
+  way: 9a done (2026-11-12), paused at 9b while the DTS Operations Handbook was drafted. The
+  handbook's version 1 is done (2026-11-14, H1-H99), on GitHub as a private repository. This site
+  is classified Fully managed, Brochure, hosted by the customer, with two exceptions (the
+  project's `CLAUDE.md`).
+- **In progress:** the Editing Help plugin (H89), on branch `feat/editing-help` (3 commits,
+  local): done on the dev site, not deployed; it reaches staging and live with 9b's `bin/deploy`
+  (`docs/ENVIRONMENTS.md`).
+- **Next, in order (the user, 2026-11-14):**
+  1. Review the site's Privacy Policy page as staging shows it, the text live will get (D30): the
+     user removed WordPress's "Suggested text:" labels; the wording is not settled. Compare it with
+     the handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
+     click-to-load player, H88) and settle it with the user.
+  2. American English spelling across the project: about 130 British forms in 28 files, some in
+     code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
+     a trial branch with the checks, tests and review gate; a renamed design value is shown to the
+     user first.
+  3. Compare this site with the handbook; each difference becomes a plan item or a recorded
+     exception: the deploy path; Simple History and its check of the SEO plugin's fields (H94);
+     the theme's presets only (H87); D27's backups against H17; `docs/SITE_CHECKLIST.md` becoming
+     this site's status sheet against chapter 12 (D16 replaced by H16), with `records/` (H99); the
+     Site Hardening plugin taking unfiltered HTML from Editors and sending HSTS; Wordfence's
+     password and username settings; the plugin-set comparison in the monthly check; the
+     click-to-load player after go-live (H88).
+  4. The project's `CLAUDE.md`: "follows version 1".
+  5. Rewrite 9b from the handbook's chapter 2 (`bin/deploy` from the user's computer, no deploy
+     jobs or keys on GitHub, H8 and H9).
+  6. 9c to 9q: live updated in place (D31), its content from staging's export (D30), its settings
+     by hand.
+  7. Step 10, the move to a new host, before 2028-07-16.
+- **Dates and holds:** Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
+  first gets the version staging runs. Live's text names the old service area until go-live
+  (D22). The page generator's Music links are old; only the dev previews use it (D30).
+- **Open decisions waiting on the user:** the new host (step 10).
+- **Future, not needed for go-live (D19):** the clip request and setlist plugins (5b to 5d), a
+  song search after go-live, the template project (D21) when a second site has a date.
+- **Stale documents:** none. The Current position's earlier text is kept word for word in
+  "Earlier positions (archived)" at the end of this plan, not read on resume.
 
 ## Decisions
 
@@ -975,6 +632,298 @@ new findings added as steps.
      in the admin with the request, so the user sees what the client wants before planning the
      set. Layout worked out in step 2b. Uses the same form safeguards as 5b. *Why:* lets a client dial in
      the music they want, and gives the user the details before the conversation. Status: `[ ]`
+   - 5g. **The look's polish (D29).** Status `[x]`, deployed to staging 2026-11-11 and 2026-11-12
+     (#42 to #55). Moved here word for word from the Current position on 2026-11-14:
+     **In progress (D29, 2026-11-11):** a subtle polish of the look, on the branch
+     `style/subtle-polish`, in stages: (1) the CSS linter in `bin/check` (done); (2) the CSS
+     restructured into the site layer and generic components (done: 16 screenshots compared pixel
+     by pixel, identical apart from the outlined button now as large as the main one, accepted by
+     the user; `component-styles.spec.ts` proves where each stylesheet loads, shown failing on four
+     planted faults). After its deploy, staging's Home, Music, Songs and About pages need the new
+     class names in their content (`site-…` instead of `hb-…`); (3) the type and spacing
+     packages as the user approved them (done): text weight 400 and line height 1.6, paragraphs in
+     a new light warm grey (`contrast-soft`, 15.6:1 on black), bold h2s and page titles, the
+     features' headings with a short accent rule, one section spacing (`clamp(56px, 8vw, 96px)`),
+     the features' columns aligned at the top, and the "Over 30 years" text at a 65-character
+     measure through WordPress's own content width (an inner group in the page content, so no CSS
+     overrides the layout); the call-to-action band keeps pure white text (5.3:1; the grey would
+     fall below 4.5:1); (4) buttons, menu and texture, one package at a time,
+     each shown to the user in screenshots and checked for accessibility. **Paused after (3),
+     2026-11-11** (commits d3710e9, 1a0d2f6, 9c69c78 on the branch, not pushed). **Package 3, the
+     buttons (done after the resume, kept by the user after trying them live on the dev site):** a
+     soft glow in the button's own colour and a hairline highlight from above (WordPress shadow
+     presets in `theme.json`), a 1-pixel lift on hover with a stronger glow (150 ms, none under
+     `prefers-reduced-motion`), the outlined button filling green, a 2px `:focus-visible` ring with a
+     gap (checklist 7.2), the form's Send button the same; on the call-to-action band no glow, a dark
+     lift shadow and a white ring, through custom properties the button component reads. Found: the
+     parent theme turned the main button beige on hover (its own hover colour now set in
+     `theme.json`), and the user noticed the outlined button was 4px larger than the main one (every
+     button now has the same border width). Every state passes WCAG AA (the white ring 5.3:1 on the
+     band); `buttons.spec.ts` (6 tests) protects the ring, its contrast against its band, the
+     reduced-motion exception, the lift, no stuck hover after a tap on a touch screen (hover effects
+     only under `(hover: hover)`), and the equal heights, each shown failing on a planted fault.
+     **Package 4, the header and menu (done, the user: "good", after trying it live):** a sticky
+     header (the user's addition), option B, slimmer on phones (logo 40px instead of 56px), over 85%
+     black with a slight blur and a hairline below it; the browser's scroll padding equals the
+     header's height, so a link reached with the keyboard or a jump link never lands under it (WCAG
+     2.2, 2.4.11); logged in, it sits below WordPress's toolbar. Menu links at weight 500 with a
+     green underline on hover and on the current page, which `hbmusic_mark_current_menu_link()`
+     marks with `aria-current="page"` by comparing each menu link's path with the page shown
+     (WordPress marks only links to a page by its ID, and this menu holds addresses). The black
+     strip under the green band (89px: the parent template's bottom padding, an inline style, plus
+     the footer's top margin) removed only on pages whose content ends with the band; the inline
+     style needed the one `!important`, with its reason. The stand-in About page gained the band, so
+     the tests see this. Menu text 13.4:1 even over white passing beneath. `header.spec.ts` (6
+     tests) protects the stickiness, focus not obscured, the current-page mark, no gap, and the
+     slimmer phone header, each shown failing on a planted fault. **The hero photo (the user,
+     after package 4):** it sat 87px below the headline; the hero's columns went from 48-52 to 40-60
+     (chosen from four mock-ups), so at 1280px and up the photo is 15% larger, the head level with
+     the headline's top, still standing on the band's edge (its cut-off bottom must sit on an edge).
+     A content change (`data/content/build_pages.py`), reaching staging with the class-name update.
+     Headings now wrap in lines of even length (`text-wrap: balance`, `headings.css`): below about
+     1200px the headline had left "event" alone on its last line; WordPress's own "pretty" on
+     headings first outranked the rule, which a test now catches. **Package 5, texture (done, the
+     user: "it all looks fine"):** a warm stage light behind the hero photo and a fine grain (a 128px
+     tile, 14 KB, seed 29, 2.7% on average) on the hero, features and call-to-action bands, half
+     strength on the green band so its white text keeps about 5:1. Claude's earlier "dark-grey edge"
+     of the photo was a misreading: its background is pure black (1 of 255), so that 5f item is
+     struck. Blending the photo with the band was tried first, but the light also lit the black
+     shirt (the user saw it); the photo is now a cut-out with a transparent background,
+     `howard-buie-guitar-cutout.webp` (57 KB), made by `data/photos/make_cutout.py` (flood fill of the
+     black from the top and side edges, so the shirt's enclosed shadows stay solid; reproducible
+     pixel for pixel; for dark pages only, a faint fringe stays around the hair). Staging gets it
+     in place of the JPEG with the content update. Also from the user: two buttons in a row are
+     equally wide and, stacked, the same length at every width (they wrap by column, not by one
+     screen width). Tests: the bands' texture and the grain image, equal button widths at four
+     widths, each shown failing on a planted fault. **Package 6, the videos as a carousel (the
+     user's request, option A+ after weighing it against a scripted carousel; the user did not
+     want JavaScript):** the Music page's videos in a row that scrolls sideways and snaps, CSS only
+     (`site-carousel.css`; a labelled `section` group, WordPress's wide width, slides at most 860px
+     so the next one shows). Chrome and Edge also show CSS's native previous/next buttons and dots
+     (since version 135; MDN: limited availability), Firefox and Safari a green scrollbar (the user
+     first missed Firefox's grey one). No wrap-around (that needs a script). The user saw the "next"
+     button stay at the last video in VS Code's built-in browser; the last slide now snaps to the
+     row's end, and in Chrome it hides. Hidden slides' videos load only when scrolled near
+     (WordPress's lazy loading). Stylelint 17 does not yet know the native carousel syntax; its config
+     allows exactly those names. axe then found the row unreachable by keyboard
+     (scrollable-region-focusable): `hbmusic_make_carousel_focusable()` adds `tabindex="0"` when the
+     page is rendered (an attribute in the content would make the editor flag the block invalid),
+     with a focus ring, and the arrow keys scroll it. `carousel.spec.ts` (5 tests), each shown
+     failing on a planted fault. **Package 7, a calmer green (the user: the solid green band "honked", and
+     so did the green arrows and scrollbar):** green now marks only what can be pressed. The call to
+     action is a black band with a loose green fog (chosen from three, tight, medium and loose,
+     tried on temporary pages; its shape and strength are tokens) and the normal bright green
+     button, so contrast draws the eye, not area; its text has 9.3:1 at the fog's centre (5.3:1 on
+     the old band), the band's white-text token and lift shadow are gone. The carousel's arrows are
+     dark discs that turn green only when pointed at (the user liked that), its scrollbar and dots
+     soft grey, the current dot warm white; every control 9.9:1 or more. A test checks the fog. **Pushed
+     and deployed (#42, d9abe45, 2026-11-11).** Staging's content update to the new class names: Home
+     done by the user (code pasted from `data/content/for-staging/home.html`, the cut-out chosen in the
+     hero, its alt text asked for); **Music, Songs and About still to paste** from the same folder.
+     **One frame for every page (the user, 2026-11-12; branch `style/one-frame`):** the frame is
+     WordPress's own wide width (`settings.layout.wideSize`, 1100px), not a token of ours. Every band
+     of a page (sections, panels, the carousel) is a wide block, so WordPress itself sets its width
+     and centring; the page content names only the component (`site-section`, `site-hero site-panel`
+     and so on), never a size, and no CSS overrides the layout. The header's and footer's content sit
+     at the frame; the page side padding is the gutter. Narrow pages (Songs, About, Book) keep their
+     narrow text column inside the full frame. **Panels (the user's idea, after the review found two
+     panels touching):** the class `site-panel` makes a band a panel, and `site-panel.css` alone owns
+     its side margins, corners (`panelRadius` 8px) and the space between panels; `site-hero`,
+     `site-features` and `site-cta` keep only their own look. A new panel needs only the class.
+     Rejected: an exception for the features panel in the call to action's spacing rule (a patch per
+     pair), and a panel file listing the three by name. The opening panel stands a gutter below the
+     header (as a full-width band its stage light had reached the screen's edges, past everything
+     else, the user saw it). **The call to action lives in the theme (the user: pages should need
+     copying only where there is no other reasonable way):** `parts/call-to-action.html`, shown under
+     the content by two page templates of the theme's own, "Page with call to action" (Music, Songs,
+     About) and "Page No Title with call to action" (Home); a page gets it by choosing the template,
+     and its wording is edited once, in the Site Editor (which then keeps a copy in the database
+     that theme updates no longer reach). Copied into four pages before. The panel stands a
+     section's spacing below the content (a plain section ending the content gives up its bottom
+     padding for that) and the template's own space before the footer, 89px on every page, the same
+     as after text; this removed the call to action's page-end rules and their `!important`. Found
+     while building it: a child theme's `templateParts` and `customTemplates` replace the parent's
+     lists rather than adding to them, which turned the header and footer into plain `div`s (the
+     sticky header's tests failed) and would have hidden "Page No Title"; the child lists repeat the
+     parent's entries. **Headings** are styled by class (`.wp-block-heading` within each component),
+     not by level, so an editor chooses the level for the page's outline without changing the look.
+     **The carousel** fills the frame with the current video centred and small, equal peeks (about
+     100px on a computer, 18px on a phone): slides sized in container units, empty spacers before the
+     first and after the last so they centre too, which also makes the last stop exactly the end.
+     Measured on the real pages at 1920, 1280, 1000, 800 and 390px; the user looked at Home in
+     Chrome (the header's menu looked off to the right while the opening band was full-width;
+     aligned once it became a panel). Tests: `frame.spec.ts` (shared edges on three pages at two
+     widths, every panel at the frame on a wide screen, two panels in a row a section's spacing
+     apart, the call to action a section's spacing below the content on Home and About), the
+     carousel's first and last slides centred, and the space before the footer after the call to
+     action equal to that after text in both templates, each shown failing on a planted fault; 122
+     browser tests. `bin/dev-site` gives each test page its template from its list. **One push at
+     the end** (the user's preference for a single staging update): after the deploy, on staging,
+     Music, Songs and About get their content from `data/content/for-staging/` and the template
+     "Page with call to action"; Home its own code with the changes made by Claude (the user copies
+     it into `data/content/for-staging/home-staging.html`, Claude makes the bands wide, adds
+     `site-panel`, removes the call to action and hands it back, keeping the photo) and the template
+     "Page No Title with call to action". Until then staging's pages show their old bands. After
+     this paste, look changes reach the site through the theme folder alone; patterns for the
+     sections (a customer inserts them from the block inserter, never the code editor) are the next
+     step. **Pushed and deployed (#45, 4eedebd, 2026-11-12);** staging's Home, Music,
+     Songs and About updated by the user (content pasted, templates chosen). **Then, on branch
+     `style/cta-fog` (the user, looking at staging):** the call-to-action panel's green made more
+     prominent: the fog tried at 55% and 65%, then wider toward the sides, then without a fade; the
+     user chose the even green, now one colour token (`custom.color.ctaBackground`, 65% of the
+     palette's green mixed with black) instead of a gradient; contrast computed for each step (80%
+     would have dropped the button's edge below 3:1). The panel's text takes the heading's brighter
+     warm white (7.2:1 instead of 6.0:1, the user asked for more contrast). The lead size had been
+     smaller than body text (20px against 22px; found by measuring when the user asked for larger
+     text): now `clamp(1.25rem, 1rem + 1vw, 1.625rem)`, 20px on a phone to 26px on a computer, its own
+     component `site-lead.css` (on paragraphs; it was inside the hero's file), used by Home's
+     introduction and the panel's line. Tests: the panel's colour is green (not black or missing),
+     the lead larger than body text at two widths, each shown failing on a planted fault. **Then (the
+     user: the hero's picture looked vertically off centre):** bottom alignment was built first (the
+     buttons' bottom the picture's bottom, the picture's crop faded out over 18%); when the user
+     changed Home's introduction to "including Hope Mills and Southern Pines", the taller text left a
+     gap above the picture, and the user, shown both on two preview pages, chose centring. The
+     theme now overrides nothing: the hero's columns are centred by their own editor setting (a
+     customer can change it without code). Centred, the picture no longer stands on the panel's edge,
+     so its cropped bottom is softened by a 2px fade (`mask-image`, token `texture.photoFade`; 18%,
+     6% and 5px were tried, and no fade, the user chose 2px). The test Home page's hero now has the
+     real structure (two columns, the theme's logo as a stand-in picture); a test checks the text and
+     picture centred on each other and the softened bottom, shown failing on both faults. Hope Mills
+     added to the towns in the page data for search engines (`HBMUSIC_AREAS_SERVED`), which follow
+     the page text; staging's Home introduction is changed by the user in the editor. **Then (the
+     user):** a "Book Howard" button under "For any kind of event", for symmetry with "See the song
+     list" and because booking is that point's next step; outlined, so the solid green stays the
+     page's main action (top and end). It is Home's content (a block in the middle of the page, which
+     a theme cannot insert), added by the user in the block editor on staging; the page generator and
+     `data/content/for-staging/home.html` have it too. The theme's part: a features panel's buttons
+     sit at the bottom of their columns, so points side by side line up whatever their texts'
+     lengths (flex columns, an auto margin, the block gap kept as padding). The test page's points
+     now differ clearly in length; a test checks the line-up, shown failing on its fault. The
+     coming "Features" pattern will bring a button under each point. **Pushed and deployed (#46,
+     6afcf5e, 2026-11-12;** the deploy's last check timed out once at the host and passed on a
+     re-run of that step). **Then (the user, on branch `style/cta-solid`):** the call-to-action panel
+     back to its original look, found in the history (before d9abe45): the palette's solid green with
+     the grain at half strength, pure white text (`onCta`), and the black button that rests flat and
+     lifts with a dark shadow (`button-lift-on-band`), its focus ring white; the text sizes and the
+     panel's shape stay as they are. Contrast: text 5.0:1 at the brightest speck, the button's edge
+     4.0:1, its text 21:1. A test checks the button stands out from the panel (3:1), shown failing
+     without the black (2.3:1). **Pushed and deployed (#47, 221c0bd).** **Then (the user: the Site
+     Editor showed the call to action black with a green button):** a stale copy of the stylesheet,
+     confirmed when Ctrl+Shift+R showed the right look. Every stylesheet's address was labelled with
+     the theme's (or the Song List's) version, 0.2.0 since the CSS was split, so a changed file kept
+     its address; pages inline these stylesheets, the editor loads them by address. Now each
+     stylesheet is labelled by a fingerprint of its contents (`hbmusic_stylesheet_version()`,
+     `songlist_stylesheet_version()`; Song List 0.2.1), so a change reaches browsers and caches by
+     itself. A scenario check, `dev-stylesheet-versions.sh`, compares each registered stylesheet's
+     label with its file's fingerprint computed from the repository, shown failing on both faults. **Pushed and deployed (#48, 1003102).** **5f's videos (the user,
+     2026-11-12):** Home's "Hear him play" gets "Live gig 42 song mashup" (https://youtu.be/JfP1oGtCkbI,
+     audio with a still picture); Music's carousel the old site's three, renamed by the user in YouTube
+     Studio ("Two country, one rock", "80's rock", "First several songs of a set"). Each is an Embed
+     block added by the user in the block editor; the page generator has them too. Checked on the dev
+     site with YouTube really loading: the Home video fills its section at 16:9, the carousel's slides
+     are 16:9 and centred with the arrow hiding at the end, and no policy refusal or console error at
+     either width (the first real test of YouTube under the policy). YouTube's automatic captions came
+     on by themselves; the user unpublished the video's automatic caption track in YouTube Studio.
+     **Found:** WordPress 7.1 escapes an apostrophe in an embedded video's title twice, so "80's rock"
+     was read as "80&apos;s rock" (wp_filter_oembed_iframe_title_attribute()); the theme decodes the
+     title first (`hbmusic_decode_embed_title()`, the user chose this over renaming the video), and a
+     scenario check, `dev-embed-titles.sh`, runs WordPress's own function on YouTube-like player code
+     (shown failing without the fix; ampersands and quotation marks were never affected and are
+     checked so the fix does not break them). WordPress keeps each player's code in its oEmbed cache,
+     so the Music videos are added on staging after this fix is deployed. **Pushed and deployed (#49,
+     98040c2).** **Carousels as a component (the user: several per page, such as Rock, Country and
+     Mellow; a heading only when there are several):** a carousel already took any number of slides
+     (the three grey boxes were stand-ins). Several on a page: the arrows were placed by a name all
+     carousels shared (`anchor-name`), so they followed the last one; `anchor-scope` keeps it to each.
+     A carousel directly under a heading is named after it for screen readers (the theme links it to
+     the heading with `aria-labelledby` when the page is rendered, `hbmusic_name_carousels_after_
+     headings()`), one without keeps its label "Videos"; nothing to set in the editor. A "Video
+     carousel" pattern (`patterns/video-carousel.php`, three empty YouTube embeds) adds one from the
+     inserter; duplicating an existing one works too. The test Music page has a second carousel under
+     a heading; tests check each carousel's arrows act on their own row, the naming, and (a scenario
+     check, `dev-patterns.sh`) that the pattern's blocks are the structure the CSS expects; each shown
+     failing on its fault. **Found:** no embedded video is lazy-loaded: WordPress leaves the first
+     three images or embeds of a page eager (its loading threshold), which on Music is all three
+     videos; the carousel's comment had claimed otherwise and was corrected. **Pushed and deployed
+     (#50, 358b19b).** **Lazy loading (the user: yes):** lowering WordPress's count would not have
+     helped (it skips pictures without a stated size, so a video was the first it counted); the theme
+     returns "lazy" for every embedded frame in a page's content instead
+     (`wp_iframe_tag_add_loading_attr`), pictures keep WordPress's choice. The test Home page has a
+     stand-in video below its picture, like the real one; `media.spec.ts` checks every player on Home
+     and Music is lazy, shown failing without the filter. Checklist 8.5 is partly met: a click-to-load
+     player would meet it in full. **Next (the user, 2026-11-12):** a small script of the theme's own,
+     its first, so a video stops when it leaves view or another starts (YouTube's player cannot be
+     told from CSS); the carousel stays CSS-only and works without it. **Pushed and deployed (#51, 2a312b3).**
+     **One pattern with an optional name, and the carousel described (the user, 2026-11-12):** the
+     "Video carousel" pattern starts with an empty heading (hint text "Carousel name (optional)" in the
+     editor only) directly above the carousel; left empty, the theme drops it from the page
+     (`hbmusic_drop_empty_heading()`: an empty heading leaves a gap and is announced as an empty
+     heading, an accessibility error anywhere), and the carousel keeps "Videos"; given text, it names
+     the carousel. Each carousel is described as in the W3C's carousel pattern (WAI-ARIA Authoring
+     Practices): `aria-roledescription="carousel"`, each slide `role="group"`, "slide", "n of m"
+     (`hbmusic_describe_carousel()`, with WordPress's HTML processor, which knows the slides' depth; a
+     bare video frame keeps its own role, and markup it cannot parse is left as it is). The test Music
+     page's first video is wrapped as WordPress renders an Embed block, with the pattern's empty
+     heading above it. Tests check the descriptions, the empty heading's absence and the pattern's
+     two blocks, each shown failing on its fault. **Pushed and deployed (#52, 72328dd);** the user replaces
+     staging's Music carousel with the pattern, to try it in the real editor. **The theme's first
+     script (the user, 2026-11-12: a good reason for JavaScript):** `assets/js/video-pause.js` keeps one
+     YouTube player playing at a time: a player whose visible share drops below half is paused (an
+     IntersectionObserver, so arrows, dots, swipe, keyboard and page scrolling all count), and when a
+     player reports "playing", the others are paused. YouTube's player takes commands as messages when
+     its address has `enablejsapi=1`, which the theme adds to each YouTube player in a page's content
+     as it is rendered (existing embeds included), and reports its state once told the page listens;
+     messages go only to the player's origin and are taken only from it. The script loads deferred,
+     only on pages with a player, labelled by its contents' fingerprint (`hbmusic_asset_version()`,
+     renamed from `hbmusic_stylesheet_version()`); the carousel stays CSS-only and everything works
+     without it. Checked with real YouTube players on the dev site (play 1, "next": 1 paused; play 2,
+     then 3: 2 paused; no console error). `video-pause.spec.ts` answers the player addresses with a
+     stand-in player that reports the commands it gets: the script and the switch where there is a
+     player, none elsewhere; starting one pauses the other; "next" pauses the one moved out; each
+     shown failing on its own fault (the script not loaded fails all three). The test Music page's
+     second carousel has a stand-in video. **Then (the user):** a player outside a carousel, Home's
+     (music with a still picture), keeps playing while the visitor scrolls; only players in a carousel
+     pause when they leave view; starting any player still pauses the others. Going to another page
+     stops a video anyway (the browser closes the page). A test scrolls Home's player out of view and
+     checks it got no pause, shown failing with every player watched. **A checker for JavaScript (the
+     review found none):** `bin/check` type-checks the theme's scripts with the TypeScript compiler the
+     browser tests already install (`tools/js-check/tsconfig.json`, strict, the scripts' JSDoc carrying
+     the types), no new tool; ESLint was not chosen, WordPress's configuration bringing a large set of
+     packages for one small script. Its first run found 13 loose types in the script (elements used as
+     frames unchecked, messages without a declared shape), fixed; shown failing on a planted one.
+     **Then (the user: why must YouTube tell us anything?):** knowing which player started used a
+     handshake that is only partly documented by YouTube; it is replaced by the browser's focus, which
+     is standard: clicking or tabbing into a player moves the focus into its frame, so the page sees it
+     as its active element and pauses the others with YouTube's documented pause command. The page is
+     told only when the focus first leaves it, so while the focus is inside a player it checks every
+     250ms whether it moved to another (moving straight from one player to another counts). Any click
+     into a player counts as moving to it. Checked with real YouTube players and real clicks (play 1,
+     click into 2: 1 paused, 2 playing). The test now clicks into the stand-in players, first into one,
+     then straight into the other, shown failing without the focus handling and without the checking. **Pushed and
+     deployed (#53, f0f69da).** **Then (the user, on staging: scrolling down Music to the call to
+     action stopped the video):** scrolling the page never pauses a player, in a carousel or not; a
+     carousel's player pauses only when the carousel moves to another video (or the visitor clicks
+     into another, or stops it). Each carousel's observer measures against the carousel itself
+     (`root`), not the window. Checked with real YouTube (playing, scrolled off screen to the call to
+     action: still playing; "next": paused); a test scrolls the Music page past a carousel's player
+     and checks it got no pause, shown failing when measured against the window. **Added
+     after the resume (the user, 2026-11-11):** `bin/screenshots`, versioned and generic, replacing
+     the unversioned helpers of `data/dev-tools/` (removed): every site gets restyled, so a
+     before/after check with the real content belongs in the template, built on conventions every
+     site follows (`data/content/pages.json`, `{{photo:<file>}}`), not on knowledge of particular
+     sites. Claude's corrections to its own first idea, accepted by the user: preview pages beside
+     the stand-ins instead of WordPress's importer (same addresses would collide, and no new
+     dependency), Playwright's own comparison instead of Python with an image library, local only
+     and never a gate (exact pixels hold within one container), and it shows changes, not whether
+     they look right. Found while building it: WP-CLI swallowed the loop's input, so only the first
+     page got a preview, and the first runs "passed" on 404 pages; now each page must answer 200,
+     outside services are answered locally, and a scenario check with two neutral fixture pages
+     covers it (shown failing on three planted faults). A planted colour change was reported on
+     exactly the 10 screenshots with the call-to-action band. Also for 5f: the hero photo's description
+     for screen readers (it has `alt=""`; checklist 7.4), set in staging's Media Library and in the
+     import file (the photo's background needs nothing: it is pure black, package 5). Later, after this work: the
+     global CSS rule proposed from `docs/planning/css-standards-notes.md` (the user: not now).
+
 6. **Plugins.** Keep, replace or drop `updraftplus`, `wordfence`, `wordpress-seo`; remove the
    Hostinger's auto-updates plugin and mu-plugin (open item 3), or keep them while the site is at
    Hostinger. FluentSMTP is already chosen
@@ -1740,3 +1689,119 @@ new findings added as steps.
     Manage WAF), which names the old location's exact path, and optimize the firewall again at
     the new host (8i).
     Status: `[ ]`
+
+## Earlier positions (archived)
+
+*The plan's Current position as it stood on 2026-11-14, before it was trimmed to a short
+summary; the D29 part moved to step 5g, the rest kept here word for word so nothing was lost.
+Not read on resume.*
+
+- **Where the work stands:** steps 0-2 done; 3a (the local copy in Docker Compose, 7555e34),
+  3b (local mail into Mailpit through FluentSMTP, f389f76), 3d (code checks, `bin/check`,
+  14e8788), 3e (tests, `bin/test`, 69ace60) and 3f (checks in GitHub, public repository,
+  branch protection, and the Dependabot follow-up) done; 3g-1 (the staging site) and 3g-2 (the
+  restricted deploy key) done on 2026-11-03, with the review of `docs/SITE_CHECKLIST.md`, and
+  3g-3 (the deploy to staging after every merge to `main`) on 2026-11-04;
+  step 4 (the child theme, the dev site, its tests, and those tests as a required check on
+  GitHub) done on 2026-11-04; 3h dropped by the user. The old site is still live, secured.
+- **Findings:** the live site's email is unreliable (step 8 brings a mail service); the login
+  log shows no break-in; the live site's PHP and plugins are current since step 0f
+  (2026-11-02), and the old staging copy is removed (0g).
+- **Hostinger plan:** expires 2028-07-16, auto-renewal off (the user, from Billing →
+  Subscriptions, 2026-11-02). SSH is on since 3g-2; its only key is restricted to staging's
+  theme and plugin folders, and password logins cannot be switched off (3g-2).
+- **Hosting (D15):** the new site goes live at Hostinger; the move to another host is step 10.
+- **Done 2026-11-07:** 5a (the song list plugin, deployed, the 108 songs imported on staging),
+  5a-2 (the old-site copy removed, D20) and 2b (the pages, D22, and the look, D23).
+- **Done 2026-11-09:** step 6, the plugin set (D25): Yoast SEO on the dev site with its tests
+  (#19), and on staging by hand; `docs/ENVIRONMENTS.md` lists the intended differences between
+  the dev site, staging and live. In step 8: 8a, the Site Hardening plugin (D26: the security
+  headers, XML-RPC refused, Application Passwords off, no version comments), on staging and
+  checked (#20); 8c, a last debug-log check in `bin/test`; 8d, the browser tests log in once,
+  without the login screen (#21; it explains the login timeout of 2026-11-07); 8e, the
+  logged-in view: the toolbar's icon font allowed, avatars off, a logged-in policy test (#22);
+  8b, `Update URI: false` on every plugin, enforced by `bin/check` (#23). After the resume: 8f,
+  backups by hand (D27), UpdraftPlus and its old backups removed from live; 8g, Yoast's AI
+  generator off, and the build stops on a Yoast setting name it does not know (#24); 8h, local
+  visibility planned, Search Console set up with a baseline; 8i, Wordfence on live (two-factor
+  required for administrators, XML-RPC logins off, the firewall found in Extended Protection).
+- **Mail (D24), evening of 2026-11-09:** Brevo authenticated the domain; staging now sends through
+  Brevo with SPF, DKIM and DMARC passing, and a failed booking request raises a Pushover alert
+  (proven with a planted failure). 2026-11-10: the visitor's name out of the subject, a new
+  "sending failed" message (both on the dev site with tests, typed in by hand on staging after
+  the merge), Brevo's IP blocking on; on staging, the same text, a real request in the inbox
+  without the visitor's name in the subject, and a Gmail filter; the monthly site check
+  (`docs/ROUTINES.md`) and the privacy policy naming Brevo. The mail setup is done.
+- **Updates (8j, settled 2026-11-11):** Hostinger installs security updates only (hPanel, both
+  sites); the monthly check installs the rest by hand, staging first. The timing test is dropped.
+- **Staging's site-wide password (2026-11-10):** it stopped accepting logins because hPanel
+  writes password entries the server cannot verify; fixed by hand, and users are added only by
+  hand until Hostinger fixes it (3g-1).
+- **Server hardening (8k, 2026-11-10):** on staging, the version files refused and no PHP in
+  `uploads/` (server rules by hand, for live at step 9); the PHP version header removed by the
+  Site Hardening plugin. 2026-11-11: permissions checked on both sites, `wp-config.php` 600 on
+  both. HSTS at step 9.
+- **Done 2026-11-11:** 8k's permissions (`wp-config.php` 600 on both sites), D28 (no admin
+  policy of the site's own), 8l (cache: nothing to do), 8h's structured data (checked on
+  staging), 8j settled (security updates by Hostinger, the rest in the monthly check; Wordfence
+  9.1.1 on both sites), and the weekly versions check built and proven end to end
+  (`bin/versions-check`, `versions.yml`; #35 raised Contact Form 7 to 6.2.5 on the dev site,
+  merged by the user on 2026-11-11, earlier than the week agreed).
+- **Step 8 done (2026-11-11):** 8m closed with uptime monitoring by HetrixTools on live
+  (14.1, 14.2: the alert proven through Pushover; certificate and domain expiry warned 15 days
+  ahead). Earlier in 8m: 2.2-2.5, 3.8, 4.8, 5.4, 11.2, 11.3, 11.4, 14.3 (live's alerts land in
+  spam until step 9, a Gmail filter meanwhile; staging's arrive through Brevo).
+- **Next:** step 9, going live (the user, 2026-11-12: "I'm ready to go live"). 5f is done: the
+  videos are on staging (Home's featured video; Music's carousel replaced by the user with the
+  "Video carousel" pattern, its links changed by the user there), and D30 decides that live's
+  content comes from staging's export. Live's WordPress is updated in place (D31, the user,
+  2026-11-12); step 9 now follows its order, 9a to 9q; 9a is done (2026-11-12). **Step 9 is paused
+  at 9b** (2026-11-13) while the DTS Operations Handbook is drafted (the project's `CLAUDE.md`,
+  Handbook); this site is classified Fully managed, Brochure, hosted by the customer. On
+  2026-11-13 the handbook's topics 1 to 9 were decided (H1-H44: topic 8 moving a site between
+  hosts, which step 10 will follow; topic 9 handover), and the whole handbook was reviewed for
+  duplication and conflicts. On 2026-11-14 topic 10 (customer-facing, H45-H65: the service
+  agreement, visitors' personal data, the content guide, search titles, the monthly report, with
+  model documents in the handbook's `customer/`) and topic 11 (care plans, H66-H74) were
+  decided, and topic 12 (the site standard, from this site's checklist) was begun: round 1 of 4
+  (H75-H78); rounds 2 to 4 come next, then version 1. Topic 2 replaces 9b's design: no deploy jobs or server keys on GitHub, `bin/deploy`
+  run from the user's computer with its guards (H8, H9). **When step 9 resumes, first (the
+  user, 2026-11-14):** (1) the Help box, the Site Help plugin showing the content guide and this
+  site's page on the dashboard (handbook H89), designed with the user and built for this site to
+  see it working before it goes into the starter (the guide's text may be public); (2) a review
+  of the site's Privacy Policy page as staging shows it, the text live will get (D30): the user
+  removed WordPress's "Suggested text:" labels from it on 2026-11-14, but its wording is not yet
+  settled; it is compared with the handbook's model policy (`customer/privacy-policy.md`, with
+  the `videos-scroll` block until the click-to-load player, H88) and settled with the user; (3)
+  American English spelling across the project (the user, 2026-11-14; the handbook was converted
+  for its version 1): about 130 British forms in 28 versioned files, mostly "colour", "grey" and
+  "centre", in the plan and notes but also in code (CSS and PHP comments, browser test names,
+  possibly names of `theme.json` values, checked first), so on a trial branch with `bin/check`,
+  `bin/test` and the review gate; a renamed design value is a breaking change for page content
+  and is shown to the user before it is made. Then this site is compared with the handbook and each difference becomes a plan item or a recorded exception
+  (for example: the deploy path, Simple History, the theme's palette limits, the backups of
+  D27 against H17, whose monthly full copy may make the routines' content export unneeded;
+  `docs/SITE_CHECKLIST.md` becoming this site's status sheet against the handbook's chapter 12,
+  with D16 replaced by H16; from topic 12's rounds 2 and 3, the Site Hardening plugin taking
+  unfiltered HTML from Editors and sending HSTS, Wordfence's password and username settings, the
+  plugin-set comparison in the monthly check, the `theme.json` presets only (H87), the
+  click-to-load player after go-live (H88), and the Simple History check of the SEO plugin's
+  fields (H94)). Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
+  gets the version staging runs. The page generator (`data/content/`) still has the old Music
+  links; only the dev previews use it now (D30), so it is updated when the user sends the new
+  links. 3i whenever the user chooses. The live site's text still names the old service area
+  (D22) until go-live.
+- **Order of the coming steps (D19, replacing D11's; 6 done first on 2026-11-09 while Brevo's
+  support answered; 8 and 5e done by 2026-11-11; 5f done 2026-11-12):** 9 → 10.
+- **Future, not needed for go-live (D19):** the clip request plugin (5b, 5c) and the setlist
+  preferences plugin (5d); a search on the Songs page (the user, 2026-11-11: after go-live). **The template (D21)** starts when a second site has a date.
+- **Open decisions waiting on the user:**
+  - the new host (step 10, before 2028-07-16).
+- **Site checklist (D16):** `docs/SITE_CHECKLIST.md` (named `BEST_PRACTICES.md` until
+  2026-11-03) is the draft of WordPress additions for a shared global file; until anything moves
+  there, it is this project's checklist. Reviewed with the user on 2026-11-03 and committed: 89 items, each with
+  its check, its kind (general, WordPress or shop) and its status (done, in force, partly,
+  planned with its step, or not applicable); a section for shops (WooCommerce, for the template)
+  and a list of practices deliberately not used.
+- **Stale documents:** none. The checklist's statuses and the inventory's list were brought up
+  to date on 2026-11-11 (D19's changes, the old local copy's removal).
