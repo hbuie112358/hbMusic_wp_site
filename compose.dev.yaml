@@ -27,6 +27,8 @@ x-theme-mount: &theme-mount ./themes/hbmusic-child:/var/www/html/wp-content/them
 x-song-list-mount: &song-list-mount ./plugins/song-list:/var/www/html/wp-content/plugins/song-list:ro
 # The Site Hardening plugin, read-only for the same reasons; it sends the security headers.
 x-site-hardening-mount: &site-hardening-mount ./plugins/site-hardening:/var/www/html/wp-content/plugins/site-hardening:ro
+# The Editing Help plugin, read-only for the same reasons; it shows the content guide in the admin.
+x-editing-help-mount: &editing-help-mount ./plugins/editing-help:/var/www/html/wp-content/plugins/editing-help:ro
 
 services:
   db:
@@ -59,6 +61,7 @@ services:
       - *theme-mount
       - *song-list-mount
       - *site-hardening-mount
+      - *editing-help-mount
       # Dev-only services: mail to Mailpit and a stand-in for Cloudflare. Never deployed.
       - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
@@ -88,6 +91,7 @@ services:
       - *theme-mount
       - *song-list-mount
       - *site-hardening-mount
+      - *editing-help-mount
 
 volumes:
   db_data:

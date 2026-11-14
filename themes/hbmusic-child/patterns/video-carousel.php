@@ -4,7 +4,7 @@
  * Slug: hbmusic/video-carousel
  * Categories: media
  * Keywords: video, videos, carousel, youtube
- * Description: A row of videos that scrolls sideways, with an optional name above it. Type a name (for example "Rock") or leave it empty, and it stays off the page. Paste a YouTube link into each video; add or remove videos as needed.
+ * Description: A row of videos that scrolls sideways, with an optional name above it. Type a name (for example "Rock") or leave it empty, and it stays off the page. Paste a YouTube link into each video; add or remove videos as needed. Each video must be public or unlisted on YouTube, with embedding allowed.
  *
  * An optional heading directly above the carousel (site-carousel.css), which holds three empty
  * YouTube embeds, each showing the editor's box for a link (plan D29; the user wanted carousels

@@ -7,9 +7,18 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Each folder under wp-content/ in the container, and under the repository on the host.
-readonly CODE_FOLDERS=(themes/hbmusic-child plugins/song-list plugins/site-hardening)
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
+
+# Each folder under wp-content/ in the container, and under the repository on the host: the child
+# theme and every plugin in plugins/, found rather than listed, so a new plugin cannot be left out
+# (the Editing Help plugin was, until this check found its folders by itself).
+code_folders() {
+  printf '%s\n' themes/hbmusic-child
+  local plugin_folder
+  for plugin_folder in "$REPO_ROOT"/plugins/*/; do
+    printf 'plugins/%s\n' "$(basename "$plugin_folder")"
+  done
+}
 
 # A write that succeeds is removed again at once, so a failing check leaves no file behind.
 expect_write_refused() {
@@ -31,7 +40,7 @@ expect_host_files_private() {
 main() {
   load_settings
   local code_folder
-  for code_folder in "${CODE_FOLDERS[@]}"; do
+  for code_folder in $(code_folders); do
     expect_write_refused www-data "$code_folder"
     expect_write_refused root "$code_folder"
     expect_host_files_private "$code_folder"

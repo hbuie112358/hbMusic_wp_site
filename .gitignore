@@ -23,6 +23,7 @@
 /plugins/*
 !/plugins/song-list/
 !/plugins/site-hardening/
+!/plugins/editing-help/
 
 # Secrets, dumps and archives stay out even inside the allowed folders: a stray export saved
 # into docs/ or the theme must never be staged by `git add -A`.

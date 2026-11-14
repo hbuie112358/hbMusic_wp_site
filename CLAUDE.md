@@ -8,6 +8,16 @@ shared rules are in `~/.claude/CLAUDE.md`; "the user" is the person Claude works
 A musician's WordPress site, being rebuilt on a maintained theme (a Twenty Twenty-Five child
 theme) and with booking features, to go live at its current host and move to another later.
 
+## Handbook
+
+- Follows: the DTS Operations Handbook, version 0 (first draft in progress).
+- Type: Fully managed, Brochure, hosted by the customer (the user's own site).
+- Exceptions:
+  - Hosted on Hostinger, not a DTS standard host: the hosting is prepaid through 2028; the site
+    moves when that plan ends.
+  - Keeps a staging site on the host: the user's practice ground for staging on the host, which
+    Shop sites need.
+
 ## Terms
 
 The places code passes through, in order (agreed with the user on 2026-11-04):
@@ -35,6 +45,12 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   can be shared; its own prefix `songlist`, text domain `song-list` and `phpcs.xml.dist`.
 - `plugins/site-hardening/`: the Site Hardening plugin (plan D26), shared the same way; prefix
   `sitehardening`, text domain `site-hardening`.
+- `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way; prefix
+  `editinghelp`, text domain `editing-help`. It shows the content guide in the admin (a dashboard
+  box and Dashboard → Editing help), ending with the site's page templates and ready-made
+  sections read from the theme; the child theme supplies its templates' descriptions and its
+  link example through the plugin's filters. The guide's text is also kept in the handbook
+  (`customer/content-guide.md`), with the same version number; a change goes into both.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
   wording and import file, and the photos.
 - `docs/planning/rebuild-plan.md`: the active plan (rolling-wave mode); its Current position
@@ -64,14 +80,17 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
-  `tools/versions.sh`, the child theme and the Song List plugin mounted read-only and activated,
+  `tools/versions.sh`, the child theme and the project's three plugins (Song List, Site Hardening,
+  Editing Help) mounted read-only and activated,
   Contact Form 7 at the version in `tools/versions.sh`, checked against WordPress.org's checksums,
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
   and its "sending failed" message from `config/booking-form-messages.json` (merged into Contact
   Form 7's own messages; staging and live get the same text typed in by hand),
   test pages (`tests/dev-content/`, each with the page template its real page uses) and songs with neutral text, a stand-in Yoast organization
   (a neutral name and the theme's logo), a dev admin (`devadmin`, password
-  `DEV_ADMIN_PASSWORD` in `.env`). `config/dev-mu-plugins/`, on the dev site only and never
+  `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role
+  a customer gets. To log in by hand, copy a password without showing it:
+  `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never
   deployed, sends mail to Mailpit and answers for Cloudflare. Needs no backup, so CI can build it
   too.
 - `bin/test`: the tests against the dev site: the scenario checks named
@@ -90,7 +109,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, several carousels each with their own arrows, a carousel named after a heading directly above it, described as a carousel with "n of m" slides, an empty heading above it left out, and reduced motion (D29); every embedded player lazy-loaded; the video script (one YouTube player at a time: one moved out of its carousel's view, or the visitor clicking into another, pauses it; scrolling the page never does; loaded only where there is a player, with stand-in players instead of YouTube); one frame on every page (the header,
   footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
   menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, and the slimmer phone header
-  (D29); the Site Hardening plugin's refusals; the old addresses' redirects; then, last, a check that the PHP debug
+  (D29); the Site Hardening plugin's refusals; the old addresses' redirects; the Editing Help
+  guide for the admin and the dev Editor (its dashboard box, headings and accessibility, the
+  site's templates, sections and link example, and every editor label it names found in the real
+  editor, on a draft page of its own); then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
   Run it after `bin/dev-site` and before every commit that touches the site, the theme or a

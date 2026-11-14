@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { WCAG_TAGS } from './accessibility';
 import { answerOutsideServices, recordCspViolations, recordedCspViolations } from './csp-violations';
 import { TEST_PATHS } from './test-pages';
 
@@ -10,8 +11,6 @@ import { TEST_PATHS } from './test-pages';
 const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
 // The policy's rules that no outside source may loosen (checklist 3.2; the Site Hardening plugin).
 const STRICT_POLICY_RULES = ["default-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'self'"];
-// WCAG 2.2 level AA and the levels it includes (checklist 7.1).
-const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 for (const path of TEST_PATHS) {
 	test.describe(`the page ${path}`, () => {
