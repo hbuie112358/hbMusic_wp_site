@@ -208,8 +208,13 @@ pending_decisions:
     private repository on the user's account; it moves to the DTS organization when that exists
     (Transfer ownership, then git -C ~/dev/dts-handbook remote set-url origin ...).
   - >
-    Pushing this project's branch feat/editing-help (3 commits and the pause commit) and its pull
-    request: when the user chooses; nothing in it is deployed until 9b's bin/deploy.
+    Pushing this project's branch feat/editing-help and its pull request, when the user chooses:
+    10 commits not on GitHub's main (from git log origin/main..HEAD, 2026-11-14): the 3 Editing
+    Help commits (8c410f3, 0a50544, 8a14023), the pause commit 9f16248, the follow-up commit with
+    the cold-resume check's fixes, and 5 plan and pause commits from 2026-11-12 to 11-14 that
+    never reached GitHub (092aed1, 970a434, e1c69b1, e2eb2af, 6c26f23). Nothing in it is deployed until 9b's
+    bin/deploy. The old local branch chore/pause-2026-11-12 was deleted on 2026-11-14 (fully
+    contained in feat/editing-help).
   - >
     Offered 2026-11-14, not answered: a line for the global WORKING_STYLE.md on American English
     spelling (it is in this project's memory now); and a change to the global

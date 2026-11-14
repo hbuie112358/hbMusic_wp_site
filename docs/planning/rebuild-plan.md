@@ -42,11 +42,15 @@ new findings added as steps.
 - **Dates and holds:** Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
   first gets the version staging runs. Live's text names the old service area until go-live
   (D22). The page generator's Music links are old; only the dev previews use it (D30).
-- **Open decisions waiting on the user:** the new host (step 10).
+- **Open decisions waiting on the user:** the new host (step 10). Smaller, optional items that
+  stop nothing are in `project-state.yaml`, `pending_decisions`.
 - **Future, not needed for go-live (D19):** the clip request and setlist plugins (5b to 5d), a
   song search after go-live, the template project (D21) when a second site has a date.
-- **Stale documents:** none. The Current position's earlier text is kept word for word in
-  "Earlier positions (archived)" at the end of this plan, not read on resume.
+- **Stale (do not trust until item 5 rewrites them):** step 9's description of deploying
+  through GitHub (9b, 9p's "approved deploy job", "the deploy pipeline (3g) points at the live
+  site") and D14, replaced by the handbook's chapter 2 (H8, H9: `bin/deploy` from the user's
+  computer, no deploy jobs or keys on GitHub). The Current position's earlier text is kept word
+  for word in "Earlier positions (archived)" at the end of this plan, not read on resume.
 
 ## Decisions
 
