@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { WCAG_TAGS } from './accessibility';
 
 // Protects the booking form (plan step 5e): a visitor's request reaches the site owner's inbox
 // (Mailpit here) with the visitor as the reply address and without the visitor's name in the
@@ -144,7 +145,7 @@ for (const [problem, fill] of [
 		await expect(page.locator(FIELD_ERROR), 'the problem is shown at its field').toHaveCount(1);
 		expect(await mailsWith(request, marker), 'no mail').toEqual([]);
 
-		const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+		const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 		expect(results.violations.map((violation) => violation.id), 'the error messages are accessible').toEqual([]);
 	});
 }

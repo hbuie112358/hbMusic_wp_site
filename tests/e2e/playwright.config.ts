@@ -21,11 +21,12 @@ export default defineConfig({
 		trace: 'retain-on-failure',
 	},
 	projects: [
-		// Logs in as the dev admin once and saves the login (plan step 8d), so the specs that use
-		// the admin never log in at the same moment, which made WordPress lose a session.
-		{ name: 'admin login', testMatch: /admin\.setup\.ts$/ },
-		// Every spec; only those that ask for the saved login (test.use storageState) are logged in,
+		// Logs in as the dev admin and the dev Editor once each and saves the logins (plan step
+		// 8d), so the specs that use the admin never log in at the same moment, which made
+		// WordPress lose a session.
+		{ name: 'logins', testMatch: /(admin|editor)\.setup\.ts$/ },
+		// Every spec; only those that ask for a saved login (test.use storageState) are logged in,
 		// so the visitor tests see what a visitor sees.
-		{ name: 'dev', testMatch: /\.spec\.ts$/, dependencies: ['admin login'] },
+		{ name: 'dev', testMatch: /\.spec\.ts$/, dependencies: ['logins'] },
 	],
 });

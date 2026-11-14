@@ -14,12 +14,13 @@ readonly WAIT_INTERVAL_SECONDS=2
 readonly CHILD_THEME="hbmusic-child"
 readonly SONG_LIST_PLUGIN="song-list"
 readonly SITE_HARDENING_PLUGIN="site-hardening"
+readonly EDITING_HELP_PLUGIN="editing-help"
 readonly FORM_PLUGIN="contact-form-7"
 readonly SEO_PLUGIN="wordpress-seo"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
-  DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL
+  DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL DEV_EDITOR_USER DEV_EDITOR_PASSWORD DEV_EDITOR_EMAIL
 )
 # The test pages as "title|address|template", in menu order: the new site's pages (plan D22), with
 # the templates the real pages use (empty: WordPress's default), so templates and navigation are
@@ -91,6 +92,14 @@ install_wordpress() {
     --admin_email="$DEV_ADMIN_EMAIL" --skip-email >/dev/null
 }
 
+# An Editor, the role a customer gets (handbook chapter 6), so the tests see the admin as a
+# customer does: what the Editing Help plugin shows them, and what WordPress lets them do.
+create_dev_editor() {
+  log "Creating the dev Editor $DEV_EDITOR_USER"
+  wp_cli --skip-plugins --skip-themes user create "$DEV_EDITOR_USER" "$DEV_EDITOR_EMAIL" \
+    --role=editor --user_pass="$DEV_EDITOR_PASSWORD" --porcelain >/dev/null
+}
+
 # WordPress.org publishes no checksums for themes, so the zip is checked against the
 # fingerprint pinned in tools/versions.sh before it is installed (AI_SECURITY.md, section 4).
 install_parent_theme() {
@@ -117,13 +126,13 @@ remove_unused_code() {
     wp_cli theme delete "$theme"
   done
   # The project's own plugins are mounted read-only from the repository, so they could not be deleted.
-  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$SITE_HARDENING_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
+  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$SITE_HARDENING_PLUGIN,$EDITING_HELP_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
 }
 
 configure_site() {
-  log "Activating $CHILD_THEME, $SONG_LIST_PLUGIN and $SITE_HARDENING_PLUGIN, discouraging search engines, setting the live site's permalinks"
+  log "Activating $CHILD_THEME, $SONG_LIST_PLUGIN, $SITE_HARDENING_PLUGIN and $EDITING_HELP_PLUGIN, discouraging search engines, setting the live site's permalinks"
   wp_cli theme activate "$CHILD_THEME"
-  wp_cli plugin activate "$SONG_LIST_PLUGIN" "$SITE_HARDENING_PLUGIN"
+  wp_cli plugin activate "$SONG_LIST_PLUGIN" "$SITE_HARDENING_PLUGIN" "$EDITING_HELP_PLUGIN"
   wp_cli option update blog_public 0
   # Avatars off, as on staging and live: the site has no comments, and WordPress would otherwise
   # show logged-in users' pictures from Gravatar, which the policy refuses and which sends a code
@@ -289,6 +298,7 @@ main() {
   compose up -d --force-recreate --no-deps wordpress
   wait_for_wordpress_files
   install_wordpress
+  create_dev_editor
   clear_uploads
   install_parent_theme
   remove_unused_code
@@ -299,7 +309,7 @@ main() {
   create_test_content
   clear_debug_log
   log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"
-  log "Log in as ${DEV_ADMIN_USER}; the password is DEV_ADMIN_PASSWORD in .env"
+  log "Log in as ${DEV_ADMIN_USER}; the password is DEV_ADMIN_PASSWORD in .env (the Editor: ${DEV_EDITOR_USER}, DEV_EDITOR_PASSWORD)"
 }
 
 main "$@"

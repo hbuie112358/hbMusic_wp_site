@@ -585,3 +585,36 @@ function hbmusic_enqueue_video_pause_script(): void {
 		)
 	);
 }
+
+/**
+ * What each page template does, for the Editing Help plugin's guide (handbook H89): theme.json can
+ * name a template but not describe it, so the lines come from here, keyed by the template's slug
+ * ("page" is WordPress's default page template). Wording agreed with the user, 2026-11-14.
+ *
+ * @param mixed $descriptions The descriptions so far (an array of slug => line).
+ * @return array<mixed> The descriptions, with this theme's.
+ */
+function hbmusic_describe_page_templates( mixed $descriptions ): array {
+	$descriptions = is_array( $descriptions ) ? $descriptions : array();
+	return array_merge(
+		$descriptions,
+		array(
+			'page'                              => __( "The WordPress default: shows the page's default title as a heading at the top.", 'hbmusic' ),
+			'page-no-title'                     => __( 'Leaves out the title that the WordPress default page would show at the top, for a page whose first section has a title that you specify, such as a home page.', 'hbmusic' ),
+			'page-with-call-to-action'          => __( 'Like the WordPress default page, with the call to action panel added at the end.', 'hbmusic' ),
+			'page-no-title-with-call-to-action' => __( 'Leaves out the title that the WordPress default page would show at the top, and adds the call to action panel at the end.', 'hbmusic' ),
+		)
+	);
+}
+add_filter( 'editinghelp_template_descriptions', 'hbmusic_describe_page_templates' );
+
+/**
+ * This site's example of good link text, for the Editing Help plugin's guide: a link the site
+ * really has, so the guide reads as written for it (the user, 2026-11-14).
+ *
+ * @return string The example.
+ */
+function hbmusic_link_example(): string {
+	return __( 'See the song list', 'hbmusic' );
+}
+add_filter( 'editinghelp_link_example', 'hbmusic_link_example' );
