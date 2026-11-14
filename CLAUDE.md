@@ -46,8 +46,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `plugins/site-hardening/`: the Site Hardening plugin (plan D26), shared the same way; prefix
   `sitehardening`, text domain `site-hardening`.
 - `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way; prefix
-  `editinghelp`, text domain `editing-help`. It shows the content guide in the admin (a dashboard
-  box and Dashboard → Editing help), ending with the site's page templates and ready-made
+  `editinghelp`, text domain `editing-help`. It shows the content guide in the admin (a panel at
+  the top of the Dashboard, and the guide's page, linked in the left menu under Dashboard), ending with the site's page templates and ready-made
   sections read from the theme; the child theme supplies its templates' descriptions and its
   link example through the plugin's filters. The guide's text is also kept in the handbook
   (`customer/content-guide.md`), with the same version number; a change goes into both.
@@ -110,7 +110,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
   menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, and the slimmer phone header
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; the Editing Help
-  guide for the admin and the dev Editor (its dashboard box, headings and accessibility, the
+  guide for the admin and the dev Editor (its panel first on the Dashboard, and on the Editor's first screen, headings and accessibility, the
   site's templates, sections and link example, and every editor label it names found in the real
   editor, on a draft page of its own); then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not

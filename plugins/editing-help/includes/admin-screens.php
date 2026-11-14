@@ -1,8 +1,8 @@
 <?php
 /**
- * The two places the guide appears in the admin: a box on the dashboard, and the guide's own
- * page under Dashboard. Both use WordPress's own admin markup and styles, so the plugin loads no
- * stylesheet or script.
+ * The two places the guide appears in the admin: a panel at the top of the Dashboard, and the
+ * guide's own page, linked in the left menu under Dashboard. Both use WordPress's own admin markup
+ * and styles, so the plugin loads no stylesheet or script.
  *
  * @package editing-help
  */
@@ -10,19 +10,33 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Adds the dashboard box for the people the guide is for.
+ * WordPress's place for the panel: the first column ("normal"), ahead of every panel of lower
+ * priority. WordPress's own panels and other plugins' come at "core" or below, so this one comes
+ * first. Placed among them, it sat at the bottom of a column, and the user had to search the page
+ * to find it (2026-11-14). A person who drags it elsewhere keeps their own order: WordPress saves
+ * it for them and uses it instead.
  */
-function editinghelp_add_dashboard_box(): void {
+const EDITINGHELP_PANEL_COLUMN   = 'normal';
+const EDITINGHELP_PANEL_PRIORITY = 'high';
+
+/**
+ * Adds the Dashboard panel for the people the guide is for, at the top of the first column.
+ */
+function editinghelp_add_dashboard_panel(): void {
 	if ( ! current_user_can( EDITINGHELP_CAPABILITY ) ) {
 		return;
 	}
 	wp_add_dashboard_widget(
-		'editinghelp_dashboard_box',
+		'editinghelp_dashboard_panel',
 		__( 'Editing help', 'editing-help' ),
-		'editinghelp_render_dashboard_box'
+		'editinghelp_render_dashboard_panel',
+		null,
+		null,
+		EDITINGHELP_PANEL_COLUMN,
+		EDITINGHELP_PANEL_PRIORITY
 	);
 }
-add_action( 'wp_dashboard_setup', 'editinghelp_add_dashboard_box' );
+add_action( 'wp_dashboard_setup', 'editinghelp_add_dashboard_panel' );
 
 /**
  * Adds the guide's page under Dashboard; WordPress shows it only to users with the capability.
@@ -48,16 +62,16 @@ function editinghelp_guide_url(): string {
 }
 
 /**
- * Why the guide matters, in two sentences; it opens both the box and the page.
+ * Why the guide matters, in two sentences; it opens both the panel and the page.
  */
 function editinghelp_print_purpose(): void {
 	esc_html_e( "Edits can quietly make your site harder for customers to find. This guide keeps your pages easy to find in search engines and easy for everyone to read: headings, links, pictures, videos, ready-made sections and each page's search title.", 'editing-help' );
 }
 
 /**
- * The dashboard box: the purpose and the way to the guide.
+ * The Dashboard panel: the purpose and the way to the guide.
  */
-function editinghelp_render_dashboard_box(): void {
+function editinghelp_render_dashboard_panel(): void {
 	?>
 	<p><?php editinghelp_print_purpose(); ?></p>
 	<p>

@@ -8,7 +8,17 @@ import { ADMIN_STORAGE_STATE, EDITOR_STORAGE_STATE } from './admin-session';
 // from the active theme; the screen labels the guide names must exist in the real editor, so an
 // update that renames one fails here instead of leaving the guide wrong.
 const GUIDE_PATH = '/wp-admin/index.php?page=editing-help';
-const DASHBOARD_BOX = '#editinghelp_dashboard_box';
+const DASHBOARD_PANEL = '#editinghelp_dashboard_panel';
+// The Dashboard's panels in the order they are shown, first column first.
+const DASHBOARD_PANELS = '#dashboard-widgets .postbox';
+
+// The panel must be the first one on the Dashboard: placed among WordPress's and other plugins'
+// panels, it sat at the bottom of a column, and the user searched the page to find it.
+async function expectPanelFirst(page: Page): Promise<void> {
+	await page.goto('/wp-admin/');
+	const firstPanelId = await page.locator(DASHBOARD_PANELS).first().getAttribute('id');
+	expect(firstPanelId, 'the first panel on the Dashboard').toBe(DASHBOARD_PANEL.slice(1));
+}
 const GUIDE_CONTENT = '#wpbody-content .wrap';
 // The page whose editor the label check opens: a test page with one of the theme's templates.
 const PAGE_WITH_TEMPLATE = 'about';
@@ -102,12 +112,12 @@ async function expectEditorLabels(page: Page): Promise<void> {
 test.describe('the admin', () => {
 	test.use({ storageState: ADMIN_STORAGE_STATE });
 
-	test('finds the guide from the dashboard box', async ({ page }) => {
-		await page.goto('/wp-admin/');
-		const box = page.locator(DASHBOARD_BOX);
-		await expect(box.getByRole('heading', { name: 'Editing help' })).toBeVisible();
-		await expectNoAccessibilityErrors(page, DASHBOARD_BOX);
-		await box.getByRole('link', { name: 'Read the guide' }).click();
+	test('finds the guide from the panel at the top of the Dashboard', async ({ page }) => {
+		await expectPanelFirst(page);
+		const panel = page.locator(DASHBOARD_PANEL);
+		await expect(panel.getByRole('heading', { name: 'Editing help' })).toBeVisible();
+		await expectNoAccessibilityErrors(page, DASHBOARD_PANEL);
+		await panel.getByRole('link', { name: 'Read the guide' }).click();
 		await expect(page).toHaveURL(/index\.php\?page=editing-help$/);
 		await expect(page.locator(GUIDE_CONTENT).getByRole('heading', { level: 1 })).toHaveText('Editing help');
 	});
@@ -157,9 +167,12 @@ test.describe('the admin', () => {
 test.describe('an Editor', () => {
 	test.use({ storageState: EDITOR_STORAGE_STATE });
 
-	test('sees the dashboard box and can open the guide', async ({ page }) => {
-		await page.goto('/wp-admin/');
-		await expect(page.locator(DASHBOARD_BOX)).toBeVisible();
+	// On screen without scrolling, as a customer sees it. Not checked for the admin: WordPress shows
+	// administrators a large "Welcome to WordPress" banner above all panels until they dismiss it,
+	// and the dev site's admin is new on every build.
+	test('sees the panel at the top of the Dashboard, without scrolling, and can open the guide', async ({ page }) => {
+		await expectPanelFirst(page);
+		await expect(page.locator(DASHBOARD_PANEL), 'the panel on the first screen').toBeInViewport();
 		const response = await page.goto(GUIDE_PATH);
 		expect(response?.status(), 'the guide page').toBe(200);
 		await expect(page.locator(GUIDE_CONTENT).getByRole('heading', { level: 1 })).toHaveText('Editing help');
