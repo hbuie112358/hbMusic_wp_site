@@ -62,10 +62,11 @@ function editinghelp_guide_url(): string {
 }
 
 /**
- * Why the guide matters, in two sentences; it opens both the panel and the page.
+ * Why the guide matters, worded to encourage editing rather than warn against it (the user,
+ * 2026-11-14); it opens both the panel and the page.
  */
 function editinghelp_print_purpose(): void {
-	esc_html_e( "Edits can quietly make your site harder for customers to find. This guide keeps your pages easy to find in search engines and easy for everyone to read: headings, links, pictures, videos, ready-made sections and each page's search title.", 'editing-help' );
+	esc_html_e( "You can edit your pages freely. Some edits, though, can affect how easily customers find you in search engines and how easily everyone can read your site. This guide helps you make your changes without those side effects, with a few simple habits for headings, links, pictures, videos, ready-made sections and each page's search title.", 'editing-help' );
 }
 
 /**
