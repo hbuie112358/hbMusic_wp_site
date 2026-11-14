@@ -1,7 +1,10 @@
+# Session state for pause and resume (~/.claude/PAUSE_CONVENTION.md). Read the active plan's
+# Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
-timestamp: 2026-11-14T05:41:49-05:00
-current_branch: chore/pause-2026-11-12
-last_commit: e2eb2af
+project_state_version: 1
+timestamp: 2026-11-14T10:01:52-05:00
+current_branch: feat/editing-help
+last_commit: 8a14023
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -137,20 +140,30 @@ last_work: >
   frame from this site's checklist (61 items to word, 18 pointers to earlier chapters, 1.3 and
   13.5 retired, the shop items as a draft, the practices left out). Handbook commits 7d3d5e0,
   bfc5824, 7004de8, c961d97, b008671, 427f6a3 (local only).
+  Later on 2026-11-14 (after a resume): handbook topic 12 rounds 2 to 4 (H79-H98: sections 1-14
+  of the site standard; unfiltered HTML only for Administrators, checked by running WordPress's
+  filter in memory over the real content; breached and weak passwords refused for publishers;
+  urgent security fixes within 2 business days; HSTS from Site Hardening; DMARC to quarantine
+  after 4 weeks; bin/deploy shows the PHP error log; Site Health monthly), then one read of the
+  whole handbook and version 1 (37c64b8: a site's records in records/ of its repository, H99;
+  the activity log 30 days, as Simple History's free version keeps it; American spelling
+  throughout). The handbook pushed to a private GitHub repository on the user's account
+  (hbuie112358/dts-handbook; moved to the DTS organization when it exists). Step 9 resumed with
+  its first item: the Editing Help plugin (H89; plugins/editing-help/, branch feat/editing-help,
+  8c410f3, 0a50544, 8a14023): the content guide in a panel at the top of the Dashboard and a page
+  under Dashboard, the site's templates (lines the user wrote), patterns and link example read
+  from the theme, every editor label it names checked in the real editor ("View options" found
+  wrong: the visible label is "View"), a dev Editor account (deveditor). The handbook's guide
+  matched to it (2a7839e, not pushed). The plan's Current position trimmed from 400 lines to 41
+  (D29's story moved to step 5g, the rest to "Earlier positions (archived)", nothing lost).
+  project-state.yaml given the knowledge-platform project's shape (the user chose option a).
 
 next_action: >
-  Continue the DTS Operations Handbook (~/dev/dts-handbook; read its WORKING_DRAFT.md first, and
-  change nothing there without the user's approval of that specific change): topic 12, round 2
-  next (sections 1-5 of the standard; unfiltered HTML off, tested against the embeds on the dev
-  site only with the user's approval; Wordfence's breached-password setting for Editors and
-  Authors; the credentials a move-in replaces, 1.4; whether the security plugin updates itself,
-  5.3), then rounds 3 and 4, then version 1. After that, step 9 resumes: this site
-  is compared with the handbook (differences become plan items or recorded exceptions), 9b is
-  rewritten from the handbook's chapter 2, then 9c to 9q, live updated in place (D31). D30:
-  staging's content exported and imported into live, the hero photo uploaded by hand, live's
-  settings set by hand. Contact Form 7 6.2.5 not onto staging or live before 2026-11-17 (live
-  first gets staging's version). The page generator's Music links are old; updated when the user
-  sends the new ones (dev previews only, D30).
+  Step 9, item 1 of the plan's Current position "Next, in order": review the site's Privacy
+  Policy page as staging shows it. Claude asks the user to paste the page's code from staging's
+  editor (Options, "Code editor"), compares it with the handbook's model policy
+  (customer/privacy-policy.md, the videos-scroll block) and settles the wording with the user.
+  Then items 2 to 7 there.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -169,8 +182,8 @@ verification:
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
   brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
-  local_sites: dev site on 10102 (rebuilt 2026-11-12 with the test pages' templates; preview pages from bin/screenshots), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 21 checks (a JavaScript type check of the theme's scripts added, tools/js-check/); bin/test 9 scenario checks + 138 browser tests + the final debug-log check, all passing on main at 84999a3 (2026-11-12); bin/screenshots for before/after looks
+  local_sites: dev site on 10102 (rebuilt 2026-11-14 with the Editing Help plugin and the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
+  checks: bin/check 22 checks (the Editing Help plugin's PHPCS added); bin/test 9 scenario checks + 146 browser tests + the final debug-log check, all passing on feat/editing-help (2026-11-14); bin/screenshots for before/after looks
   github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
@@ -180,26 +193,29 @@ verification:
   not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes:
-  - file: CLAUDE.md
+  - file: none in this repository (the plan and this file go in with the pause commit)
+  - file: ~/dev/dts-handbook/WORKING_DRAFT.md
     why: >
-      The new Handbook section (version 0, the site's type, its two exceptions), written with the
-      user's approval on 2026-11-13; waiting for the user's "commit" (documentation only, no
-      review gate needed).
+      The handbook's "Open items" checklist (one grouped list replacing the long paragraph),
+      written with the user's approval on 2026-11-14; waiting for the user's "commit". The
+      handbook's commit 2a7839e is also not pushed yet; that waits for the user's "push".
 
 pending_decisions:
   - >
-    The handbook exists only on the user's computer (no remote, no backup). Proposed 2026-11-13:
-    the user creates the DTS organization on GitHub (free plan, H8) with an empty private
-    repository dts-handbook; Claude searches the handbook's history for personal data and secrets
-    and reports; on the user's yes, Claude connects and pushes. The user chose to continue topics
-    first. Handbook commits since: 2f522dd to 427f6a3, still local only.
+    The handbook's follow-ups for the user (the lawyer, the accountant, the payment service, the
+    continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
+    handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is on GitHub as a
+    private repository on the user's account; it moves to the DTS organization when that exists
+    (Transfer ownership, then git -C ~/dev/dts-handbook remote set-url origin ...).
   - >
-    Handbook follow-ups for the user, no deadline: set up Bitwarden (own logins first, recovery
-    sheet, emergency access); the Cloudways trial before any customer site; the continuity sheet
-    and a technical stand-in before the first paying customer (H22). Also before the first paying
-    customer (2026-11-14): a lawyer checks the model agreement and privacy policy (H45); the
-    invoicing and payment service is chosen (H72); whether sales tax applies, asked of an
-    accountant.
+    Pushing this project's branch feat/editing-help (3 commits and the pause commit) and its pull
+    request: when the user chooses; nothing in it is deployed until 9b's bin/deploy.
+  - >
+    Offered 2026-11-14, not answered: a line for the global WORKING_STYLE.md on American English
+    spelling (it is in this project's memory now); and a change to the global
+    PAUSE_CONVENTION.md so every project's state file stays pause/resume only (the knowledge-
+    platform project's file has the same growth). Both are shared files: nothing without the
+    user's yes; the user commits ~/.claude on the host.
   - >
     Later, at the user's request (2026-11-10): the time report counts a gap longer than 10 minutes
     as zero even while Claude is busy (one long command, or an approval prompt the user is still
@@ -225,23 +241,24 @@ pending_decisions:
     docs/planning/css-standards-notes.md. (The versioned bin/screenshots, option B, was built on
     2026-11-11 after the resume.)
 
-open_items:
-  - id: 1
-    item: >
-      Settled 2026-11-02 (plan steps 0b-0d): the local leftovers in the live site root were
-      downloadable, were deleted (all 404 since), and every credential they exposed was
-      replaced.
-  - id: 2
-    item: >
-      Settled 2026-11-02 (plan step 0g): the staging copy was backed up and removed from the
-      live server.
-  - id: 3
-    item: >
-      Hostinger's Smart auto-updates (hPanel, selected) manage WordPress, themes and plugins, and a
-      must-use plugin turns off WordPress's own updates (plan 8j, 2026-11-10; step 0f's "updates
-      only WordPress itself" was wrong), set to security updates only for core, themes and
-      plugins on both sites (settled 2026-11-11); the monthly check installs the rest by hand.
-      Kept while the site is at Hostinger (D15, D25); removed when moving hosts (step 10).
-  - id: 4
-    item: >
-      Settled (plan step 2): music-lite-child is empty; nothing to carry over.
+reference_documents: |
+  - docs/planning/rebuild-plan.md: the active plan. Current position (read first: where the work
+    stands, the next items in order, holds and open decisions), Decisions D1-D31, the steps with
+    their status and details (D29's story is step 5g), "Earlier positions (archived)" at the end.
+  - CLAUDE.md (the project's): what is true of this project, its commands, tests and rules.
+  - docs/ENVIRONMENTS.md: the intended differences between the dev site, staging and live.
+  - docs/ROUTINES.md: the monthly site check.
+  - docs/SITE_CHECKLIST.md: this site's checklist, to become its status sheet against the
+    handbook's chapter 12 at step 9 (H16, H99).
+  - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without
+    the user's approval of that change): the DTS Operations Handbook, version 1; WORKING_DRAFT.md
+    holds its open items.
+  - data/ (not versioned): the site's real content, photos and exports, needed at go-live.
+  - Git history: what was done, commit by commit.
+
+resume_instructions: |
+  1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
+     (this project's repository and ~/dev/dts-handbook).
+  2. working_mode is rolling-wave: read the plan's Current position, its Decisions table, and the
+     entries of step 9 and of the item in progress.
+  3. Then next_action: ask the user for staging's Privacy Policy page code.
