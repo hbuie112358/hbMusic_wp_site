@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Editing Help
- * Description:       Shows the content guide inside WordPress: an "Editing help" box on the dashboard and a page with the guide, ending with the site's own page templates and ready-made sections, read from the active theme. Each site adds its templates' descriptions and a contact line.
+ * Description:       Shows the content guide inside WordPress: an "Editing help" panel at the top of the Dashboard and a page with the guide, linked in the left menu under Dashboard, ending with the site's own page templates and ready-made sections, read from the active theme. Each site adds its templates' descriptions and a contact line.
  * Version:           0.1.0
  * Requires at least: 7.0
  * Requires PHP:      8.4
