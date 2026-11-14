@@ -361,11 +361,17 @@ new findings added as steps.
   Handbook); this site is classified Fully managed, Brochure, hosted by the customer. On
   2026-11-13 the handbook's topics 1 to 9 were decided (H1-H44: topic 8 moving a site between
   hosts, which step 10 will follow; topic 9 handover), and the whole handbook was reviewed for
-  duplication and conflicts; topics 10 to 12 come next, then version 1. Topic 2 replaces 9b's design: no deploy jobs or server keys on GitHub, `bin/deploy`
+  duplication and conflicts. On 2026-11-14 topic 10 (customer-facing, H45-H65: the service
+  agreement, visitors' personal data, the content guide, search titles, the monthly report, with
+  model documents in the handbook's `customer/`) and topic 11 (care plans, H66-H74) were
+  decided, and topic 12 (the site standard, from this site's checklist) was begun: round 1 of 4
+  (H75-H78); rounds 2 to 4 come next, then version 1. Topic 2 replaces 9b's design: no deploy jobs or server keys on GitHub, `bin/deploy`
   run from the user's computer with its guards (H8, H9). When step 9 resumes, this site is first
   compared with the handbook and each difference becomes a plan item or a recorded exception
   (for example: the deploy path, Simple History, the theme's palette limits, the backups of
-  D27 against H17, whose monthly full copy may make the routines' content export unneeded). Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
+  D27 against H17, whose monthly full copy may make the routines' content export unneeded;
+  `docs/SITE_CHECKLIST.md` becoming this site's status sheet against the handbook's chapter 12,
+  with D16 replaced by H16; staging's privacy policy against the handbook's model policy). Contact Form 7 6.2.5 goes onto staging and live no earlier than 2026-11-17; live first
   gets the version staging runs. The page generator (`data/content/`) still has the old Music
   links; only the dev previews use it now (D30), so it is updated when the user sends the new
   links. 3i whenever the user chooses. The live site's text still names the old service area

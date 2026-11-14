@@ -1,7 +1,7 @@
 project: hbMusic_wp_site
-timestamp: 2026-11-13T14:29:33-05:00
+timestamp: 2026-11-14T05:41:49-05:00
 current_branch: chore/pause-2026-11-12
-last_commit: e1c69b1
+last_commit: e2eb2af
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -120,12 +120,31 @@ last_work: >
   passwords, the repository transferred, a site may stay on DTS hosting as hosting only); a review
   of the whole handbook removed duplication and conflicts and added a chapter list to its README.
   Handbook commits 2f522dd, ce7b29b, 1224d45 (local only).
+  2026-11-14 (after a resume): handbook topic 10 in three rounds (H45-H65): the service agreement
+  (one model checked once by a lawyer, a Site Sheet per site, the customer owning the work made
+  for their site, notice periods, ending with 30 days' notice, unpaid bills, liability capped at
+  12 months' fees, versioned agreements); visitors' personal data (the customer answers for it,
+  the least collected by default with comments off, a retention time per kind of data, requests
+  through the customer, one model privacy policy in building blocks to California's CalOPPA); the
+  content guide, search titles and descriptions, the monthly report (fixed order, by the 10th,
+  with a search line, saved as the uptime record). Model documents in the handbook's customer/:
+  service-agreement.md, privacy-policy.md, content-guide.md (its screen labels checked on the dev
+  site against WordPress 7.1.4 and Yoast 28.8), monthly-report.md (in the user's first person).
+  Topic 11, care plans (H66-H74): one plan per arrangement, $59 / $99 / $25 a month, $75 an hour,
+  one hour of content time in Fully managed, business-hours response times, an outage over an
+  hour told the same day (narrows H20), monthly or yearly billing, outside costs on the
+  customer's own card, customer/price-list.md. Topic 12, round 1 of 4 (H75-H78): the standard's
+  frame from this site's checklist (61 items to word, 18 pointers to earlier chapters, 1.3 and
+  13.5 retired, the shop items as a draft, the practices left out). Handbook commits 7d3d5e0,
+  bfc5824, 7004de8, c961d97, b008671, 427f6a3 (local only).
 
 next_action: >
   Continue the DTS Operations Handbook (~/dev/dts-handbook; read its WORKING_DRAFT.md first, and
-  change nothing there without the user's approval of that specific change): topic 10
-  (customer-facing: content guide, visitors' personal data and privacy policy, service agreement,
-  the monthly report's form, search-text guidance) next, then 11 and 12, then version 1. After that, step 9 resumes: this site
+  change nothing there without the user's approval of that specific change): topic 12, round 2
+  next (sections 1-5 of the standard; unfiltered HTML off, tested against the embeds on the dev
+  site only with the user's approval; Wordfence's breached-password setting for Editors and
+  Authors; the credentials a move-in replaces, 1.4; whether the security plugin updates itself,
+  5.3), then rounds 3 and 4, then version 1. After that, step 9 resumes: this site
   is compared with the handbook (differences become plan items or recorded exceptions), 9b is
   rewritten from the handbook's chapter 2, then 9c to 9q, live updated in place (D31). D30:
   staging's content exported and imported into live, the hero photo uploaded by hand, live's
@@ -173,11 +192,14 @@ pending_decisions:
     the user creates the DTS organization on GitHub (free plan, H8) with an empty private
     repository dts-handbook; Claude searches the handbook's history for personal data and secrets
     and reports; on the user's yes, Claude connects and pushes. The user chose to continue topics
-    first.
+    first. Handbook commits since: 2f522dd to 427f6a3, still local only.
   - >
     Handbook follow-ups for the user, no deadline: set up Bitwarden (own logins first, recovery
     sheet, emergency access); the Cloudways trial before any customer site; the continuity sheet
-    and a technical stand-in before the first paying customer (H22).
+    and a technical stand-in before the first paying customer (H22). Also before the first paying
+    customer (2026-11-14): a lawyer checks the model agreement and privacy policy (H45); the
+    invoicing and payment service is chosen (H72); whether sales tax applies, asked of an
+    accountant.
   - >
     Later, at the user's request (2026-11-10): the time report counts a gap longer than 10 minutes
     as zero even while Claude is busy (one long command, or an approval prompt the user is still
