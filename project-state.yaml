@@ -2,9 +2,9 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-14T10:01:52-05:00
+timestamp: 2026-11-14T10:22:20-05:00
 current_branch: feat/editing-help
-last_commit: 8a14023
+last_commit: fe1f8f7
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -157,6 +157,12 @@ last_work: >
   matched to it (2a7839e, not pushed). The plan's Current position trimmed from 400 lines to 41
   (D29's story moved to step 5g, the rest to "Earlier positions (archived)", nothing lost).
   project-state.yaml given the knowledge-platform project's shape (the user chose option a).
+  After that pause: a cold-resume check (a fresh helper resuming read-only from the files alone)
+  found the push understated, stale step 9 text not marked, and a topic range off by one; fixed
+  (fe1f8f7, the handbook's WORKING_DRAFT.md), the old branch chore/pause-2026-11-12 deleted. The
+  global PAUSE_CONVENTION.md gained five rules approved by the user (uncommitted and unpushed
+  work from git's output; blocking decisions also in the plan; numbers from their source; stale
+  plan parts marked at once; a cold-resume check after a plan section is moved or trimmed).
 
 next_action: >
   Step 9, item 1 of the plan's Current position "Next, in order": review the site's Privacy
@@ -196,9 +202,10 @@ uncommitted_changes:
   - file: none in this repository (the plan and this file go in with the pause commit)
   - file: ~/dev/dts-handbook/WORKING_DRAFT.md
     why: >
-      The handbook's "Open items" checklist (one grouped list replacing the long paragraph),
-      written with the user's approval on 2026-11-14; waiting for the user's "commit". The
-      handbook's commit 2a7839e is also not pushed yet; that waits for the user's "push".
+      The handbook's "Open items" checklist (one grouped list replacing the long paragraph) and
+      topic 8's range corrected to H31-H38, written with the user's approval on 2026-11-14;
+      waiting for the user's "commit". The handbook's main is 1 commit ahead of GitHub (2a7839e,
+      from git status); that waits for the user's "push".
 
 pending_decisions:
   - >
@@ -209,18 +216,18 @@ pending_decisions:
     (Transfer ownership, then git -C ~/dev/dts-handbook remote set-url origin ...).
   - >
     Pushing this project's branch feat/editing-help and its pull request, when the user chooses:
-    10 commits not on GitHub's main (from git log origin/main..HEAD, 2026-11-14): the 3 Editing
-    Help commits (8c410f3, 0a50544, 8a14023), the pause commit 9f16248, the follow-up commit with
-    the cold-resume check's fixes, and 5 plan and pause commits from 2026-11-12 to 11-14 that
-    never reached GitHub (092aed1, 970a434, e1c69b1, e2eb2af, 6c26f23). Nothing in it is deployed until 9b's
+    11 commits not on GitHub's main once this pause is committed (git log origin/main..HEAD
+    showed 10 before it, 2026-11-14): the 3 Editing Help commits (8c410f3, 0a50544, 8a14023), the
+    pause commits 9f16248 and this one, fe1f8f7 with the cold-resume check's fixes, and 5 plan and
+    pause commits from 2026-11-12 to 11-14 that never reached GitHub (092aed1, 970a434, e1c69b1,
+    e2eb2af, 6c26f23). Nothing in it is deployed until 9b's
     bin/deploy. The old local branch chore/pause-2026-11-12 was deleted on 2026-11-14 (fully
     contained in feat/editing-help).
   - >
     Offered 2026-11-14, not answered: a line for the global WORKING_STYLE.md on American English
-    spelling (it is in this project's memory now); and a change to the global
-    PAUSE_CONVENTION.md so every project's state file stays pause/resume only (the knowledge-
-    platform project's file has the same growth). Both are shared files: nothing without the
-    user's yes; the user commits ~/.claude on the host.
+    spelling (it is in this project's memory now); a shared file, nothing without the user's yes.
+    (The PAUSE_CONVENTION.md change was decided instead as five rules, written 2026-11-14; the
+    user commits ~/.claude on the host.)
   - >
     Later, at the user's request (2026-11-10): the time report counts a gap longer than 10 minutes
     as zero even while Claude is busy (one long command, or an approval prompt the user is still
