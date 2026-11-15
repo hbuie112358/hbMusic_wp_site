@@ -21,7 +21,11 @@ new findings added as steps.
   1. Review the site's Privacy Policy page as staging shows it, the text live will get (D30): the
      user removed WordPress's "Suggested text:" labels; the wording is not settled. Compare it with
      the handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
-     click-to-load player, H88) and settle it with the user.
+     click-to-load player, H88) and settle it with the user. Under way (2026-11-15): compared
+     and drafted; failed emails' copies settled at 60 days (FluentSMTP's Delete Logs, set on
+     staging by the user; a monthly-check step for them, `docs/ROUTINES.md` step 8); waiting on
+     Hostinger's log and backup retention and three wording decisions (the voice "Howard", DTS
+     left out, a 30-day reply time).
   2. American English spelling across the project: about 130 British forms in 28 files, some in
      code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
      a trial branch with the checks, tests and review gate; a renamed design value is shown to the
@@ -1648,7 +1652,10 @@ new findings added as steps.
    - [ ] 9f. The new admin account (a name that is not easy to guess, two-factor login with
      Wordfence); the rest of step 9 done with it.
    - [ ] 9g. Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
-     Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m).
+     Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m); its log
+     as on staging: Log Emails off, Delete Logs "After 60 Days" (set while Log Emails is switched
+     on, since the field is hidden otherwise; then switched off and saved), as the privacy policy
+     states (`docs/ENVIRONMENTS.md`).
    - [ ] 9h. Contact Form 7 at the version staging runs (6.2.5 not before 2026-11-17), Song List
      activated, WordPress's importer installed.
 
