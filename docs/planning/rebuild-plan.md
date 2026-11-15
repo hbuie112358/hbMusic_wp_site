@@ -23,8 +23,10 @@ new findings added as steps.
      click-to-load player, H88) and pasted by the user; live gets it with staging's export (D30).
      Failed emails' copies kept 60 days (FluentSMTP's Delete Logs, set on staging by the user;
      a monthly-check step, `docs/ROUTINES.md` step 8). Facts found: Hostinger keeps 7 daily and 7
-     weekly backups, none older than 60 days, and shows access logs for 7 days (its assistant,
-     for this plan); Wordfence 9.1.1 keeps Live Traffic 30 days (staging's setting), its
+     weekly backups, none older than 60 days (its assistant, for this plan), and shows access logs
+     for 7 days in hPanel, while documenting no retention for them (its privacy policy says only
+     "as long as needed"; its assistant would not answer without a paid plan), so the policy says
+     Howard sees them for 7 days and links Hostinger's policy for the rest (2026-11-15); Wordfence 9.1.1 keeps Live Traffic 30 days (staging's setting), its
      blocked-address log one month, and the newest 2,000 login attempts with no time limit (its
      code); Wordfence's own network is left to a link to its policy. Decided: the voice
      "Howard", DTS left out, a reply within 30 days ("usually within a few days"), the host named
@@ -40,6 +42,25 @@ new findings added as steps.
      with a browser test that the link leads to the page set in Settings → Privacy (shown failing
      on a planted fault first). On a trial branch with the checks and the review gate, before
      go-live (the user, 2026-11-15).
+  1c. The search work (the user, 2026-11-15), before 9c's export, since it changes staging's
+     content: every check of the SEO plugin (Yoast 28.8, SEO and readability) green on every
+     page, or its reason recorded; the full list of checks taken from Yoast's code first, not
+     from memory. Found after the Privacy Policy showed red SEO on every page: no page has a
+     focus keyphrase or a search description, though the handbook's H62 has DTS write them at
+     launch; the pages' wording (2b, 5f) was settled without a search step. Each page gets a
+     brief in `records/search.md` before its wording changes: the search phrase (agreed for all
+     six, there), search title, description, address, an outline (the phrase in the first
+     paragraph and a heading, about 300 words of content), links to other pages, pictures with
+     descriptions. Claude drafts each change, the user approves it and pastes it on staging. New
+     addresses on staging before go-live: the menu and links checked, a redirect in the theme's
+     list where live had a page there, the dev site's test pages and tests updated, on a trial
+     branch. Each check that stays orange or red is recorded with its reason in the page's entry.
+     Limits read in Yoast 28.8's code (2026-11-15): the description green from 121 to 156
+     characters (120 or fewer "too short", over 156 "too long", none red); the search title
+     measured in pixels, green from 400 to 600 (not in characters; H62's "50-60 characters" is an
+     approximation); content green from 300 words (headings and lists count, shortcodes and the
+     page's title do not); no phrase-in-address check on the front page. Google's URL guidance
+     asks for readable words in addresses and does not say they affect ranking.
   2. American English spelling across the project: about 130 British forms in 28 files, some in
      code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
      a trial branch with the checks, tests and review gate; a renamed design value is shown to the
@@ -1276,6 +1297,12 @@ new findings added as steps.
        **Optional, the user undecided (2026-11-10):** the user worried about who else could find
        them. Discussed: the address can stay hidden for a business that travels to its customers,
        contact can be the website only, but reviews cannot be switched off. Nothing waits on it.
+       **Declined by the user (2026-11-15).** Accepted: most likely no place in Google's map
+       results, which list businesses from their Business Profiles (Google's help, "Tips to improve
+       your local ranking", says local results rest on relevance, distance and prominence, and that
+       a verified profile makes appearing more likely; it does not say a profile is required); the
+       site is found through the ordinary results (1c's search work), measured in Search Console. The Yoast scores are not affected (Yoast checks only the
+       pages). It can be reversed at any time; nothing on the site depends on it.
      - **Local structured data:** the page data names a performer and the areas served, added in
        code that extends Yoast's own (its Local SEO add-on is paid), tested on the dev site.
        **Built 2026-11-11:** Google's LocalBusiness documentation requires only a name and lists no
@@ -1621,7 +1648,9 @@ new findings added as steps.
        after a few seconds). An unreachable, malformed or empty page list fails, never skips. The
        cap, time limit and deadline are settings. It runs in `bin/test` against the dev site and
        is shown failing on planted faults (a broken page, the theme not active, the page list
-       unavailable).
+       unavailable). Added 2026-11-15 (the user, with 1c): each page must also have a search title
+       and description within their limits (H62), exactly one main heading, and a description on
+       every picture; each shown failing on its own planted fault.
      - `deploy-live`: after `deploy-staging` in the same run (the same commit, never a copy of
        staging's files), in the environment `production`: the user as required reviewer,
        "Prevent self-review" off (the user merges and is the only reviewer), `main` only, no wait
@@ -1652,7 +1681,12 @@ new findings added as steps.
        GitHub's rule for waiting deployments); the user's key and server setup (a read-only
        listing first), the refusal tests; the GitHub environment; then the pull request, with
        `CLAUDE.md`, `docs/ROUTINES.md` and `docs/ENVIRONMENTS.md` updated.
-   - [ ] 9c. Staging's content exported (Tools → Export → All content) into `data/exports/`;
+   - [ ] 9c. Just before the export, both trashes on staging (Posts and Pages) emptied, so trashed
+     items such as WordPress's "Hello world!" post and the old privacy draft (trashed 2026-11-15)
+     cannot travel to live: the "All content" export takes every item except auto-drafts, trashed
+     ones included (`post_status != 'auto-draft'`, WordPress 7.1.4's `wp-admin/includes/export.php`,
+     checked 2026-11-15).
+     Staging's content exported (Tools → Export → All content) into `data/exports/`;
      Claude reads it and lists what it carries (pages with their templates, songs, the menu, the
      booking form, template parts edited in the Site Editor, media entries) and what it does not.
    - [ ] 9d. A rehearsal: that export imported into a throwaway WordPress (the dev site's images,
@@ -1692,7 +1726,8 @@ new findings added as steps.
      still 404; HetrixTools' monitor up with its keyword found.
    - [ ] 9n. Cleanup: `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
      removed, the old admin account removed (its content given to the new one) and its name, and
-     `admin`, on Wordfence's list of names blocked at once.
+     `admin`, on Wordfence's list of names blocked at once. WordPress's sample "Hello world!" post
+     and "Sample Page" removed if live has them (staging's were trashed 2026-11-15).
    - [ ] 9o. Backups (D27): the first content export into `data/exports/`, and the restore test of
      checklist 12.3 both ways, with its date.
    - [ ] 9p. From then on, every merge reaches live through the approved deploy job.

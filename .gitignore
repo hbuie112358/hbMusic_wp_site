@@ -5,6 +5,7 @@
 !/.gitignore
 !/project-state.yaml
 !/docs/
+!/records/
 !/compose.dev.yaml
 !/.env.example
 !/bin/
