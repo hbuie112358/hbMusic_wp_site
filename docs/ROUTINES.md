@@ -143,8 +143,9 @@ The privacy policy promises a reply within 30 days, usually within a few days.
    searched for each address in that note, and any entry that came back is deleted again, as the
    privacy policy promises. That is the only visitor information a backup holds: Gmail and Brevo
    are not in it, Contact Form 7 stores no messages, and Wordfence's records hold IP addresses
-   only. A line in the note can be removed once Hostinger's backup period has passed since its
-   date: only backups made before the deletion can hold the copy.
+   only. A line in the note can be removed 60 days after its date: only backups made before the
+   deletion can hold the copy, and Hostinger keeps none older than 60 days (7 daily and 7 weekly
+   copies on the Business plan, Hostinger's assistant, 2026-11-15).
 
 ## When HetrixTools sends an alert
 
