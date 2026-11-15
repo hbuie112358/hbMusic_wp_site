@@ -18,14 +18,28 @@ new findings added as steps.
   local): done on the dev site, not deployed; it reaches staging and live with 9b's `bin/deploy`
   (`docs/ENVIRONMENTS.md`).
 - **Next, in order (the user, 2026-11-14):**
-  1. Review the site's Privacy Policy page as staging shows it, the text live will get (D30): the
-     user removed WordPress's "Suggested text:" labels; the wording is not settled. Compare it with
-     the handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
-     click-to-load player, H88) and settle it with the user. Under way (2026-11-15): compared
-     and drafted; failed emails' copies settled at 60 days (FluentSMTP's Delete Logs, set on
-     staging by the user; a monthly-check step for them, `docs/ROUTINES.md` step 8); waiting on
-     Hostinger's log and backup retention and three wording decisions (the voice "Howard", DTS
-     left out, a 30-day reply time).
+  1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
+     handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
+     click-to-load player, H88) and pasted by the user; live gets it with staging's export (D30).
+     Failed emails' copies kept 60 days (FluentSMTP's Delete Logs, set on staging by the user;
+     a monthly-check step, `docs/ROUTINES.md` step 8). Facts found: Hostinger keeps 7 daily and 7
+     weekly backups, none older than 60 days, and shows access logs for 7 days (its assistant,
+     for this plan); Wordfence 9.1.1 keeps Live Traffic 30 days (staging's setting), its
+     blocked-address log one month, and the newest 2,000 login attempts with no time limit (its
+     code); Wordfence's own network is left to a link to its policy. Decided: the voice
+     "Howard", DTS left out, a reply within 30 days ("usually within a few days"), the host named
+     once. Found: staging had two privacy pages; the footer opened WordPress's old draft, since
+     its link is a fixed `/privacy-policy/` (item 1b); the user trashed the draft and gave the
+     published page that slug, and it is the page set in Settings → Privacy. Left for item 3: the
+     handbook's model improved from this page (exact times; failed emails; Wordfence's three
+     records, its login attempts uncorrected in the model; the requests listing what is held),
+     and whether Wordfence's Live Traffic row count (2,000, which the policy states) is recorded
+     in `docs/ENVIRONMENTS.md` and checked on live.
+  1b. The footer's Privacy Policy link from WordPress's setting (`get_privacy_policy_url()`)
+     instead of the fixed `/privacy-policy/` in `parts/footer.html`, through a small PHP pattern,
+     with a browser test that the link leads to the page set in Settings → Privacy (shown failing
+     on a planted fault first). On a trial branch with the checks and the review gate, before
+     go-live (the user, 2026-11-15).
   2. American English spelling across the project: about 130 British forms in 28 files, some in
      code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
      a trial branch with the checks, tests and review gate; a renamed design value is shown to the
@@ -1665,7 +1679,10 @@ new findings added as steps.
      own address (no `-2`) and with its template as on staging; the importer deleted.
    - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; the menu,
      the hero photo uploaded by hand into Home's hero, the site icon, the booking form's Turnstile
-     keys and its Mail tab's From and To; one real booking request arrives.
+     keys and its Mail tab's From and To; one real booking request arrives. The privacy page as
+     on staging (2026-11-15): one privacy page only (live's old ones trashed), its slug
+     `privacy-policy`, the page set in Settings → Privacy ("— Privacy Policy Page" beside it in
+     Pages), and the footer's link opening it in a private window.
 
    *Stage D: checks and cleanup, from outside.*
    - [ ] 9l. Site Hardening activated and checked as on staging; avatars off; staging's two server
