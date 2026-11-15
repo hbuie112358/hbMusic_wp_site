@@ -95,6 +95,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
 7. **Log into HetrixTools** (the uptime monitor, plan 8m) and glance at the monitor: up, and the
    certificate and domain dates moving on after each renewal. A free account not logged into for
    90 days has its monitors stopped.
+8. **Failed emails:** in the live site's admin, FluentSMTP → Email Logs → Failed. Anything listed
+   is a booking request (or other site email) that never arrived; see "A Pushover alert came"
+   below, resend it, and delete the entry. FluentSMTP deletes failed entries by itself after 60
+   days (its Delete Logs setting), and the privacy policy says so.
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
@@ -107,18 +111,40 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
   security fix may then come only in a newer version that "security updates only" skips.
 - Step 7 keeps the uptime monitor running; without the login it stops silently after 90 days,
   apart from a warning email.
+- Step 8 catches a failure whose Pushover alert was missed (the phone off, the alert dismissed,
+  Pushover itself down). The failed entry is then the only copy of that request: the site does not
+  store messages, and the email never arrived. Delete Logs is 60 days, not 30, so the entry is
+  still there when a monthly check comes a week or two late (the user, 2026-11-15).
 
 ## If the test fails
 
 - **A Pushover alert came:** sending failed. FluentSMTP → Email Logs shows the error, and the
   request can be resent from there once the cause is fixed. If Brevo refused the server's address,
   that address is authorised under Brevo's Security → Authorized IPs. The failed entry holds a
-  visitor's details and is deleted once dealt with.
+  visitor's details and is deleted once dealt with; FluentSMTP deletes it after 60 days in any case.
 - **No alert and no email:** Brevo accepted the email but did not deliver it. Most likely the
   receiving address is on Brevo's blocked list for transactional email. Where Brevo lists it, to
   unblock the address, is still to be found on the real screen and written in here.
 - **The email is in spam despite the filter:** it is marked "Not spam", and the Gmail filter
   (`from:website@howardbuiemusic.com`, never spam, label "Booking requests") is checked.
+
+## When a visitor asks to see or delete their information
+
+The privacy policy promises a reply within 30 days, usually within a few days.
+
+1. **Find what is held:** the booking emails from that address in the business Gmail inbox, and
+   FluentSMTP → Email Logs, searched for the address (failed entries only, kept 60 days).
+   Brevo's delivery record is kept there for 3 months; whether it can be deleted earlier, and
+   where in Brevo, is still to be found (the handbook's chapter 10, H56, says it is deleted there).
+2. **To see it:** reply with what was found.
+3. **To delete it:** delete those emails and log entries, reply that it is done, and note the
+   date and the address in `data/deletion-requests.txt` (not versioned, never committed).
+4. **After any restore from a Hostinger backup** (on live): FluentSMTP → Email Logs → Failed is
+   searched for each address in that note, and any entry that came back is deleted again, as the
+   privacy policy promises. That is the only visitor information a backup holds: Gmail and Brevo
+   are not in it, Contact Form 7 stores no messages, and Wordfence's records hold IP addresses
+   only. A line in the note can be removed once Hostinger's backup period has passed since its
+   date: only backups made before the deletion can hold the copy.
 
 ## When HetrixTools sends an alert
 
