@@ -11,8 +11,9 @@ Everything here is public anyway in search results; no personal data.
 ## Search phrases (agreed with the user, 2026-11-15)
 
 Each page answers its own question, so no two pages compete for the same search. Only Home and
-Book carry Fayetteville; About carries Southern Pines. To be checked against Google's own search
-suggestions while each page's brief is written.
+Book carry Fayetteville; About carries Southern Pines. Every phrase is a starting point until it is checked against Google's own
+search suggestions while the page's brief is written (step 1 of 1c): a phrase comes from what
+people actually search for, never from what turns a check green.
 
 **No town in any page address** (the user, 2026-11-16; the handbook's 12, 9.6): addresses stay
 valid if the business moves or serves other towns, and the towns go where they are cheap to
@@ -25,8 +26,8 @@ first looking for a change that serves both.
 
 | Page | Current address | Search phrase |
 |---|---|---|
-| Home | `/` (the front page) | acoustic guitarist Fayetteville |
-| Book | `/book/` | book acoustic guitarist Fayetteville |
+| Home | `/` (the front page) | acoustic guitarist in Fayetteville |
+| Book | `/book/` | hire acoustic guitarist Fayetteville |
 | Music | `/music/` | acoustic guitar cover videos |
 | Songs | `/songlist/` | acoustic cover song list |
 | About | `/about/` | acoustic guitarist Southern Pines |
@@ -34,23 +35,49 @@ first looking for a change that serves both.
 
 ## Home
 
-- Search phrase: acoustic guitarist Fayetteville
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
+Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
+
+- Search phrase: acoustic guitarist in Fayetteville. Google completes both "acoustic guitarist
+  fayetteville" and "acoustic guitarist in fayetteville" (with "nc", "north carolina", "nc area");
+  "in" lets the title read naturally while staying an exact match, and Yoast's other checks
+  ignore it.
+- Search title: Acoustic Guitarist in Fayetteville, NC: Live Vocals and Guitar, followed by the
+  site name (Yoast: `… %%page%% %%sep%% %%sitename%%`). "NC" because every search added it and
+  Arkansas, Georgia and West Virginia's Fayettevilles also came up; "Live Vocals and Guitar" says
+  he sings and plays at once (the user's choice).
+- Description: Hire Howard Buie, an acoustic guitarist and singer, for events and private parties
+  in Fayetteville, Hope Mills and Southern Pines, NC. (134 characters)
 - Address: `/`, the front page, unchanged. Yoast does not run its phrase-in-address check on a
   front page (`slugKeyword` applies only when the page is not the front page, Yoast 28.8's
-  code, checked 2026-11-15), so the page can be fully green.
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*
+  code, checked 2026-11-15).
+- Text changed for the checks, each true and useful to visitors: the heading "For any kind of
+  event" became "An acoustic guitarist and singer for any kind of event"; "Over 30 years on stage"
+  became "Now a solo guitarist and singer in Fayetteville", with the 30 years moved into its
+  paragraph (the user's wording, ending "Follow him on Facebook."); a new last section,
+  "Questions people ask" (travel, own sound equipment, playing time, what to include in a
+  request), from the user's answers.
+- Links to: Book (`/book/`, three links, the new section's "booking page" among them: change all
+  three if Book's address changes), Music, Songs, About; outside, the user's Facebook page (the
+  address the Book page already uses).
+- Pictures: the hero photo, its alternative text "Howard Buie, acoustic guitarist, smiling as he
+  plays" (changed on staging from "… playing an acoustic guitar", which Yoast did not count:
+  "guitar" is not "guitarist" to its free version).
+- Not green, with reasons: none.
+- Found in step 1, for later: "singer" came up in four searches, so Home says "guitarist and
+  singer"; "hire" is a real search word ("hire guitarist near me", "hire singer guitarist");
+  "guitar" also draws shops and rentals; "live music … tonight" and "this weekend" are people
+  looking for public shows, an idea for later (a list of public gigs). Related searches named
+  performers by who they are; nothing taken from that (the user's decision).
 
 ## Book
 
-- Search phrase: book acoustic guitarist Fayetteville
+- Search phrase: hire acoustic guitarist Fayetteville (the user, 2026-11-16: people planning an
+  event say "hire"; "book" is the word of venues, agents and musicians), to confirm in step 1
 - Search title: *(to write in 1c)*
 - Description: *(to write in 1c)*
-- Address: *(to set in 1c)* `/book-acoustic-guitarist/`: 3 of the phrase's 4 words, so green
-  without the town.
+- Address: *(to set in 1c)* proposed `/hire-acoustic-guitarist/`: 3 of the phrase's 4 words, so
+  green without the town. The menu label may stay "Book"; whether it should is decided with the
+  page.
 - Links to: *(to decide in 1c)*
 - Pictures: *(to decide in 1c)*
 - Not green, with reasons: *(after Yoast's check)*
@@ -77,13 +104,17 @@ first looking for a change that serves both.
 
 ## About
 
-- Search phrase: acoustic guitarist Southern Pines
+- Search phrase: acoustic guitarist Southern Pines (the user, 2026-11-16: so that a search for it
+  finds this page, giving Southern Pines a page of its own while Home carries Fayetteville), to
+  confirm in step 1. For the phrase to be true, the page's text gains a true sentence or two about
+  playing events in Southern Pines, drafted by Claude and approved by the user; today it names the
+  town once, beside Fayetteville.
 - Search title: *(to write in 1c)*
 - Description: *(to write in 1c)*
-- Address: *(to decide in 1c)* Without the town, `/about-acoustic-guitarist/` holds 2 of the
-  phrase's 4 words, exactly half, which Yoast does not count as green. The phrase stays as people
-  search it. 1c first looks for an address that serves both; if there is none, the check stays
-  orange, with the reason "Google: hardly any effect".
+- Address: *(to decide in 1c; no town)* Without the town, `/about-acoustic-guitarist/` holds 2 of
+  the phrase's 4 words, exactly half, which Yoast does not count as green. 1c first looks for an
+  address that serves both; if there is none, the check stays orange, with the reason "Google:
+  hardly any effect".
 - Links to: *(to decide in 1c)*
 - Pictures: *(to decide in 1c)*
 - Not green, with reasons: *(after Yoast's check)*
