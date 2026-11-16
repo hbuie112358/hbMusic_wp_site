@@ -123,28 +123,53 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 
 ## About
 
-- Search phrase: acoustic guitarist Southern Pines (the user, 2026-11-16: so that a search for it
-  finds this page, giving Southern Pines a page of its own while Home carries Fayetteville), to
-  confirm in step 1. For the phrase to be true, the page's text gains a true sentence or two about
-  playing events in Southern Pines, drafted by Claude and approved by the user; today it names the
-  town once, beside Fayetteville.
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
-- Address: *(to decide in 1c; no town)* Without the town, `/about-acoustic-guitarist/` holds 2 of
-  the phrase's 4 words, exactly half, which Yoast does not count as green. 1c first looks for an
-  address that serves both; if there is none, the check stays orange, with the reason "Google:
-  hardly any effect".
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*
+Done on staging 2026-11-16: both overall lights green in the Pages list.
+
+- Search phrase: acoustic guitarist in Southern Pines (the user, 2026-11-16: so that a search for
+  it finds this page, giving Southern Pines a page of its own while Home carries Fayetteville).
+  Google completes "acoustic guitarist southern pines" (with "nc"); its suggestions there lean to
+  live music and shops, so fewer people may search this way than for Fayetteville.
+- Search title: Acoustic Guitarist in Southern Pines, NC: About Howard (then the site name)
+- Description: Meet Howard Buie, an acoustic guitarist and singer playing events in Southern
+  Pines, Fayetteville and nearby, NC, with over 30 years on stage.
+- Address: `/about/`, unchanged. Without the town, any address holds at most 2 of the phrase's 4
+  main words ("acoustic guitarist"), exactly half, which Yoast does not count as green.
+- Text changed (the user's own text kept): "covering rock and country music" links to the song
+  list; a new closing paragraph, "As an acoustic guitarist in Southern Pines and Fayetteville,
+  Howard plays local venues as well as private events. Follow him on Facebook to see where he's
+  playing next." (no venue named, the user's wish), with the Facebook link moved into it.
+- Links to: the song list (`/songlist/`; change it if the Songs page's address changes); outside,
+  the user's Facebook page.
+- Pictures: none.
+- Not green, with reasons (the user, 2026-11-16):
+  - Keyphrase in slug (an improvement): green would need the town in the address, against the
+    no-town rule, or a phrase chosen for the address, against the rule that phrases come from
+    real searches; Google: words in an address have "hardly any effect".
+  - Text length (under 300 words): the user's own text, plus one true closing paragraph; nothing
+    added for length (Google: "no magical word count target").
+  - Images, and keyphrase in image alt attributes: the user's decision; Home already shows his
+    photo.
 
 ## Privacy Policy
 
-- Search phrase: privacy policy
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
+Done on staging 2026-11-16.
+
+- Search phrase: privacy policy. Nobody is expected to find the site through it; the phrase lets
+  Yoast's checks make sense for this page.
+- Search title: the page's own name, "Privacy Policy", then the site name (Yoast's default).
+- Description: This privacy policy explains what this site collects, why, who else handles it,
+  how long it is kept, and how to ask about it.
 - Address: `/privacy-policy/`, set 2026-11-15 (plan item 1).
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*; readability green since 2026-11-15. Known:
-  Yoast's "Word complexity" line is an advertisement for its paid version and checks nothing.
+- Text changed: the first sentence opens "This privacy policy explains…"; "the Book page" in the
+  booking form section links to `/hire-acoustic-guitarist/`.
+- Links to: the Book page; outside, Brevo's, Cloudflare's, Google's, Wordfence's and Hostinger's
+  privacy policies, and the contact email address.
+- Pictures: none.
+- Not green, with reasons (the user, 2026-11-16):
+  - Keyphrase in subheading: Yoast wants "privacy policy" in at least 30% of the page's 13
+    headings, four or more; one more would read naturally ("Changes to this privacy policy"),
+    the rest would be repetition, which Google's guide calls tiring and keyword stuffing.
+  - Images, and keyphrase in image alt attributes: a privacy policy needs no picture; Google's
+    guide has no rule that every page needs one.
+  Both overall lights (SEO and readability) green in the Pages list, 2026-11-16. Known: Yoast's
+  "Word complexity" line is an advertisement for its paid version and checks nothing.
