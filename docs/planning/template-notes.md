@@ -145,3 +145,19 @@ template project starts; until then, a list, not a to-do.
     heading, sentence and button label bound to a small settings screen that Editors may use,
     so the panel's design stays in the code. Through WordPress's block bindings (since 6.5),
     once it is confirmed they work this way in the version then in use.
+  - **A "Site Manager" role** (the user, 2026-11-16, name chosen by the user: so customers need
+    not ask DTS every time they add a user). The rule: everything except what changes code,
+    updates or site-wide settings, which DTS looks after under "Content by customer".
+    - Given: everything an Editor may do; managing users (`create_users`, `list_users`,
+      `edit_users`), only Editors and Authors; exporting content (`export`); reading Site Health;
+      plugins' read-only screens where a plugin allows it (checked one by one).
+    - Held back: plugins and themes (install, activate, update, delete), the Site Editor and
+      menus (`edit_theme_options`), WordPress updates (H10), site settings (`manage_options`),
+      security settings (Wordfence), unfiltered HTML (H79), making Administrators or editing or
+      deleting an Administrator's account (WordPress's `editable_roles` filter and the
+      user-editing capability checks), and the booking form's and the SEO plugin's site-wide
+      settings. The plugins' exact capability names are read in their code when the role is
+      built, not assumed.
+    - Defined in a DTS plugin, tested on the dev site with planted faults (the role trying to
+      make someone an Administrator, or to reach a held-back screen, refused). A handbook
+      proposal for chapter 6 (access and roles, H24) when it is built.

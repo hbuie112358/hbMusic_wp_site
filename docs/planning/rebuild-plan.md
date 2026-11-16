@@ -89,7 +89,10 @@ new findings added as steps.
      - staging's Header and Footer (and any other template part or template) checked for saved
        copies (a "Reset"/"Clear customizations" option in the Site Editor); each copy's
        differences folded into the code if wanted, then reset, before the export at 9c, since the
-       export carries saved template parts to live;
+       export carries saved template parts to live. `[x]` Checked by the user 2026-11-16: after
+       the call-to-action panel's reset, Header, Footer and the three page templates (Pages,
+       Page with call to action, Page No Title with call to action) show only Edit and
+       Duplicate, so staging uses the theme's files; to repeat just before 9c;
      - a check for saved copies in the monthly site check, and later in 9b's deploy checks;
      - a handbook proposal: the frame lives in the code on every DTS site, with the lock.
      Known effects, accepted: customers cannot change the menu or the call-to-action panel's
