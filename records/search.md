@@ -14,6 +14,15 @@ Each page answers its own question, so no two pages compete for the same search.
 Book carry Fayetteville; About carries Southern Pines. To be checked against Google's own search
 suggestions while each page's brief is written.
 
+**No town in any page address** (the user, 2026-11-16; the handbook's 12, 9.6): addresses stay
+valid if the business moves or serves other towns, and the towns go where they are cheap to
+change: search titles, descriptions, page text and the page data. Google's SEO Starter Guide:
+keywords in the "URL path alone have hardly any effect beyond appearing in breadcrumbs". Yoast's
+address check passes without the town when more than half of a 3-word-or-longer phrase is in the
+address (Yoast 28.8's code). Where it would need the town, the search phrase stays as people
+search it, and the check stays orange with that reason (`toolkit/yoast.md` in the handbook), after
+first looking for a change that serves both.
+
 | Page | Current address | Search phrase |
 |---|---|---|
 | Home | `/` (the front page) | acoustic guitarist Fayetteville |
@@ -40,7 +49,8 @@ suggestions while each page's brief is written.
 - Search phrase: book acoustic guitarist Fayetteville
 - Search title: *(to write in 1c)*
 - Description: *(to write in 1c)*
-- Address: *(to decide in 1c; proposed `/book-acoustic-guitarist-fayetteville/`)*
+- Address: *(to set in 1c)* `/book-acoustic-guitarist/`: 3 of the phrase's 4 words, so green
+  without the town.
 - Links to: *(to decide in 1c)*
 - Pictures: *(to decide in 1c)*
 - Not green, with reasons: *(after Yoast's check)*
@@ -70,7 +80,10 @@ suggestions while each page's brief is written.
 - Search phrase: acoustic guitarist Southern Pines
 - Search title: *(to write in 1c)*
 - Description: *(to write in 1c)*
-- Address: *(to decide in 1c)*
+- Address: *(to decide in 1c)* Without the town, `/about-acoustic-guitarist/` holds 2 of the
+  phrase's 4 words, exactly half, which Yoast does not count as green. The phrase stays as people
+  search it. 1c first looks for an address that serves both; if there is none, the check stays
+  orange, with the reason "Google: hardly any effect".
 - Links to: *(to decide in 1c)*
 - Pictures: *(to decide in 1c)*
 - Not green, with reasons: *(after Yoast's check)*
