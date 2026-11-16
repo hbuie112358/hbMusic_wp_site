@@ -75,6 +75,16 @@ new findings added as steps.
   4. The project's `CLAUDE.md`: "follows version 1".
   5. Rewrite 9b from the handbook's chapter 2 (`bin/deploy` from the user's computer, no deploy
      jobs or keys on GitHub, H8 and H9).
+  5b. Later, but before go-live (the user, 2026-11-15): evaluate an accessibility checker for
+     the people who edit pages, which marks problems in color the way Yoast does for search
+     (skipped headings, link wording, picture descriptions). Candidates read on WordPress.org
+     on 2026-11-15, nothing else verified: Editoria11y (Claude's leaning: made for editors,
+     marks problems in the editor, sends nothing to third parties, 1,000+ sites) and Equalize
+     Digital's Accessibility Checker (10,000+ sites; its free version also makes "automated
+     fixes" and has paid tiers). Through the plugin rules (H12, `AI_SECURITY.md` section 4),
+     pinned and tested on the dev site, shown catching planted problems. If one is chosen, the
+     Editing Help guide shrinks to what neither plugin knows (templates, sections, the video
+     rules, contact).
   6. 9c to 9q: live updated in place (D31), its content from staging's export (D30), its settings
      by hand.
   7. Step 10, the move to a new host, before 2028-07-16.
