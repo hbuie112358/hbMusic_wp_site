@@ -74,7 +74,7 @@ defined( 'ABSPATH' ) || exit;
 <ul>
 	<li><?php esc_html_e( 'SEO title: different on every page, about 50-60 characters, with the page\'s subject first. Keep the "Site title" part at the end: it adds your business name, so you do not type it.', 'editing-help' ); ?></li>
 	<li><?php esc_html_e( 'Meta description: one or two plain sentences, about 120-155 characters, different on every page, saying what the page offers and, for a local business, where. Google sometimes shows its own text instead; that is normal.', 'editing-help' ); ?></li>
-	<li><?php esc_html_e( 'Yoast\'s colored scores and its "focus keyphrase" are not targets. Accurate, natural text comes first.', 'editing-help' ); ?></li>
+	<li><?php esc_html_e( 'The site is handed over with Yoast\'s checks green, or with a recorded reason where one is not. If an edit turns a page orange or red, look in the Yoast SEO box below the page to see what Yoast is complaining about. If fixing it would make the text read less naturally or say something less accurate, tell DTS. DTS will help find wording that reads well and passes. Sometimes the right choice is to leave a check orange or red, because Yoast\'s checks don\'t always match what Google recommends; in that case, DTS records why.', 'editing-help' ); ?></li>
 	<li><?php esc_html_e( 'DTS wrote them for every page at launch. Whoever adds a new page writes its own.', 'editing-help' ); ?></li>
 </ul>
 
