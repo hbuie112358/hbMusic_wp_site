@@ -84,8 +84,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   Editing Help) mounted read-only and activated,
   Contact Form 7 at the version in `tools/versions.sh`, checked against WordPress.org's checksums,
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
-  and its "sending failed" message from `config/booking-form-messages.json` (merged into Contact
-  Form 7's own messages; staging and live get the same text typed in by hand),
+  and its messages after sending ("sent" and "sending failed") from
+  `config/booking-form-messages.json` (merged into Contact Form 7's own messages; staging and live
+  get the same texts typed in by hand, in the form's Messages tab),
   test pages (`tests/dev-content/`, each with the page template its real page uses) and songs with neutral text, a stand-in Yoast organization
   (a neutral name and the theme's logo), a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role

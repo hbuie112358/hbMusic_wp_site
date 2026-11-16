@@ -1774,7 +1774,9 @@ new findings added as steps.
      own address (no `-2`) and with its template as on staging; the importer deleted.
    - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; the menu,
      the hero photo uploaded by hand into Home's hero, the site icon, the booking form's Turnstile
-     keys and its Mail tab's From and To; one real booking request arrives. The privacy page as
+     keys and its Mail tab's From and To, and its Messages tab's "sent" and "sending failed"
+     texts, copied from `config/booking-form-messages.json`; one real booking request arrives,
+     showing the "sent" text. The privacy page as
      on staging (2026-11-15): one privacy page only (live's old ones trashed), its slug
      `privacy-policy`, the page set in Settings → Privacy ("— Privacy Policy Page" beside it in
      Pages), and the footer's link opening it in a private window.
