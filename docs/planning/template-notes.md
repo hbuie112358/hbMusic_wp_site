@@ -133,3 +133,15 @@ template project starts; until then, a list, not a to-do.
 
 - `~/.claude/CLIENT_DATA.md` (not implemented yet): the template includes its settings block, so
   every customer project starts with it.
+- The frame lock (plan 1e, 2026-11-16): the frame (header, footer, call-to-action panel, page
+  templates, site-wide styles) lives in the code, and saving it in the Site Editor is refused.
+  The two features below exist because of it, so customers keep the changes they reasonably
+  want without unlocking the frame:
+  - **A menu built from the pages, automatically** (the user, 2026-11-16): customers who add or
+    rename a page see the menu follow, with the order set in each page's settings, which Editors
+    may change; pages such as the Privacy Policy left out by the theme. WordPress's own page-list
+    menu does the listing; a link to something other than a page stays a request to DTS.
+  - **The call-to-action panel's wording editable by customers** (the user, 2026-11-16): its
+    heading, sentence and button label bound to a small settings screen that Editors may use,
+    so the panel's design stays in the code. Through WordPress's block bindings (since 6.5),
+    once it is confirmed they work this way in the version then in use.
