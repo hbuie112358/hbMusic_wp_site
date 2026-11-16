@@ -73,6 +73,27 @@ new findings added as steps.
      handbook's chapter 8 routine (the parts that apply to a site staying at its host) and chapter
      9's handover to a customer who edits; the user's own Editor login, the customer's role, kept
      apart from DTS's admin account.
+  1e. The site's frame belongs to the code (the user, 2026-11-16): found when the call-to-action
+     panel's "Book Howard" button kept the old /book/ address on staging after the deploy,
+     because staging held its own copy of that template part, saved in the Site Editor at some
+     point, which overrides the theme's file and silently stops receiving theme updates (the user
+     reset it; the button then worked). The frame (header, footer, the call-to-action panel, the
+     page templates, the site-wide colors and fonts) comes from the code; content (pages, their
+     text and pictures, the songs) is edited on the site. Checked on the dev site: the Editor
+     role, the customer's, lacks `edit_theme_options`, which template parts, menus and global
+     styles all require, so customers cannot create such copies. For administrators:
+     - a lock in the Site Hardening plugin refusing to save template parts, templates and global
+       styles in the Site Editor for everyone, switched off deliberately by a server setting when
+       truly needed; menus stay editable. Designed, tested on the dev site (shown failing on a
+       planted fault) and reviewed like any code change;
+     - staging's Header and Footer (and any other template part or template) checked for saved
+       copies (a "Reset"/"Clear customizations" option in the Site Editor); each copy's
+       differences folded into the code if wanted, then reset, before the export at 9c, since the
+       export carries saved template parts to live;
+     - a check for saved copies in the monthly site check, and later in 9b's deploy checks;
+     - a handbook proposal: the frame lives in the code on every DTS site, with the lock.
+     Known effects, accepted: customers cannot change the menu or the call-to-action panel's
+     wording; both are requests to DTS.
   2. American English spelling across the project: about 130 British forms in 28 files, some in
      code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
      a trial branch with the checks, tests and review gate; a renamed design value is shown to the
@@ -1724,7 +1745,8 @@ new findings added as steps.
      items such as WordPress's "Hello world!" post and the old privacy draft (trashed 2026-11-15)
      cannot travel to live: the "All content" export takes every item except auto-drafts, trashed
      ones included (`post_status != 'auto-draft'`, WordPress 7.1.4's `wp-admin/includes/export.php`,
-     checked 2026-11-15).
+     checked 2026-11-15). Also checked first: no saved copies of template parts or templates on
+     staging (item 1e), since the export would carry them to live.
      Staging's content exported (Tools → Export → All content) into `data/exports/`;
      Claude reads it and lists what it carries (pages with their templates, songs, the menu, the
      booking form, template parts edited in the Site Editor, media entries) and what it does not.
