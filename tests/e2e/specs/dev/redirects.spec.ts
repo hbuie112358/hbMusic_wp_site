@@ -6,8 +6,8 @@ import { expect, test } from '@playwright/test';
 const OLD_TO_NEW: ReadonlyArray<readonly [string, string]> = [
 	['/video/', '/music/'],
 	['/audio/', '/music/'],
-	['/contact/', '/book/'],
-	['/Contact/', '/book/'],
+	['/contact/', '/hire-acoustic-guitarist/'],
+	['/Contact/', '/hire-acoustic-guitarist/'],
 ];
 const PERMANENTLY_MOVED = 301;
 const NOT_FOUND = 404;

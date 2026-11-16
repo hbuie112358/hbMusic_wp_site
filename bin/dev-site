@@ -31,7 +31,7 @@ readonly TEST_PAGES=(
   'Music|music|page-with-call-to-action'
   'Songs|songlist|page-with-call-to-action'
   'About|about|page-with-call-to-action'
-  'Book|book|'
+  'Book|hire-acoustic-guitarist|'
   'Privacy Policy|privacy-policy|'
 )
 # Linked from the footer, not the menu.

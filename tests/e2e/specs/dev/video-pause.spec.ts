@@ -11,7 +11,7 @@ import { expect, test, type Page } from '@playwright/test';
 const MUSIC_PATH = '/music/';
 const HOME_PATH = '/';
 const HOME_PLAYER = 'Sample featured video';
-const PAGE_WITHOUT_PLAYER = '/book/';
+const PAGE_WITHOUT_PLAYER = '/hire-acoustic-guitarist/';
 const SCRIPT = 'script[src*="video-pause.js"]';
 const ROW = 'section.site-carousel';
 const SETTLE_MS = 800;

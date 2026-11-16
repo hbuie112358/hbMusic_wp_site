@@ -27,7 +27,7 @@ first looking for a change that serves both.
 | Page | Current address | Search phrase |
 |---|---|---|
 | Home | `/` (the front page) | acoustic guitarist in Fayetteville |
-| Book | `/book/` | hire acoustic guitarist Fayetteville |
+| Book | `/hire-acoustic-guitarist/` (was `/book/`) | hire an acoustic guitarist in Fayetteville |
 | Music | `/music/` | acoustic guitar cover videos |
 | Songs | `/songlist/` | acoustic cover song list |
 | About | `/about/` | acoustic guitarist Southern Pines |
@@ -56,8 +56,8 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
   paragraph (the user's wording, ending "Follow him on Facebook."); a new last section,
   "Questions people ask" (travel, own sound equipment, playing time, what to include in a
   request), from the user's answers.
-- Links to: Book (`/book/`, three links, the new section's "booking page" among them: change all
-  three if Book's address changes), Music, Songs, About; outside, the user's Facebook page (the
+- Links to: Book (three links, the new section's "booking page" among them, changed from
+  `/book/` to `/hire-acoustic-guitarist/` on 2026-11-16), Music, Songs, About; outside, the user's Facebook page (the
   address the Book page already uses).
 - Pictures: the hero photo, its alternative text "Howard Buie, acoustic guitarist, smiling as he
   plays" (changed on staging from "… playing an acoustic guitar", which Yoast did not count:
@@ -71,16 +71,27 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 
 ## Book
 
-- Search phrase: hire acoustic guitarist Fayetteville (the user, 2026-11-16: people planning an
-  event say "hire"; "book" is the word of venues, agents and musicians), to confirm in step 1
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
-- Address: *(to set in 1c)* proposed `/hire-acoustic-guitarist/`: 3 of the phrase's 4 words, so
-  green without the town. The menu label may stay "Book"; whether it should is decided with the
-  page.
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*
+- Search phrase: hire an acoustic guitarist in Fayetteville (the user, 2026-11-16: people planning
+  an event say "hire"; "book" is the word of venues, agents and musicians). Google suggests "hire
+  guitarist near me", "hire a guitar player", "hire an acoustic guitar player"; the small words
+  let the title read naturally as an exact match.
+- Search title: Hire an Acoustic Guitarist in Fayetteville, NC (then the site name)
+- Description: Hire an acoustic guitarist and singer in Fayetteville, NC for weddings, parties,
+  clubs and restaurants. Send Howard your event's details.
+- Text changed: the first paragraph opens "Looking to hire an acoustic guitarist in
+  Fayetteville?"; "the list" links to the song list.
+- Address: `/hire-acoustic-guitarist/`, set on staging 2026-11-16 (3 of the phrase's 4 main
+  words, so green without the town); the menu label stays "Book". WordPress keeps no record of a
+  page's old address (`wp_check_for_changed_slugs()` skips hierarchical post types such as pages),
+  so `/book/` answered "not found" until each link was changed: staging's "Main menu" (Site
+  Editor, the ⋮ beside the menu's name, then Edit), Home's links (by the user), and in code the
+  call-to-action panel's button, the old site's `/contact/` redirect (no redirect from `/book/`:
+  it was never live, so nothing outside knows it), and the dev site's page and tests, with a new test that every link between the site's pages
+  answers (`links.spec.ts`).
+- Links to: the song list (from "the list"); outside, the user's Facebook page.
+- Pictures: none yet; to decide after text length (the Images checks).
+- Not green, with reasons: *(still open: text length, images)*. Both overall lights green on
+  2026-11-16.
 
 ## Music
 

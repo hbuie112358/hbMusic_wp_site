@@ -9,7 +9,7 @@ import { WCAG_TAGS } from './accessibility';
 // spam checks send nothing; and its files and Cloudflare's script load only on the page with the form. The site's
 // own configuration runs for real; only Cloudflare is simulated (config/dev-mu-plugins/). The
 // real Turnstile is proven on staging.
-const BOOK_PATH = '/book/';
+const BOOK_PATH = '/hire-acoustic-guitarist/';
 const PAGE_WITHOUT_FORM = '/about/';
 const TURNSTILE_SCRIPT = /challenges\.cloudflare\.com\/turnstile/;
 const FORM_PLUGIN_FILES = /\/plugins\/contact-form-7\//;
