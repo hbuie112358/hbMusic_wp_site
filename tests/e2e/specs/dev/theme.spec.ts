@@ -40,9 +40,14 @@ for (const path of TEST_PATHS) {
 			expect(hasLoaded, 'the logo image has loaded').toBe(true);
 		});
 
+		// The page chosen in Settings → Privacy (bin/dev-site chooses the Privacy Policy test page);
+		// tests/scenario/dev-privacy-link.sh checks that the link follows another choice, or none.
 		test('links to the privacy policy from the footer', async ({ page }) => {
 			await page.goto(path);
-			await expect(page.locator('footer a[href="/privacy-policy/"]'), 'the footer link').toHaveCount(1);
+			const link = page.locator('footer a.site-privacy-link');
+			await expect(link, 'the footer link').toHaveCount(1);
+			const address = await link.getAttribute('href');
+			expect(new URL(address ?? '', page.url()).pathname, 'the footer link leads to the chosen privacy page').toBe('/privacy-policy/');
 		});
 
 		test('has exactly one main heading', async ({ page }) => {

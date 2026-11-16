@@ -41,7 +41,15 @@ new findings added as steps.
      instead of the fixed `/privacy-policy/` in `parts/footer.html`, through a small PHP pattern,
      with a browser test that the link leads to the page set in Settings → Privacy (shown failing
      on a planted fault first). On a trial branch with the checks and the review gate, before
-     go-live (the user, 2026-11-15).
+     go-live (the user, 2026-11-15). `[x]` Built 2026-11-16, as a render filter instead of a
+     pattern (the user agreed): the footer's link carries the class `site-privacy-link`, and
+     `hbmusic_link_privacy_policy()` sets its address from `get_privacy_policy_url()`, so a footer
+     edited in the Site Editor still follows the setting; with no published privacy page chosen,
+     the link is left out. `bin/dev-site` now chooses its Privacy Policy page in Settings, which
+     it never did (the old test checked the fixed address and so enforced the flaw).
+     `theme.spec.ts` checks the link on every test page; `tests/scenario/dev-privacy-link.sh`
+     chooses another page, then none, and restores the setting. Both shown failing on planted
+     faults (the filter off; the link kept with no page chosen).
   1c. The search work (the user, 2026-11-15), before 9c's export, since it changes staging's
      content: every check of the SEO plugin (Yoast 28.8, SEO and readability) green on every
      page, or its reason recorded; the full list of checks taken from Yoast's code first, not

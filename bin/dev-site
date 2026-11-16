@@ -36,6 +36,9 @@ readonly TEST_PAGES=(
 )
 # Linked from the footer, not the menu.
 readonly PAGE_OUTSIDE_MENU="Privacy Policy"
+# Chosen in Settings → Privacy, as on staging and live: the footer's link follows that setting
+# (the theme's hbmusic_link_privacy_policy()).
+readonly PRIVACY_POLICY_PAGE="Privacy Policy"
 # Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
 # shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
 # expects them sorted and escaped. Neutral text, no real data.
@@ -253,6 +256,9 @@ create_test_content() {
     fi
     if [[ "$title" == "Home" ]]; then
       wp_cli option update page_on_front "$page_id" >/dev/null
+    fi
+    if [[ "$title" == "$PRIVACY_POLICY_PAGE" ]]; then
+      wp_cli option update wp_page_for_privacy_policy "$page_id" >/dev/null
     fi
   done
   wp_cli option update show_on_front page >/dev/null

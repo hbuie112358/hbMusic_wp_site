@@ -65,6 +65,12 @@ const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
 const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
 
 /**
+ * The class that marks the footer's Privacy Policy link (parts/footer.html), whose address the
+ * theme fills in from Settings → Privacy (hbmusic_link_privacy_policy()).
+ */
+const HBMUSIC_PRIVACY_LINK_CLASS = 'site-privacy-link';
+
+/**
  * Registers every component stylesheet with the block it styles.
  */
 function hbmusic_register_component_styles(): void {
@@ -460,6 +466,54 @@ function hbmusic_drop_empty_heading( string $block_content ): string {
 	return '' === trim( $text, " \t\n\r\0\x0B\u{00A0}" ) ? '' : $block_content;
 }
 add_filter( 'render_block_core/heading', 'hbmusic_drop_empty_heading' );
+
+/**
+ * Points the marked Privacy Policy link at the page chosen in Settings → Privacy, whatever that
+ * page's address (plan 1b; a fixed /privacy-policy/ once opened WordPress's old draft on staging).
+ * Without a chosen, published privacy page, WordPress gives no address, and the paragraph holding
+ * the link is left out, so the footer never links to a missing page. Done while the page is
+ * rendered, so a footer edited in the Site Editor still follows the setting as long as the link
+ * keeps its class; a link whose class was removed there keeps the footer's placeholder address
+ * ("#"), which nothing here can notice, a known limit accepted at review.
+ *
+ * @param string $block_content The paragraph's HTML.
+ * @return string The HTML with the link's address set, or nothing when there is no privacy page.
+ */
+function hbmusic_link_privacy_policy( string $block_content ): string {
+	$tags = hbmusic_find_privacy_link( $block_content );
+	if ( null === $tags ) {
+		return $block_content;
+	}
+	$privacy_policy_url = get_privacy_policy_url();
+	if ( '' === $privacy_policy_url ) {
+		return '';
+	}
+	$tags->set_attribute( 'href', $privacy_policy_url );
+	return $tags->get_updated_html();
+}
+add_filter( 'render_block_core/paragraph', 'hbmusic_link_privacy_policy' );
+
+/**
+ * Finds the marked Privacy Policy link in a paragraph. Every paragraph of every page passes through
+ * the filter above, so a plain text search lets almost all of them through before an HTML reader is
+ * even created; only the footer's paragraph is parsed.
+ *
+ * @param string $block_content The paragraph's HTML.
+ * @return WP_HTML_Tag_Processor|null The reader, stopped on the link, or null if there is none.
+ */
+function hbmusic_find_privacy_link( string $block_content ): ?WP_HTML_Tag_Processor {
+	if ( ! str_contains( $block_content, HBMUSIC_PRIVACY_LINK_CLASS ) ) {
+		return null;
+	}
+	$tags            = new WP_HTML_Tag_Processor( $block_content );
+	$has_marked_link = $tags->next_tag(
+		array(
+			'tag_name'   => 'a',
+			'class_name' => HBMUSIC_PRIVACY_LINK_CLASS,
+		)
+	);
+	return $has_marked_link ? $tags : null;
+}
 
 /**
  * Describes a carousel the way the W3C's carousel pattern does (WAI-ARIA Authoring Practices), so
