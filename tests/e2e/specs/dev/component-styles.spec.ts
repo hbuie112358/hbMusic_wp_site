@@ -6,7 +6,7 @@ import { TEST_PATHS } from './test-pages';
 // table's styles itself, only where the song list appears. WordPress inlines small stylesheets,
 // so a stylesheet shows as a <style> or <link> whose id starts with its handle.
 const SONG_LIST_PATH = '/songlist/';
-const FORM_PATH = '/book/';
+const FORM_PATH = '/hire-acoustic-guitarist/';
 const EVERY_PAGE_STYLES = ['hbmusic-site-header', 'hbmusic-site-footer'];
 const FORM_STYLES = 'hbmusic-form';
 const SONG_TABLE_STYLES = 'songlist-song-list';

@@ -11,13 +11,15 @@ require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
 
 /**
  * This site's old page addresses and the pages that replaced them (plan D22): the old site's
- * Video and Audio pages became Music, its Contact page became Book. Search engines and old links
- * still point at the old addresses. A site without old addresses leaves this list empty.
+ * Video and Audio pages became Music, its Contact page became Book, whose address is
+ * /hire-acoustic-guitarist/ (plan 1c). Search engines and old links still point at the old
+ * addresses. Book's earlier address on staging, /book/, gets no redirect: it was never live, so
+ * nothing outside the site knows it. A site without old addresses leaves this list empty.
  */
 const HBMUSIC_OLD_ADDRESSES = array(
 	'video'   => 'music',
 	'audio'   => 'music',
-	'contact' => 'book',
+	'contact' => 'hire-acoustic-guitarist',
 );
 
 /**
