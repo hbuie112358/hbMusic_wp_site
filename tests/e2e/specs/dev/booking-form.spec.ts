@@ -106,6 +106,7 @@ test.describe('sending', () => {
 		await fillForm(page, marker, 'visitor@example.test');
 		await page.getByRole('button', { name: 'Send' }).click();
 		await expect(page.locator(SENT_FORM), 'the form reports it was sent').toBeVisible();
+		await expect(page.locator(RESPONSE_OUTPUT), 'the message from config/').toHaveText(configuredMessage('mail_sent_ok'));
 
 		await expect.poll(async () => (await mailsWith(request, marker)).length, 'one mail arrives').toBe(1);
 		const [mail] = await mailsWith(request, marker);
