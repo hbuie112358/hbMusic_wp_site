@@ -102,6 +102,13 @@ new findings added as steps.
   stop nothing are in `project-state.yaml`, `pending_decisions`.
 - **Future, not needed for go-live (D19):** the clip request and setlist plugins (5b to 5d), a
   song search after go-live, the template project (D21) when a second site has a date.
+  Before the next site (the user, 2026-11-16): a full evaluation of SEO plugins for the
+  handbook's standard (chapter 3 names Yoast), judged against Google's guide and chapter 12's
+  9.6: what each writes into pages, its checks and how they match Google, search phrases per
+  page in the free version, outside services it contacts, upkeep and upsells. Candidates include
+  Rank Math (five phrases per page free; several optional outside services) and The SEO
+  Framework (no phrase analysis free), as read on WordPress.org 2026-11-16; not a decision to
+  switch. This site keeps Yoast (D25; the theme's page data uses Yoast's hook).
 - **Stale (do not trust until item 5 rewrites them):** step 9's description of deploying
   through GitHub (9b, 9p's "approved deploy job", "the deploy pipeline (3g) points at the live
   site") and D14, replaced by the handbook's chapter 2 (H8, H9: `bin/deploy` from the user's
