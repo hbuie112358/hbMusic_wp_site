@@ -87,6 +87,13 @@ new findings added as steps.
      rules, contact).
   6. 9c to 9q: live updated in place (D31), its content from staging's export (D30), its settings
      by hand.
+  6b. After go-live (the user, 2026-11-16): promoting the site, step 13 of Google's SEO Starter
+     Guide ("Promote your website": word of mouth, social media, community, offline materials
+     such as business cards), which the guide also names as the main way new sites are found,
+     through links from other sites. For this site, to look at then, each judged by what it
+     brings in Search Console rather than assumed: venues the user has played linking to the
+     site, the Facebook page pointing to it (and Yoast's "Other profiles", optional), the
+     address on cards and flyers. Which of these helps most is not verified.
   7. Step 10, the move to a new host, before 2028-07-16.
 - **Dates and holds:** Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
   first gets the version staging runs. Live's text names the old service area until go-live
@@ -1733,7 +1740,12 @@ new findings added as steps.
      rules (8k) and HSTS (3.1).
    - [ ] 9m. Yoast as on staging, each page indexable with its own canonical address at the live
      domain; `x-hcdn-cache-status: DYNAMIC`; the old addresses' redirects; the local leftovers
-     still 404; HetrixTools' monitor up with its keyword found.
+     still 404; HetrixTools' monitor up with its keyword found. The launch baseline of the
+     search work (1c; the handbook's 12, 9.6, the user, 2026-11-16): for every page on live, a
+     screenshot of Yoast's panel alone (never the admin bar, which shows the login name), with
+     both the SEO and readability results open, saved under `records/`, and in each page's entry
+     of `records/search.md` the date, Yoast's version and a written reason for each check that is
+     not green; the user's acknowledgment noted there with its date.
    - [ ] 9n. Cleanup: `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
      removed, the old admin account removed (its content given to the new one) and its name, and
      `admin`, on Wordfence's list of names blocked at once. WordPress's sample "Hello world!" post
