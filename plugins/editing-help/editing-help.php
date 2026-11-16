@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Editing Help
  * Description:       Shows the content guide inside WordPress: an "Editing help" panel at the top of the Dashboard and a page with the guide, linked in the left menu under Dashboard, ending with the site's own page templates and ready-made sections, read from the active theme. Each site adds its templates' descriptions and a contact line.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 7.0
  * Requires PHP:      8.4
  * License:           GPL-2.0-or-later
@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
  * The guide's version, shown at the bottom of its page. The company's printed copy of the guide
  * carries the same number, and a change is made to both at once, so a copy left behind shows.
  */
-const EDITINGHELP_GUIDE_VERSION = '1';
+const EDITINGHELP_GUIDE_VERSION = '2';
 
 /**
  * WordPress's right to edit content. Administrators, Editors and Authors have it, and they are
