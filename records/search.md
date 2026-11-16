@@ -89,9 +89,17 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
   it was never live, so nothing outside knows it), and the dev site's page and tests, with a new test that every link between the site's pages
   answers (`links.spec.ts`).
 - Links to: the song list (from "the list"); outside, the user's Facebook page.
-- Pictures: none yet; to decide after text length (the Images checks).
-- Not green, with reasons: *(still open: text length, images)*. Both overall lights green on
-  2026-11-16.
+- Pictures: none (see below).
+- Not green, with reasons:
+  - Text length (about 55 words; Yoast wants 300): a form page, which visitors open to send a
+    request. Google: "there's no magical word count target". A "What happens next" section was
+    considered; the user judged the page says enough before sending, and the form's "sent"
+    message now tells visitors what happens next (2026-11-16).
+  - Images, and keyphrase in image alt attributes (no picture on the page): the user's decision,
+    2026-11-16. A form page; Google's guide places images near relevant text and has no rule that
+    every page needs one; the only prepared photo is Home's, and repeating it adds nothing. To
+    reconsider if a photo of Howard performing at an event becomes available.
+  Both overall lights green on 2026-11-16.
 
 ## Music
 
