@@ -28,8 +28,8 @@ first looking for a change that serves both.
 |---|---|---|
 | Home | `/` (the front page) | acoustic guitarist in Fayetteville |
 | Book | `/hire-acoustic-guitarist/` (was `/book/`) | hire an acoustic guitarist in Fayetteville |
-| Music | `/music/` | acoustic guitar cover videos |
-| Songs | `/songlist/` | acoustic cover song list |
+| Music | `/music/` | music (not a search target; see below) |
+| Songs | `/songlist/` | song list (not a search target; see below) |
 | About | `/about/` | acoustic guitarist Southern Pines |
 | Privacy Policy | `/privacy-policy/` | privacy policy |
 
@@ -103,23 +103,60 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 
 ## Music
 
-- Search phrase: acoustic guitar cover videos
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
-- Address: *(to decide in 1c)*
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*
+Done on staging 2026-11-16: both overall lights green in the Pages list.
+
+- Search phrase: music. Like the Songs page, not a page people are expected to find through
+  search (the user, 2026-11-16); its job is to let a visitor already deciding hear and see Howard
+  play, then book. "Live acoustic music videos" was considered; "music" describes the page and
+  matches its address, so the address check is green without moving a live address.
+- Search title: Music: Live Acoustic Videos (then the site name). The page's own title stays
+  "Music", as in the menu.
+- Description: Watch video samples of Howard Buie's live acoustic music, playing and singing rock
+  and country. See and hear him before you book.
+- Address: `/music/`, unchanged: it exists on live, and the old `/video/` and `/audio/` redirect
+  to it.
+- Text: "Enjoy these video samples of Howard playing and singing his live acoustic music, from rock
+  to country." (the user's sentence with the music added), then the videos, then "Ready to book?
+  Send Howard your request. You can also follow him on Facebook.", with a top margin only, so the
+  gap above the call-to-action panel matches the other pages.
+- Links to: the Book page; outside, the user's Facebook page (no separate YouTube channel link,
+  the user's choice; the embedded videos are not counted as links).
+- Pictures: none besides the videos.
+- Not green, with reasons (2026-11-16):
+  - Text length (about 34 words): the videos are the page's content, which Yoast does not read as
+    text; Google sets no word count target.
+  - Images, and keyphrase in image alt attributes: the page's pictures are its videos; a photo
+    would compete with them (the user's decision).
 
 ## Songs
 
-- Search phrase: acoustic cover song list
-- Search title: *(to write in 1c)*
-- Description: *(to write in 1c)*
-- Address: *(to decide in 1c; `/songlist/` was kept on purpose by D22)*
-- Links to: *(to decide in 1c)*
-- Pictures: *(to decide in 1c)*
-- Not green, with reasons: *(after Yoast's check)*
+Done on staging 2026-11-16.
+
+- Search phrase: song list. Not a page people are expected to find through search (the user,
+  2026-11-16: people who want to hire him do not search for songs, and only other musicians search
+  for cover songs); its job is to help a visitor already deciding, and to lead to booking. The
+  phrase describes the page so that Yoast's checks make sense; no search research done for it.
+- Search title: Song List: Rock and Country Covers (then the site name)
+- Description: Howard Buie's song list: rock and country from 1959 to 2022, plus a few originals.
+  Don't see your favorite? Ask, and he may add it.
+- Address: `/songlist/`, unchanged: it exists on live and Google knows it (D22).
+- Text (first person on this page, the user's choice; the rest of the site speaks of "Howard"):
+  "Here's my song list: rock and country from 1959 to 2022, plus a few originals. Don't see a song
+  you're hoping to hear? Feel free to ask; I'm always open to considering special requests for your
+  event." and "Ready to book? Send me your request. You can also follow me on Facebook."
+- Links to: the Book page ("Send me your request"); outside, the user's Facebook page.
+- Pictures: a photo of Howard performing, at the top of the content, aligned right (the user,
+  2026-11-16), alternative text "Howard Buie singing a song with his acoustic guitar". The page
+  keeps the template "Page with call to action": the "No Title" template was tried to put the photo
+  beside the title, but it drops the gap above the content that the other pages have.
+- Both overall lights (SEO and readability) green in the Pages list, 2026-11-16.
+- Not green, with reasons (2026-11-16):
+  - Keyphrase in slug (an improvement): Yoast reads `songlist` as one word, not "song list";
+    `/song-list/` would be green, but `/songlist/` is live and known to Google (D22), and moving it
+    would need a redirect and changes to every link to it, for an address Google says has
+    "hardly any effect".
+  - Text length (about 51 words): the song table is the page's content, added by the Song List
+    plugin, which Yoast does not read as text; Google sets no word count target.
 
 ## About
 
