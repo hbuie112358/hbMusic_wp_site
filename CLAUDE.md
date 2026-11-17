@@ -131,7 +131,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `Update URI: false`; `theme.json`'s schema matching
   the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
   rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
-  packages; the theme's component list in `functions.php` matching the files in
+  packages (every advisory fails, except one the user accepted in that folder's
+  `audit-exceptions.json`, with its reason and a review-by date after which it fails again); the theme's component list in `functions.php` matching the files in
   `assets/css/components/`, both ways; a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on a test page in
   `tests/dev-content/` (so the browser tests see it); ShellCheck on `bin/`; the compose file. Runs every check even
