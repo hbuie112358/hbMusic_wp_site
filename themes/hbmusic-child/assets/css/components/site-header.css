@@ -53,11 +53,30 @@ header.wp-block-template-part:has(> .site-header) {
 	}
 }
 
-/* Block and component class together outrank WordPress's layout rules at any load order. */
+/*
+ * Block and component class together outrank WordPress's layout rules at any load order.
+ * "isolation" keeps the frosted layer below behind this header's content only, never behind the
+ * page; unlike a filter or transform, it does not become a frame for fixed elements inside.
+ */
 .wp-block-group.site-header {
+	position: relative;
+	isolation: isolate;
 	padding: var(--site-header-padding-block) var(--wp--custom--spacing--gutter);
-	background: var(--wp--custom--header--background);
 	border-bottom: 1px solid var(--wp--preset--color--accent-5);
+}
+
+/*
+ * The frosted background, on a layer of its own behind the header's content (plan 9t). A
+ * backdrop-filter on the header itself would make the header the frame of everything fixed inside
+ * it (CSS Filter Effects), and WordPress's open menu panel on a phone is fixed to the window: it
+ * was trapped in the header strip, showing only its first link.
+ */
+.wp-block-group.site-header::before {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	content: "";
+	background: var(--wp--custom--header--background);
 	backdrop-filter: blur(var(--wp--custom--header--blur));
 }
 
