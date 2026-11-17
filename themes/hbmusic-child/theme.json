@@ -171,7 +171,8 @@
 				"lift": "-1px"
 			},
 			"motion": {
-				"duration": "150ms"
+				"duration": "150ms",
+				"menuDrop": "200ms"
 			},
 			"header": {
 				"logoSize": "56px",
