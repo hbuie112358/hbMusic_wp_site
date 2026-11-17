@@ -50,7 +50,15 @@ new findings added as steps.
      `theme.spec.ts` checks the link on every test page; `tests/scenario/dev-privacy-link.sh`
      chooses another page, then none, and restores the setting. Both shown failing on planted
      faults (the filter off; the link kept with no page chosen).
-  1c. The search work (the user, 2026-11-15), before 9c's export, since it changes staging's
+  1c. `[x]` Done 2026-11-16 on staging, all six pages with both overall lights green; each page's
+     phrase, title, description, text changes and every check not green with its reason are in
+     `records/search.md` (Home and Book searched for; Songs and Music judged not search targets
+     by the user; About carries Southern Pines; the Book page moved to
+     `/hire-acoustic-guitarist/`). Noted for the Editing Help guide's next change (both copies,
+     version 3): the title at the top of the editor is the page's name, which some templates
+     do not show on the page; the menu is edited in the Site Editor through the ⋮ beside the
+     menu's name, then Edit (only while the frame lock of 1e allows it, and not by Editors).
+     The search work (the user, 2026-11-15), before 9c's export, since it changes staging's
      content: every check of the SEO plugin (Yoast 28.8, SEO and readability) green on every
      page, or its reason recorded; the full list of checks taken from Yoast's code first, not
      from memory. Found after the Privacy Policy showed red SEO on every page: no page has a
