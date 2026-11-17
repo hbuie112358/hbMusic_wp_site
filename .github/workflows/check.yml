@@ -1,7 +1,11 @@
-# Runs on each push to main, each pull request and weekly: bin/check (every static check, plan
-# step 3f), and the dev site's tests (plan step 4d): the dev site is built here from the
-# repository alone and tested with bin/test. On main, once both pass, the child theme and the
-# plugins are deployed to the staging site (plan step 3g-3, bin/deploy-staging).
+# Runs on each pull request, weekly and by its button: bin/check (every static check, plan step
+# 3f), and the dev site's tests (plan step 4d): the dev site is built here from the repository
+# alone and tested with bin/test. A push to main, which is always a merged pull request, deploys the
+# child theme and the plugins to the staging site (plan step 3g-3, bin/deploy-staging) without
+# running the checks again: main is protected, its pull requests must pass both checks and be up to
+# date with main first ("strict"), so the merged code is the code just tested (the user,
+# 2026-11-17, to cut a code change's wait by about five minutes). The weekly run and the button
+# still run the full checks on main.
 name: check
 
 on:
@@ -27,6 +31,8 @@ concurrency:
 
 jobs:
   check:
+    # Not again after a merge (see the top of this file).
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -40,6 +46,8 @@ jobs:
         run: bin/check
 
   dev-site:
+    # Not again after a merge (see the top of this file).
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -68,12 +76,20 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-  # The deploy to staging (plan step 3g-3): only after both jobs above pass, only on main, and
-  # only for a push or the "Run workflow" button, never for a pull request or the weekly run.
+  # The deploy to staging (plan step 3g-3): only on main, and only for a push (a merge) or the "Run
+  # workflow" button, never for a pull request or the weekly run. After the button the checks run
+  # first and stop it unless both pass; after a merge they are skipped, which does not stop it
+  # (GitHub's default rule, "all succeeded", counts a skipped job as not succeeded, so it is
+  # replaced by "each check passed or was skipped": a failed, cancelled or timed-out one stops it).
   # Its secrets exist only in the "staging" environment, which accepts only protected branches.
   deploy-staging:
     needs: [check, dev-site]
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: >-
+      !cancelled()
+      && github.ref == 'refs/heads/main'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && contains(fromJSON('["success", "skipped"]'), needs.check.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.dev-site.result)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: staging
