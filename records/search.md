@@ -27,7 +27,7 @@ first looking for a change that serves both.
 | Page | Current address | Search phrase |
 |---|---|---|
 | Home | `/` (the front page) | acoustic guitarist in Fayetteville |
-| Book | `/hire-acoustic-guitarist/` (was `/book/`) | hire an acoustic guitarist in Fayetteville |
+| Book | `/hire-acoustic-guitarist/` (was `/book/`) | book an acoustic guitarist in Fayetteville (was "hire …" until 2026-11-17) |
 | Music | `/music/` | music (not a search target; see below) |
 | Songs | `/songlist/` | song list (not a search target; see below) |
 | About | `/about/` | acoustic guitarist Southern Pines |
@@ -47,7 +47,7 @@ overall SEO and readability lights are green.
 | Music | Keyphrase in image alt attributes, Images, Text length | none |
 | Songs | Text length; Keyphrase in slug (improvement) | none |
 | About | Keyphrase in image alt attributes, Images, Text length; Keyphrase in slug (improvement) | Sentence length (42.9% over 20 words), red |
-| Book | Keyphrase in image alt attributes, Images, Text length | none |
+| Book | Keyphrase in image alt attributes, Images, Text length; Keyphrase in slug (improvement, since the change to "book", 2026-11-17) | none |
 | Privacy Policy | Keyphrase in image alt attributes, Images, Keyphrase in subheading | none |
 
 Each SEO item is explained in its page's entry below. "Word complexity", grey on every page, is
@@ -108,15 +108,19 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 
 ## Book
 
-- Search phrase: hire an acoustic guitarist in Fayetteville (the user, 2026-11-16: people planning
-  an event say "hire"; "book" is the word of venues, agents and musicians). Google suggests "hire
-  guitarist near me", "hire a guitar player", "hire an acoustic guitar player"; the small words
-  let the title read naturally as an exact match.
-- Search title: Hire an Acoustic Guitarist in Fayetteville, NC (then the site name)
-- Description: Hire an acoustic guitarist and singer in Fayetteville, NC for weddings, parties,
+- Search phrase: book an acoustic guitarist in Fayetteville, changed on live by the user on
+  2026-11-17, with the search title, the description and the first sentence. Until then "hire an
+  acoustic guitarist in Fayetteville" (the user, 2026-11-16: people planning an event say "hire";
+  "book" is the word of venues, agents and musicians; Google suggests "hire guitarist near me",
+  "hire a guitar player", "hire an acoustic guitar player"). On 2026-11-17 Claude set out that
+  reasoning and offered "Hire or Book …" in the title; the user chose "book", judging that only the
+  Home page's search ranking matters much. The small words let the title read naturally as an
+  exact match.
+- Search title: Book an Acoustic Guitarist in Fayetteville, NC (then the site name)
+- Description: Book an acoustic guitarist and singer in Fayetteville, NC for weddings, parties,
   clubs and restaurants. Send Howard your event's details.
-- Text changed: the first paragraph opens "Looking to hire an acoustic guitarist in
-  Fayetteville?"; "the list" links to the song list.
+- Text changed: the first paragraph opens "Looking to book an acoustic guitarist in
+  Fayetteville?" ("hire" until 2026-11-17); "the list" links to the song list.
 - Address: `/hire-acoustic-guitarist/`, set on staging 2026-11-16 (3 of the phrase's 4 main
   words, so green without the town); the menu label stays "Book". WordPress keeps no record of a
   page's old address (`wp_check_for_changed_slugs()` skips hierarchical post types such as pages),
@@ -128,6 +132,9 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 - Links to: the song list (from "the list"); outside, the user's Facebook page.
 - Pictures: none (see below).
 - Not green, with reasons:
+  - Keyphrase in slug (an improvement, since 2026-11-17): the address keeps "hire"
+    (`/hire-acoustic-guitarist/`); "book" in it would mean a new address, a redirect and every
+    link changed, for words Google says have "hardly any effect" in addresses.
   - Text length (about 55 words; Yoast wants 300): a form page, which visitors open to send a
     request. Google: "there's no magical word count target". A "What happens next" section was
     considered; the user judged the page says enough before sending, and the form's "sent"
