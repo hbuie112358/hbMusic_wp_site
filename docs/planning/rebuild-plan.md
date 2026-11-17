@@ -19,8 +19,8 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next:** item 1d-4 (the settings record), then 1e (the frame lock in code), then items 2 to
-  7 below. 1d-3 (the user's Editor login) happens on live at 9f.
+- **Next:** 1e (the frame lock in code), then items 2 to 7 below. 1d-3 (the user's Editor
+  login) happens on live at 9f.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
@@ -101,7 +101,10 @@ new findings added as steps.
      - 1d-3 `[ ]` The user's own Editor login, as chapter 6's table gives the customer: its own
        person, a name hard to guess, a strong password set by DTS, two-factor offered. On live
        only, at 9f (the user, 2026-11-17); staging gets none.
-  1d-4. A settings record (chapter 2, H99): every setting made by hand in the admin, with its
+  1d-4. `[x]` Drafted 2026-11-17 and accepted by the user; its open items (staging's admin
+     email, WordPress Importer and two old themes deleted on staging, the Turnstile account,
+     Brevo's list of blocked addresses) are listed at its end, to confirm in the admin. A
+     settings record (chapter 2, H99): every setting made by hand in the admin, with its
      date and reason, gathered from the plan's steps, `project-state.yaml` and
      `docs/ENVIRONMENTS.md`; found missing by 1d-2. In `data/records/settings.md`, beside the
      handover note, not in `records/` (the user, 2026-11-17): much of it is security
@@ -1851,9 +1854,11 @@ new findings added as steps.
      and "Sample Page" removed if live has them (staging's were trashed 2026-11-15). Done two
      weeks after the switch, not the same day (chapter 8's way back, 1d, 2026-11-17): until
      then, reactivating `music-lite` returns the old look, with the 9e backup and export behind
-     it. New security keys in live's `wp-config.php` here (the user, 2026-11-17), since the
-     old admin's name was in the exposed `local.sql`: everyone is logged out once and logs in
-     again, two-factor included; a copy of `wp-config.php` first, removed once the site works.
+     it. No new security keys here (the user, 2026-11-17, after first agreeing on a wrong
+     premise): live's were already replaced on 2026-11-02 (0d); a login name is not a key, and
+     removing the old admin ends its sessions; new salts could also leave FluentSMTP unable to
+     read its stored Brevo key, which its form says is encrypted with them (not read in its
+     code). Replaced again only if they may have leaked.
    - [ ] 9o. Backups (D27): the first content export into `data/exports/`, and the restore test of
      checklist 12.3 both ways, with its date.
    - [ ] 9p. From then on, every merge reaches live through the approved deploy job.
