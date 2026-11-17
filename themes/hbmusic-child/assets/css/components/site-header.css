@@ -144,10 +144,11 @@ header.wp-block-template-part:has(> .site-header) {
 	}
 }
 
+/* The links fade in while moving down into place, over the theme's drop distance and duration. */
 @keyframes site-header-menu-drop {
 	from {
 		opacity: 0;
-		transform: translateY(-0.5rem);
+		transform: translateY(calc(-1 * var(--wp--custom--motion--menu-drop-distance)));
 	}
 
 	to {

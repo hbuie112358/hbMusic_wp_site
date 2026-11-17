@@ -56,6 +56,7 @@ const HBMUSIC_COMPONENT_STYLES = array(
 	'core/button'        => array( 'buttons' ),
 	'core/heading'       => array( 'headings' ),
 	'core/post-title'    => array( 'headings' ),
+	'core/media-text'    => array( 'media-text' ),
 );
 
 /**
