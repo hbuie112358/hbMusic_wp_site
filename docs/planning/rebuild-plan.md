@@ -11,12 +11,15 @@ new findings added as steps.
 - **Where the work stands:** steps 0 to 8 done, with the D29 polish and 5f done and deployed to
   staging on 2026-11-12 (#42 to #55); their entries hold the details. Step 9 (going live) is under
   way: 9a done (2026-11-12), paused at 9b while the DTS Operations Handbook was drafted. The
-  handbook's version 1 is done (2026-11-14, H1-H99), on GitHub as a private repository. This site
-  is classified Fully managed, Brochure, hosted by the customer, with two exceptions (the
-  project's `CLAUDE.md`).
-- **In progress:** the Editing Help plugin (H89), on branch `feat/editing-help` (3 commits,
-  local): done on the dev site, not deployed; it reaches staging and live with 9b's `bin/deploy`
-  (`docs/ENVIRONMENTS.md`).
+  handbook's version 1 is done (2026-11-14, H1-H99; since then H100-H102), on GitHub as a
+  private repository. This site is now treated as a standard takeover handed to a customer who
+  edits (D32): Content by customer, Brochure, hosted by the customer; the project's `CLAUDE.md`
+  still says Fully managed until item 4.
+- **Done since 2026-11-15:** items 1 (Privacy Policy), 1b (footer link), 1c (search work on all
+  six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
+  staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
+  moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
+- **Next:** item 1d, then 1e (the frame lock in code), then items 2 to 7 below.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the

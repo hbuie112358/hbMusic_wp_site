@@ -2,9 +2,12 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-14T10:22:20-05:00
-current_branch: feat/editing-help
-last_commit: fe1f8f7
+timestamp: 2026-11-16T19:20:31-05:00
+# main once the pause's pull request is merged; last_commit is the branch's tip before the pause
+# commit, rewritten by GitHub's rebase merge, so on main it is found by its subject line:
+# "docs(records): finish the search work with the Songs and Music pages (1c)".
+current_branch: main
+last_commit: c6646c3
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -163,13 +166,32 @@ last_work: >
   global PAUSE_CONVENTION.md gained five rules approved by the user (uncommitted and unpushed
   work from git's output; blocking decisions also in the plan; numbers from their source; stale
   plan parts marked at once; a cold-resume check after a plan section is moved or trimmed).
+  2026-11-15 and 11-16 (after a resume): item 1, staging's Privacy Policy rewritten from the
+  handbook's model and pasted by the user (facts checked in FluentSMTP's and Wordfence's code;
+  failed emails kept 60 days; routines for visitors' requests and restores); item 1b, the footer's
+  privacy link from WordPress's setting, with a link test; item 1c, the search work on all six
+  pages on staging (records/search.md; Home and Book searched for, Songs and Music not search
+  targets, About carries Southern Pines, Book moved to /hire-acoustic-guitarist/ with its
+  call-to-action button, a test that every link between the site's pages answers); the form's
+  "sent" message; D32, the site treated as a standard takeover handed to a customer who edits
+  (Content by customer; takeover record skipped with its reason; staging a temporary preview,
+  removed after go-live at 9r); item 1e planned, the frame kept in the code with a lock, after
+  staging's saved copy of the call-to-action panel blocked the deploy (reset by the user; staging
+  otherwise clean); template notes for an automatic menu, editable call-to-action wording and a
+  "Site Manager" role. Handbook: H100 (Google's guide as the search method, a brief per page,
+  Yoast as the check, toolkit/yoast.md), H101 (Business Profile recommended), H102 (host preview
+  for a build), the restore clause and California's rule under H56, the content guide version 2.
+  Global: WORKING_STYLE.md gained "Checking tools measure the goal" and the merge rule (rebase by
+  default; GitHub deletes its branch; the local branch only after pulling and verifying); memory
+  gained verify-before-claiming and curiosity-questions-not-recorded. GitHub: "Automatically
+  delete head branches" on; a GitHub pull request incident on 2026-11-16 caused 502s on merges,
+  and a deleted branch closed #58 once (restored). Pull requests #57 to #60 merged.
 
 next_action: >
-  Step 9, item 1 of the plan's Current position "Next, in order": review the site's Privacy
-  Policy page as staging shows it. Claude asks the user to paste the page's code from staging's
-  editor (Options, "Code editor"), compares it with the handbook's model policy
-  (customer/privacy-policy.md, the videos-scroll block) and settles the wording with the user.
-  Then items 2 to 7 there.
+  Plan item 1d: map the remaining step 9 onto the handbook's chapter 8 routine (the parts that
+  apply to a site staying at its host) and chapter 9's handover to a customer who edits, and set
+  up the user's own Editor login. Then 1e (the frame lock in code, designed with the user first),
+  then items 2 to 7.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -188,9 +210,10 @@ verification:
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
   brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
-  local_sites: dev site on 10102 (rebuilt 2026-11-14 with the Editing Help plugin and the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 22 checks (the Editing Help plugin's PHPCS added); bin/test 9 scenario checks + 146 browser tests + the final debug-log check, all passing on feat/editing-help (2026-11-14); bin/screenshots for before/after looks
-  github: required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
+  staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
+  local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
+  checks: bin/check all passing; bin/test 10 scenario checks (dev-privacy-link.sh added) + 152 browser tests (links.spec.ts added) + the final debug-log check, all passing (2026-11-16); bin/screenshots for before/after looks
+  github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
   dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter); alerts and security updates on; #43 and #44 reviewed line by line and merged 2026-11-12, none open
@@ -199,13 +222,17 @@ verification:
   not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes:
-  - file: none in this repository (the plan and this file go in with the pause commit)
-  - file: ~/dev/dts-handbook/WORKING_DRAFT.md
+  - file: none in this repository
+    why: the plan and this file go in with the pause commit, pushed and merged as this pause's pull request
+  - file: ~/dev/dts-handbook (committed, not pushed)
     why: >
-      The handbook's "Open items" checklist (one grouped list replacing the long paragraph) and
-      topic 8's range corrected to H31-H38, written with the user's approval on 2026-11-14;
-      waiting for the user's "commit". The handbook's main is 1 commit ahead of GitHub (2a7839e,
-      from git status); that waits for the user's "push".
+      The handbook's main is 1 commit ahead of GitHub (73c7495, H102, from git status); it waits
+      for the user's "push".
+  - file: ~/.claude (uncommitted; the user commits it on the host)
+    why: >
+      WORKING_STYLE.md (the "Checking tools measure the goal" section and the merge rule), this
+      project's memory (MEMORY.md, verify-before-claiming.md, curiosity-questions-not-recorded.md)
+      and the time log.
 
 pending_decisions:
   - >
@@ -215,14 +242,7 @@ pending_decisions:
     private repository on the user's account; it moves to the DTS organization when that exists
     (Transfer ownership, then git -C ~/dev/dts-handbook remote set-url origin ...).
   - >
-    Pushing this project's branch feat/editing-help and its pull request, when the user chooses:
-    11 commits not on GitHub's main once this pause is committed (git log origin/main..HEAD
-    showed 10 before it, 2026-11-14): the 3 Editing Help commits (8c410f3, 0a50544, 8a14023), the
-    pause commits 9f16248 and this one, fe1f8f7 with the cold-resume check's fixes, and 5 plan and
-    pause commits from 2026-11-12 to 11-14 that never reached GitHub (092aed1, 970a434, e1c69b1,
-    e2eb2af, 6c26f23). Nothing in it is deployed until 9b's
-    bin/deploy. The old local branch chore/pause-2026-11-12 was deleted on 2026-11-14 (fully
-    contained in feat/editing-help).
+    Pushing the handbook's main (1 commit ahead, H102), when the user says "push".
   - >
     Offered 2026-11-14, not answered: a line for the global WORKING_STYLE.md on American English
     spelling (it is in this project's memory now); a shared file, nothing without the user's yes.
