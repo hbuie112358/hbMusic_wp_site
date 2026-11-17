@@ -1,7 +1,7 @@
 <?php
 /**
- * The security headers on visitor pages: a Content-Security-Policy, nosniff, a referrer policy and
- * a permissions policy.
+ * The security headers on visitor pages: a Content-Security-Policy, nosniff, a referrer policy, a
+ * permissions policy, and HSTS on HTTPS requests.
  *
  * WordPress's send_headers hook runs for the pages it builds for visitors, not for the admin, the
  * login page or the REST API (which sends its own nosniff). The admin is left out on purpose: the
@@ -61,16 +61,44 @@ const SITEHARDENING_CSP_EXTENSIBLE_DIRECTIVES = array( 'script-src', 'style-src'
 // add a keyword such as 'unsafe-eval'. Wildcard hosts are refused: each service is named.
 const SITEHARDENING_CSP_SOURCE_PATTERN = '#^https://[a-z0-9.-]+(:[0-9]{1,5})?(/[A-Za-z0-9._~/-]*)?$#';
 
+/*
+ * HSTS (handbook H83): browsers that have seen it use only https:// for this host for a year.
+ * Without includeSubDomains, since a customer's other subdomains may lack HTTPS, and without
+ * preload, which is hard to undo. Sent only on a request that arrived over HTTPS: such a site
+ * already has HTTPS working, and a plain-HTTP copy (the dev site) never sends it. Browsers ignore
+ * the header on plain HTTP anyway.
+ */
+const SITEHARDENING_HSTS_HEADER = 'Strict-Transport-Security: max-age=31536000';
+
 /**
  * Sends the security headers.
  */
 function sitehardening_send_security_headers(): void {
-	header( 'Content-Security-Policy: ' . sitehardening_content_security_policy() );
-	header( 'X-Content-Type-Options: nosniff' );
-	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
-	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()' );
+	foreach ( sitehardening_security_headers( is_ssl() ) as $header_line ) {
+		header( $header_line );
+	}
 }
 add_action( 'send_headers', 'sitehardening_send_security_headers' );
+
+/**
+ * The security header lines for one response, apart from sending them, so they can be checked
+ * for an HTTPS request on a site that has none.
+ *
+ * @param bool $is_https_request Whether the request arrived over HTTPS.
+ * @return list<string> The header lines, each "Name: value".
+ */
+function sitehardening_security_headers( bool $is_https_request ): array {
+	$header_lines = array(
+		'Content-Security-Policy: ' . sitehardening_content_security_policy(),
+		'X-Content-Type-Options: nosniff',
+		'Referrer-Policy: strict-origin-when-cross-origin',
+		'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()',
+	);
+	if ( $is_https_request ) {
+		$header_lines[] = SITEHARDENING_HSTS_HEADER;
+	}
+	return $header_lines;
+}
 
 /**
  * Builds the policy: the core, with the outside sources the site adds.
