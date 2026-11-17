@@ -103,7 +103,7 @@ new findings added as steps.
        user, 2026-11-17; a customer's repository would be private). Each section filled where
        the facts exist, else marked with the item that makes them. It found two missing records:
        the settings record (chapter 2) and the status sheet (chapter 12, item 3).
-     - 1d-3 `[ ]` The user's own Editor login, as chapter 6's table gives the customer: its own
+     - 1d-3 `[x]` (2026-11-17, on live at 9f, its login tested) The user's own Editor login, as chapter 6's table gives the customer: its own
        person, a name hard to guess, a strong password set by DTS, two-factor offered. On live
        only, at 9f (the user, 2026-11-17); staging gets none.
   1d-4. `[x]` Drafted 2026-11-17 and accepted by the user; its open items (staging's admin
@@ -167,7 +167,8 @@ new findings added as steps.
      - 3-1 `[x]` Wordfence's password rules (4.11, H80), 2026-11-17, by the user on staging and
        live: leaked passwords refused for everyone who can publish (was admins only); strong
        passwords already so.
-     - 3-2 Site Hardening 0.2.0: unfiltered HTML for Administrators only (4.10, H79, through
+     - 3-2 `[x]` (2026-11-17: deployed to staging with #64; the user's `curl -I` there showed
+       `strict-transport-security: max-age=31536000`) Site Hardening 0.2.0: unfiltered HTML for Administrators only (4.10, H79, through
        `map_meta_cap`), and HSTS for a year on HTTPS requests only (3.1, H83; the user chose
        "automatic", not a constant on live). Tested in `dev-site-hardening.sh`, four planted
        faults caught. Left: the user's `curl -I` on staging after the deploy.
@@ -1824,7 +1825,7 @@ new findings added as steps.
        GitHub's rule for waiting deployments); the user's key and server setup (a read-only
        listing first), the refusal tests; the GitHub environment; then the pull request, with
        `CLAUDE.md`, `docs/ROUTINES.md` and `docs/ENVIRONMENTS.md` updated.
-   - [ ] 9c. Just before the export, both trashes on staging (Posts and Pages) emptied, so trashed
+   - [x] 9c. (2026-11-17: exported to `data/exports/2026-11-17-staging-content.xml`; the content list in `data/records/content-list-2026-11-17.md`. Found and fixed before the final export: the menu's Book link was a full staging address, now `/hire-acoustic-guitarist/`. The Songs photo must be uploaded by hand too, 9k.) Just before the export, both trashes on staging (Posts and Pages) emptied, so trashed
      items such as WordPress's "Hello world!" post and the old privacy draft (trashed 2026-11-15)
      cannot travel to live: the "All content" export takes every item except auto-drafts, trashed
      ones included (`post_status != 'auto-draft'`, WordPress 7.1.4's `wp-admin/includes/export.php`,
@@ -1837,20 +1838,20 @@ new findings added as steps.
      staging, since an edit made after the export never reaches live; and a content list is made
      from the export (the counts of pages, songs, menus, forms and media entries), which 9j
      checks on live.
-   - [ ] 9d. A rehearsal: that export imported into a throwaway WordPress (the dev site's images,
+   - [x] 9d. (2026-11-17, Claude, on a throwaway Docker site at port 10104, removed afterwards: WordPress 7.1.4, the theme and plugins as on staging, the WordPress Importer 0.9.7. All 6 pages at their addresses with their templates and Yoast titles, 108 songs, the header picking "Main menu" by itself with its five links, the Book page's form found by its name, the videos, an empty PHP log. Found: the 7 pictures fail with 401 (staging's password); an existing page with the same address, even a draft such as WordPress's own Privacy Policy, gives the imported page a "-2" address; Contact Form 7 creates a sample "Contact form 1" when activated; the front page and the address style are not carried.) A rehearsal: that export imported into a throwaway WordPress (the dev site's images,
      without its test pages), to see before live what the importer does with the addresses, the
      templates, the menu, the form and the template parts, and what must be set by hand after.
      What it finds also corrects the refresh routine of 9q.
-   - [ ] 9e. Just before stage B: a Hostinger backup of live made by hand (hPanel), and live's old
+   - [x] 9e. (2026-11-17: a Hostinger backup of live at 06:54, made by the user's first click although hPanel reported an error; live's old content in `data/exports/2026-11-17-live-old-content.xml`: 7 pages, 3 posts "Video 01-03", 2 reusable blocks, the old menu, 6 media entries. Its addresses not yet covered, `/audio-and-video/` and `/video-01/` to `/video-03/`, now redirect to Music, handbook 12, 9.4.) Just before stage B: a Hostinger backup of live made by hand (hPanel), and live's old
      content exported into `data/exports/` (the way back, D27).
 
    *Stage B: setup on live, behind the old look (visitors see no change).*
-   - [ ] 9f. The new admin account (a name that is not easy to guess, two-factor login with
+   - [x] 9f. (2026-11-17, by the user: the new admin with two-factor, tested; the user's Editor, tested; live's admin email the same address as staging's.) The new admin account (a name that is not easy to guess, two-factor login with
      Wordfence); the rest of step 9 done with it. The user's own Editor login too (1d-3).
      Live's admin email (Settings → General) chosen with the user: an address the user reads,
      since WordPress's own notices go there (2026-11-17: staging's is the user's third address,
      not the business one; its change, recorded as pending on 2026-11-09, never started).
-   - [ ] 9g. Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
+   - [x] 9g. (2026-11-17, by the user: FluentSMTP on live connected to Brevo with live's own API key, From forced to website@, Delete Logs 60 days with Log Emails off, Pushover alerts with live's own application token; the Email Test arrived at once. Brevo's IP blocking is on and its one authorized address is the Hostinger server live and staging share, so live needed no new entry and 9r keeps it. The alert path is shown by 9k's real booking request.) Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
      Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m); its log
      as on staging: Log Emails off, Delete Logs "After 60 Days" (set while Log Emails is switched
      on, since the field is hidden otherwise; then switched off and saved), as the privacy policy
@@ -1862,12 +1863,12 @@ new findings added as steps.
      the booking form on live refuses every request.
 
    *Stage C: the switch (a short window; the old site has little traffic).*
-   - [ ] 9i. The old pages to the trash (the inventory's list, step 2).
-   - [ ] 9j. Staging's export imported, assigned to the new admin; each new page checked at its
+   - [ ] 9i. The old pages to the trash (the inventory's list, step 2): every page, drafts included (WordPress's own Privacy Policy draft and "Sample Page" too, if there), and the three old posts "Video 01-03" (9e), since any page holding an address makes the imported one "-2" (9d).
+   - [ ] 9j. Staging's export imported, assigned to the new admin, "Download and import file attachments" left unchecked (the pictures cannot come from staging, 9d); each new page checked at its
      own address (no `-2`) and with its template as on staging; the importer deleted. 9c's
      content list matched on live: every page, song, menu, form and media entry came over.
-   - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; the menu,
-     the hero photo uploaded by hand into Home's hero, the site icon, the booking form's Turnstile
+   - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; Settings → Permalinks checked to be "Post name" (9d); the menu,
+     the hero photo uploaded by hand into Home's hero and the Songs photo into its Media & Text block (9c), the site icon, the booking form's Turnstile
      keys and its Mail tab's From and To, and its Messages tab's "sent" and "sending failed"
      texts, copied from `config/booking-form-messages.json`; one real booking request arrives,
      showing the "sent" text. The privacy page as
@@ -1890,7 +1891,7 @@ new findings added as steps.
      keyboard-only pass of every page (7.2), PageSpeed Insights rating Home and each template
      "good" on mobile (8.1), and Site Health with no critical issue (14.5); the results into
      the status sheet (item 3).
-   - [ ] 9n. Cleanup: `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
+   - [ ] 9n. Cleanup: Contact Form 7's sample "Contact form 1" deleted (9d); `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
      removed, the old admin account removed (its content given to the new one) and its name, and
      `admin`, on Wordfence's list of names blocked at once. WordPress's sample "Hello world!" post
      and "Sample Page" removed if live has them (staging's were trashed 2026-11-15). Done two
@@ -1914,7 +1915,7 @@ new findings added as steps.
    - [ ] 9r. Staging removed, its job as the build's preview done (D32, the handbook's 12, 3.9):
      after 9q's refresh is no longer needed and the user has approved the new site, staging's
      files, database and subdomain are deleted at the host, with its server rules, its deploy
-     destination and key, its address in Brevo's Authorized IPs, its hostname in the Turnstile
+     destination and key (not its address in Brevo's Authorized IPs, which live shares, 9g), its hostname in the Turnstile
      widget, its HetrixTools or other
      monitors if any, and its DNS record; checked from outside that the address no longer
      answers. Before the first monthly update after that, local staging is set up as the
