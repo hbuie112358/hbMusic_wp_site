@@ -19,13 +19,26 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next: go live as soon as possible (the user, 2026-11-17, D33).** Before go-live only:
-  1. item 3-2's last step: the user's `curl -I` on staging after the deploy (HSTS);
-  2. Contact Form 7 6.2.5 on staging, by the user (the hold ended 2026-11-17);
-  3. step 9 from 9c, the code reaching live by hand upload at 9h (D33) instead of 9b; 9d's
-     rehearsal kept. 1d-3 (the user's Editor login) happens at 9f.
-  **After go-live, in this order:** item 5 (`bin/deploy`, ending D33's exception), item 3's
-  parts 3-3 to 3-9, item 4, item 5b, 9o (restore test), 9q, 9r, 9s, then 6b, 6c and 7.
+- **THE NEW SITE IS LIVE (2026-11-17, D33).** Done that day: 3-2's HSTS on staging, Contact Form
+  7 6.2.5 on staging (already there), and step 9 from 9c to 9l with 9m's parts A (Yoast as on
+  staging) and B (sitemap submitted, indexing requested for Home and Book); details in each
+  item. Found on the way and fixed: the menu's Book link and the form's From address carried
+  staging's domain; four old addresses not redirected (#65); live's tagline still named the Mid
+  Ohio Valley; live got its own Turnstile widget. Pull requests #62 to #65 merged.
+- **Next, to finish going live (step 9):**
+  1. 9m part C: HetrixTools shows the live monitor Up (the user).
+  2. 9m part D: the launch baseline, a screenshot of Yoast's panel for every page (SEO and
+     readability open, no admin bar), into `records/`, with each page's entry in
+     `records/search.md` dated, and the user's acknowledgment.
+  3. 9m part E: Site Health with no critical issue (14.5), a keyboard-only pass of every page
+     (7.2), PageSpeed (Mobile) for Music and Book (8.1; Home and Songs measured, 9v), the
+     secrets check (1.5).
+  4. 9n, from about 2026-12-01 (two weeks after the switch): cleanup as listed there.
+- **Then, after go-live, in this order:** 9t (the phone menu shows only Home), 9v (speed: the
+  click-to-load player and the logo), 9u (the form's message before the spam check), item 5
+  (`bin/deploy`, ending D33's exception; until then a change reaches live as a zip uploaded by
+  hand), item 3's parts 3-3 to 3-9, item 4, item 5b, 9o (restore test), 9q, 9r, 9s, then 6b, 6c
+  and 7.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
@@ -1856,18 +1869,19 @@ new findings added as steps.
      as on staging: Log Emails off, Delete Logs "After 60 Days" (set while Log Emails is switched
      on, since the field is hidden otherwise; then switched off and saved), as the privacy policy
      states (`docs/ENVIRONMENTS.md`).
-   - [ ] 9h. Contact Form 7 at the version staging runs (6.2.5 not before 2026-11-17), Song List
+   - [x] 9h. (2026-11-17, by the user from the zips of 181eef0: the theme installed, not active, its card with the picture and no parent warning; Song List 0.2.1 and Editing Help 0.1.1 active; Site Hardening 0.2.0 installed, inactive until 9l; Contact Form 7 6.2.5, FluentSMTP 2.4.5 and the WordPress Importer 0.9.7 active.) Contact Form 7 at the version staging runs (6.2.5 not before 2026-11-17), Song List
      activated, WordPress's importer installed. In Cloudflare (the account under the user's
-     third address), the Turnstile widget's hostnames gain `howardbuiemusic.com`: on 2026-11-17
-     it listed only `staging.howardbuiemusic.com` (seen by the user), and without live's domain
-     the booking form on live refuses every request.
+     third address), the Turnstile widget's hostnames hold `howardbuiemusic.com` (without it the
+     booking form on live refuses every request): `[x]` found already there beside
+     `staging.howardbuiemusic.com`, 2026-11-17 (the user; an earlier reading had seen only
+     staging's).
 
    *Stage C: the switch (a short window; the old site has little traffic).*
    - [ ] 9i. The old pages to the trash (the inventory's list, step 2): every page, drafts included (WordPress's own Privacy Policy draft and "Sample Page" too, if there), and the three old posts "Video 01-03" (9e), since any page holding an address makes the imported one "-2" (9d).
-   - [ ] 9j. Staging's export imported, assigned to the new admin, "Download and import file attachments" left unchecked (the pictures cannot come from staging, 9d); each new page checked at its
+   - [x] 9j. (2026-11-17: imported as the new admin, attachments unticked, the 7 media entries reported failed as in 9d; 6 pages at their own addresses with staging's templates, checked from outside; songs and the booking form seen by the user; the importer deleted.) Staging's export imported, assigned to the new admin, "Download and import file attachments" left unchecked (the pictures cannot come from staging, 9d); each new page checked at its
      own address (no `-2`) and with its template as on staging; the importer deleted. 9c's
      content list matched on live: every page, song, menu, form and media entry came over.
-   - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; Settings → Permalinks checked to be "Post name" (9d); the menu,
+   - [x] 9k. (2026-11-17, by the user: the theme active, Home the front page, addresses already "Post name", the hero and Songs pictures uploaded with their descriptions, the site icon, live's own Turnstile widget and keys, the form's From retyped (the import carried staging's, which Contact Form 7 flagged), its messages checked, the privacy page set, the tagline replaced (it still named the Mid Ohio Valley); a real booking request arrived. The new site is live.) The child theme activated; Settings → Reading with Home as the front page; Settings → Permalinks checked to be "Post name" (9d); the menu,
      the hero photo uploaded by hand into Home's hero and the Songs photo into its Media & Text block (9c), the site icon, the booking form's Turnstile
      keys and its Mail tab's From and To, and its Messages tab's "sent" and "sending failed"
      texts, copied from `config/booking-form-messages.json`; one real booking request arrives,
@@ -1877,7 +1891,7 @@ new findings added as steps.
      Pages), and the footer's link opening it in a private window.
 
    *Stage D: checks and cleanup, from outside.*
-   - [ ] 9l. Site Hardening activated and checked as on staging; avatars off; staging's two server
+   - [x] 9l. (2026-11-17: Site Hardening 0.2.0 active, its headers and HSTS seen from outside, no PHP version header, XML-RPC 403, Yoast's comment gone; avatars off; the version files 403 and no PHP in uploads (a test file 403, then deleted), `.htaccess` backed up first; every page loads in a browser with the policy, videos and the spam check included. Two console messages from outside code, harmless: YouTube's player asking for compute-pressure, and Cloudflare's script probing `data:`; a booking request sent with the policy on arrived.) Site Hardening activated and checked as on staging; avatars off; staging's two server
      rules (8k) and HSTS (3.1).
    - [ ] 9m. Yoast as on staging, each page indexable with its own canonical address at the live
      domain; `x-hcdn-cache-status: DYNAMIC`; the old addresses' redirects; the local leftovers
@@ -1915,12 +1929,15 @@ new findings added as steps.
    - [ ] 9r. Staging removed, its job as the build's preview done (D32, the handbook's 12, 3.9):
      after 9q's refresh is no longer needed and the user has approved the new site, staging's
      files, database and subdomain are deleted at the host, with its server rules, its deploy
-     destination and key (not its address in Brevo's Authorized IPs, which live shares, 9g), its hostname in the Turnstile
-     widget, its HetrixTools or other
+     destination and key (not its address in Brevo's Authorized IPs, which live shares, 9g), its Turnstile widget "Howard
+     Buie Music" (live has its own since 9k), its HetrixTools or other
      monitors if any, and its DNS record; checked from outside that the address no longer
      answers. Before the first monthly update after that, local staging is set up as the
      handbook's H7 describes (a copy of live on the user's computer, no internet access), and
      `docs/ROUTINES.md` changes from "staging first" to local staging.
+   - [ ] 9t. **The phone menu (found by the user on live, 2026-11-17):** opening it shows only "Home". The sticky header's `backdrop-filter` (`site-header.css`) makes the header the frame of the fixed, full-screen menu panel inside it, so the panel is clipped to the header; the same on staging. Fix: the blur moved to a layer behind the header, with a browser test that opens the phone menu and finds all five links on screen and clickable (shown failing with the blur back on the header); then the theme zip uploaded on live again.
+   - [ ] 9u. **The booking form's message before the spam check is done (the user, 2026-11-17):** a request sent before Cloudflare's check gives its go-ahead is refused, rightly, but the visitor was told it failed (which message, not remembered: most likely Contact Form 7's own "spam" message, never customized), and Send pressed again then worked. The user wants the visitor told to click the box first. Proposed wording for Contact Form 7's spam message (key `spam`): "Please tick the box above the Send button to show you're not a robot, then press Send again. If no box appears, wait a moment and press Send again." Set in `config/booking-form-messages.json` with a dev test (the no-token case already shows the spam result), typed into staging's and live's Messages tab; first confirmed on the dev site that this is the message shown.
+   - [ ] 9v. **Speed (handbook 12, 8.1), failed at launch, 2026-11-17:** PageSpeed Insights, Mobile, Home: LCP 8.3 s (good under 2.5), FCP 5.7 s, TBT 230 ms (under 200), CLS 0, Speed Index 6.1 s; no field data yet (too few visitors). Its list: unused JavaScript 529 KiB and third parties (most likely YouTube's player for Home's featured video, loaded early despite lazy loading), unused CSS 112 KiB, 4 long tasks, font display 200 ms, image delivery 30 KiB (the 56-pixel logo is a 33 KB file and takes `fetchpriority=high` from WordPress, the hero picture none), cache lifetimes 14 KiB. Songs, without a video, the same day: LCP 1.5 s, FCP 0.9 s, TBT 0 ms, CLS 0, all good, which confirms YouTube's player as the cause on Home (and Music). Measured from outside by Claude: the server answers in 0.3-0.5 s, the page is 88 KB. The fix, on the dev site with before and after numbers: the click-to-load video player (H88, checklist 8.5, item 3-9, brought forward), the logo made small and the priority given to the hero picture, and the font's display.
    - [ ] 9s. The handover, rehearsed (1d, below): the note in `data/records/handover-note.md`
      finished with live's facts, and the user's written sign-off, as the customer, that the new
      site is approved, joined with 9m's acknowledgment of the search results.
