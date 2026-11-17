@@ -172,7 +172,8 @@
 			},
 			"motion": {
 				"duration": "150ms",
-				"menuDrop": "200ms"
+				"menuDrop": "200ms",
+				"menuDropDistance": "0.5rem"
 			},
 			"header": {
 				"logoSize": "56px",
