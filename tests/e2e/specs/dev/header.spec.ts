@@ -1,4 +1,7 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { WCAG_TAGS } from './accessibility';
+import { CLOSE_MENU_BUTTON, OPEN_MENU_BUTTON, OPEN_MENU_PANEL, PHONE, TAP_BELOW_PANEL, expectTapBelowClosesMenu, openPhoneMenu, unreachableLinks } from './hamburger-menu';
 
 // Protects the sticky header and the menu (plan D29): the header stays at the top while the page
 // scrolls, a link reached with the keyboard is never hidden under it (WCAG 2.2, 2.4.11), the menu
@@ -100,37 +103,72 @@ test('the header is slimmer on a phone than on a computer', async ({ page }) => 
 	expect(phone, 'the header\'s height on a phone').toBeLessThan(desktop);
 });
 
-// The hamburger menu on a phone (plan 9t): WordPress's menu panel is fixed to the window, and a
-// backdrop-filter on any element around it makes that element the panel's frame instead (CSS
-// Filter Effects), which once trapped the open panel inside the header strip with only its first
-// link showing. The panel must fill the window, and each link must be the element the browser
-// finds at its own centre, so a visitor's tap reaches it.
-const PHONE = { width: 390, height: 800 };
-const OPEN_MENU_PANEL = `${HEADER} .wp-block-navigation__responsive-container.is-menu-open`;
+// The hamburger menu on a phone (plan 9t). A backdrop-filter on the header once made it the frame
+// of WordPress's fixed menu panel, so the open panel was trapped in the header strip. Now the panel
+// drops down from under the header, only as tall as its links, with the page visible below (the
+// user's choice): the close button takes the menu button's place, every link is the element the
+// browser finds at its own centre (so a tap reaches it), and the close button, Escape and a tap on
+// the page below each close it.
+test('the hamburger menu drops down under the header on a phone, every link reachable', async ({ page }) => {
+	const panel = await openPhoneMenu(page);
+	const header = await page.locator(HEADER).boundingBox();
+	const box = await panel.boundingBox();
+	// In whole pixels: the browser lays out in fractions.
+	expect(Math.round(box?.y ?? -1), 'the panel starts at the header\'s bottom').toBe(Math.round((header?.y ?? 0) + (header?.height ?? 0)));
+	expect(Math.round((box?.y ?? 0) + (box?.height ?? 0)), 'the panel ends above the window\'s bottom').toBeLessThan(PHONE.height);
+	expect(await panel.locator('.wp-block-navigation-item__content').count(), 'the menu\'s links').toBeGreaterThan(1);
+	expect(await unreachableLinks(panel), 'menu links a tap would not reach').toEqual([]);
 
-test('the hamburger menu opens over the whole window on a phone, every link reachable', async ({ page }) => {
+	const below = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('.wp-block-navigation__responsive-container') === null, { x: PHONE.width / 2, y: Math.round((box?.y ?? 0) + (box?.height ?? 0)) + TAP_BELOW_PANEL });
+	expect(below, 'the page is visible below the panel').toBe(true);
+});
+
+test('the close button takes the menu button\'s place, and the menu button steps aside', async ({ page }) => {
 	await page.setViewportSize(PHONE);
 	await page.goto('/');
-	await page.locator(HEADER).getByRole('button', { name: 'Open menu' }).click();
-	const panel = page.locator(OPEN_MENU_PANEL);
-	await expect(panel, 'the open menu panel').toBeVisible();
+	const openButton = await page.locator(OPEN_MENU_BUTTON).boundingBox();
+	await openPhoneMenu(page);
+	const closeButton = await page.locator(CLOSE_MENU_BUTTON).boundingBox();
+	expect(Math.abs((closeButton?.x ?? 0) - (openButton?.x ?? 0)), 'horizontal distance, in pixels').toBeLessThanOrEqual(2);
+	expect(Math.abs((closeButton?.y ?? 0) - (openButton?.y ?? 0)), 'vertical distance, in pixels').toBeLessThanOrEqual(2);
+	await expect(page.locator(OPEN_MENU_BUTTON), 'the menu button while the menu is open').toBeHidden();
+});
 
-	// In whole pixels: the browser lays out in fractions (799.99998 for a full 800-pixel window).
-	const box = await panel.boundingBox();
-	expect(Math.round(box?.height ?? 0), 'the open panel\'s height, in pixels').toBeGreaterThanOrEqual(PHONE.height);
-	const links = panel.locator('.wp-block-navigation-item__content');
-	expect(await links.count(), 'the menu\'s links').toBeGreaterThan(1);
-	const unreachable = await links.evaluateAll((elements) =>
-		elements
-			.filter((link) => {
-				const rect = link.getBoundingClientRect();
-				const centre = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-				const isInWindow = rect.top >= 0 && rect.bottom <= window.innerHeight && rect.width > 0;
-				return !isInWindow || !(centre !== null && link.contains(centre));
-			})
-			.map((link) => link.textContent?.trim() ?? '(no text)'),
-	);
-	expect(unreachable, 'menu links a tap would not reach').toEqual([]);
+for (const [way, close] of [
+	['the close button', async (page: Page) => page.locator(CLOSE_MENU_BUTTON).click()],
+	['Escape', async (page: Page) => page.keyboard.press('Escape')],
+] as const) {
+	test(`${way} closes the hamburger menu`, async ({ page }) => {
+		await openPhoneMenu(page);
+		await close(page);
+		await expect(page.locator(OPEN_MENU_PANEL), 'the open menu panel').toHaveCount(0);
+	});
+}
+
+// A tap on the page below the panel closes it (WordPress closes the menu when the focus leaves it
+// for nothing); the same test in WebKit, Safari's engine, is hamburger-menu-webkit.spec.ts.
+test.describe('with a touch screen', () => {
+	test.use({ hasTouch: true });
+
+	test('a tap on the page below closes the hamburger menu', async ({ page }) => {
+		await expectTapBelowClosesMenu(page);
+	});
+});
+
+test.describe('with reduced motion', () => {
+	test.use({ reducedMotion: 'reduce' });
+
+	test('the hamburger menu appears without sliding', async ({ page }) => {
+		const panel = await openPhoneMenu(page);
+		const running = await panel.evaluate((element) => element.getAnimations({ subtree: true }).length);
+		expect(running, 'animations in the open menu').toBe(0);
+	});
+});
+
+test('the open hamburger menu has no accessibility errors', async ({ page }) => {
+	await openPhoneMenu(page);
+	const results = await new AxeBuilder({ page }).include(OPEN_MENU_PANEL).withTags(WCAG_TAGS).analyze();
+	expect(results.violations.map((violation) => violation.id), 'the menu\'s accessibility').toEqual([]);
 });
 
 // The fix must keep the header's frosted look, not drop it: the blur sits on a layer behind the

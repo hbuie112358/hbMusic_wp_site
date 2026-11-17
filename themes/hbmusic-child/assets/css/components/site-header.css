@@ -14,6 +14,9 @@
 	--site-header-logo-size: var(--wp--custom--header--logo-size);
 	--site-header-padding-block: var(--wp--custom--spacing--header);
 	--site-header-height: calc(var(--site-header-logo-size) + 2 * var(--site-header-padding-block) + 1px);
+
+	/* The size of WordPress's menu buttons, which the hamburger menu places: its icons are 24px squares. */
+	--site-header-menu-button-size: 24px;
 }
 
 /*
@@ -84,6 +87,73 @@ header.wp-block-template-part:has(> .site-header) {
 	display: block;
 	width: var(--site-header-logo-size);
 	height: var(--site-header-logo-size);
+}
+
+/*
+ * The hamburger menu on a phone drops down from under the header, only as tall as its links, with
+ * the page still visible below (the user, plan 9t). WordPress's open panel is fixed to the whole
+ * window by default; here its top edge moves to the header's bottom and its bottom edge lets go.
+ */
+
+@media (width < 600px) {
+	.site-header .wp-block-navigation__responsive-container.is-menu-open {
+		inset: var(--site-header-height) 0 auto;
+		max-height: calc(100dvh - var(--site-header-height));
+		padding: var(--site-header-padding-block) var(--wp--custom--spacing--gutter);
+		background-color: transparent;
+		border-bottom: 1px solid var(--wp--preset--color--accent-5);
+
+		/*
+		 * WordPress slides the whole panel in with a transform, which would make the panel the
+		 * frame of the fixed close button inside it while it runs; the links slide instead.
+		 */
+		animation: none;
+	}
+
+	/* The header's frosted background, on a layer behind the panel's links for the same reason. */
+	.site-header .wp-block-navigation__responsive-container.is-menu-open::before {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		content: "";
+		background: var(--wp--custom--header--background);
+		backdrop-filter: blur(var(--wp--custom--header--blur));
+	}
+
+	/* The close button takes the menu button's place in the header, so it appears where the visitor tapped. */
+	.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-close {
+		position: fixed;
+		top: calc((var(--site-header-height) - var(--site-header-menu-button-size)) / 2);
+		right: var(--wp--custom--spacing--gutter);
+	}
+
+	/* ...and the menu button steps aside meanwhile, or the two icons show one over the other. */
+	.site-header .wp-block-navigation:has(.is-menu-open) .wp-block-navigation__responsive-container-open {
+		visibility: hidden;
+	}
+
+	/* WordPress keeps room above the links for its close button, which now sits in the header. */
+	.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content {
+		padding-top: 0;
+	}
+}
+
+@media (width < 600px) and (prefers-reduced-motion: no-preference) {
+	.site-header .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content {
+		animation: site-header-menu-drop var(--wp--custom--motion--menu-drop) ease-out;
+	}
+}
+
+@keyframes site-header-menu-drop {
+	from {
+		opacity: 0;
+		transform: translateY(-0.5rem);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 /* The site's name reads as a name, not as a link in running text. */
