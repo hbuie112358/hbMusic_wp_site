@@ -109,15 +109,20 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   its contrast against its band, equal sizes and equal widths in a row, no movement with reduced motion and no stuck hover
   after a tap (D29); the video carousel's row, label, keyboard access, end, its first and last slides centred, several carousels each with their own arrows, a carousel named after a heading directly above it, described as a carousel with "n of m" slides, an empty heading above it left out, and reduced motion (D29); every embedded player lazy-loaded; the video script (one YouTube player at a time: one moved out of its carousel's view, or the visitor clicking into another, pauses it; scrolling the page never does; loaded only where there is a player, with stand-in players instead of YouTube); one frame on every page (the header,
   footer, panels and carousel sharing the same edges on a computer and a phone, the panels at the theme's wide width on a wide screen, two panels in a row never touching, the call to action from the page template a section's spacing below the content, D29); the sticky header, a link reached with the keyboard never under it, the
-  menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, the slimmer phone header, and the hamburger menu on a phone dropping down under the header with every link reachable, closed by its button, Escape or a tap on the page (also in WebKit, plan 9t); Media & Text's text lined up with the page title on a computer and a phone, its text first on a phone when the picture is on the right (plan 9t-3)
+  menu's current-page mark, the same space before the footer after the call to action as after text in both page templates, the slimmer phone header, and the hamburger menu on a phone as a small panel under the header at the right, as wide as its links, with every link reachable, closed by its button, Escape or a tap on the page (also in WebKit, plan 9t); Media & Text's text lined up with the page title on a computer and a phone, its text first on a phone when the picture is on the right (plan 9t-3)
   (D29); the Site Hardening plugin's refusals; the old addresses' redirects; the Editing Help
   guide for the admin and the dev Editor (its panel first on the Dashboard, and on the Editor's first screen, headings and accessibility, the
   site's templates, sections and link example, and every editor label it names found in the real
   editor, on a draft page of its own); then, last, a check that the PHP debug
   log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
-  Run it after `bin/dev-site` and before every commit that touches the site, the theme or a
-  plugin. Every test runs even after a failure; exit status 1 if any failed.
+  Before a commit that touches the site, the theme or a plugin, Claude runs `bin/check` and the
+  browser tests of the part changed (their spec files, in the Playwright container as `bin/test`
+  runs them), plus any scenario check the change touches; the full `bin/test` runs on GitHub for
+  every pull request (the required `dev-site` job), and Claude runs it locally only for a change
+  that reaches across the site (the user, 2026-11-17: a small code change took about 15 minutes
+  from ready to live, the full tests running three times). Every test runs even after a failure;
+  exit status 1 if any failed.
 - Dev site: http://localhost:10102 (admin `/wp-admin`); mail inbox: http://localhost:10103.
 - `docker compose -f compose.dev.yaml stop` / `start`: stop and start without losing anything.
 - `docker compose -f compose.dev.yaml run --rm cli wp <command>`: WP-CLI against the dev site.
@@ -139,8 +144,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
-- GitHub runs `bin/check` on every push to `main` and every pull request
-  (`.github/workflows/check.yml`); a pull request merges only when it passes.
+- GitHub runs `bin/check` and the dev site's tests on every pull request, weekly and by the "Run
+  workflow" button (`.github/workflows/check.yml`); a pull request merges only when both pass and
+  it is up to date with `main`. A merge to `main` then deploys to staging without running them
+  again (the same code was just tested).
 - `bin/versions-check`: compares the dev site's pinned plugins and theme (`tools/versions.sh`) with
   WordPress.org and reports what is behind, changing nothing. Every Monday GitHub runs it with
   `--act` (`.github/workflows/versions.yml`, plan 8j): a plugin released at least 7 days ago gets a
