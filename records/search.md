@@ -33,6 +33,41 @@ first looking for a change that serves both.
 | About | `/about/` | acoustic guitarist Southern Pines |
 | Privacy Policy | `/privacy-policy/` | privacy policy |
 
+## Launch baseline (live, 2026-11-17, Yoast SEO 28.8)
+
+The handbook's 12, 9.6: each page's Yoast results on live at launch, as screenshots of Yoast's
+panel with both analyses open (no admin bar), in `records/launch/yoast_screenshots/`
+(`<page>-1.png` the SEO results, `<page>-2.png` the rest and readability). The contact address on
+the Book page is covered with a black box in its two shots (the user's choice). Every page's
+overall SEO and readability lights are green.
+
+| Page | SEO: not green | Readability: not green |
+|---|---|---|
+| Home | none | Transition words (18.4%), red |
+| Music | Keyphrase in image alt attributes, Images, Text length | none |
+| Songs | Text length; Keyphrase in slug (improvement) | none |
+| About | Keyphrase in image alt attributes, Images, Text length; Keyphrase in slug (improvement) | Sentence length (42.9% over 20 words), red |
+| Book | Keyphrase in image alt attributes, Images, Text length | none |
+| Privacy Policy | Keyphrase in image alt attributes, Images, Keyphrase in subheading | none |
+
+Each SEO item is explained in its page's entry below. "Word complexity", grey on every page, is
+an advertisement for Yoast Premium and checks nothing. The two readability items were not listed
+on staging (2026-11-16): that check was read from the overall lights in the Pages list, which
+were green, not item by item; they were there on staging too, since live's text is staging's.
+Their reason, in each page's entry: Google does not use readability scores for ranking (its
+guide asks for people-first text, with no sentence-length or linking-word rules); the text is the
+user's own voice, and the overall readability light is green (the user, 2026-11-17).
+
+Where live differs from what was recorded for staging (staging's export carried what staging had
+saved, so these edits had not been saved there): Music had no search title or description, both
+retyped on live as recorded below (2026-11-17); the Privacy Policy opens "The privacy policy
+explains…", not "This…"; Home's last heading is "Common questions", not "Questions people ask";
+Home's bands' range reads "from DC to WV and Ohio". The last three are left as they are (the user:
+no effect on search).
+
+**Acknowledged by the user, 2026-11-17:** "I've seen the launch results for all six pages and the
+reasons for the ones that aren't green."
+
 ## Home
 
 Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
@@ -62,7 +97,9 @@ Done on staging 2026-11-16: Yoast's SEO and readability analyses both green.
 - Pictures: the hero photo, its alternative text "Howard Buie, acoustic guitarist, smiling as he
   plays" (changed on staging from "… playing an acoustic guitar", which Yoast did not count:
   "guitar" is not "guitarist" to its free version).
-- Not green, with reasons: none.
+- Not green, with reasons: none in SEO. Readability (found at launch, 2026-11-17): Transition
+  words, 18.4% of sentences (Yoast wants more); left as written, for the reason in the launch
+  baseline above.
 - Found in step 1, for later: "singer" came up in four searches, so Home says "guitarist and
   singer"; "hire" is a real search word ("hire guitarist near me", "hire singer guitarist");
   "guitar" also draws shops and rentals; "live music … tonight" and "this weekend" are people
@@ -186,6 +223,8 @@ Done on staging 2026-11-16: both overall lights green in the Pages list.
     added for length (Google: "no magical word count target").
   - Images, and keyphrase in image alt attributes: the user's decision; Home already shows his
     photo.
+  - Readability, Sentence length (found at launch, 2026-11-17: 42.9% of sentences over 20
+    words): left as written, for the reason in the launch baseline above.
 
 ## Privacy Policy
 
