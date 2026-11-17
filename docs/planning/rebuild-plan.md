@@ -19,7 +19,7 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next:** items 2 to 7 below (1e settled 2026-11-17: no lock, a monthly check). 1d-3 (the user's Editor
+- **Next:** items 3 to 7 below (1e settled 2026-11-17: no lock, a monthly check; 2 skipped). 1d-3 (the user's Editor
   login) happens on live at 9f.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
@@ -145,17 +145,30 @@ new findings added as steps.
      Known effects, accepted: customers cannot change the menu or the call-to-action panel's
      wording; both are requests to DTS. `[x]` 2026-11-17, apart from the handbook proposal
      (with item 3).
-  2. American English spelling across the project: about 130 British forms in 28 files, some in
-     code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
-     a trial branch with the checks, tests and review gate; a renamed design value is shown to the
-     user first.
+  2. ~~American English spelling across the project~~ **Skipped (the user, 2026-11-17).** The
+     existing British forms stay (134 found that day in 33 versioned files, mostly comments and
+     docs; in code only a test variable and two palette display names, `theme.json`'s "Soft grey"
+     and "Light warm grey", whose slugs are neutral). New writing is American by the global
+     `WORKING_STYLE.md` ("American English spelling", added 2026-11-17); names fixed by outside
+     tools stay (PHPStan's `analyse`).
   3. Compare this site with the handbook; each difference becomes a plan item or a recorded
      exception: the deploy path; Simple History and its check of the SEO plugin's fields (H94);
      the theme's presets only (H87); D27's backups against H17; `docs/SITE_CHECKLIST.md` becoming
      this site's status sheet against chapter 12 (D16 replaced by H16), with `records/` (H99); the
      Site Hardening plugin taking unfiltered HTML from Editors and sending HSTS; Wordfence's
      password and username settings; the plugin-set comparison in the monthly check; the
-     click-to-load player after go-live (H88).
+     click-to-load player after go-live (H88). Taken one at a time, 9 parts (the user,
+     2026-11-17: each with the user's steps; the deploy path is item 5):
+     - 3-1 `[x]` Wordfence's password rules (4.11, H80), 2026-11-17, by the user on staging and
+       live: leaked passwords refused for everyone who can publish (was admins only); strong
+       passwords already so.
+     - 3-2 Site Hardening 0.2.0: unfiltered HTML for Administrators only (4.10, H79, through
+       `map_meta_cap`), and HSTS for a year on HTTPS requests only (3.1, H83; the user chose
+       "automatic", not a constant on live). Tested in `dev-site-hardening.sh`, four planted
+       faults caught. Left: the user's `curl -I` on staging after the deploy.
+     - Then: the theme's presets only (H87); Simple History (H94); backups against H17; the
+       plugin-set comparison (H85); the status sheet; the handbook proposals; the click-to-load
+       player (H88).
   4. The project's `CLAUDE.md`: "follows version 1", and the type of D32 (Content by customer,
      Brochure, hosted by the customer); the staging exception removed once staging is gone (9r),
      the skipped takeover record recorded as an exception.

@@ -164,7 +164,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `bin/dev-site`.
 - `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,
   `docs/SITE_CHECKLIST.md` 3.2), XML-RPC refused, Application Passwords off, no version
-  comments and no PHP version header (plan D26, 8k), in a generic plugin that names nothing of this site, with its own prefix
+  comments and no PHP version header (plan D26, 8k), HSTS for a year on HTTPS requests only and
+  unfiltered HTML for Administrators only (handbook 12, 3.1 and 4.10), in a generic plugin that names nothing of this site, with its own prefix
   `sitehardening` and `phpcs.xml.dist`. It deploys like Song List. The policy's outside sources
   are this site's setting, added in the child theme's `functions.php`, each with its reason.
 
