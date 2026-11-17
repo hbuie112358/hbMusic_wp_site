@@ -105,8 +105,8 @@ test('the header is slimmer on a phone than on a computer', async ({ page }) => 
 
 // The hamburger menu on a phone (plan 9t). A backdrop-filter on the header once made it the frame
 // of WordPress's fixed menu panel, so the open panel was trapped in the header strip. Now the panel
-// drops down from under the header, only as tall as its links, with the page visible below (the
-// user's choice): the close button takes the menu button's place, every link is the element the
+// drops down from under the header at the right, only as tall and as wide as its links, with the
+// page visible below and beside it (the user's choice): the close button takes the menu button's place, every link is the element the
 // browser finds at its own centre (so a tap reaches it), and the close button, Escape and a tap on
 // the page below each close it.
 test('the hamburger menu drops down under the header on a phone, every link reachable', async ({ page }) => {
@@ -121,6 +121,12 @@ test('the hamburger menu drops down under the header on a phone, every link reac
 
 	const below = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('.wp-block-navigation__responsive-container') === null, { x: PHONE.width / 2, y: Math.round((box?.y ?? 0) + (box?.height ?? 0)) + TAP_BELOW_PANEL });
 	expect(below, 'the page is visible below the panel').toBe(true);
+
+	// Only as wide as its links, at the right edge (the user): the page shows beside it too.
+	expect(Math.round(box?.width ?? PHONE.width), 'the panel\'s width').toBeLessThan(PHONE.width / 2);
+	expect(Math.round((box?.x ?? 0) + (box?.width ?? 0)), 'the panel\'s right edge').toBe(PHONE.width);
+	const beside = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('.wp-block-navigation__responsive-container') === null, { x: Math.round((box?.x ?? 0) / 2), y: Math.round((box?.y ?? 0) + (box?.height ?? 0) / 2) });
+	expect(beside, 'the page is visible beside the panel').toBe(true);
 });
 
 test('the close button takes the menu button\'s place, and the menu button steps aside', async ({ page }) => {

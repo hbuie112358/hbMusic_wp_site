@@ -96,12 +96,21 @@ header.wp-block-template-part:has(> .site-header) {
  */
 
 @media (width < 600px) {
+	/*
+	 * A panel at the right, as wide as its longest link plus the header's side spacing, so the
+	 * page stays visible beside it as well as below (the user: only "a little bit wider than the
+	 * widest word"). It fits its content, so a renamed or added page still fits.
+	 */
 	.site-header .wp-block-navigation__responsive-container.is-menu-open {
-		inset: var(--site-header-height) 0 auto;
+		inset: var(--site-header-height) 0 auto auto;
+		width: max-content;
+		max-width: 100%;
 		max-height: calc(100dvh - var(--site-header-height));
 		padding: var(--site-header-padding-block) var(--wp--custom--spacing--gutter);
 		background-color: transparent;
 		border-bottom: 1px solid var(--wp--preset--color--accent-5);
+		border-left: 1px solid var(--wp--preset--color--accent-5);
+		border-bottom-left-radius: var(--wp--custom--panel-radius);
 
 		/*
 		 * WordPress slides the whole panel in with a transform, which would make the panel the
@@ -118,6 +127,7 @@ header.wp-block-template-part:has(> .site-header) {
 		content: "";
 		background: var(--wp--custom--header--background);
 		backdrop-filter: blur(var(--wp--custom--header--blur));
+		border-bottom-left-radius: inherit;
 	}
 
 	/* The close button takes the menu button's place in the header, so it appears where the visitor tapped. */
