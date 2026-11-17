@@ -6,6 +6,11 @@ import { expect, test } from '@playwright/test';
 const OLD_TO_NEW: ReadonlyArray<readonly [string, string]> = [
 	['/video/', '/music/'],
 	['/audio/', '/music/'],
+	// From live's export (plan 9e): the empty "Audio and Video" page and the three old video posts.
+	['/audio-and-video/', '/music/'],
+	['/video-01/', '/music/'],
+	['/video-02/', '/music/'],
+	['/video-03/', '/music/'],
 	['/contact/', '/hire-acoustic-guitarist/'],
 	['/Contact/', '/hire-acoustic-guitarist/'],
 ];

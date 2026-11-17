@@ -14,12 +14,18 @@ require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
  * Video and Audio pages became Music, its Contact page became Book, whose address is
  * /hire-acoustic-guitarist/ (plan 1c). Search engines and old links still point at the old
  * addresses. Book's earlier address on staging, /book/, gets no redirect: it was never live, so
- * nothing outside the site knows it. A site without old addresses leaves this list empty.
+ * nothing outside the site knows it. Also from live's export (plan 9e): the empty "Audio and
+ * Video" page and three old video posts, whose videos are on Music now. A site without old
+ * addresses leaves this list empty.
  */
 const HBMUSIC_OLD_ADDRESSES = array(
-	'video'   => 'music',
-	'audio'   => 'music',
-	'contact' => 'hire-acoustic-guitarist',
+	'video'           => 'music',
+	'audio'           => 'music',
+	'audio-and-video' => 'music',
+	'video-01'        => 'music',
+	'video-02'        => 'music',
+	'video-03'        => 'music',
+	'contact'         => 'hire-acoustic-guitarist',
 );
 
 /**
