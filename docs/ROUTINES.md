@@ -99,6 +99,12 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    is a booking request (or other site email) that never arrived; see "A Pushover alert came"
    below, resend it, and delete the entry. FluentSMTP deletes failed entries by itself after 60
    days (its Delete Logs setting), and the privacy policy says so.
+9. **No saved copies of the frame (plan 1e):** in the admin, Appearance → Editor. Under
+   Templates, and under Patterns → Template parts (Header, Footer, the call-to-action panel),
+   open each one's ⋮ menu: only Edit and Duplicate is right. "Reset" or "Clear customizations"
+   means a copy was saved in the Site Editor, which overrides the theme's file and no longer
+   follows the code. Then ask Claude in a session to compare it with the theme's file and fold
+   in any change worth keeping, and only then choose Reset.
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
@@ -115,6 +121,9 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
   Pushover itself down). The failed entry is then the only copy of that request: the site does not
   store messages, and the email never arrived. Delete Logs is 60 days, not 30, so the entry is
   still there when a monthly check comes a week or two late (the user, 2026-11-15).
+- Step 9 catches a copy of the frame saved by an Administrator in the Site Editor: without it, a
+  later theme change deployed for that part silently does not appear, as happened with the
+  call-to-action panel on staging (plan 1e, 2026-11-16).
 
 ## If the test fails
 
@@ -123,8 +132,12 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
   that address is authorised under Brevo's Security → Authorized IPs. The failed entry holds a
   visitor's details and is deleted once dealt with; FluentSMTP deletes it after 60 days in any case.
 - **No alert and no email:** Brevo accepted the email but did not deliver it. Most likely the
-  receiving address is on Brevo's blocked list for transactional email. Where Brevo lists it, to
-  unblock the address, is still to be found on the real screen and written in here.
+  receiving address is on Brevo's blocked list for transactional email: in Brevo, Settings
+  (bottom left) → Transactional emails → Blocked or Unsubscribed contacts (found by the user,
+  empty, 2026-11-17). If the address is there, it is unblocked in CRM → Contacts → the contact →
+  Preferences, transactional emails set to Subscribed (Brevo's help, "Blocklist, unblock, or
+  resubscribe contacts"); only the user's own address, never a visitor's who asked to be
+  blocked.
 - **The email is in spam despite the filter:** it is marked "Not spam", and the Gmail filter
   (`from:website@howardbuiemusic.com`, never spam, label "Booking requests") is checked.
 
