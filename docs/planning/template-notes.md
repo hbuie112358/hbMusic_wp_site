@@ -28,6 +28,9 @@ template project starts; until then, a list, not a to-do.
   and `assets/images/`; the neutral test pages' layouts in `tests/dev-content/` follow them. A new
   site changes these, not the component stylesheets.
 - The stylesheet handles' prefix `hbmusic-` in `functions.php`, with the PHP prefix.
+- The theme's picture in Appearance → Themes, `themes/hbmusic-child/screenshot.png` (1200x900,
+  WordPress's recommended size): this site's Home page, shot from its dev preview
+  (`bin/screenshots previews`, `/preview-home/`) with the site's real name in the header.
 - The theme's header in `themes/hbmusic-child/style.css`: its name ("Howard Buie Music") and
   description; the parent, text domain, versions and licence stay.
 
@@ -133,10 +136,29 @@ template project starts; until then, a list, not a to-do.
 
 - `~/.claude/CLIENT_DATA.md` (not implemented yet): the template includes its settings block, so
   every customer project starts with it.
-- The frame lock (plan 1e, 2026-11-16): the frame (header, footer, call-to-action panel, page
-  templates, site-wide styles) lives in the code, and saving it in the Site Editor is refused.
-  The two features below exist because of it, so customers keep the changes they reasonably
-  want without unlocking the frame:
+- The frame in the code (plan 1e, 2026-11-16; settled 2026-11-17): the frame (header, footer,
+  call-to-action panel, page templates, site-wide styles) lives in the code. No lock is built
+  while only Administrators (DTS) can reach the Site Editor, which is so for Editors (no
+  `edit_theme_options`); the monthly check looks for saved copies instead. **If an arrangement
+  ever lets customers reach the frame** (an Administrator login, or a role with
+  `edit_theme_options`), one of the two designs worked out on 2026-11-17 is built:
+  - **The lock:** a separate "Frame Lock" plugin. Through `rest_endpoints`, it wraps the
+    permission check of every saving method served by WordPress's template, template-autosave,
+    global-styles, font-family and font-face controllers (matched by controller class, not
+    address), so a save is a 403 and the REST Allow header leaves the method out. Reset (a
+    template's DELETE), deleting an installed font and menus stay allowed. `edit_css` is denied
+    through `map_meta_cap`. A constant in `wp-config.php` switches it off; a notice in the Site
+    Editor and the page editor; a Site Health test listing saved copies; and a tripwire test
+    requiring every route of those controllers to refuse saving, so a WordPress update that
+    adds one fails when its pin is raised. Not capabilities alone: WordPress 7.1.4's template
+    endpoints check `edit_theme_options` directly, not the post type's capabilities. To verify
+    in the build: whether the Site Editor's interface honors the Allow header.
+  - **Warn and log, lighter:** a confirmation in the Site Editor before a frame change is
+    saved (with the reminder that fixing a broken frame is paid work, by the service
+    agreement), each confirmation and save logged in the activity log, and the same Site Health
+    test.
+  The two features below let customers make the changes they reasonably want without reaching
+  the frame:
   - **A menu built from the pages, automatically** (the user, 2026-11-16): customers who add or
     rename a page see the menu follow, with the order set in each page's settings, which Editors
     may change; pages such as the Privacy Policy left out by the theme. WordPress's own page-list

@@ -19,7 +19,7 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next:** 1e (the frame lock in code), then items 2 to 7 below. 1d-3 (the user's Editor
+- **Next:** items 2 to 7 below (1e settled 2026-11-17: no lock, a monthly check). 1d-3 (the user's Editor
   login) happens on live at 9f.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
@@ -61,7 +61,7 @@ new findings added as steps.
      `/hire-acoustic-guitarist/`). Noted for the Editing Help guide's next change (both copies,
      version 3): the title at the top of the editor is the page's name, which some templates
      do not show on the page; the menu is edited in the Site Editor through the ⋮ beside the
-     menu's name, then Edit (only while the frame lock of 1e allows it, and not by Editors).
+     menu's name, then Edit (by Administrators only, not by Editors).
      The search work (the user, 2026-11-15), before 9c's export, since it changes staging's
      content: every check of the SEO plugin (Yoast 28.8, SEO and readability) green on every
      page, or its reason recorded; the full list of checks taken from Yoast's code first, not
@@ -121,10 +121,16 @@ new findings added as steps.
      text and pictures, the songs) is edited on the site. Checked on the dev site: the Editor
      role, the customer's, lacks `edit_theme_options`, which template parts, menus and global
      styles all require, so customers cannot create such copies. For administrators:
-     - a lock in the Site Hardening plugin refusing to save template parts, templates and global
-       styles in the Site Editor for everyone, switched off deliberately by a server setting when
-       truly needed; menus stay editable. Designed, tested on the dev site (shown failing on a
-       planted fault) and reviewed like any code change;
+     - ~~a lock in the Site Hardening plugin refusing to save template parts, templates and
+       global styles~~ **Not built (the user, 2026-11-17):** only Administrators (DTS) can reach
+       the frame, so a lock or a warning would guard against no customer. Designed twice first:
+       WordPress 7.1.4's template endpoints check `edit_theme_options` directly
+       (`class-wp-rest-templates-controller.php`, 182-195), so a capability-based lock cannot
+       work for them; the workable lock (a separate "Frame Lock" plugin wrapping the REST
+       permission checks of the template, global-styles and font controllers, `edit_css`
+       denied, Site Health detection, a tripwire test) and a lighter warn-and-log version are in
+       `docs/planning/template-notes.md`, for an arrangement where customers can reach the
+       frame. What stays: the manual check for saved copies below;
      - staging's Header and Footer (and any other template part or template) checked for saved
        copies (a "Reset"/"Clear customizations" option in the Site Editor); each copy's
        differences folded into the code if wanted, then reset, before the export at 9c, since the
@@ -132,10 +138,13 @@ new findings added as steps.
        the call-to-action panel's reset, Header, Footer and the three page templates (Pages,
        Page with call to action, Page No Title with call to action) show only Edit and
        Duplicate, so staging uses the theme's files; to repeat just before 9c;
-     - a check for saved copies in the monthly site check, and later in 9b's deploy checks;
-     - a handbook proposal: the frame lives in the code on every DTS site, with the lock.
+     - `[x]` a check for saved copies in the monthly site check (`docs/ROUTINES.md`, step 9,
+       2026-11-17), and later in 9b's deploy checks;
+     - a handbook proposal: the frame lives in the code on every DTS site; DTS does not save it
+       in the Site Editor, and the monthly check looks for saved copies (no lock).
      Known effects, accepted: customers cannot change the menu or the call-to-action panel's
-     wording; both are requests to DTS.
+     wording; both are requests to DTS. `[x]` 2026-11-17, apart from the handbook proposal
+     (with item 3).
   2. American English spelling across the project: about 130 British forms in 28 files, some in
      code (CSS and PHP comments, test names, possibly `theme.json` value names, checked first). On
      a trial branch with the checks, tests and review gate; a renamed design value is shown to the
@@ -1811,13 +1820,19 @@ new findings added as steps.
    *Stage B: setup on live, behind the old look (visitors see no change).*
    - [ ] 9f. The new admin account (a name that is not easy to guess, two-factor login with
      Wordfence); the rest of step 9 done with it. The user's own Editor login too (1d-3).
+     Live's admin email (Settings → General) chosen with the user: an address the user reads,
+     since WordPress's own notices go there (2026-11-17: staging's is the user's third address,
+     not the business one; its change, recorded as pending on 2026-11-09, never started).
    - [ ] 9g. Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
      Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m); its log
      as on staging: Log Emails off, Delete Logs "After 60 Days" (set while Log Emails is switched
      on, since the field is hidden otherwise; then switched off and saved), as the privacy policy
      states (`docs/ENVIRONMENTS.md`).
    - [ ] 9h. Contact Form 7 at the version staging runs (6.2.5 not before 2026-11-17), Song List
-     activated, WordPress's importer installed.
+     activated, WordPress's importer installed. In Cloudflare (the account under the user's
+     third address), the Turnstile widget's hostnames gain `howardbuiemusic.com`: on 2026-11-17
+     it listed only `staging.howardbuiemusic.com` (seen by the user), and without live's domain
+     the booking form on live refuses every request.
 
    *Stage C: the switch (a short window; the old site has little traffic).*
    - [ ] 9i. The old pages to the trash (the inventory's list, step 2).
@@ -1872,7 +1887,8 @@ new findings added as steps.
    - [ ] 9r. Staging removed, its job as the build's preview done (D32, the handbook's 12, 3.9):
      after 9q's refresh is no longer needed and the user has approved the new site, staging's
      files, database and subdomain are deleted at the host, with its server rules, its deploy
-     destination and key, its address in Brevo's Authorized IPs, its HetrixTools or other
+     destination and key, its address in Brevo's Authorized IPs, its hostname in the Turnstile
+     widget, its HetrixTools or other
      monitors if any, and its DNS record; checked from outside that the address no longer
      answers. Before the first monthly update after that, local staging is set up as the
      handbook's H7 describes (a copy of live on the user's computer, no internet access), and
