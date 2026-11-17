@@ -19,7 +19,8 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next:** item 1d, then 1e (the frame lock in code), then items 2 to 7 below.
+- **Next:** item 1d-4 (the settings record), then 1e (the frame lock in code), then items 2 to
+  7 below. 1d-3 (the user's Editor login) happens on live at 9f.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
@@ -83,7 +84,31 @@ new findings added as steps.
   1d. The standard takeover (D32, the user, 2026-11-16): the remaining step 9 mapped onto the
      handbook's chapter 8 routine (the parts that apply to a site staying at its host) and chapter
      9's handover to a customer who edits; the user's own Editor login, the customer's role, kept
-     apart from DTS's admin account.
+     apart from DTS's admin account. Read 2026-11-17: chapter 8 is about a new server, so only
+     its safeguards carry over (written into 9c, 9j and 9n); chapter 9 is the Handover
+     arrangement (the customer runs the site), which Content by customer is not: DTS keeps
+     running it, and the customer's login and guide come from chapters 6 and 10. The user chose
+     to rehearse chapter 9 anyway (2026-11-17), to see what a handover produces; which of its
+     steps are done, done in part or skipped is in step 9's entry ("The handover, rehearsed").
+     - 1d-1 `[x]` The mapping written into step 9 (2026-11-17), with chapter 12's launch-day
+       checks step 9 lacked (into 9m).
+     - 1d-2 `[x]` The handover note drafted (2026-11-17) in `data/records/handover-note.md`, not
+       versioned: in one place it maps the site's outside accounts, what each controls, live's
+       versions and the routines, which this public repository should not hold together (the
+       user, 2026-11-17; a customer's repository would be private). Each section filled where
+       the facts exist, else marked with the item that makes them. It found two missing records:
+       the settings record (chapter 2) and the status sheet (chapter 12, item 3).
+     - 1d-3 `[ ]` The user's own Editor login, as chapter 6's table gives the customer: its own
+       person, a name hard to guess, a strong password set by DTS, two-factor offered. On live
+       only, at 9f (the user, 2026-11-17); staging gets none.
+  1d-4. A settings record (chapter 2, H99): every setting made by hand in the admin, with its
+     date and reason, gathered from the plan's steps, `project-state.yaml` and
+     `docs/ENVIRONMENTS.md`; found missing by 1d-2. In `data/records/settings.md`, beside the
+     handover note, not in `records/` (the user, 2026-11-17): much of it is security
+     configuration (Wordfence's limits, two-factor, the firewall, mail retention) that this
+     public repository should not hold together; a customer's private repository would keep
+     it in `records/`. Its cost, accepted: no git history, covered by the backup of `data/`.
+     Before or with item 3.
   1e. The site's frame belongs to the code (the user, 2026-11-16): found when the call-to-action
      panel's "Book Howard" button kept the old /book/ address on staging after the deploy,
      because staging held its own copy of that template part, saved in the Site Editor at some
@@ -143,6 +168,11 @@ new findings added as steps.
      brings in Search Console rather than assumed: venues the user has played linking to the
      site, the Facebook page pointing to it (and Yoast's "Other profiles", optional), the
      address on cards and flyers. Which of these helps most is not verified.
+  6c. After go-live (the user, 2026-11-17): a review of what this public repository's files
+     reveal about the site's operation taken together (outside services, alert routes, the
+     deploy key's limits, versions), with what to move to `data/` or trim, proposed item by
+     item. A one-off: DTS's customer repositories are private (handbook chapter 7); this one is
+     public by D17.
   7. Step 10, the move to a new host, before 2028-07-16.
 - **Dates and holds:** Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
   first gets the version staging runs. Live's text names the old service area until go-live
@@ -1764,6 +1794,10 @@ new findings added as steps.
      Staging's content exported (Tools → Export → All content) into `data/exports/`;
      Claude reads it and lists what it carries (pages with their templates, songs, the menu, the
      booking form, template parts edited in the Site Editor, media entries) and what it does not.
+     From chapter 8 (1d, 2026-11-17): from the export until 9j's import the user does not edit
+     staging, since an edit made after the export never reaches live; and a content list is made
+     from the export (the counts of pages, songs, menus, forms and media entries), which 9j
+     checks on live.
    - [ ] 9d. A rehearsal: that export imported into a throwaway WordPress (the dev site's images,
      without its test pages), to see before live what the importer does with the addresses, the
      templates, the menu, the form and the template parts, and what must be set by hand after.
@@ -1773,7 +1807,7 @@ new findings added as steps.
 
    *Stage B: setup on live, behind the old look (visitors see no change).*
    - [ ] 9f. The new admin account (a name that is not easy to guess, two-factor login with
-     Wordfence); the rest of step 9 done with it.
+     Wordfence); the rest of step 9 done with it. The user's own Editor login too (1d-3).
    - [ ] 9g. Mail: FluentSMTP connected to Brevo as on staging, live's server address in Brevo's
      Authorized IPs, a `wp_mail` test in the inbox without the Gmail filter's help (8m); its log
      as on staging: Log Emails off, Delete Logs "After 60 Days" (set while Log Emails is switched
@@ -1785,7 +1819,8 @@ new findings added as steps.
    *Stage C: the switch (a short window; the old site has little traffic).*
    - [ ] 9i. The old pages to the trash (the inventory's list, step 2).
    - [ ] 9j. Staging's export imported, assigned to the new admin; each new page checked at its
-     own address (no `-2`) and with its template as on staging; the importer deleted.
+     own address (no `-2`) and with its template as on staging; the importer deleted. 9c's
+     content list matched on live: every page, song, menu, form and media entry came over.
    - [ ] 9k. The child theme activated; Settings → Reading with Home as the front page; the menu,
      the hero photo uploaded by hand into Home's hero, the site icon, the booking form's Turnstile
      keys and its Mail tab's From and To, and its Messages tab's "sent" and "sending failed"
@@ -1805,11 +1840,20 @@ new findings added as steps.
      screenshot of Yoast's panel alone (never the admin bar, which shows the login name), with
      both the SEO and readability results open, saved under `records/`, and in each page's entry
      of `records/search.md` the date, Yoast's version and a written reason for each check that is
-     not green; the user's acknowledgment noted there with its date.
+     not green; the user's acknowledgment noted there with its date. Chapter 12's other
+     launch-day checks (1d, 2026-11-17): each secret found only where it belongs (1.5), a
+     keyboard-only pass of every page (7.2), PageSpeed Insights rating Home and each template
+     "good" on mobile (8.1), and Site Health with no critical issue (14.5); the results into
+     the status sheet (item 3).
    - [ ] 9n. Cleanup: `music-lite` and `music-lite-child` deleted, the trash emptied, old revisions
      removed, the old admin account removed (its content given to the new one) and its name, and
      `admin`, on Wordfence's list of names blocked at once. WordPress's sample "Hello world!" post
-     and "Sample Page" removed if live has them (staging's were trashed 2026-11-15).
+     and "Sample Page" removed if live has them (staging's were trashed 2026-11-15). Done two
+     weeks after the switch, not the same day (chapter 8's way back, 1d, 2026-11-17): until
+     then, reactivating `music-lite` returns the old look, with the 9e backup and export behind
+     it. New security keys in live's `wp-config.php` here (the user, 2026-11-17), since the
+     old admin's name was in the exposed `local.sql`: everyone is logged out once and logs in
+     again, two-factor included; a copy of `wp-config.php` first, removed once the site works.
    - [ ] 9o. Backups (D27): the first content export into `data/exports/`, and the restore test of
      checklist 12.3 both ways, with its date.
    - [ ] 9p. From then on, every merge reaches live through the approved deploy job.
@@ -1828,8 +1872,25 @@ new findings added as steps.
      answers. Before the first monthly update after that, local staging is set up as the
      handbook's H7 describes (a copy of live on the user's computer, no internet access), and
      `docs/ROUTINES.md` changes from "staging first" to local staging.
+   - [ ] 9s. The handover, rehearsed (1d, below): the note in `data/records/handover-note.md`
+     finished with live's facts, and the user's written sign-off, as the customer, that the new
+     site is approved, joined with 9m's acknowledgment of the search results.
    - Later: DMARC to `p=quarantine` a few weeks after go-live (11.2); Contact Form 7 6.2.5
      after 2026-11-17, staging first.
+
+   **The handover, rehearsed (1d, the user, 2026-11-17).** The handbook's chapter 9 does not
+   apply (D32: Content by customer, DTS keeps running the site); it is gone through to see what
+   it produces:
+
+   | Chapter 9 step | Here |
+   |---|---|
+   | 1. Agreed beforehand | written at the note's top: go-live date, DTS keeps running it, stays at Hostinger |
+   | 2. The handover note | written: drafted at 1d-2, finished at 9s |
+   | 3. The session | in part: the user's Editor login (1d-3; chapter 6's customer login, not chapter 9's Administrator); the webmaster address, password resets and Search Console skipped, the accounts being the user's already |
+   | 4. DTS removes itself | skipped: it would end the site's care |
+   | 5. The repository transferred | skipped |
+   | 6. The handover record | in part: the content list (9c, 9j); the written confirmation becomes the sign-off of 9s |
+   | 7. After | not applicable |
 
    Status: `[ ]`
 10. **Move to a new host before 2028-07-16** (when the Hostinger plan ends; auto-renewal off):
