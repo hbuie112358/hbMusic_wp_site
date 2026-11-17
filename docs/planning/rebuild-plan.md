@@ -19,8 +19,13 @@ new findings added as steps.
   six pages, `records/search.md`); the Editing Help plugin merged (#57, #58; not deployed to
   staging, which only receives the theme and two plugins, until 9b's `bin/deploy`); the Book page
   moved to `/hire-acoustic-guitarist/` (#59); the form's "sent" message (#60).
-- **Next:** items 3 to 7 below (1e settled 2026-11-17: no lock, a monthly check; 2 skipped). 1d-3 (the user's Editor
-  login) happens on live at 9f.
+- **Next: go live as soon as possible (the user, 2026-11-17, D33).** Before go-live only:
+  1. item 3-2's last step: the user's `curl -I` on staging after the deploy (HSTS);
+  2. Contact Form 7 6.2.5 on staging, by the user (the hold ended 2026-11-17);
+  3. step 9 from 9c, the code reaching live by hand upload at 9h (D33) instead of 9b; 9d's
+     rehearsal kept. 1d-3 (the user's Editor login) happens at 9f.
+  **After go-live, in this order:** item 5 (`bin/deploy`, ending D33's exception), item 3's
+  parts 3-3 to 3-9, item 4, item 5b, 9o (restore test), 9q, 9r, 9s, then 6b, 6c and 7.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
@@ -174,7 +179,7 @@ new findings added as steps.
      the skipped takeover record recorded as an exception.
   5. Rewrite 9b from the handbook's chapter 2 (`bin/deploy` from the user's computer, no deploy
      jobs or keys on GitHub, H8 and H9).
-  5b. Later, but before go-live (the user, 2026-11-15): evaluate an accessibility checker for
+  5b. After go-live (D33; first set "before go-live", the user, 2026-11-15): evaluate an accessibility checker for
      the people who edit pages, which marks problems in color the way Yoast does for search
      (skipped headings, link wording, picture descriptions). Candidates read on WordPress.org
      on 2026-11-15, nothing else verified: Editoria11y (Claude's leaning: made for editors,
@@ -254,6 +259,7 @@ new findings added as steps.
 | D28 | The admin and login pages get no Content-Security-Policy of the site's own (the user, 2026-11-11); they keep what WordPress 7.1 sends there (`X-Frame-Options: SAMEORIGIN`, `frame-ancestors 'self'`, a referrer policy). | The admin's script rules would need `'unsafe-inline'` and probably `'unsafe-eval'` (the block editor, Yoast's analysis), which take away most of their protection; the cheap rules (`object-src`, `base-uri`, `form-action`) help only after a script is already running. Wordfence's and FluentSMTP's admin screens exist only on staging and live, so a policy could not be tested on the dev site, and one that breaks after a plugin update can lock the user out of the screen needed to fix it. The one path from a visitor into the admin, failed booking emails shown by FluentSMTP, relies on the plugin escaping them; what protects it is prompt updates (8j), few admins and two-factor login. Looked at again if the site adds accounts or plugins that show visitors' input in the admin. |
 | D30 | Live gets its content from staging (the user, 2026-11-12, option A): staging's pages, songs, menu and booking form are exported there (Tools → Export) and imported into live (Tools → Import), exactly as the user finished them on staging; live's settings (Yoast, the site icon, the booking form's keys and From/To, mail, Wordfence, avatars) are set by hand from step 9's checklist, and the hero photo is uploaded to live once by hand, since live cannot fetch files from password-protected staging. The page generator's import file (`data/content/`) is no longer the source for live; the generator stays a dev tool (previews). Whether live's WordPress is updated in place or installed fresh stays step 9's own question. | Staging is where the content was finished (wording, videos, alt text, templates chosen), so nothing is retyped and the generator's copy cannot bring back what was corrected there. Copying staging's whole database (option B) was declined: it would also carry staging's address (to rewrite everywhere), test entries, staging's mail and spam-protection settings and admin account, and overwrite live's own Wordfence and two-factor setup; more to go wrong, harder to see. Many of live's settings differ from staging's anyway (address, keys, sender). |
 | D31 | Live's WordPress is updated in place, not installed fresh (the user, 2026-11-12, option A): the new theme, plugins and staging's content (D30) go onto the running installation; the old pages are moved to the trash just before the import so their addresses are free, and the old theme, old pages, revisions and the old admin account are removed afterwards. Step 9 runs in four stages: preparation with live untouched, setup on live behind the old look, a short switch, then checks and cleanup. | Keeps live's Wordfence setup (two-factor login, the firewall in Extended Protection, the login limits, the alerts), Hostinger's update plugin and the site's addresses, and the site stays up throughout. A fresh install would redo all of that by hand, take the site down meanwhile, and save only one round of cleanup. |
+| D33 | Go live as soon as possible (the user, 2026-11-17): before go-live only item 3-2's staging check, Contact Form 7 6.2.5 on staging, and step 9 from 9c; everything else after (the Current position's order). The code reaches live the first time by a hand upload of zips built from `main` (9b, option b), and `bin/deploy` (item 5) is built after go-live. A temporary exception to the handbook's chapter 2 (H8, H9), ending with item 5. | Saves 6-10 hours before go-live; the first install is one step in any case, and live changes rarely in the first weeks. None of the deferred items changes what visitors get or the site's safety on day one; the user is the only editor. Building `bin/deploy` first (option a) was declined. |
 | D32 | This site is treated as DTS's standard takeover of a live site, to be handed to a customer who edits it (the user, 2026-11-16). Type: Content by customer, Brochure, hosted by the customer (Hostinger, prepaid to 2028: the one exception kept). The takeover evaluation and takeover record (handbook chapter 8, H32, H37) are skipped, an exception recorded with its reason: the user built the old site and made every change since, so there is no other builder's work to vouch for; the untouched export of 2026-11-02 stays in `backups/` as the site as found. The rebuild so far is the "rebuilt, content kept" outcome. Staging on the host is the build's temporary preview, where the user approves the new site as the customer; it is removed after go-live (9r), and from then on changes and updates go through local staging (H7). The user edits as the customer, with an Editor login; DTS's admin account stays separate. Replaces "Fully managed" and the staging exception in the project's `CLAUDE.md` (item 4). | The first real site should test the standard path, not a special case; the user will edit it the way customers do. The takeover record would only document what the user already knows; recreating it from the export would cost an hour or two for nothing new. |
 
 ## Steps
@@ -1741,7 +1747,15 @@ new findings added as steps.
    - [x] 9a. The user: live's wp-config backup in the home folder deleted (8m; done 2026-11-12,
      over SSH, since hPanel's File Manager shows nothing above `public_html`); HetrixTools'
      two-factor login on (the user, 2026-11-12).
-   - [ ] 9b. The live deploy job (the design above), through a pull request with the review gate:
+   - [ ] 9b. **For go-live, replaced by a hand upload (D33, the user, 2026-11-17);** `bin/deploy`
+     (item 5) follows after go-live. At 9h, Claude builds one zip each of the child theme, Song
+     List, Site Hardening and Editing Help from `main`'s commit that staging runs (`git archive`,
+     each with its folder name), lists the files in each, and gives their checksums; the user
+     uploads them in live's admin (Appearance → Themes → Add New → Upload Theme; Plugins → Add
+     New → Upload Plugin), activating only the plugins at 9h and the theme at 9k. A later
+     change to live before item 5 is the same upload ("Replace current with uploaded"), staging
+     first as always. The design below is stale (item 5 rewrites it).
+     ~~The live deploy job (the design above), through a pull request with the review gate:~~
      a `production` environment with the user as required reviewer, its own restricted key and
      server destinations for the child theme, Song List and Site Hardening (as 3g-2 and 8a). Its
      checks afterwards must hold before the switch too (the files in place; the old theme still
