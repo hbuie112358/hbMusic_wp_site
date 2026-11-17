@@ -205,7 +205,7 @@ new findings added as steps.
      item. A one-off: DTS's customer repositories are private (handbook chapter 7); this one is
      public by D17.
   7. Step 10, the move to a new host, before 2028-07-16.
-- **Dates and holds:** Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
+- **Dates and holds:** **2026-12-17:** the accepted npm advisory GHSA-fc5q-39xc-vjpf (picomatch, in the CSS linter's packages; no fixed release on 2026-11-17) reaches its review date in `tools/css-lint/audit-exceptions.json`, and `bin/check` fails from then on: update the linter if picomatch has a fix (Dependabot proposes it), and remove the entry; otherwise the user decides again (the user, 2026-11-17: option b, after it blocked #66). Contact Form 7 6.2.5 not onto staging or live before 2026-11-17, and live
   first gets the version staging runs. Live's text names the old service area until go-live
   (D22). The page generator's Music links are old; only the dev previews use it (D30).
 - **Open decisions waiting on the user:** the new host (step 10). Smaller, optional items that
