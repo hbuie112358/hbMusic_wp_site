@@ -92,7 +92,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role
   a customer gets. To log in by hand, copy a password without showing it:
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never
-  deployed (and mounted for WP-CLI too), sends mail to Mailpit and answers for Cloudflare and for YouTube's image server (a test picture). Needs no backup, so CI can build it
+  deployed (and mounted for WP-CLI too), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
   too.
 - `bin/test`: the tests against the dev site: the scenario checks named
   `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
