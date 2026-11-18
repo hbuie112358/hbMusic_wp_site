@@ -131,8 +131,10 @@ theme_json_schema_matches_wordpress() {
 # name without a file. So the names and the files in assets/css/components/ must match, both ways.
 component_styles_match_files() {
   local theme_dir="$REPO_ROOT/themes/hbmusic-child" listed on_disk
+  # The block components, the form's stylesheet (loaded by page) and the video facade's (loaded
+  # with a page's videos, includes/video-facade.php).
   listed="$(sed -n '/^const HBMUSIC_COMPONENT_STYLES/,/^);/p' "$theme_dir/functions.php" | grep -oE "'[a-z0-9-]+'" | tr -d "'"
-    sed -nE "s#^const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/([a-z0-9-]+)\.css';#\1#p" "$theme_dir/functions.php")"
+    sed -nE "s#^const HBMUSIC_(FORM|VIDEO_FACADE)_STYLESHEET *= 'assets/css/components/([a-z0-9-]+)\.css';#\2#p" "$theme_dir/functions.php" "$theme_dir/includes/video-facade.php")"
   on_disk="$(find "$theme_dir/assets/css/components" -maxdepth 1 -name '*.css' -printf '%f\n' | sed 's/\.css$//')"
   if [[ -z "$listed" ]]; then
     log "functions.php lists no component stylesheets; the list or this check's pattern changed"

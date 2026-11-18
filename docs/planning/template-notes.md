@@ -91,6 +91,7 @@ template project starts; until then, a list, not a to-do.
   slides. Generic; the pattern's label "Videos" suits a site whose carousels hold videos.
 - Media & Text (plan 9t-3): `media-text.css` lines the block's text up with the page's edge (no padding on its outer side, none on a phone) and, on a phone, puts the text before a picture on the right, in reading order. Generic for any site using the block.
 - The menu's close-on-tap script (plan 9t-5): `assets/js/menu-close-outside.js`, loaded with the navigation block by `hbmusic_enqueue_menu_close_script()`; generic for any site using WordPress's hamburger menu, since Safari otherwise leaves it open on a tap beside it.
+- Click-to-load videos (plan 9v): `includes/video-facade.php`, `assets/js/video-facade.js` and `video-facade.css` turn every YouTube player in a page's content into its picture (fetched into the uploads folder when a page is saved) and a play button, loading YouTube's privacy-enhanced player only on play; generic for any site with YouTube embeds (handbook 12, 8.5). The privacy policy uses the handbook model's `videos` block with it.
 - The video script (plan D29): `assets/js/video-pause.js` with its loading and YouTube's command
   switch in `functions.php`; generic for any site with YouTube embeds.
 - The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),

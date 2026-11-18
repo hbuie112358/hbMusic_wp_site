@@ -8,6 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
+require_once __DIR__ . '/includes/video-facade.php';
 
 /**
  * This site's old page addresses and the pages that replaced them (plan D22): the old site's
@@ -67,7 +68,8 @@ const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/form.css';
 
 /**
  * The script that pauses embedded YouTube players so only one plays at a time (plan D29), loaded
- * only on pages whose content has one; its handle; and the addresses that count as a player.
+ * with the click-to-load videos on pages that have one (includes/video-facade.php); its handle; and
+ * the addresses that count as a player.
  */
 const HBMUSIC_VIDEO_PAUSE_SCRIPT   = 'assets/js/video-pause.js';
 const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
@@ -600,33 +602,6 @@ function hbmusic_describe_slide( WP_HTML_Processor $tags, int $position, int $sl
 	/* translators: 1: the slide's position, 2: the number of slides. */
 	$tags->set_attribute( 'aria-label', sprintf( __( '%1$d of %2$d', 'hbmusic' ), $position, $slide_count ) );
 }
-
-/**
- * Prepares the YouTube players in a page's content for the video script: adds YouTube's switch for
- * accepting commands from the page (enablejsapi=1) to each player's address, and loads the script
- * when there is at least one. Added when the page is rendered, so players embedded before this
- * change get it too, and the editor's content stays as WordPress saved it.
- *
- * @param string $block_content The page content's HTML.
- * @return string The HTML, with each YouTube player able to take commands.
- */
-function hbmusic_prepare_youtube_players( string $block_content ): string {
-	$tags       = new WP_HTML_Tag_Processor( $block_content );
-	$has_player = false;
-	while ( $tags->next_tag( array( 'tag_name' => 'iframe' ) ) ) {
-		$address = $tags->get_attribute( 'src' );
-		if ( ! is_string( $address ) || ! hbmusic_is_youtube_player( $address ) ) {
-			continue;
-		}
-		$tags->set_attribute( 'src', add_query_arg( 'enablejsapi', '1', $address ) );
-		$has_player = true;
-	}
-	if ( $has_player ) {
-		hbmusic_enqueue_video_pause_script();
-	}
-	return $tags->get_updated_html();
-}
-add_filter( 'render_block_core/post-content', 'hbmusic_prepare_youtube_players' );
 
 /**
  * Whether an address is a YouTube player's (an embed address on one of YouTube's hosts).
