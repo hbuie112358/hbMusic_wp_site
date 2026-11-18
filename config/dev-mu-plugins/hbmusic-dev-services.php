@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Dev site services
- * Description: On the dev site only: sends mail to Mailpit, and answers for Cloudflare Turnstile.
+ * Description: On the dev site only: sends mail to Mailpit, and answers for Cloudflare Turnstile and for YouTube's oEmbed service and image server.
  *
  * Mounted only by compose.dev.yaml; it is never deployed. The mail never leaves the computer, and
  * the tests need no outside service: only Cloudflare, which the project does not own, is simulated.
@@ -102,3 +102,72 @@ function hbmusic_dev_answer_video_pictures( $preempted_response, array $request,
 	);
 }
 add_filter( 'pre_http_request', 'hbmusic_dev_answer_video_pictures', 10, 3 );
+
+// YouTube's oEmbed service, which WordPress asks to turn a video block's address into its player.
+// Answered here with a player as YouTube writes it, so the stand-in videos are real video blocks,
+// as the editor saves them, and the dev site loads the same WordPress styles as live (a fault in
+// the click-to-load videos showed only there: WordPress's video block stylesheet, which plain
+// HTML stand-ins never loaded). Neutral titles by video ID; any other video gets a generic one.
+const HBMUSIC_DEV_OEMBED_ADDRESS = 'https://www.youtube.com/oembed';
+const HBMUSIC_DEV_VIDEO_TITLES   = array(
+	'sampleFeat1' => 'Sample featured video',
+	'sampleVid01' => 'Sample video',
+	'sampleVid02' => 'Sample video of the second set',
+);
+const HBMUSIC_DEV_VIDEO_TITLE    = 'Stand-in video';
+// The player's size in the answer: YouTube's own default for an embedded player.
+const HBMUSIC_DEV_PLAYER_WIDTH  = 560;
+const HBMUSIC_DEV_PLAYER_HEIGHT = 315;
+
+/**
+ * Answers YouTube's oEmbed service as it would for a video: its title and player.
+ *
+ * @param false|array<string, mixed>|WP_Error $preempted_response Any earlier answer to the request.
+ * @param array<string, mixed>                $request            The request's arguments.
+ * @param string                              $url                The request's address.
+ * @return false|array<string, mixed>|WP_Error The answer; false lets the request go out.
+ */
+function hbmusic_dev_answer_video_lookup( $preempted_response, array $request, string $url ) {
+	if ( ! str_starts_with( $url, HBMUSIC_DEV_OEMBED_ADDRESS . '?' ) ) {
+		return $preempted_response;
+	}
+	$video_id = hbmusic_dev_looked_up_video_id( $url );
+	$title    = HBMUSIC_DEV_VIDEO_TITLES[ $video_id ] ?? HBMUSIC_DEV_VIDEO_TITLE;
+	$player   = sprintf(
+		'<iframe width="%d" height="%d" src="https://www.youtube.com/embed/%s?feature=oembed" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="%s"></iframe>',
+		HBMUSIC_DEV_PLAYER_WIDTH,
+		HBMUSIC_DEV_PLAYER_HEIGHT,
+		rawurlencode( $video_id ),
+		esc_attr( $title )
+	);
+	return array(
+		'response' => array( 'code' => 200 ),
+		'headers'  => array( 'content-type' => 'application/json' ),
+		'body'     => (string) wp_json_encode(
+			array(
+				'type'          => 'video',
+				'version'       => '1.0',
+				'provider_name' => 'YouTube',
+				'title'         => $title,
+				'width'         => HBMUSIC_DEV_PLAYER_WIDTH,
+				'height'        => HBMUSIC_DEV_PLAYER_HEIGHT,
+				'html'          => $player,
+			)
+		),
+	);
+}
+add_filter( 'pre_http_request', 'hbmusic_dev_answer_video_lookup', 10, 3 );
+
+/**
+ * The video ID in an oEmbed request: the "v" of the watch address it asks about.
+ *
+ * @param string $lookup_url The oEmbed request's address.
+ * @return string The video ID, or an empty string.
+ */
+function hbmusic_dev_looked_up_video_id( string $lookup_url ): string {
+	$lookup_query = (string) wp_parse_url( $lookup_url, PHP_URL_QUERY );
+	wp_parse_str( $lookup_query, $lookup );
+	$video_query = is_string( $lookup['url'] ?? null ) ? (string) wp_parse_url( $lookup['url'], PHP_URL_QUERY ) : '';
+	wp_parse_str( $video_query, $video );
+	return is_string( $video['v'] ?? null ) ? $video['v'] : '';
+}

@@ -8,11 +8,17 @@
  * holding a facade or player, which would otherwise sit below it, at twice the height. Other embeds
  * keep WordPress's box. (WordPress's spacer and overlay come from its video block's stylesheet,
  * which a player pasted as code does not load: relying on them left the facade without a box.)
+ *
+ * Where that stylesheet loads, its spacer and overlay rules are more specific than a plain class
+ * (".wp-embed-responsive .wp-has-aspect-ratio …"), and they won: the spacer stayed on above every
+ * picture on live, 2026-11-17. So each rule here also names that same chain, which outranks
+ * WordPress's by specificity alone, whatever order the stylesheets load in.
  */
 
 .video-facade,
 .video-facade__player,
-.wp-block-embed__wrapper > .video-facade__player {
+.wp-block-embed__wrapper > .video-facade__player,
+.wp-embed-responsive .wp-has-aspect-ratio .wp-block-embed__wrapper > .video-facade__player {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -21,7 +27,8 @@
 	border: 0;
 }
 
-.wp-block-embed__wrapper:has(> .video-facade, > .video-facade__player)::before {
+.wp-block-embed__wrapper:has(> .video-facade, > .video-facade__player)::before,
+.wp-embed-responsive .wp-has-aspect-ratio .wp-block-embed__wrapper:has(> .video-facade, > .video-facade__player)::before {
 	display: none;
 }
 

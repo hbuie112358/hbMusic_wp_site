@@ -44,21 +44,48 @@ for (const path of PAGES_WITH_VIDEOS) {
 	});
 }
 
-// Each picture keeps the video's 16:9 box, inside WordPress's video block (Music) and on its own
-// (Home): relying on the block's own spacer once stretched it to the whole carousel.
+// Each video, its picture and then its player, keeps a 16:9 box, and WordPress's video block around
+// it is exactly that tall: relying on the block's own spacer once stretched the picture to the
+// whole carousel, and the spacer left on above the picture doubled the block's height on live (the
+// block's stylesheet outranked the theme's rule; 2026-11-17). Once played, WordPress lays the player
+// over that spacer, so with the spacer off the player must keep its own height.
 const WIDESCREEN = 16 / 9;
 const SHAPE_TOLERANCE = 0.02;
+const HEIGHT_TOLERANCE_PX = 1;
+const VIDEO_BLOCK = 'figure.wp-block-embed';
+
+type VideoBox = { name: string; ratio: number; height: number; blockHeight: number };
+
+async function videoBoxes(page: import('@playwright/test').Page, video: string): Promise<VideoBox[]> {
+	return page.locator(video).evaluateAll((elements, block) => elements.map((element) => {
+		const box = element.getBoundingClientRect();
+		return {
+			name: element.getAttribute('aria-label') ?? element.getAttribute('title') ?? '',
+			ratio: box.width / box.height,
+			height: box.height,
+			blockHeight: (element.closest(block) ?? element).getBoundingClientRect().height,
+		};
+	}), VIDEO_BLOCK);
+}
+
+function expectWidescreenFilling(boxes: VideoBox[], what: string): void {
+	expect(boxes.length, `the ${what}s`).toBeGreaterThanOrEqual(1);
+	for (const box of boxes) {
+		expect(Math.abs(box.ratio - WIDESCREEN), `the shape of the ${what} "${box.name}"`).toBeLessThanOrEqual(SHAPE_TOLERANCE);
+		expect(Math.abs(box.blockHeight - box.height), `the video block's height around the ${what} "${box.name}"`).toBeLessThanOrEqual(HEIGHT_TOLERANCE_PX);
+	}
+}
+
 for (const path of PAGES_WITH_VIDEOS) {
-	test(`every video's picture on ${path} keeps a 16:9 box`, async ({ page }) => {
+	test(`every video on ${path} keeps a 16:9 box, its video block no taller, before and after playing`, async ({ page }) => {
+		await page.route(PLAYER_ADDRESS, (route) => route.fulfill({ contentType: 'text/html', body: STAND_IN_PLAYER }));
 		await page.setViewportSize({ width: 1280, height: 900 });
 		await page.goto(path);
-		const shapes = await page.locator(FACADE).evaluateAll((links) => links.map((link) => {
-			const box = link.getBoundingClientRect();
-			return { name: link.getAttribute('aria-label') ?? '', ratio: box.width / box.height };
-		}));
-		for (const shape of shapes) {
-			expect(Math.abs(shape.ratio - WIDESCREEN), `the shape of "${shape.name}"`).toBeLessThanOrEqual(SHAPE_TOLERANCE);
-		}
+		expectWidescreenFilling(await videoBoxes(page, FACADE), 'picture');
+
+		await page.locator(FACADE).first().click();
+		await expect(page.locator('main iframe'), 'the player').toHaveCount(1);
+		expectWidescreenFilling(await videoBoxes(page, 'main iframe'), 'player');
 	});
 }
 
