@@ -2,12 +2,12 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-17T10:14:30-05:00
-# The pause commit is on the branch chore/pause-2026-11-17 until the user says "push"; then main.
-# last_commit is main's tip before the pause commit: "fix(theme): redirect the old site's last
-# four addresses to Music".
-current_branch: chore/pause-2026-11-17
-last_commit: 181eef0
+timestamp: 2026-11-17T21:20:00-05:00
+# The pause commit is on the branch chore/pause-2026-11-17-evening until the user says "push";
+# then main. last_commit is main's tip before the pause commit: "fix(theme): no black space above
+# the click-to-load videos" (#74).
+current_branch: chore/pause-2026-11-17-evening
+last_commit: a1e5271
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -206,13 +206,30 @@ last_work: >
   Global: WORKING_STYLE.md gained the nutshell rule and American spelling (the user's yes);
   memory gained github-waits-in-background (with the merge-script rules after a failed merge
   was taken for a success and its branch deleted, then restored). Pull requests #62 to #65 merged.
+  Later on 2026-11-17 (after a resume): 9m parts C, D and E done (HetrixTools up through the
+  switch; the launch baseline in records/launch/ and records/search.md; Site Health, the keyboard
+  pass, the secrets check). The Book page's search wording from "hire" to "book" and its photo.
+  9t, the hamburger menu: a small panel at the right under the header on phones, closed by its
+  button, Escape or a tap beside it (menu-close-outside.js, also in WebKit, after the iPhone failed
+  on live). 9t-3, Media & Text's text lined up with the page title. D34, a faster pipeline (a merge
+  deploys to staging without repeating the checks). One npm advisory accepted in the CSS linter
+  until 2026-12-17 (#67). 9v, click-to-load videos (includes/video-facade.php, video-facade.js):
+  nothing from YouTube until played, the pictures fetched once on save into uploads/, PageSpeed on
+  phones Home 1.2 s (was 8.3), Music 1.7 s (was 14.2), Songs 1.5 s, Book 2.2 s, every page good on
+  8.1; the privacy policy's Videos paragraph updated on live by the user (dated November 18). The
+  same evening a black space above each video on live: WordPress's video block stylesheet, which
+  the dev site's plain-HTML stand-ins never loaded, kept its spacer on; fixed by naming WordPress's
+  own selector chain (#74), the dev stand-ins made real video blocks with a local stand-in for
+  YouTube's oEmbed service, the test checking the block's height before and after playing; uploaded
+  by the user and measured on live (Home 192 px around a 192 px picture, was 385). Each theme change
+  reached live as a hand-uploaded zip (D33), the latest data/exports/live-upload-a1e5271/. Pull
+  requests #66 to #74 merged.
 
 next_action: >
-  Finish going live (plan, Current position): 9m part C (HetrixTools shows the monitor Up), part D
-  (the launch baseline: Yoast's panel per page into records/, records/search.md dated, the user's
-  acknowledgment), part E (Site Health, a keyboard pass, PageSpeed for Music and Book, the
-  secrets check); 9n from about 2026-12-01. Then 9t, 9v, 9u, item 5 (bin/deploy), item 3's parts
-  3-3 to 3-9, item 4, 5b, 9o, 9q, 9r, 9s.
+  9u (the booking form's message when the spam check fails: the box not ticked), giving the user
+  the steps one at a time; then item 5 (bin/deploy, ending D33's hand uploads), item 3's parts 3-3
+  to 3-8, item 4, 5b, 9o, 9q, 9r, 9s, then 6b, 6c and 7 (plan, Current position). 9n from about
+  2026-12-01. The npm advisory's review date is 2026-12-17.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -222,7 +239,7 @@ verification:
   live_plugins: wordfence 9.1.1 (by hand, 2026-11-11), wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); Hostinger's Smart auto-updates set to security updates only for core, themes and plugins on both sites; the rest by hand in the monthly check (8j)
   live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10); visitors' addresses read from REMOTE_ADDR behind Hostinger's CDN (8i); brute-force limits as on staging, read 2026-11-10
   search_console: Domain property under the business Google account, verified 2026-11-09 by a new google-site-verification TXT record; the other owner is the user's other Google account (the older TXT record); baseline in plan 8h
-  live_theme: the child theme Howard Buie Music, from the zip of 181eef0, active since 2026-11-17 (9k); music-lite and music-lite-child still installed until 9n (the way back)
+  live_theme: the child theme Howard Buie Music, active since 2026-11-17 (9k), now the zip of a1e5271 (uploaded by the user 2026-11-17, the video boxes measured right from outside); music-lite and music-lite-child still installed until 9n (the way back); Home and Music saved after 9v, their four video pictures in uploads/hbmusic-video-pictures/
   live_site_2026_11_17: staging's content imported (6 pages, 108 songs, Main menu, the Booking form); pictures for Home and Songs, the site icon, the sharing image and Yoast's logo uploaded by hand; old pages and posts in the trash until 9n; plugins Contact Form 7 6.2.5, Editing Help 0.1.1, FluentSMTP 2.4.5 (Brevo with live's own key, Pushover with live's own token), Site Hardening 0.2.0, Song List 0.2.1, Wordfence 9.1.1, Yoast SEO 28.8 (the importer deleted); a new admin with two-factor and the user's Editor, both tested; the old admin until 9n; live's own Turnstile widget; HSTS and the security headers, the version files 403, no PHP in uploads, all checked from outside; every old address redirected; a Hostinger backup of 06:54 before the switch; the settings in data/records/settings.md
   live_backups: Hostinger backs up the live site daily (the user, 2026-11-09), kept at Hostinger; the off-site copy by hand, content exports into data/exports/ (D27), first one at go-live
   staging_site: staging.howardbuiemusic.com, site-wide password (one PWPROTECTID block in .htaccess; .htpasswd holds APR1 lines made by hand for the user and github-check, since hPanel's SHA-512 entries are refused; no users added through hPanel until Hostinger fixes it), server rules for the version files (top of .htaccess) and uploads/.htaccess (8k), wp-config.php 600, Wordfence 9.1.1, Wordfence with two-factor login required for administrators, the theme with the On Stage look, Song List with the 108 songs, the five pages and the Privacy Policy, Contact Form 7 with the Booking form, Turnstile keys and its To and From set by hand; Yoast SEO 28.8 set as in plan step 6; Site Hardening active (8a); avatars off (8e); the site icon (5f, 2026-11-11); the pages' final wording pasted (5f); theme as of 84999a3 deployed (#55); its pages updated by the user on 2026-11-12 (Home, Music, Songs and About) with wide bands and the site-panel class, templates chosen (Page No Title with call to action for Home, Page with call to action for Music, Songs and About), Home's introduction naming Hope Mills, Home's featured video, a Book Howard button in Home's features panel, Music's carousel from the Video carousel pattern with three videos; Yoast AI off (8g); WordPress Importer deleted again, as far as the user reported before the booking form's import (the user was asked to delete it again afterwards and has not confirmed)
@@ -233,7 +250,7 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check all passing; bin/test 10 scenario checks + 156 browser tests (4 redirects added) + the final debug-log check, all passing (2026-11-17); bin/screenshots for before/after looks
+  checks: bin/check 22 checks all passing; bin/test 11 scenario checks + 175 browser tests + the final debug-log check, all passing (2026-11-17, on a1e5271's code); bin/screenshots for before/after looks
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
@@ -244,13 +261,19 @@ verification:
 
 uncommitted_changes:
   - file: none in this repository
-    why: the plan and this file are the pause commit, on chore/pause-2026-11-17 (1 commit, not pushed; it waits for the user's "push")
+    why: the plan and this file are the pause commit, on chore/pause-2026-11-17-evening (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main at a1e5271
   - file: data/ (not versioned)
     why: >
       New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
-      data/exports/ (staging's and live's exports of 2026-11-17, the zips of 181eef0 with their
-      SHA256SUMS), data/photos/web/howard-buie-share.png. Covered only by the user's off-computer
-      backup of data/ (D27), which should be brought up to date.
+      data/exports/ (staging's and live's exports of 2026-11-17, the theme zips live-upload-181eef0
+      to live-upload-a1e5271 with their SHA256SUMS), data/photos/web/howard-buie-share.png. Covered
+      only by the user's off-computer backup of data/ (D27), which should be brought up to date.
+  - file: the dev site (not versioned)
+    why: >
+      Four "Unfiltered HTML probe" drafts left on it (IDs 23, 24, 43, 44): 43 and 44 most likely from
+      a full test run Claude started by mistake and stopped; 23 and 24 older, so
+      tests/scenario/dev-site-hardening.sh's cleanup may not be deleting its drafts. Not looked into
+      yet (an existing test); the next bin/dev-site clears them.
   - file: ~/.claude (the user commits it on the host)
     why: see the pause output's git status of ~/.claude.
 
@@ -261,6 +284,8 @@ pending_decisions:
     handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is on GitHub as a
     private repository on the user's account (all pushed, 2026-11-17).
   - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
+  - Whether to look into the Site Hardening check's leftover probe drafts (see uncommitted_changes).
+  - Optional, from the review of #74: a pasted-code video on a test page (the CSS for pasted players is kept but no longer shown on a test page; live has none). Claude advised leaving it out.
   - >
     Optional tidy-up: keep Search Console in the business Google account only (remove the other
     account as owner, then the older google-site-verification TXT record); harmless to leave.
@@ -293,4 +318,4 @@ resume_instructions: |
      (this project's repository and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the plan's Current position, its Decisions table, and the
      entries of step 9 (9m to 9v) and of the item in progress.
-  3. Then next_action: 9m part C, giving the user the steps for each item, one at a time.
+  3. Then next_action: 9u, giving the user the steps for each item, one at a time.

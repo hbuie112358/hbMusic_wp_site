@@ -35,8 +35,10 @@ new findings added as steps.
      (7.2), PageSpeed (Mobile) for Music and Book (8.1; Home and Songs measured, 9v), the
      secrets check (1.5).
   4. 9n, from about 2026-12-01 (two weeks after the switch): cleanup as listed there.
-- **Then, after go-live, in this order:** 9t (the phone menu shows only Home), 9v (speed: the
-  click-to-load player and the logo), 9u (the form's message before the spam check), item 5
+- **Then, after go-live, in this order:** `[x]` 9t (the hamburger menu, done 2026-11-17), `[x]` 9v
+  (click-to-load videos, live 2026-11-17, every page good on PageSpeed; its black space above the
+  videos fixed the same evening, #74, uploaded and measured on live), **next: 9u** (the form's
+  message before the spam check), item 5
   (`bin/deploy`, ending D33's exception; until then a change reaches live as a zip uploaded by
   hand), item 3's parts 3-3 to 3-9, item 4, item 5b, 9o (restore test), 9q, 9r, 9s, then 6b, 6c
   and 7.
