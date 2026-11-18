@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { WCAG_TAGS } from './accessibility';
-import { CLOSE_MENU_BUTTON, OPEN_MENU_BUTTON, OPEN_MENU_PANEL, PHONE, TAP_BELOW_PANEL, expectTapBelowClosesMenu, openPhoneMenu, unreachableLinks } from './hamburger-menu';
+import { CLOSE_MENU_BUTTON, OPEN_MENU_BUTTON, OPEN_MENU_PANEL, PHONE, TAP_BELOW_PANEL, expectTapOnPlainPageClosesMenu, openPhoneMenu, unreachableLinks } from './hamburger-menu';
 
 // Protects the sticky header and the menu (plan D29): the header stays at the top while the page
 // scrolls, a link reached with the keyboard is never hidden under it (WCAG 2.2, 2.4.11), the menu
@@ -151,13 +151,13 @@ for (const [way, close] of [
 	});
 }
 
-// A tap on the page below the panel closes it (WordPress closes the menu when the focus leaves it
-// for nothing); the same test in WebKit, Safari's engine, is hamburger-menu-webkit.spec.ts.
+// A tap on plain page content beside the panel closes it (the theme's menu-close-outside.js, plan
+// 9t-5); the same test in WebKit, Safari's engine, is hamburger-menu-webkit.spec.ts.
 test.describe('with a touch screen', () => {
 	test.use({ hasTouch: true });
 
-	test('a tap on the page below closes the hamburger menu', async ({ page }) => {
-		await expectTapBelowClosesMenu(page);
+	test('a tap on plain page content beside it closes the hamburger menu', async ({ page }) => {
+		await expectTapOnPlainPageClosesMenu(page);
 	});
 });
 

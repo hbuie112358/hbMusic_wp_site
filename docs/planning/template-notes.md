@@ -90,6 +90,7 @@ template project starts; until then, a list, not a to-do.
   page if left empty). Each carousel is described for screen readers as a carousel of "n of m"
   slides. Generic; the pattern's label "Videos" suits a site whose carousels hold videos.
 - Media & Text (plan 9t-3): `media-text.css` lines the block's text up with the page's edge (no padding on its outer side, none on a phone) and, on a phone, puts the text before a picture on the right, in reading order. Generic for any site using the block.
+- The menu's close-on-tap script (plan 9t-5): `assets/js/menu-close-outside.js`, loaded with the navigation block by `hbmusic_enqueue_menu_close_script()`; generic for any site using WordPress's hamburger menu, since Safari otherwise leaves it open on a tap beside it.
 - The video script (plan D29): `assets/js/video-pause.js` with its loading and YouTube's command
   switch in `functions.php`; generic for any site with YouTube embeds.
 - The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),

@@ -34,13 +34,20 @@ export async function unreachableLinks(panel: Locator): Promise<string[]> {
 }
 
 
-// Taps the page below the open panel, as a visitor's thumb would, and expects the menu closed.
-export async function expectTapBelowClosesMenu(page: Page): Promise<void> {
+// Taps plain page content beside the open panel, as a visitor's thumb would, and expects the menu
+// closed. The spot must be neither a link, a button nor a field: a tap there moves the focus, and
+// WordPress closes the menu on its own, so the test would pass without the theme's script (it did,
+// and Safari on live kept the menu open beside plain text, plan 9t-5).
+export async function expectTapOnPlainPageClosesMenu(page: Page): Promise<void> {
 	const panel = await openPhoneMenu(page);
 	const box = await panel.boundingBox();
-	const tapY = Math.round((box?.y ?? 0) + (box?.height ?? 0)) + TAP_BELOW_PANEL;
-	// A tap off the window's edge would prove nothing: Chromium counts it as focus leaving too.
-	expect(tapY, 'the tap lands on the page, inside the window').toBeLessThan(PHONE.height);
-	await page.touchscreen.tap(PHONE.width / 2, tapY);
+	const spot = { x: Math.round((box?.x ?? 0) / 2), y: Math.round((box?.y ?? 0) + (box?.height ?? 0) / 2) };
+	expect(spot.x, 'a spot beside the panel, inside the window').toBeGreaterThan(0);
+	const isPlain = await page.evaluate(({ x, y }) => {
+		const element = document.elementFromPoint(x, y);
+		return element !== null && element.closest('a, button, input, select, textarea, [tabindex]') === null;
+	}, spot);
+	expect(isPlain, 'the tapped spot is plain page content, not a link, button or field').toBe(true);
+	await page.touchscreen.tap(spot.x, spot.y);
 	await expect(page.locator(OPEN_MENU_PANEL), 'the open menu panel').toHaveCount(0);
 }
