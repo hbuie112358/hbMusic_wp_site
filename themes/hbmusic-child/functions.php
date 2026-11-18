@@ -74,6 +74,13 @@ const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
 const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
 
 /**
+ * The script that closes the open hamburger menu on a tap outside it (plan 9t-5), loaded only
+ * where a navigation block is rendered, and its handle.
+ */
+const HBMUSIC_MENU_CLOSE_SCRIPT = 'assets/js/menu-close-outside.js';
+const HBMUSIC_MENU_CLOSE_HANDLE = 'hbmusic-menu-close-outside';
+
+/**
  * The class that marks the footer's Privacy Policy link (parts/footer.html), whose address the
  * theme fills in from Settings → Privacy (hbmusic_link_privacy_policy()).
  */
@@ -648,6 +655,29 @@ function hbmusic_enqueue_video_pause_script(): void {
 		)
 	);
 }
+
+/**
+ * Loads the menu's close-on-tap script with the first navigation block on the page, at the end of
+ * the page, deferred, labelled by its contents' fingerprint; the block's markup passes unchanged.
+ * Scripts placed in the footer can still be queued while the page's blocks are being rendered.
+ *
+ * @param string $block_content The navigation block's markup.
+ * @return string The same markup.
+ */
+function hbmusic_enqueue_menu_close_script( string $block_content ): string {
+	wp_enqueue_script(
+		HBMUSIC_MENU_CLOSE_HANDLE,
+		get_theme_file_uri( HBMUSIC_MENU_CLOSE_SCRIPT ),
+		array(),
+		hbmusic_asset_version( HBMUSIC_MENU_CLOSE_SCRIPT ),
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
+	);
+	return $block_content;
+}
+add_filter( 'render_block_core/navigation', 'hbmusic_enqueue_menu_close_script' );
 
 /**
  * What each page template does, for the Editing Help plugin's guide (handbook H89): theme.json can
