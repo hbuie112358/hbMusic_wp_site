@@ -92,6 +92,9 @@ services:
       - *song-list-mount
       - *site-hardening-mount
       - *editing-help-mount
+      # The dev-only services, as for the site: WP-CLI saving a page fetches its videos' pictures
+      # (the theme, plan 9v), which must be answered here too, never by the real YouTube.
+      - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
 volumes:
   db_data:

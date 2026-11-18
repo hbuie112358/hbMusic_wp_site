@@ -33,6 +33,6 @@ export async function recordedCspViolations(page: Page): Promise<CspViolation[]>
 // by the test, so it needs no network and no outside site, while the browser still applies the
 // policy to both.
 export async function answerOutsideServices(page: Page): Promise<void> {
-	await page.route(/youtube\.com\/embed/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>video</title>' }));
+	await page.route(/youtube(-nocookie)?\.com\/embed/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>video</title>' }));
 	await page.route(/challenges\.cloudflare\.com/, (route) => route.fulfill({ contentType: 'text/javascript', body: '' }));
 }

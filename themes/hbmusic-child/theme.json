@@ -175,6 +175,12 @@
 				"menuDrop": "200ms",
 				"menuDropDistance": "0.5rem"
 			},
+			"video": {
+				"playWidth": "68px",
+				"playHeight": "48px",
+				"playIcon": "20px",
+				"playBackground": "rgb(0 0 0 / 75%)"
+			},
 			"header": {
 				"logoSize": "56px",
 				"logoSizeCompact": "40px",

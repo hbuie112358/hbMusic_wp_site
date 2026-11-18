@@ -214,3 +214,18 @@ for a week. Pages, styles and scripts need nothing: they arrive fresh or carry a
 address.
 
 Claude helps with any of these when the user brings the symptom to a session.
+
+## When adding a video
+
+Videos are added as before: a YouTube link pasted into a video block, or the "Video carousel"
+pattern. Since plan 9v the site shows each video as its picture with a play button, and loads
+YouTube only when a visitor plays it. The picture is fetched from YouTube's image server when the
+page is saved (Update or Publish), and kept in the uploads folder.
+
+- **A video shows a dark box with the play button instead of its picture:** the fetch failed, or
+  the video was added before the theme had this feature. Open the page and click **Update** once
+  (nothing needs changing); the picture is fetched then. Some very new or private videos have no
+  picture at YouTube; they keep the dark box and still play.
+- **Changing a video's picture on YouTube** (a new thumbnail): the site keeps its first copy. To
+  refresh it, ask Claude in a session; the old file is removed from
+  `wp-content/uploads/hbmusic-video-pictures/` and the page saved again.

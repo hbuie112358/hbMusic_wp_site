@@ -1,0 +1,74 @@
+/*
+ * Click-to-load videos (plan 9v; includes/video-facade.php): the video's picture with a play
+ * button, in the box the player will fill, and the player that replaces it when played. Loaded only
+ * on pages that have a video.
+ *
+ * Both keep a 16:9 box themselves, wherever they are. WordPress's video block keeps its own 16:9 box
+ * with a spacer in its wrapper and a player laid over it; that spacer is switched off for a wrapper
+ * holding a facade or player, which would otherwise sit below it, at twice the height. Other embeds
+ * keep WordPress's box. (WordPress's spacer and overlay come from its video block's stylesheet,
+ * which a player pasted as code does not load: relying on them left the facade without a box.)
+ */
+
+.video-facade,
+.video-facade__player,
+.wp-block-embed__wrapper > .video-facade__player {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 16 / 9;
+	border: 0;
+}
+
+.wp-block-embed__wrapper:has(> .video-facade, > .video-facade__player)::before {
+	display: none;
+}
+
+.video-facade {
+	overflow: hidden;
+	background: var(--wp--preset--color--accent-5);
+}
+
+/* The picture fills the box; YouTube's smaller pictures carry black bars, which this crops away. */
+.video-facade__picture {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* The play button: a rounded dark plate with a light triangle, centered, as video players draw it. */
+.video-facade__play {
+	position: absolute;
+	inset: 0;
+	width: var(--wp--custom--video--play-width);
+	height: var(--wp--custom--video--play-height);
+	margin: auto;
+	background: var(--wp--custom--video--play-background);
+	border-radius: var(--wp--custom--panel-radius);
+	transition: background-color var(--wp--custom--motion--duration) ease;
+}
+
+.video-facade__play::before {
+	position: absolute;
+	inset: 0;
+	width: var(--wp--custom--video--play-icon);
+	height: var(--wp--custom--video--play-icon);
+	margin: auto;
+	content: "";
+	background: var(--wp--preset--color--contrast);
+	clip-path: polygon(15% 0, 100% 50%, 15% 100%);
+}
+
+/* Pointed at or reached with the keyboard: the plate takes the site's green. */
+.video-facade:hover .video-facade__play,
+.video-facade:focus-visible .video-facade__play {
+	background: var(--wp--preset--color--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.video-facade__play {
+		transition: none;
+	}
+}

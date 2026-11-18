@@ -4,7 +4,9 @@ import { expect, test, type Page } from '@playwright/test';
 // plays at a time (the user found a carousel's first video still playing after moving on). A
 // player moved out of its carousel's view is paused, scrolling the page never pauses one, and
 // clicking into one pauses the others. The script loads only
-// where there is a player, and each player's address carries YouTube's switch for commands.
+// where there is a video, and each player's address carries YouTube's switch for commands. Since the
+// click-to-load videos (plan 9v), each player is created when the visitor plays its video, so the
+// tests start the videos that way, by clicking their pictures.
 //
 // YouTube itself is not called: each player address is answered with a stand-in player that
 // reports the commands it receives to the page.
@@ -19,6 +21,8 @@ const SHORT_WINDOW = 300;
 const TALL_WINDOW = 2400;
 const FIRST_PLAYER = 'Sample video';
 const SECOND_PLAYER = 'Sample video of the second set';
+// The players' addresses, YouTube's usual and its privacy-enhanced one, answered by the stand-in.
+const YOUTUBE_PLAYER_ADDRESS = /^https:\/\/www\.youtube(-nocookie)?\.com\/embed\//;
 
 // The stand-in player: it answers every command with a "test-command" message naming it.
 const STAND_IN_PLAYER = `<!doctype html><title>Stand-in player</title><style>body { margin: 0; height: 100vh; }</style><script>
@@ -38,7 +42,7 @@ interface Command {
 }
 
 async function openWithStandInPlayers(page: Page, path: string): Promise<void> {
-	await page.route('https://www.youtube.com/embed/**', (route) => route.fulfill({ contentType: 'text/html', body: STAND_IN_PLAYER }));
+	await page.route(YOUTUBE_PLAYER_ADDRESS, (route) => route.fulfill({ contentType: 'text/html', body: STAND_IN_PLAYER }));
 	// Collects the commands each player reports, named by the player's title.
 	await page.addInitScript(() => {
 		const commands: Array<{ player: string; func: string }> = [];
@@ -59,12 +63,14 @@ async function openWithStandInPlayers(page: Page, path: string): Promise<void> {
 	await page.goto(path);
 }
 
-// Scrolls a player into view and waits until it has loaded (players are lazy-loaded, and a command
-// to a player that has not loaded is dropped). Loaded, its document is the stand-in's, on
-// YouTube's origin, which the page cannot read.
-async function loadPlayer(page: Page, title: string): Promise<void> {
+// Plays a video as a visitor does, by clicking its picture, and waits until its player has loaded
+// (a command to a player that has not loaded is dropped). Loaded, its document is the stand-in's,
+// on YouTube's origin, which the page cannot read.
+async function startPlayer(page: Page, title: string): Promise<void> {
+	const facade = page.locator(`main a.video-facade[aria-label="Play video: ${title}"]`);
+	await facade.scrollIntoViewIfNeeded();
+	await facade.click();
 	const player = page.locator(`main iframe[title="${title}"]`);
-	await player.scrollIntoViewIfNeeded();
 	await expect.poll(() => player.evaluate((frame) => (frame as HTMLIFrameElement).contentDocument === null), { message: `"${title}" loaded` }).toBe(true);
 }
 
@@ -77,9 +83,12 @@ async function commandCount(page: Page): Promise<number> {
 	return page.evaluate(() => (window as unknown as { playerCommands: Command[] }).playerCommands.length);
 }
 
-test('the video script loads where there is a player, and each player can take commands', async ({ page }) => {
-	await page.goto(MUSIC_PATH);
+test('the video script loads where there is a video, and each player can take commands', async ({ page }) => {
+	await openWithStandInPlayers(page, MUSIC_PATH);
+	await page.setViewportSize({ width: 1280, height: TALL_WINDOW });
 	await expect(page.locator(SCRIPT), 'the script on the Music page').toHaveCount(1);
+	await startPlayer(page, FIRST_PLAYER);
+	await startPlayer(page, SECOND_PLAYER);
 	const addresses = await page.locator('main iframe').evaluateAll((frames) => frames.map((frame) => frame.getAttribute('src') ?? ''));
 	expect(addresses.length, 'the players').toBeGreaterThanOrEqual(2);
 	for (const address of addresses) {
@@ -96,12 +105,11 @@ test('clicking into a player pauses the others, also when moving straight from o
 	await openWithStandInPlayers(page, MUSIC_PATH);
 	// Tall enough for both carousels, so no player leaves view and pausing comes from the clicks.
 	await page.setViewportSize({ width: 1280, height: TALL_WINDOW });
-	await loadPlayer(page, SECOND_PLAYER);
-	await loadPlayer(page, FIRST_PLAYER);
+	await startPlayer(page, SECOND_PLAYER);
 	await page.waitForTimeout(SETTLE_MS);
 	let start = await commandCount(page);
-	await page.locator(`main iframe[title="${FIRST_PLAYER}"]`).click();
-	await expect.poll(() => pausesSince(page, start), { message: 'the players paused by entering the first' }).toContain(SECOND_PLAYER);
+	await startPlayer(page, FIRST_PLAYER);
+	await expect.poll(() => pausesSince(page, start), { message: 'the players paused by playing the first' }).toContain(SECOND_PLAYER);
 	expect(await pausesSince(page, start), 'the entered player itself').not.toContain(FIRST_PLAYER);
 	start = await commandCount(page);
 	await page.locator(`main iframe[title="${SECOND_PLAYER}"]`).click();
@@ -111,7 +119,7 @@ test('clicking into a player pauses the others, also when moving straight from o
 test('a player moved out of view in its carousel is paused', async ({ page }) => {
 	await openWithStandInPlayers(page, MUSIC_PATH);
 	const row = page.locator(ROW).first();
-	await loadPlayer(page, FIRST_PLAYER);
+	await startPlayer(page, FIRST_PLAYER);
 	await page.waitForTimeout(SETTLE_MS);
 	const start = await commandCount(page);
 	const box = await row.boundingBox();
@@ -125,7 +133,7 @@ test('a player moved out of view in its carousel is paused', async ({ page }) =>
 // carousel, scrolling it out of view does not pause it.
 test('a player outside a carousel keeps playing when scrolled out of view', async ({ page }) => {
 	await openWithStandInPlayers(page, HOME_PATH);
-	await loadPlayer(page, HOME_PLAYER);
+	await startPlayer(page, HOME_PLAYER);
 	await page.waitForTimeout(SETTLE_MS);
 	const start = await commandCount(page);
 	// A short window, so the test page's end lies well below the video.
@@ -141,7 +149,7 @@ test('a player outside a carousel keeps playing when scrolled out of view', asyn
 // pauses only when the carousel moves to another video, or when stopped).
 test('a player in a carousel keeps playing when the page is scrolled past it', async ({ page }) => {
 	await openWithStandInPlayers(page, MUSIC_PATH);
-	await loadPlayer(page, FIRST_PLAYER);
+	await startPlayer(page, FIRST_PLAYER);
 	await page.waitForTimeout(SETTLE_MS);
 	const start = await commandCount(page);
 	await page.setViewportSize({ width: 1280, height: SHORT_WINDOW });

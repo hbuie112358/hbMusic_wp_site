@@ -11,7 +11,9 @@
  *
  * YouTube's player runs in its own frame, which the page cannot reach or see into; it accepts
  * commands sent as messages when its address carries enablejsapi=1 (the theme adds it), and only
- * its documented pause command is used. Which player the visitor starts is seen from the browser's
+ * its documented pause command is used. Players created later, when the visitor plays a
+ * click-to-load video (video-facade.js, plan 9v), are announced and join in. Which player the
+ * visitor starts is seen from the browser's
  * focus, not asked of YouTube (the user: no reliance on YouTube's less documented reports), so any
  * click into a player counts as moving to it. Without this script everything still works; the
  * players just do not pause by themselves.
@@ -27,6 +29,8 @@
 	// How often, while the focus is inside a player, the page checks whether it moved to another
 	// player: the page is told only when the focus first leaves it, not when it moves on.
 	const FOCUS_CHECK_MS = 250;
+	// Announced by video-facade.js when a click-to-load video becomes a player.
+	const PLAYER_ADDED_EVENT = 'hbmusic:player-added';
 
 	/**
 	 * Whether an element is a frame (the players' selector matches frames only; this tells the
@@ -64,10 +68,10 @@
 		}
 	};
 
-	const players = [ ...document.querySelectorAll( PLAYER_SELECTOR ) ].filter( isFrame );
-	if ( players.length === 0 ) {
-		return;
-	}
+	// The players on the page: those in its markup, and those created later, when the visitor plays
+	// a click-to-load video (video-facade.js announces each one).
+	/** @type {HTMLIFrameElement[]} */
+	const players = [];
 
 	// The player the visitor is in: clicking or tabbing into a player moves the focus into its
 	// frame, which the page sees as its active element. Entering one pauses the others.
@@ -108,8 +112,43 @@
 
 	// One observer per carousel, measuring against the carousel itself, not the window: moving to
 	// another slide changes what the carousel shows, scrolling the page does not.
+	/** @type {Map<Element, IntersectionObserver>} */
+	const carouselObservers = new Map();
 	document.querySelectorAll( CAROUSEL_SELECTOR ).forEach( ( carousel ) => {
-		const observer = new IntersectionObserver( pauseMovedOut, { root: carousel, threshold: [ VISIBLE_SHARE ] } );
-		players.filter( ( player ) => carousel.contains( player ) ).forEach( ( player ) => observer.observe( player ) );
+		carouselObservers.set( carousel, new IntersectionObserver( pauseMovedOut, { root: carousel, threshold: [ VISIBLE_SHARE ] } ) );
+	} );
+
+	/**
+	 * Takes a player into account: followed when the visitor enters it, and watched by its carousel.
+	 *
+	 * @param {HTMLIFrameElement} player The player's frame.
+	 */
+	const addPlayer = ( player ) => {
+		if ( players.includes( player ) ) {
+			return;
+		}
+		players.push( player );
+		carouselObservers.forEach( ( observer, carousel ) => {
+			if ( carousel.contains( player ) ) {
+				observer.observe( player );
+			}
+		} );
+	};
+
+	document.querySelectorAll( PLAYER_SELECTOR ).forEach( ( element ) => {
+		if ( isFrame( element ) ) {
+			addPlayer( element );
+		}
+	} );
+	// A video the visitor just started (video-facade.js) is the one playing: every other is paused at
+	// once, without waiting to see the focus move.
+	document.addEventListener( PLAYER_ADDED_EVENT, ( event ) => {
+		const player = event instanceof CustomEvent ? event.detail : null;
+		if ( ! ( player instanceof HTMLIFrameElement ) || ! player.matches( PLAYER_SELECTOR ) ) {
+			return;
+		}
+		addPlayer( player );
+		currentPlayer = player;
+		players.filter( ( other ) => other !== player ).forEach( pause );
 	} );
 } )();
