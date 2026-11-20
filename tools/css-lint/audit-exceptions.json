@@ -1,9 +1,1 @@
-[
-	{
-		"advisory": "GHSA-fc5q-39xc-vjpf",
-		"package": "picomatch",
-		"accepted": "2026-11-17",
-		"reviewBy": "2026-12-17",
-		"reason": "ReDoS from crafted glob patterns; no fixed release yet. Here picomatch only matches the linter's own fixed patterns (bin/check, stylelint.config.mjs) against this repository's files, in a throwaway container with no secrets, and never runs on a website; the worst case is a CSS check that hangs and fails. Accepted by the user, 2026-11-17 (plan 9t)."
-	}
-]
+[]
