@@ -8,6 +8,10 @@ new findings added as steps.
 
 ## Current position
 
+- **Paused for the template (the user, 2026-11-20):** the active plan is now
+  `docs/planning/template-plan.md`, the brochure-site template, done before this plan's remaining
+  items. **9u is kept waiting, not forgotten:** done at the first break in the template work that
+  suits the user. Item 5 (`bin/deploy`) is the template plan's step 1.4, done once for both.
 - **Where the work stands:** steps 0 to 8 done, with the D29 polish and 5f done and deployed to
   staging on 2026-11-12 (#42 to #55); their entries hold the details. Step 9 (going live) is under
   way: 9a done (2026-11-12), paused at 9b while the DTS Operations Handbook was drafted. The
