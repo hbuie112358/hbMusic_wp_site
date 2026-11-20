@@ -2,12 +2,12 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-17T21:20:00-05:00
-# The pause commit is on the branch chore/pause-2026-11-17-evening until the user says "push";
-# then main. last_commit is main's tip before the pause commit: "fix(theme): no black space above
-# the click-to-load videos" (#74).
+timestamp: 2026-11-20T07:17:00-05:00
+# The pause commits are on the branch chore/pause-2026-11-17-evening until the user says "push";
+# then main. last_commit is HEAD before this pause commit: the previous pause commit, on top of
+# main's a1e5271, "fix(theme): no black space above the click-to-load videos" (#74).
 current_branch: chore/pause-2026-11-17-evening
-last_commit: a1e5271
+last_commit: eadc33f
 working_mode: rolling-wave
 active_plan: docs/planning/rebuild-plan.md
 
@@ -224,6 +224,10 @@ last_work: >
   by the user and measured on live (Home 192 px around a 192 px picture, was 385). Each theme change
   reached live as a hand-uploaded zip (D33), the latest data/exports/live-upload-a1e5271/. Pull
   requests #66 to #74 merged.
+  2026-11-18 to 11-20 (after a resume): a learning session at the user's request, no code or
+  files changed; the child theme's PHP (functions.php, includes/, patterns/) read through and
+  explained, and how to ask Google to show the pages' new search wording (Search Console). 9u
+  not started.
 
 next_action: >
   9u (the booking form's message when the spam check fails: the box not ticked), giving the user
@@ -261,7 +265,7 @@ verification:
 
 uncommitted_changes:
   - file: none in this repository
-    why: the plan and this file are the pause commit, on chore/pause-2026-11-17-evening (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main at a1e5271
+    why: the plan and this file are the pause commits, on chore/pause-2026-11-17-evening (2 commits, not pushed; they wait for the user's "push"); main is even with origin/main at a1e5271
   - file: data/ (not versioned)
     why: >
       New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
@@ -276,6 +280,11 @@ uncommitted_changes:
       yet (an existing test); the next bin/dev-site clears them.
   - file: ~/.claude (the user commits it on the host)
     why: see the pause output's git status of ~/.claude.
+  - file: the session scratchpad (deleted when the session ends)
+    why: >
+      Holds the learning session's write-up of the child theme's PHP (2026-11-18), which the user
+      copies if wanted; it is not part of the project. Everything else there is throwaway from
+      earlier work.
 
 pending_decisions:
   - >
@@ -284,6 +293,10 @@ pending_decisions:
     handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is on GitHub as a
     private repository on the user's account (all pushed, 2026-11-17).
   - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
+  - >
+    For the user, not done yet (2026-11-20): in Search Console, URL Inspection, Test live URL, then
+    Request indexing for the Book page (and any other page whose search wording changed), so
+    Google shows the new "book" wording sooner; Google still chooses the snippet it shows.
   - Whether to look into the Site Hardening check's leftover probe drafts (see uncommitted_changes).
   - Optional, from the review of #74: a pasted-code video on a test page (the CSS for pasted players is kept but no longer shown on a test page; live has none). Claude advised leaving it out.
   - >
