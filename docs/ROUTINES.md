@@ -188,7 +188,9 @@ The privacy policy promises a reply within 30 days, usually within a few days.
 
 Every Monday Dependabot compares the dev site's plugins (`site-packages/composer.json`) with
 WordPress.org (template plan T8, T9). Releases at least a week old arrive together in one pull
-request, such as "Bump the site-plugins group in /site-packages". **Normally nothing is needed:**
+request, such as "Bump the site-plugins group in /site-packages". Only WordPress.org's plugins
+merge themselves: an update to `composer/installers` (the helper that places them, and runs code
+as it does) arrives in a pull request of its own and is reviewed like the tools'. **Normally nothing is needed:**
 its checks run by themselves (the dev site rebuilt with the new versions, every file checked
 against WordPress.org's checksums, every test), and once they pass it merges itself. GitHub's
 emails about it can be read and archived.
@@ -200,9 +202,11 @@ emails, titled "Plugin update #… is waiting: …":
 - **its checks failed:** a new version breaks something the tests protect. Nothing is merged, and
   staging and live stay on their versions until it has been looked at with Claude. The failing
   check names the plugin.
-- **it is behind main:** something else was merged after it was opened. Click **Update branch** on
-  its page; its checks run again and it merges itself. (Dependabot brings its pull requests up to
-  date only when they conflict.)
+- **it is behind main:** something else was merged after it was opened. On its page, write a
+  comment containing only `@dependabot rebase` and send it. Dependabot redoes its branch on top of
+  main within a few minutes; its checks run again and it merges itself. (Not **Update branch**:
+  that adds a commit of the user's, after which Dependabot stops looking after the pull request.
+  Dependabot brings its pull requests up to date by itself only when they conflict.)
 - **it has not merged** for another reason: open it and read what GitHub says at the bottom.
 
 An issue titled "Dependabot has not proposed …" means a plugin's release is 14 days old with no

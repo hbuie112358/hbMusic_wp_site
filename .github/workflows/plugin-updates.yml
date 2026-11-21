@@ -1,11 +1,15 @@
 # Lets Dependabot's weekly plugin update merge itself once its checks pass (template plan T9): only
-# a pull request opened by Dependabot into main that changes nothing but site-packages/. It
+# a pull request opened by Dependabot into main that changes nothing but site-packages/, and in its
+# lock file nothing but WordPress.org plugins, whose files the dev site checks against
+# WordPress.org's checksums. Anything else (composer/installers, which runs code as Composer
+# installs; any tool) waits for the user's review. It
 # switches on GitHub's auto-merge, by rebase as the project merges; the required checks (check,
 # dev-site) still decide, and the merge changes nothing on staging or live, which get a tested
 # version only when the user deploys. A pull request that fails, or falls behind main, stays open,
 # and the weekly versions check opens an issue about it after a few days (versions.yml).
 #
-# Nothing from the pull request runs here: no checkout, only GitHub's own API.
+# Nothing from the pull request runs here: the checkout is main's own code (the base commit), and
+# the pull request's lock file is fetched as data only.
 name: plugin-updates
 
 on:
@@ -33,18 +37,36 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       PR_URL: ${{ github.event.pull_request.html_url }}
     steps:
-      - name: Change only site-packages/?
+      # main's own code, for the shared rule (tools/site-packages.sh); pinned by commit like the others.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Change only WordPress.org plugins in site-packages/?
         id: scope
+        env:
+          REPOSITORY: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           outside="$(gh pr view "$PR_URL" --json files --jq '.files[].path' | grep -v '^site-packages/' || true)"
           if [ -n "$outside" ]; then
-            echo "Changes outside site-packages/, so this pull request waits for the user:"
+            printf 'Changes outside site-packages/, so this pull request waits for the user:\n'
             printf '  %s\n' "$outside"
-            echo "only-site-packages=false" >> "$GITHUB_OUTPUT"
+            echo "plugins-only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$REPOSITORY/contents/site-packages/composer.lock?ref=$HEAD_SHA" \
+            -H "Accept: application/vnd.github.raw" > "$RUNNER_TEMP/head.lock"
+          problems="$(REPO_ROOT="$PWD" bash -c 'source tools/site-packages.sh && site_packages_not_plugins_only site-packages/composer.lock "$1"' _ "$RUNNER_TEMP/head.lock")"
+          if [ -n "$problems" ]; then
+            printf 'Not only WordPress.org plugins changed, so this pull request waits for the user:\n'
+            printf '  %s\n' "$problems"
+            echo "plugins-only=false" >> "$GITHUB_OUTPUT"
           else
-            echo "only-site-packages=true" >> "$GITHUB_OUTPUT"
+            echo "plugins-only=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Switch on auto-merge (by rebase, once the required checks pass)
-        if: steps.scope.outputs.only-site-packages == 'true'
+        if: steps.scope.outputs.plugins-only == 'true'
         run: gh pr merge --auto --rebase "$PR_URL"
