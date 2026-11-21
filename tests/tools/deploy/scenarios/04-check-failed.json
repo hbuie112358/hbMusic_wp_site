@@ -1,0 +1,7 @@
+{
+  "description": "main's commit whose dev-site check failed, and no pull request: refused, naming the check.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "failure"]] },
+  "expectStatus": 1,
+  "expectOutputNaming": ["dev-site: failure"]
+}

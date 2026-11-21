@@ -1,0 +1,8 @@
+{
+  "description": "A server that does not answer while its note is read: refused, never taken for a first deploy.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "unreachable": ["example-staging"],
+  "expectStatus": 1,
+  "expectOutputNaming": ["example-staging"]
+}

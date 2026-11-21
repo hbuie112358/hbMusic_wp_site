@@ -1,0 +1,6 @@
+{
+  "description": "A check that failed and then passed when run again: its newest run counts, and the commit is accepted.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "failure"], ["dev-site", "success"]] },
+  "expectStatus": 0
+}

@@ -1,0 +1,8 @@
+{
+  "description": "live, staging already running the same commit: accepted.",
+  "place": "live",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{B}", "example-live": "{A}" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["{B7}"]
+}

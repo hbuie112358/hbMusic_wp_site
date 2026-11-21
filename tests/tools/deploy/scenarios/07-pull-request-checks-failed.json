@@ -1,0 +1,7 @@
+{
+  "description": "main's commit whose pull request's last commit failed a check: refused, naming the check.",
+  "place": "staging",
+  "pullRequest": { "holds": ["{B}"], "number": 7, "sameFiles": true, "checks": [["check", "failure"], ["dev-site", "success"]] },
+  "expectStatus": 1,
+  "expectOutputNaming": ["#7", "check: failure"]
+}

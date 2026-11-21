@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Stand-in for rsync in bin/deploy's tests (tests/tools/deploy/run.sh): reads files from a
+# stand-in server, server/<short name>/<folder>/ in FAKE_SERVICES_DIR, the way rsync's daemon mode
+# over ssh reads "<short name>::<folder>/<file>". It refuses to run unless ssh is told never to ask
+# for a password (BatchMode), and refuses any copy to the server, which bin/deploy does not make
+# yet (template plan 1.4d-1). A short name listed in unreachable.txt does not answer.
+set -Euo pipefail
+
+readonly SERVER="$FAKE_SERVICES_DIR/server"
+# rsync's own exit statuses.
+readonly RSYNC_SYNTAX_ERROR=1
+readonly RSYNC_FILE_MISSING=23
+readonly SSH_FAILED=255
+
+remote_shell=""
+paths=()
+while (($# > 0)); do
+  case "$1" in
+    -e) remote_shell="$2" && shift 2 ;;
+    -q) shift ;;
+    -*) echo "fake rsync: unexpected option $1" >&2; exit "$RSYNC_SYNTAX_ERROR" ;;
+    *) paths+=("$1") && shift ;;
+  esac
+done
+printf '%s\n' "$remote_shell" >>"$FAKE_SERVICES_DIR/remote-shells.txt"
+[[ "$remote_shell" == *"BatchMode=yes"* ]] || { echo "fake rsync: ssh may ask for a password (no BatchMode=yes): $remote_shell" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+((${#paths[@]} == 2)) || { echo "fake rsync: expected a source and a destination" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+source_path="${paths[0]}" destination="${paths[1]}"
+[[ "$destination" != *::* ]] || { echo "fake rsync: a copy to the server ($destination), which this part must never make" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+[[ "$source_path" =~ ^([A-Za-z0-9._-]+)::(.+)$ ]] || { echo "fake rsync: not a server path: $source_path" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+ssh_host="${BASH_REMATCH[1]}" server_file="${BASH_REMATCH[2]}"
+if grep -qxF -- "$ssh_host" "$FAKE_SERVICES_DIR/unreachable.txt" 2>/dev/null; then
+  echo "ssh: connect to host $ssh_host port 22: Connection timed out" >&2
+  exit "$SSH_FAILED"
+fi
+[[ -f "$SERVER/$ssh_host/$server_file" ]] || { echo "rsync: link_stat \"$server_file\" (in $ssh_host) failed: No such file or directory (2)" >&2; exit "$RSYNC_FILE_MISSING"; }
+cp "$SERVER/$ssh_host/$server_file" "$destination"

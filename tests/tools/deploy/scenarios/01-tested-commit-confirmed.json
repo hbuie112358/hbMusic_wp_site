@@ -1,0 +1,8 @@
+{
+  "description": "main's commit whose own checks passed, staging on the commit before: it shows the arriving commit, asks, and stops before copying.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["{B7}", "B: a change", "nothing was copied"]
+}

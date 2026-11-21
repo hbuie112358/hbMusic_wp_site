@@ -1,0 +1,7 @@
+{
+  "description": "staging on a site with no staging: refused at the start.",
+  "place": "staging",
+  "noStaging": true,
+  "expectStatus": 2,
+  "expectOutputNaming": ["staging"]
+}

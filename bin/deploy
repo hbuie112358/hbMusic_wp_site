@@ -1,0 +1,258 @@
+#!/usr/bin/env bash
+# Deploys the site's code to live or staging (template plan 1.4, T11; handbook chapter 2), run by
+# the user on the user's computer:
+#
+#   bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]
+#
+# Built in parts. This part (1.4d-1) does everything before a copy and changes nothing on the
+# server: it refuses unless the working copy is clean, the commit is on GitHub's main and its
+# required checks passed, either on the commit itself (the weekly run, the button) or on its
+# merged pull request's last commit with exactly the same files (a rebase merge gives the commit a
+# new name, so no check ran on it); it reads which commit the place runs from the note on the
+# server, shows the commits between that one and the new one, and goes on only after "yes". Where
+# the site has staging, live accepts only the commit staging runs.
+#
+# The places come from site.json's deploy section; each one's server, account, port and key are in
+# the user's SSH settings under its short name, and its key can reach only its own folders on the
+# server, rsync's daemon mode forced by the key. ssh never asks for a password (BatchMode): the
+# account's password opens a full shell, so a key that does not work stops the deploy instead.
+#
+# Needs git, gh (logged in), rsync, ssh, jq and curl on the user's computer, and Docker. Exit
+# status: 0 done, 1 refused or failed, 2 the command was given wrongly or the settings are wrong.
+set -Euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
+
+# The jobs of .github/workflows/check.yml that must pass before code reaches a server; the same for
+# every site, since the workflow comes with the tools.
+readonly REQUIRED_CHECKS=(check dev-site)
+readonly MAIN_BRANCH="main"
+# The note on the server saying which commit a place runs: a folder of its own for each place's
+# key, outside the web folders, holding one file whose first line is the commit.
+readonly NOTE_FOLDER="deploy-note"
+readonly NOTE_FILE="deployed-commit"
+# rsync's exit status for a file that does not exist on the server: no note yet, the first deploy.
+readonly RSYNC_FILE_MISSING=23
+readonly SSH_CONNECT_SECONDS=20
+readonly REQUIRED_TOOLS=(git gh rsync ssh jq curl docker)
+readonly PLACES=(staging live)
+
+PLACE=""
+COMMIT_REQUESTED=""
+ALLOWED_LOWER=()
+SSH_CONFIG_FILE=""
+PLACE_SSH_HOST=""
+PLACE_ADDRESS=""
+GITHUB_REPOSITORY_NAME=""
+DEPLOY_COMMIT=""
+WORK_DIR=""
+
+log() { printf '%s [deploy] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+refuse() {
+  log "REFUSED: $*"
+  log "nothing was copied"
+  exit 1
+}
+usage_error() {
+  log "$*"
+  log "usage: bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]"
+  exit 2
+}
+
+remove_work_dir() {
+  [[ -n "$WORK_DIR" ]] && rm -rf "$WORK_DIR"
+  return 0
+}
+
+require_option_value() {
+  local option="$1" value="$2"
+  [[ -n "$value" && "$value" != -* ]] || usage_error "$option needs a value"
+}
+
+read_arguments() {
+  while (($# > 0)); do
+    case "$1" in
+      --commit) require_option_value "$1" "${2:-}" && COMMIT_REQUESTED="$2" && shift 2 ;;
+      --allow-lower) require_option_value "$1" "${2:-}" && ALLOWED_LOWER+=("$2") && shift 2 ;;
+      --ssh-config) require_option_value "$1" "${2:-}" && SSH_CONFIG_FILE="$2" && shift 2 ;;
+      -*) usage_error "unknown option $1" ;;
+      *) [[ -z "$PLACE" ]] || usage_error "one place only"; PLACE="$1" && shift ;;
+    esac
+  done
+  [[ " ${PLACES[*]} " == *" $PLACE "* ]] || usage_error "the place must be staging or live, not \"$PLACE\""
+  # rsync splits its -e command at spaces itself, so a path with spaces or quotes cannot pass.
+  [[ ! "$SSH_CONFIG_FILE" =~ [[:space:]\"\'\\] ]] || usage_error "--ssh-config: a path without spaces, quotes or backslashes, not \"$SSH_CONFIG_FILE\""
+  [[ -z "$SSH_CONFIG_FILE" || -f "$SSH_CONFIG_FILE" ]] || usage_error "--ssh-config: no file $SSH_CONFIG_FILE"
+}
+
+require_tools() {
+  local tool
+  for tool in "${REQUIRED_TOOLS[@]}"; do
+    command -v "$tool" >/dev/null || usage_error "$tool is not installed; bin/deploy needs it"
+  done
+}
+
+# The place's short name and address from site.json; a site without them is refused by name.
+load_place_settings() {
+  require_valid_site_settings || exit 2
+  site_settings_query ".deploy // empty" | grep -q . || usage_error "site.json has no deploy section; tools/site-settings.md explains it"
+  PLACE_SSH_HOST="$(site_settings_query ".deploy.$PLACE.sshHost // empty")"
+  [[ -n "$PLACE_SSH_HOST" ]] || usage_error "site.json's deploy section has no $PLACE"
+  PLACE_ADDRESS="$(site_setting ".deploy.$PLACE.address")" || exit 2
+}
+
+# ssh as every rsync call uses it: the user's SSH settings (or the file given), never a password.
+ssh_command() {
+  local command="ssh -o BatchMode=yes -o ConnectTimeout=$SSH_CONNECT_SECONDS"
+  # The path holds no spaces or quotes (read_arguments), so it passes rsync's splitting as it is.
+  [[ -z "$SSH_CONFIG_FILE" ]] || command+=" -F $SSH_CONFIG_FILE"
+  printf '%s' "$command"
+}
+
+in_repository() { git -C "$REPO_ROOT" "$@"; }
+
+# Every change counts, untracked files too: the deploy copies the commit, and a working copy
+# that differs from it suggests the commit is not the one meant.
+require_clean_working_copy() {
+  local changes
+  # A git status that fails prints nothing, which must not read as clean.
+  changes="$(in_repository status --porcelain)" || refuse "could not read the working copy's state (git status failed)"
+  [[ -z "$changes" ]] || refuse "the working copy is not clean; commit or remove these first:
+$changes"
+}
+
+# The commit to deploy: the one asked for, or GitHub's main; it must be on GitHub's main.
+resolve_deploy_commit() {
+  in_repository fetch -q origin "$MAIN_BRANCH" || refuse "could not fetch $MAIN_BRANCH from GitHub"
+  DEPLOY_COMMIT="$(in_repository rev-parse -q --verify "${COMMIT_REQUESTED:-origin/$MAIN_BRANCH}^{commit}")" ||
+    refuse "no commit $COMMIT_REQUESTED in this repository"
+  in_repository merge-base --is-ancestor "$DEPLOY_COMMIT" "origin/$MAIN_BRANCH" ||
+    refuse "commit ${DEPLOY_COMMIT:0:7} is not on GitHub's $MAIN_BRANCH"
+}
+
+github_api() { gh api "$@"; }
+
+load_github_repository_name() {
+  GITHUB_REPOSITORY_NAME="$(gh repo view --json nameWithOwner --jq .nameWithOwner)" ||
+    refuse "could not read the repository's name from GitHub (is gh logged in?)"
+}
+
+# Prints a line for each required check that did not pass on a commit, with its latest result
+# (a check run again counts by its newest run); nothing when all passed.
+failed_required_checks() {
+  local commit="$1" runs name
+  runs="$(github_api "repos/$GITHUB_REPOSITORY_NAME/commits/$commit/check-runs?per_page=100")" ||
+    { printf 'GitHub did not answer for its checks\n'; return; }
+  for name in "${REQUIRED_CHECKS[@]}"; do
+    jq -r --arg name "$name" '[.check_runs[] | select(.name == $name)] | max_by(.id)
+      | if . == null then "\($name): never ran" elif .conclusion == "success" then empty
+        else "\($name): \(.conclusion // .status)" end' <<<"$runs"
+  done
+}
+
+# The last commit of the merged pull request into main that holds this commit, or nothing; fails
+# when GitHub does not answer, so an outage is never read as "no pull request".
+merged_pull_request_head() {
+  local commit="$1" pulls
+  pulls="$(github_api "repos/$GITHUB_REPOSITORY_NAME/commits/$commit/pulls")" || return 1
+  jq -r --arg main "$MAIN_BRANCH" '[.[] | select(.merged_at != null and .base.ref == $main)][0]
+    | if . == null then empty else "\(.number) \(.head.sha)" end' <<<"$pulls"
+}
+
+commit_tree_on_github() {
+  local commit="$1" details
+  details="$(github_api "repos/$GITHUB_REPOSITORY_NAME/git/commits/$commit")" || return 1
+  jq -er '.tree.sha' <<<"$details"
+}
+
+# Tested means: the required checks passed on this commit, or on its merged pull request's last
+# commit holding exactly the same files (the same tree).
+require_tested_commit() {
+  local own_failures pull head number failures head_tree
+  own_failures="$(failed_required_checks "$DEPLOY_COMMIT")"
+  [[ -n "$own_failures" ]] || { log "commit ${DEPLOY_COMMIT:0:7}: its checks passed"; return; }
+  pull="$(merged_pull_request_head "$DEPLOY_COMMIT")" || refuse "GitHub did not answer which pull request holds ${DEPLOY_COMMIT:0:7}"
+  [[ -n "$pull" ]] || refuse "commit ${DEPLOY_COMMIT:0:7} is not tested: no merged pull request holds it, and on the commit itself: $(paste -sd ';' <<<"$own_failures")"
+  number="${pull%% *}" head="${pull#* }"
+  head_tree="$(commit_tree_on_github "$head")" || refuse "GitHub did not answer for #$number's last commit ${head:0:7}"
+  [[ "$head_tree" == "$(in_repository rev-parse "$DEPLOY_COMMIT^{tree}")" ]] ||
+    refuse "commit ${DEPLOY_COMMIT:0:7} does not hold the same files as #$number's tested last commit ${head:0:7}; only a pull request's last commit can be deployed"
+  failures="$(failed_required_checks "$head")"
+  [[ -z "$failures" ]] || refuse "#$number's last commit ${head:0:7} did not pass its checks: $(paste -sd ';' <<<"$failures")"
+  log "commit ${DEPLOY_COMMIT:0:7}: the same files as #$number's last commit ${head:0:7}, whose checks passed"
+}
+
+# Reads the commit a place runs from its note into SERVER_COMMIT; empty before the first deploy.
+# Any other failure to read it (the key refused, no answer) stops the deploy. Run in this shell,
+# never in a command substitution, so a refusal ends the script rather than looking like "no
+# note".
+SERVER_COMMIT=""
+read_server_commit() {
+  local place="$1" ssh_host note="$WORK_DIR/$1.note" status=0
+  ssh_host="$(site_setting ".deploy.$place.sshHost")" || exit 2
+  SERVER_COMMIT=""
+  rsync -q -e "$(ssh_command)" "$ssh_host::$NOTE_FOLDER/$NOTE_FILE" "$note" 2>"$WORK_DIR/$place.rsync-errors" || status=$?
+  ((status == RSYNC_FILE_MISSING)) && return 0
+  ((status == 0)) || refuse "could not read $place's note through $ssh_host (rsync status $status): $(tail -n 3 "$WORK_DIR/$place.rsync-errors" | paste -sd ' ')"
+  SERVER_COMMIT="$(head -n 1 "$note" | tr -d '[:space:]')"
+}
+
+# Where the site has staging, live gets only the commit staging runs, never one staging skipped.
+require_staging_runs_commit() {
+  [[ "$PLACE" == live ]] || return 0
+  site_settings_query '.deploy.staging // empty' | grep -q . || return 0
+  read_server_commit staging
+  [[ -n "$SERVER_COMMIT" ]] || refuse "live accepts only the commit staging runs, and staging has no note yet; deploy to staging first"
+  [[ "$SERVER_COMMIT" == "$DEPLOY_COMMIT" ]] ||
+    refuse "live accepts only the commit staging runs: staging runs ${SERVER_COMMIT:0:7}, this is ${DEPLOY_COMMIT:0:7}; deploy it to staging first"
+  log "staging runs ${DEPLOY_COMMIT:0:7} too"
+}
+
+# What the deploy changes, from the place's current commit to the new one.
+show_changes() {
+  local current="$1"
+  if [[ -z "$current" ]]; then
+    log "$PLACE has no note yet (a first deploy); it gets ${DEPLOY_COMMIT:0:7}:"
+    in_repository log --oneline -1 "$DEPLOY_COMMIT" >&2
+  elif [[ "$current" == "$DEPLOY_COMMIT" ]]; then
+    log "$PLACE already runs ${DEPLOY_COMMIT:0:7}; this copies it again"
+  elif ! in_repository cat-file -e "$current^{commit}" 2>/dev/null; then
+    log "$PLACE runs $current, which is not in this repository's history; it gets ${DEPLOY_COMMIT:0:7}"
+  elif in_repository merge-base --is-ancestor "$current" "$DEPLOY_COMMIT"; then
+    log "$PLACE runs ${current:0:7}; these commits arrive:"
+    in_repository log --oneline "$current..$DEPLOY_COMMIT" >&2
+  else
+    log "$PLACE runs ${current:0:7}; going back to ${DEPLOY_COMMIT:0:7} takes away these commits:"
+    in_repository log --oneline "$DEPLOY_COMMIT..$current" >&2
+  fi
+}
+
+confirm() {
+  local answer=""
+  ((${#ALLOWED_LOWER[@]} == 0)) || log "allowed to lower on $PLACE: ${ALLOWED_LOWER[*]}"
+  printf 'Deploy %s to %s (%s)? Type yes to go on: ' "${DEPLOY_COMMIT:0:7}" "$PLACE" "$PLACE_ADDRESS" >&2
+  read -r answer || true
+  [[ "$answer" == yes ]] || refuse "not confirmed"
+}
+
+main() {
+  read_arguments "$@"
+  require_tools
+  load_place_settings
+  WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }
+  trap remove_work_dir EXIT
+  require_clean_working_copy
+  resolve_deploy_commit
+  load_github_repository_name
+  require_tested_commit
+  require_staging_runs_commit
+  read_server_commit "$PLACE"
+  show_changes "$SERVER_COMMIT"
+  confirm
+  log "confirmed; the copy itself arrives with template plan 1.4d-2, so nothing was copied"
+}
+
+main "$@"

@@ -1,0 +1,7 @@
+{
+  "description": "A site.json without a deploy section: refused at the start, naming it.",
+  "place": "staging",
+  "noDeploySection": true,
+  "expectStatus": 2,
+  "expectOutputNaming": ["deploy section"]
+}

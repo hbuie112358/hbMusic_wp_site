@@ -179,7 +179,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   refusing the broken examples in `tests/tools/site-settings/`; the versions check's alerts on
   known situations (`tests/tools/versions-check/`: the real script against stand-ins for GitHub
   and WordPress.org, which issues it would open, template plan 1.3c); the page check on known
-  situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); ShellCheck on `bin/`, the
+  situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); the
+  deploy's checks on known situations (`tests/tools/deploy/`: `bin/deploy` in a throwaway Git
+  repository against stand-ins for GitHub and the servers, 1.4d-1); ShellCheck on `bin/`, the
   scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
@@ -213,6 +215,15 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   for a plugin release 14 days old that Dependabot never proposed. GitHub emails the owner about
   new issues; one with the same title is never opened twice. The workflow can read the repository
   and its pull requests and open issues, nothing more.
+- `bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]`
+  (template plan 1.4d, T11; handbook chapter 2), run by the user: being built in parts. So far
+  (1.4d-1) it refuses unless the working copy is clean, the commit is on GitHub's `main` and its
+  required checks (`check`, `dev-site`) passed on it or on its merged pull request's last commit
+  with the same files, reads the place's note on the server, shows the commits arriving or taken
+  away, waits for "yes", and on live requires the commit staging runs; it copies nothing yet. The
+  places come from `site.json`'s `deploy` section. Unlike the other scripts it uses programs on the
+  user's computer besides Docker and `jq`: `git`, `gh` (logged in), `rsync`, `ssh` and `curl`;
+  `ssh` never asks for a password (`BatchMode`), so a key that does not work stops it.
 - `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan
   1.4b, handbook chapter 2's step 7): every published page of the site at the address, from
   WordPress's page list, and the site's root, answers 200 directly, shows the child theme named

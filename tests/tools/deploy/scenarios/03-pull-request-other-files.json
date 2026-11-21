@@ -1,0 +1,7 @@
+{
+  "description": "main's commit whose pull request's tested last commit holds other files: refused, naming both.",
+  "place": "staging",
+  "pullRequest": { "holds": ["{B}"], "number": 7, "sameFiles": false, "checks": [["check", "success"], ["dev-site", "success"]] },
+  "expectStatus": 1,
+  "expectOutputNaming": ["{B7}", "#7", "{H7}"]
+}

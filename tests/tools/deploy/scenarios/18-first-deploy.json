@@ -1,0 +1,7 @@
+{
+  "description": "A place with no note yet: said so, and it goes on.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "expectStatus": 0,
+  "expectOutputNaming": ["no note yet"]
+}

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Stand-in for gh in bin/deploy's tests (tests/tools/deploy/run.sh): answers the repository's name
+# and the three GitHub API questions bin/deploy asks (a commit's check runs, its pull requests, a
+# commit's tree) from github.json in FAKE_SERVICES_DIR, keyed by commit; written by the test for
+# each situation, since the commits are made fresh each time. Nothing goes over the network.
+set -Euo pipefail
+
+readonly SERVICES="$FAKE_SERVICES_DIR/github.json"
+readonly REPOSITORY="example-owner/example-site"
+
+answer_api() {
+  local path="$1" commit
+  jq -e '.isDown // false' "$SERVICES" >/dev/null && { echo "gh: HTTP 503" >&2; exit 1; }
+  if [[ "$path" =~ ^repos/$REPOSITORY/commits/([0-9a-f]{40})/check-runs\?per_page=100$ ]]; then
+    commit="${BASH_REMATCH[1]}"
+    jq --arg commit "$commit" '{check_runs: (.checks[$commit] // [])}' "$SERVICES"
+  elif [[ "$path" =~ ^repos/$REPOSITORY/commits/([0-9a-f]{40})/pulls$ ]]; then
+    commit="${BASH_REMATCH[1]}"
+    jq --arg commit "$commit" '.pulls[$commit] // []' "$SERVICES"
+  elif [[ "$path" =~ ^repos/$REPOSITORY/git/commits/([0-9a-f]{40})$ ]]; then
+    commit="${BASH_REMATCH[1]}"
+    jq -e --arg commit "$commit" '.trees | has($commit)' "$SERVICES" >/dev/null || { echo "gh: HTTP 404" >&2; exit 1; }
+    jq --arg commit "$commit" '{tree: {sha: .trees[$commit]}}' "$SERVICES"
+  else
+    echo "fake gh: unexpected api path $path" >&2
+    exit 2
+  fi
+}
+
+case "${1:-} ${2:-}" in
+  "repo view") [[ "$*" == "repo view --json nameWithOwner --jq .nameWithOwner" ]] || { echo "fake gh: unexpected $*" >&2; exit 2; }; echo "$REPOSITORY" ;;
+  "api "*) answer_api "$2" ;;
+  *) echo "fake gh: unexpected $*" >&2; exit 2 ;;
+esac
