@@ -1,0 +1,10 @@
+{
+  "description": "The downloaded plugin newer on the server than the pin (the host updated it): refused, naming both versions and --allow-lower, nothing copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "serverPluginVersion": { "example-staging": "1.10.0" },
+  "expectStatus": 1,
+  "expectOutputNaming": ["1.10.0", "1.1.0", "--allow-lower example-download"],
+  "expectWrites": []
+}

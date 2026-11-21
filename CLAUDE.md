@@ -181,7 +181,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   and WordPress.org, which issues it would open, template plan 1.3c); the page check on known
   situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); the
   deploy's checks on known situations (`tests/tools/deploy/`: `bin/deploy` in a throwaway Git
-  repository against stand-ins for GitHub and the servers, 1.4d-1); ShellCheck on `bin/`, the
+  repository against stand-ins for GitHub, the servers, the Composer build and WordPress.org's
+  checksums, 1.4d-1, 1.4d-2); ShellCheck on `bin/`, the
   scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
@@ -217,11 +218,17 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   and its pull requests and open issues, nothing more.
 - `bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]`
   (template plan 1.4d, T11; handbook chapter 2), run by the user: being built in parts. So far
-  (1.4d-1) it refuses unless the working copy is clean, the commit is on GitHub's `main` and its
-  required checks (`check`, `dev-site`) passed on it or on its merged pull request's last commit
-  with the same files, reads the place's note on the server, shows the commits arriving or taken
-  away, waits for "yes", and on live requires the commit staging runs; it copies nothing yet. The
-  places come from `site.json`'s `deploy` section. Unlike the other scripts it uses programs on the
+  (1.4d-1, 1.4d-2) it refuses unless the working copy is clean, the commit is on GitHub's `main`
+  and its required checks (`check`, `dev-site`) passed on it or on its merged pull request's last
+  commit with the same files, and on live unless staging runs that commit; it reads the place's
+  note on the server and shows the commits arriving or taken away. Before asking "yes", it exports
+  the commit, builds its downloaded plugins from its `composer.lock` (the pinned Composer
+  container) and checks every file against WordPress.org's checksum file, checks each folder
+  exists on the server for the key, and refuses to lower a downloaded plugin the host updated
+  unless `--allow-lower` names it. After "yes" it copies the downloaded plugins, the site's own
+  plugins and the theme, each folder made exactly the commit's, then writes the note, and names
+  any folder that was empty there (to activate by hand). The page check and the PHP log follow at
+  1.4d-3. The places come from `site.json`'s `deploy` section. Unlike the other scripts it uses programs on the
   user's computer besides Docker and `jq`: `git`, `gh` (logged in), `rsync`, `ssh` and `curl`;
   `ssh` never asks for a password (`BatchMode`), so a key that does not work stops it.
 - `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan

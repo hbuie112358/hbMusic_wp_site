@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Stand-in for docker in bin/deploy's tests (tests/tools/deploy/run.sh): answers only the
+# Composer build of the downloaded plugins, "docker run ... -v <site-packages>:/app ...
+# composer:<version> composer install ...", by writing each WordPress.org plugin of that folder's
+# composer.lock as fakes/plugin-files.sh describes it, at the pinned version, where Composer would
+# put it. The situation (situation.json in FAKE_SERVICES_DIR) may make the build fail, or tamper
+# with the built files afterwards ("changed", "added", "removed"). Nothing goes over the network.
+set -Euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly HERE
+# shellcheck source=tests/tools/deploy/fakes/plugin-files.sh
+source "$HERE/plugin-files.sh"
+readonly SITUATION="$FAKE_SERVICES_DIR/situation.json"
+
+packages_dir=""
+arguments="$*"
+[[ "${1:-}" == run && "$arguments" == *" composer:"*" composer install "* ]] || { echo "fake docker: unexpected $arguments" >&2; exit 2; }
+while (($# > 0)); do
+  [[ "$1" == -v && "${2:-}" == *:/app ]] && packages_dir="${2%:/app}"
+  shift
+done
+[[ -d "$packages_dir" ]] || { echo "fake docker: no site-packages folder mounted at /app" >&2; exit 2; }
+jq -e '.buildFails // false' "$SITUATION" >/dev/null && { echo "Your requirements could not be resolved" >&2; exit 2; }
+
+while IFS=$'\t' read -r plugin_slug version; do
+  write_plugin_files "$packages_dir/wp-content/plugins/$plugin_slug" "$plugin_slug" "$version"
+done < <(jq -r '.packages[] | select(.type == "wordpress-plugin") | "\(.name | sub("^.*/"; ""))\t\(.version)"' "$packages_dir/composer.lock")
+
+built="$packages_dir/wp-content/plugins/example-download"
+case "$(jq -r '.tamperDownloaded // empty' "$SITUATION")" in
+  changed) printf '// planted\n' >>"$built/includes/functions.php" ;;
+  added) printf '<?php\n' >"$built/extra.php" ;;
+  removed) rm "$built/readme.txt" ;;
+esac

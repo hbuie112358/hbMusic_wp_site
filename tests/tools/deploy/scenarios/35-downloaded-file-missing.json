@@ -1,0 +1,10 @@
+{
+  "description": "A file of WordPress.org's release missing from the build: refused, naming it, nothing copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "tamperDownloaded": "removed",
+  "expectStatus": 1,
+  "expectOutputNaming": ["readme.txt"],
+  "expectWrites": []
+}

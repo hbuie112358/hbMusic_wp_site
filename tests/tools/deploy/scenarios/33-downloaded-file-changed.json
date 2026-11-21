@@ -1,0 +1,10 @@
+{
+  "description": "A built file that differs from WordPress.org's release: refused, naming the file, nothing copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "tamperDownloaded": "changed",
+  "expectStatus": 1,
+  "expectOutputNaming": ["includes/functions.php"],
+  "expectWrites": []
+}

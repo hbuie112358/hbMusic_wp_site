@@ -1,0 +1,10 @@
+{
+  "description": "Every check passing but the answer not yes: nothing copied, the note unchanged.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "answer": "no",
+  "expectStatus": 1,
+  "expectWrites": [],
+  "expectServerFiles": { "example-staging/deploy-note/deployed-commit": "{A}" }
+}

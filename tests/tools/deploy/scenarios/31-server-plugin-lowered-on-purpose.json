@@ -1,0 +1,12 @@
+{
+  "description": "The same, with --allow-lower naming the plugin: it is lowered to the pin, and said so.",
+  "place": "staging",
+  "options": ["--allow-lower", "example-download"],
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "serverPluginVersion": { "example-staging": "1.10.0" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["1.10.0"],
+  "expectWrites": ["example-staging::example-download", "example-staging::example-plugin", "example-staging::example-child", "example-staging::deploy-note"],
+  "expectServerFiles": { "example-staging/example-download/example-download.php": "Version: 1.1.0" }
+}

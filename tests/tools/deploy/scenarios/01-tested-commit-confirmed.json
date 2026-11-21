@@ -1,8 +1,15 @@
 {
-  "description": "main's commit whose own checks passed, staging on the commit before: it shows the arriving commit, asks, and stops before copying.",
+  "description": "main's tested commit, staging on the commit before: it shows the arriving commit, copies the downloaded plugin, the site's plugin and the theme in that order, removes what the commit does not have, and writes the note last.",
   "place": "staging",
   "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
   "notes": { "example-staging": "{A}" },
   "expectStatus": 0,
-  "expectOutputNaming": ["{B7}", "B: a change", "nothing was copied"]
+  "expectOutputNaming": ["{B7}", "B: a change", "every file matches"],
+  "expectWrites": ["example-staging::example-download", "example-staging::example-plugin", "example-staging::example-child", "example-staging::deploy-note"],
+  "expectServerFiles": {
+    "example-staging/deploy-note/deployed-commit": "{B}",
+    "example-staging/example-download/example-download.php": "Version: 1.1.0",
+    "example-staging/example-child/style.css": "/* B */"
+  },
+  "expectServerMissing": ["example-staging/example-child/old.txt", "example-staging/example-plugin/old.txt"]
 }

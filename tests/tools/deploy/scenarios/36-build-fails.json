@@ -1,0 +1,10 @@
+{
+  "description": "Composer failing to build the downloaded plugins: refused, nothing copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "buildFails": true,
+  "expectStatus": 1,
+  "expectOutputNaming": ["Composer"],
+  "expectWrites": []
+}

@@ -1,0 +1,10 @@
+{
+  "description": "A downloaded plugin's folder empty on the server: copied, and named as new there, to activate by hand.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "serverPluginVersion": { "example-staging": "" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["new on staging: example-download"],
+  "expectWrites": ["example-staging::example-download", "example-staging::example-plugin", "example-staging::example-child", "example-staging::deploy-note"]
+}
