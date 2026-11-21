@@ -1,0 +1,21 @@
+{
+  "description": "A plugin update open 3 days, its checks passed, behind main.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 102,
+      "daysOpen": 3,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BEHIND",
+      "checks": [
+        "SUCCESS"
+      ]
+    }
+  ],
+  "expectedIssues": [
+    "Plugin update #102 is waiting: it is behind main"
+  ]
+}

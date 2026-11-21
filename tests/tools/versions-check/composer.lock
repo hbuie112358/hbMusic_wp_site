@@ -1,0 +1,11 @@
+{
+    "_readme": "A stand-in lock file for the versions check's tests: one neutral plugin, only the fields bin/versions-check reads.",
+    "packages": [
+        {
+            "name": "wpackagist-plugin/example-plugin",
+            "version": "1.0.0",
+            "type": "wordpress-plugin"
+        }
+    ],
+    "packages-dev": []
+}

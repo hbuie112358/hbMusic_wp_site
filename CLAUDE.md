@@ -175,7 +175,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in
   `tools/site-settings.jq` (a missing or unknown field, or a wrong kind of value, fails and is
   named), every field explained in `tools/site-settings.md` and nothing else, and those checks
-  refusing the broken examples in `tests/tools/site-settings/`; ShellCheck on `bin/`; the compose file. Runs every check even
+  refusing the broken examples in `tests/tools/site-settings/`; the versions check's alerts on
+  known situations (`tests/tools/versions-check/`: the real script against stand-ins for GitHub
+  and WordPress.org, which issues it would open, template plan 1.3c); ShellCheck on `bin/`, the
+  scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.

@@ -1,0 +1,11 @@
+{
+  "description": "No update open and a plugin release 14 days old (the 7-day wait and a week's run): Dependabot has stopped proposing.",
+  "act": true,
+  "pullRequests": [],
+  "newerPluginRelease": {
+    "daysOld": 14
+  },
+  "expectedIssues": [
+    "Dependabot has not proposed example-plugin 1.1.0"
+  ]
+}

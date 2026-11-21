@@ -1,0 +1,21 @@
+{
+  "description": "A plugin update open 3 days, neither failed nor behind main.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 103,
+      "daysOpen": 3,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "PENDING"
+      ]
+    }
+  ],
+  "expectedIssues": [
+    "Plugin update #103 is waiting: it has not merged"
+  ]
+}
