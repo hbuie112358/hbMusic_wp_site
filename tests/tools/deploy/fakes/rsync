@@ -1,37 +1,99 @@
 #!/usr/bin/env bash
-# Stand-in for rsync in bin/deploy's tests (tests/tools/deploy/run.sh): reads files from a
-# stand-in server, server/<short name>/<folder>/ in FAKE_SERVICES_DIR, the way rsync's daemon mode
-# over ssh reads "<short name>::<folder>/<file>". It refuses to run unless ssh is told never to ask
-# for a password (BatchMode), and refuses any copy to the server, which bin/deploy does not make
-# yet (template plan 1.4d-1). A short name listed in unreachable.txt does not answer.
+# Stand-in for rsync in bin/deploy's tests (tests/tools/deploy/run.sh): a stand-in server per
+# short name, server/<short name>/<folder>/ in FAKE_SERVICES_DIR, reached the way rsync's daemon
+# mode over ssh reaches "<short name>::<folder>/": only the folders that exist there (the ones
+# the key's settings name); reading a file, listing a folder (--list-only), copying a file into
+# one, and making a folder exactly a local one (-rt --delete --checksum --itemize-changes, the
+# only copy bin/deploy makes). Every copy is written to writes.txt. It refuses to run unless ssh
+# is told never to ask for a password (BatchMode). A short name in unreachable.txt does not answer;
+# a copy into the folder the situation names as copyFailsAt fails, and one into interruptAt
+# interrupts bin/deploy as Ctrl+C would.
 set -Euo pipefail
 
 readonly SERVER="$FAKE_SERVICES_DIR/server"
+readonly SITUATION="$FAKE_SERVICES_DIR/situation.json"
 # rsync's own exit statuses.
 readonly RSYNC_SYNTAX_ERROR=1
+readonly RSYNC_UNKNOWN_MODULE=5
+readonly RSYNC_IO_ERROR=12
 readonly RSYNC_FILE_MISSING=23
 readonly SSH_FAILED=255
+readonly MIRROR_OPTIONS="-rt --delete --checksum --itemize-changes"
 
-remote_shell=""
-paths=()
-while (($# > 0)); do
-  case "$1" in
-    -e) remote_shell="$2" && shift 2 ;;
-    -q) shift ;;
-    -*) echo "fake rsync: unexpected option $1" >&2; exit "$RSYNC_SYNTAX_ERROR" ;;
-    *) paths+=("$1") && shift ;;
-  esac
-done
-printf '%s\n' "$remote_shell" >>"$FAKE_SERVICES_DIR/remote-shells.txt"
-[[ "$remote_shell" == *"BatchMode=yes"* ]] || { echo "fake rsync: ssh may ask for a password (no BatchMode=yes): $remote_shell" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
-((${#paths[@]} == 2)) || { echo "fake rsync: expected a source and a destination" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
-source_path="${paths[0]}" destination="${paths[1]}"
-[[ "$destination" != *::* ]] || { echo "fake rsync: a copy to the server ($destination), which this part must never make" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
-[[ "$source_path" =~ ^([A-Za-z0-9._-]+)::(.+)$ ]] || { echo "fake rsync: not a server path: $source_path" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
-ssh_host="${BASH_REMATCH[1]}" server_file="${BASH_REMATCH[2]}"
-if grep -qxF -- "$ssh_host" "$FAKE_SERVICES_DIR/unreachable.txt" 2>/dev/null; then
-  echo "ssh: connect to host $ssh_host port 22: Connection timed out" >&2
-  exit "$SSH_FAILED"
-fi
-[[ -f "$SERVER/$ssh_host/$server_file" ]] || { echo "rsync: link_stat \"$server_file\" (in $ssh_host) failed: No such file or directory (2)" >&2; exit "$RSYNC_FILE_MISSING"; }
-cp "$SERVER/$ssh_host/$server_file" "$destination"
+remote_shell="" options="" paths=()
+read_arguments() {
+  while (($# > 0)); do
+    case "$1" in
+      -e) remote_shell="$2" && shift 2 ;;
+      -q) shift ;;
+      --list-only | -rt | --delete | --checksum | --itemize-changes) options+="${options:+ }$1" && shift ;;
+      -*) echo "fake rsync: unexpected option $1" >&2; exit "$RSYNC_SYNTAX_ERROR" ;;
+      *) paths+=("$1") && shift ;;
+    esac
+  done
+  printf '%s\n' "$remote_shell" >>"$FAKE_SERVICES_DIR/remote-shells.txt"
+  [[ "$remote_shell" == *"BatchMode=yes"* ]] || { echo "fake rsync: ssh may ask for a password (no BatchMode=yes): $remote_shell" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+}
+
+# Splits "<short name>::<folder>/<path>" into SSH_HOST, FOLDER and FOLDER_PATH, refusing what the
+# server would refuse: a short name that does not answer, a folder the key's settings do not name.
+SSH_HOST="" FOLDER="" FOLDER_PATH=""
+reach() {
+  [[ "$1" =~ ^([A-Za-z0-9._-]+)::([^/]+)/?(.*)$ ]] || { echo "fake rsync: not a server path: $1" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+  SSH_HOST="${BASH_REMATCH[1]}" FOLDER="${BASH_REMATCH[2]}" FOLDER_PATH="${BASH_REMATCH[3]}"
+  if grep -qxF -- "$SSH_HOST" "$FAKE_SERVICES_DIR/unreachable.txt" 2>/dev/null; then
+    echo "ssh: connect to host $SSH_HOST port 22: Connection timed out" >&2
+    exit "$SSH_FAILED"
+  fi
+  [[ -d "$SERVER/$SSH_HOST/$FOLDER" ]] || { echo "@ERROR: Unknown module '$FOLDER'" >&2; exit "$RSYNC_UNKNOWN_MODULE"; }
+}
+
+list_folder() {
+  reach "$1"
+  printf 'drwxr-xr-x          4,096 2026/01/01 00:00:00 .\n'
+  find "$SERVER/$SSH_HOST/$FOLDER" -mindepth 1 -maxdepth 1 -printf '%M %12s 2026/01/01 00:00:00 %f\n'
+}
+
+read_file() {
+  reach "$1"
+  [[ -f "$SERVER/$SSH_HOST/$FOLDER/$FOLDER_PATH" ]] || { echo "rsync: link_stat \"$FOLDER_PATH\" (in $FOLDER) failed: No such file or directory (2)" >&2; exit "$RSYNC_FILE_MISSING"; }
+  cp "$SERVER/$SSH_HOST/$FOLDER/$FOLDER_PATH" "$2"
+}
+
+copy_in() {
+  local source_path="$1" target
+  reach "$2"
+  printf '%s::%s\n' "$SSH_HOST" "$FOLDER" >>"$FAKE_SERVICES_DIR/writes.txt"
+  [[ "$(jq -r '.copyFailsAt // empty' "$SITUATION")" != "$FOLDER" ]] || { echo "rsync: write failed on \"$FOLDER\": No space left on device (28)" >&2; exit "$RSYNC_IO_ERROR"; }
+  # The user pressing Ctrl+C during this copy: the signal goes to bin/deploy itself, the parent of
+  # the command substitution that runs this stand-in.
+  [[ "$(jq -r '.interruptAt // empty' "$SITUATION")" != "$FOLDER" ]] || kill -INT "$(ps -o ppid= -p "$PPID" | tr -d ' ')"
+  target="$SERVER/$SSH_HOST/$FOLDER"
+  if [[ "$options" == "$MIRROR_OPTIONS" && -d "$source_path" ]]; then
+    find "$target" -mindepth 1 -delete
+    cp -r "$source_path/." "$target/"
+    (cd "$target" && find . -type f -printf '>f+++++++++ %P\n')
+  elif [[ -z "$options" && -f "$source_path" && -n "$FOLDER_PATH" ]]; then
+    cp "$source_path" "$target/$FOLDER_PATH"
+  else
+    echo "fake rsync: a copy bin/deploy never makes: $options $source_path" >&2
+    exit "$RSYNC_SYNTAX_ERROR"
+  fi
+}
+
+main() {
+  read_arguments "$@"
+  if [[ "$options" == --list-only ]]; then
+    ((${#paths[@]} == 1)) || { echo "fake rsync: --list-only takes one server path" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+    list_folder "${paths[0]}"
+    return
+  fi
+  ((${#paths[@]} == 2)) || { echo "fake rsync: expected a source and a destination" >&2; exit "$RSYNC_SYNTAX_ERROR"; }
+  if [[ "${paths[1]}" == *::* ]]; then
+    copy_in "${paths[0]}" "${paths[1]}"
+  else
+    read_file "${paths[0]}" "${paths[1]}"
+  fi
+}
+
+main "$@"

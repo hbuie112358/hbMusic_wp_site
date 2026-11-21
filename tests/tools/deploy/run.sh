@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Tests bin/deploy's checks before a copy (template plan 1.4d-1) on known situations, run by
-# bin/check every time: for each situation in scenarios/, its exit status and what its output
-# names. The real script runs in a throwaway Git repository of its own, with the files it reads
-# and the neutral valid site.json example, cloned from a throwaway "GitHub" (a bare repository);
-# GitHub's answers and the servers are stand-ins (fakes/), first on the search path, checked
-# before each run. Nothing goes over the network, and the stand-in rsync refuses any copy to a
-# server. Needs bash, git and jq.
+# Tests bin/deploy (template plan 1.4d-1, 1.4d-2) on known situations, run by bin/check every
+# time: for each situation in scenarios/, its exit status, what its output names, what it copied
+# where and in which order, and what the stand-in servers hold afterwards. The real script runs in
+# a throwaway Git repository of its own, with the files it reads, the neutral valid site.json
+# example (theme example-child, own plugin example-plugin) and one downloaded plugin,
+# example-download 1.1.0, cloned from a throwaway "GitHub" (a bare repository). GitHub, the
+# servers, the Composer build and WordPress.org's checksums are stand-ins (fakes/), first on the
+# search path, checked before each run. Nothing goes over the network. Needs bash, git and jq.
+#
+# Each stand-in server has the folders a key's settings would name (example-download,
+# example-plugin, example-child, deploy-note); example-plugin and example-child hold an old file
+# that a copy must remove, and example-download holds version 1.0.0 unless the situation says
+# otherwise.
 #
 # Each situation has two commits on main, A and then B, made fresh, so it names them as {A} and
 # {B} (in full) or {A7} and {B7} (the first 7 characters); {H} is a merged pull request's last
@@ -17,14 +23,25 @@
 # noDeploySection; noStaging; answer (typed at the question, "yes" when left out); missingTool;
 # sshConfigFile (a file made in the situation's folder and passed with --ssh-config); workingCopy
 # "broken" (an index git cannot read); expectSshNaming (text the ssh command must hold, {work}
-# for the situation's folder);
-# expectStatus; expectOutputNaming.
+# for the situation's folder); serverPluginVersion ({short name: version} of example-download
+# there, "" for an empty folder); missingFolders (["<short name>/<folder>"]); tamperDownloaded;
+# buildFails; checksumsUnavailable; copyFailsAt (a folder whose copy fails); interruptAt (a folder
+# during whose copy bin/deploy is interrupted);
+# expectStatus; expectOutputNaming; expectWrites (every copy, in order, "<short name>::<folder>",
+# [] for none); expectServerFiles ({"<short name>/<folder>/<file>": text it holds});
+# expectServerLacking ({"<short name>/<folder>/<file>": text it must not hold}); expectServerMissing
+# (["<short name>/<folder>/<file>"]).
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
 readonly HERE REPO_ROOT
 readonly VALID_SITE_SETTINGS="$REPO_ROOT/tests/tools/site-settings/valid.json"
+readonly DOWNLOADED_PLUGIN="example-download"
+readonly PINNED_VERSION="1.1.0"
+readonly SERVER_FOLDERS=(example-download example-plugin example-child deploy-note)
+# shellcheck source=tests/tools/deploy/fakes/plugin-files.sh
+source "$HERE/fakes/plugin-files.sh"
 TEST_ROOT=""
 
 log() { printf '%s [deploy tests] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
@@ -37,13 +54,28 @@ make_repository() {
   in_git init -q "$work/repo"
   mkdir -p "$work/repo/bin" "$work/repo/tools"
   cp "$REPO_ROOT/bin/deploy" "$work/repo/bin/"
-  cp "$REPO_ROOT/tools/site-settings.sh" "$REPO_ROOT/tools/site-settings.jq" "$work/repo/tools/"
+  cp "$REPO_ROOT/tools/site-settings.sh" "$REPO_ROOT/tools/site-settings.jq" \
+    "$REPO_ROOT/tools/site-packages.sh" "$REPO_ROOT/tools/versions.sh" "$work/repo/tools/"
   site_settings_for "$scenario" >"$work/repo/site.json"
+  write_site_code "$work/repo"
   in_git -C "$work/repo" add -A && in_git -C "$work/repo" commit -qm "A: the site"
   printf 'a change\n' >"$work/repo/change.txt"
+  printf '/* B */\n' >>"$work/repo/themes/example-child/style.css"
   in_git -C "$work/repo" add -A && in_git -C "$work/repo" commit -qm "B: a change"
   in_git -C "$work/repo" remote add origin "$work/origin.git"
   in_git -C "$work/repo" push -q origin main
+}
+
+# The site's own theme and plugin, and site-packages/ pinning the downloaded plugin.
+write_site_code() {
+  local repo="$1"
+  mkdir -p "$repo/themes/example-child" "$repo/plugins/example-plugin" "$repo/site-packages"
+  printf '/* Theme Name: Example Child */\n' >"$repo/themes/example-child/style.css"
+  printf '<?php\n/**\n * Plugin Name: Example Plugin\n */\n' >"$repo/plugins/example-plugin/example-plugin.php"
+  printf '{"require": {"wpackagist-plugin/%s": "%s"}}\n' "$DOWNLOADED_PLUGIN" "$PINNED_VERSION" >"$repo/site-packages/composer.json"
+  jq -n --arg slug "$DOWNLOADED_PLUGIN" --arg version "$PINNED_VERSION" '{packages: [{
+    name: "wpackagist-plugin/\($slug)", version: $version, type: "wordpress-plugin",
+    dist: {type: "zip", url: "https://downloads.wordpress.org/plugin/\($slug).\($version).zip"}}]}' >"$repo/site-packages/composer.lock"
 }
 
 site_settings_for() {
@@ -93,9 +125,39 @@ write_github() {
       trees: {($h): $h_tree} }' "$situation" >"$work/services/github.json"
 }
 
+# The folders each stand-in server's key may reach, with what they hold before the deploy.
+write_server_folders() {
+  local work="$1" ssh_host folder version
+  local situation="$work/situation.json" server="$work/services/server"
+  for ssh_host in example-staging example-live; do
+    for folder in "${SERVER_FOLDERS[@]}"; do
+      jq -e --arg missing "$ssh_host/$folder" '(.missingFolders // []) | index($missing)' "$situation" >/dev/null && continue
+      mkdir -p "$server/$ssh_host/$folder"
+    done
+    for folder in example-plugin example-child; do
+      [[ -d "$server/$ssh_host/$folder" ]] && printf 'old\n' >"$server/$ssh_host/$folder/old.txt"
+    done
+    version="$(jq -r --arg host "$ssh_host" '.serverPluginVersion[$host] // "1.0.0"' "$situation")"
+    [[ -z "$version" || ! -d "$server/$ssh_host/$DOWNLOADED_PLUGIN" ]] ||
+      write_plugin_files "$server/$ssh_host/$DOWNLOADED_PLUGIN" "$DOWNLOADED_PLUGIN" "$version"
+  done
+}
+
+# WordPress.org's checksum file for the pinned release, from the same files the build writes.
+write_checksums() {
+  local work="$1" release="$TEST_ROOT/release-files"
+  jq -e '.checksumsUnavailable // false' "$work/situation.json" >/dev/null && return 0
+  rm -rf "$release" && write_plugin_files "$release" "$DOWNLOADED_PLUGIN" "$PINNED_VERSION"
+  mkdir -p "$work/services/checksums/$DOWNLOADED_PLUGIN"
+  write_checksum_file "$release" "$DOWNLOADED_PLUGIN" "$PINNED_VERSION" >"$work/services/checksums/$DOWNLOADED_PLUGIN/$PINNED_VERSION.json"
+}
+
 write_servers() {
   local work="$1" ssh_host note
   local situation="$work/situation.json"
+  cp "$situation" "$work/services/situation.json"
+  write_server_folders "$work"
+  write_checksums "$work"
   while IFS=$'\t' read -r ssh_host note; do
     mkdir -p "$work/services/server/$ssh_host/deploy-note"
     printf '%s\n' "$note" >"$work/services/server/$ssh_host/deploy-note/deployed-commit"
@@ -144,7 +206,7 @@ search_path_for() {
   local situation="$1" missing tool
   missing="$(jq -r '.missingTool // empty' "$situation")"
   [[ -z "$missing" ]] || { search_path_without "$missing"; return; }
-  for tool in gh rsync; do
+  for tool in gh rsync docker curl; do
     [[ "$(PATH="$HERE/fakes:$PATH" command -v "$tool")" == "$HERE/fakes/$tool" ]] ||
       { log "the stand-in $tool is not first on the search path; nothing run"; exit 1; }
   done
@@ -173,6 +235,27 @@ outcome_problems() {
     naming="${naming//\{work\}/$work}"
     grep -qF -- "$naming" "$work/services/remote-shells.txt" 2>/dev/null || printf 'ssh was not run with %s\n' "$naming"
   done < <(jq -r '.expectSshNaming // [] | .[]' "$situation")
+  server_problems "$work"
+}
+
+# What was copied where, in order, and what the stand-in servers hold afterwards.
+server_problems() {
+  local work="$1" expected written file text
+  local situation="$work/situation.json" server="$work/services/server"
+  if jq -e 'has("expectWrites")' "$situation" >/dev/null; then
+    expected="$(jq -r '.expectWrites[]' "$situation")"
+    written="$(cat "$work/services/writes.txt" 2>/dev/null || true)"
+    [[ "$written" == "$expected" ]] || printf 'copied [%s], expected [%s]\n' "${written//$'\n'/, }" "${expected//$'\n'/, }"
+  fi
+  while IFS=$'\t' read -r file text; do
+    grep -qF -- "$text" "$server/$file" 2>/dev/null || printf '%s does not hold %s\n' "$file" "$text"
+  done < <(jq -r '.expectServerFiles // {} | to_entries[] | "\(.key)\t\(.value)"' "$situation")
+  while IFS=$'\t' read -r file text; do
+    ! grep -qF -- "$text" "$server/$file" 2>/dev/null || printf '%s still holds %s\n' "$file" "$text"
+  done < <(jq -r '.expectServerLacking // {} | to_entries[] | "\(.key)\t\(.value)"' "$situation")
+  while IFS= read -r file; do
+    [[ ! -e "$server/$file" ]] || printf '%s is still on the server\n' "$file"
+  done < <(jq -r '.expectServerMissing // [] | .[]' "$situation")
 }
 
 # The repository, the stand-in GitHub and servers, and the working copy, as the situation says.

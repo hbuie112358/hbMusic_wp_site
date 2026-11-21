@@ -4,13 +4,22 @@
 #
 #   bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]
 #
-# Built in parts. This part (1.4d-1) does everything before a copy and changes nothing on the
-# server: it refuses unless the working copy is clean, the commit is on GitHub's main and its
-# required checks passed, either on the commit itself (the weekly run, the button) or on its
-# merged pull request's last commit with exactly the same files (a rebase merge gives the commit a
-# new name, so no check ran on it); it reads which commit the place runs from the note on the
-# server, shows the commits between that one and the new one, and goes on only after "yes". Where
-# the site has staging, live accepts only the commit staging runs.
+# Built in parts (1.4d-1 and 1.4d-2 so far). Before anything is copied, it refuses unless the
+# working copy is clean, the commit is on GitHub's main and its required checks passed, either on
+# the commit itself (the weekly run, the button) or on its merged pull request's last commit with
+# exactly the same files (a rebase merge gives the commit a new name, so no check ran on it); where
+# the site has staging, live accepts only the commit staging runs. It reads which commit the place
+# runs from the note on the server and shows the commits between that one and the new one.
+#
+# Then, still before asking: the commit is exported (git archive), and what it copies is the
+# commit's own: its site.json's plugins and theme, and the downloaded plugins its composer.lock
+# pins, built in the pinned Composer container and every file checked against WordPress.org's
+# checksum file. Each folder must exist on the server for this place's key, and a downloaded
+# plugin newer on the server than the pin (the host updating it by itself) is never lowered
+# unless --allow-lower names it. Only after "yes": the downloaded plugins, the site's own plugins
+# and the theme, in that order (the theme may rely on them), each folder made exactly the
+# commit's, compared by content; then the note. A folder that was empty on the server is named,
+# to activate by hand: a copy runs no code and cannot activate anything.
 #
 # The places come from site.json's deploy section; each one's server, account, port and key are in
 # the user's SSH settings under its short name, and its key can reach only its own folders on the
@@ -25,6 +34,10 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"
+# shellcheck source=tools/site-packages.sh
+source "$REPO_ROOT/tools/site-packages.sh"
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
 
 # The jobs of .github/workflows/check.yml that must pass before code reaches a server; the same for
 # every site, since the workflow comes with the tools.
@@ -39,6 +52,22 @@ readonly RSYNC_FILE_MISSING=23
 readonly SSH_CONNECT_SECONDS=20
 readonly REQUIRED_TOOLS=(git gh rsync ssh jq curl docker)
 readonly PLACES=(staging live)
+# Each server folder becomes exactly the commit's: --delete removes files the commit no longer
+# has, --checksum compares by content rather than by size and time, and times are kept so the next
+# comparison is quick. Permissions are left to the server's own setting for the key's folders.
+readonly COPY_OPTIONS=(-rt --delete --checksum --itemize-changes)
+readonly DOWNLOAD_SECONDS=60
+# Problems shown from a long list, so a refusal stays readable.
+readonly PROBLEMS_SHOWN=10
+
+# What the commit copies, read from the commit itself (load_release_contents).
+RELEASE_DIR=""
+RELEASE_THEME=""
+RELEASE_LOCAL_PLUGINS=()
+RELEASE_DOWNLOADED_PLUGINS=()
+# Server folders found empty before the copy: new on the server, to activate by hand.
+NEW_FOLDERS=()
+COPY_STARTED=false
 
 PLACE=""
 COMMIT_REQUESTED=""
@@ -53,9 +82,27 @@ WORK_DIR=""
 log() { printf '%s [deploy] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 refuse() {
   log "REFUSED: $*"
-  log "nothing was copied"
+  if [[ "$COPY_STARTED" == true ]]; then
+    log "stopped during the copy: $PLACE may now run a mix of old and new files; once the cause is fixed, bin/deploy copies everything again"
+  else
+    log "nothing was copied"
+  fi
   exit 1
 }
+# Ctrl+C or a stop: before the copy nothing changed; during it the place may run a mix, which the
+# user must be told as a failed copy tells it.
+readonly INTERRUPTED_STATUS=130
+on_interrupt() {
+  trap - INT TERM
+  log "INTERRUPTED"
+  if [[ "$COPY_STARTED" == true ]]; then
+    log "stopped during the copy: $PLACE may now run a mix of old and new files; bin/deploy copies everything again"
+  else
+    log "nothing was copied"
+  fi
+  exit "$INTERRUPTED_STATUS"
+}
+
 usage_error() {
   log "$*"
   log "usage: bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]"
@@ -97,7 +144,8 @@ require_tools() {
 
 # The place's short name and address from site.json; a site without them is refused by name.
 load_place_settings() {
-  require_valid_site_settings || exit 2
+  # Validates site.json and names the Composer cache the plugin build shares with bin/dev-site.
+  load_site_volume_names || exit 2
   site_settings_query ".deploy // empty" | grep -q . || usage_error "site.json has no deploy section; tools/site-settings.md explains it"
   PLACE_SSH_HOST="$(site_settings_query ".deploy.$PLACE.sshHost // empty")"
   [[ -n "$PLACE_SSH_HOST" ]] || usage_error "site.json's deploy section has no $PLACE"
@@ -230,6 +278,127 @@ show_changes() {
   fi
 }
 
+# The commit's files, exactly as committed: never the working folder.
+export_release() {
+  RELEASE_DIR="$WORK_DIR/release"
+  mkdir -p "$RELEASE_DIR"
+  in_repository archive "$DEPLOY_COMMIT" | tar -x -C "$RELEASE_DIR" || refuse "could not export commit ${DEPLOY_COMMIT:0:7}"
+}
+
+release_lock_file() { printf '%s/site-packages/composer.lock' "$RELEASE_DIR"; }
+
+# What this commit copies, from its own site.json and composer.lock: a commit from before a plugin
+# was added copies what it had then.
+load_release_contents() {
+  local settings="$RELEASE_DIR/site.json" lock problems
+  [[ -f "$settings" ]] || refuse "commit ${DEPLOY_COMMIT:0:7} has no site.json"
+  RELEASE_THEME="$(jq -er '.theme' "$settings")" || refuse "commit ${DEPLOY_COMMIT:0:7}'s site.json names no theme"
+  mapfile -t RELEASE_LOCAL_PLUGINS < <(jq -r '.localPlugins[]' "$settings")
+  lock="$(release_lock_file)"
+  [[ -f "$lock" ]] || return 0
+  problems="$(site_packages_unsupported_plugins "$lock"; site_packages_download_problems "$lock")"
+  [[ -z "$problems" ]] || refuse "commit ${DEPLOY_COMMIT:0:7}'s downloaded plugins: $(paste -sd ';' <<<"$problems")"
+  mapfile -t RELEASE_DOWNLOADED_PLUGINS < <(site_packages_plugin_slugs "$lock")
+}
+
+# --allow-lower names only plugins the commit downloads, so a typo cannot slip through unused.
+require_known_allowed_lower() {
+  local plugin_slug
+  for plugin_slug in "${ALLOWED_LOWER[@]}"; do
+    [[ " ${RELEASE_DOWNLOADED_PLUGINS[*]} " == *" $plugin_slug "* ]] ||
+      usage_error "--allow-lower $plugin_slug: not one of the commit's downloaded plugins (${RELEASE_DOWNLOADED_PLUGINS[*]:-none})"
+  done
+}
+
+# Composer in its pinned container, on the exported commit's site-packages/ alone, as bin/dev-site
+# builds it: composer.json and composer.lock read-only, so the build follows the pins exactly.
+build_downloaded_plugins() {
+  ((${#RELEASE_DOWNLOADED_PLUGINS[@]} > 0)) || return 0
+  local packages="$RELEASE_DIR/site-packages"
+  log "building the downloaded plugins from composer.lock: ${RELEASE_DOWNLOADED_PLUGINS[*]}"
+  docker run --rm -w /app -v "$packages:/app" \
+    -v "$packages/composer.json:/app/composer.json:ro" -v "$packages/composer.lock:/app/composer.lock:ro" \
+    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
+    "$COMPOSER_IMAGE" composer install --no-interaction --no-progress >"$WORK_DIR/composer.log" 2>&1 ||
+    refuse "Composer could not build the downloaded plugins: $(tail -n 5 "$WORK_DIR/composer.log" | paste -sd ' ')"
+}
+
+downloaded_plugin_dir() { printf '%s/site-packages/wp-content/plugins/%s' "$RELEASE_DIR" "$1"; }
+
+# Every file of each downloaded plugin as WordPress.org published it: nothing missing, changed or
+# added. The lock file holds no fingerprint for these zips, so this is what proves them.
+verify_downloaded_plugins() {
+  local plugin_slug version checksums problems
+  for plugin_slug in "${RELEASE_DOWNLOADED_PLUGINS[@]}"; do
+    version="$(site_packages_pinned_version "$(release_lock_file)" "$plugin_slug")"
+    [[ -d "$(downloaded_plugin_dir "$plugin_slug")" ]] || refuse "the build made no folder for $plugin_slug"
+    checksums="$WORK_DIR/$plugin_slug.checksums.json"
+    curl -fsS --max-time "$DOWNLOAD_SECONDS" -o "$checksums" "$(site_packages_checksums_address "$plugin_slug" "$version")" ||
+      refuse "could not fetch WordPress.org's checksums for $plugin_slug $version"
+    problems="$(site_packages_checksum_problems "$(downloaded_plugin_dir "$plugin_slug")" "$checksums")" ||
+      refuse "$plugin_slug $version: $problems"
+    [[ -z "$problems" ]] || refuse "$plugin_slug $version does not match WordPress.org's release: $(head -n "$PROBLEMS_SHOWN" <<<"$problems" | paste -sd ';')"
+    log "$plugin_slug $version: every file matches WordPress.org's release"
+  done
+}
+
+# The folders this commit copies into, by their names on the server, in the order copied: the
+# downloaded plugins, the site's own plugins, then the theme.
+copy_targets() {
+  local plugin_slug
+  for plugin_slug in "${RELEASE_DOWNLOADED_PLUGINS[@]}"; do
+    printf '%s\t%s\n' "$(downloaded_plugin_dir "$plugin_slug")" "$plugin_slug"
+  done
+  for plugin_slug in "${RELEASE_LOCAL_PLUGINS[@]}"; do
+    printf '%s\t%s\n' "$RELEASE_DIR/plugins/$plugin_slug" "$plugin_slug"
+  done
+  printf '%s\t%s\n' "$RELEASE_DIR/themes/$RELEASE_THEME" "$RELEASE_THEME"
+}
+
+# Each folder must exist on the server for this place's key (set up by hand, template plan
+# 1.4e); an empty one is new there.
+check_server_folders() {
+  local source_dir folder listing
+  while IFS=$'\t' read -r source_dir folder; do
+    [[ -d "$source_dir" ]] || refuse "commit ${DEPLOY_COMMIT:0:7} has no $source_dir to copy"
+    listing="$(rsync --list-only -e "$(ssh_command)" "$PLACE_SSH_HOST::$folder/" 2>"$WORK_DIR/list-errors")" ||
+      refuse "$PLACE_SSH_HOST has no folder $folder for this key, or did not answer: $(tail -n 2 "$WORK_DIR/list-errors" | paste -sd ' ')"
+    awk '$NF != "."' <<<"$listing" | grep -q . || NEW_FOLDERS+=("$folder")
+  done < <(copy_targets)
+}
+
+# The version of a downloaded plugin on the server, from its main file; nothing for a new folder.
+server_plugin_version() {
+  local plugin_slug="$1" main_file copy="$WORK_DIR/$1.server-main.php" status=0
+  [[ " ${NEW_FOLDERS[*]} " != *" $plugin_slug "* ]] || return 0
+  main_file="$(plugin_main_file "$(downloaded_plugin_dir "$plugin_slug")")" || refuse "$plugin_slug has no main plugin file"
+  rsync -q -e "$(ssh_command)" "$PLACE_SSH_HOST::$plugin_slug/$main_file" "$copy" 2>/dev/null || status=$?
+  ((status == RSYNC_FILE_MISSING)) && return 0
+  ((status == 0)) || refuse "could not read $plugin_slug's version on $PLACE (rsync status $status)"
+  plugin_header_version "$copy"
+}
+
+# A host updating a plugin by itself makes the server newer than the pin; mirroring the folder
+# would quietly put the older version back, so that needs --allow-lower.
+check_server_versions() {
+  local plugin_slug pinned on_server
+  for plugin_slug in "${RELEASE_DOWNLOADED_PLUGINS[@]}"; do
+    pinned="$(site_packages_pinned_version "$(release_lock_file)" "$plugin_slug")"
+    on_server="$(server_plugin_version "$plugin_slug")" || exit 1
+    if [[ -z "$on_server" ]] || ! version_is_lower "$pinned" "$on_server"; then
+      continue
+    fi
+    [[ " ${ALLOWED_LOWER[*]} " == *" $plugin_slug "* ]] ||
+      refuse "$plugin_slug is $on_server on $PLACE, newer than the $pinned pinned; raise the pin in site-packages/composer.json, or lower it on purpose with --allow-lower $plugin_slug"
+    log "$plugin_slug: $on_server on $PLACE becomes $pinned (--allow-lower)"
+  done
+}
+
+show_copy_plan() {
+  log "copies, in order: $(copy_targets | cut -f2 | paste -sd ' ')"
+  ((${#NEW_FOLDERS[@]} == 0)) || log "empty on $PLACE so far (new there): ${NEW_FOLDERS[*]}"
+}
+
 confirm() {
   local answer=""
   ((${#ALLOWED_LOWER[@]} == 0)) || log "allowed to lower on $PLACE: ${ALLOWED_LOWER[*]}"
@@ -238,12 +407,41 @@ confirm() {
   [[ "$answer" == yes ]] || refuse "not confirmed"
 }
 
-main() {
-  read_arguments "$@"
-  require_tools
-  load_place_settings
-  WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }
-  trap remove_work_dir EXIT
+# One folder made exactly the commit's; the itemized list counts what changed.
+copy_folder() {
+  local source_dir="$1" folder="$2" changes
+  changes="$(rsync "${COPY_OPTIONS[@]}" -e "$(ssh_command)" "$source_dir/" "$PLACE_SSH_HOST::$folder/" 2>"$WORK_DIR/copy-errors")" ||
+    refuse "the copy into $folder failed: $(tail -n 3 "$WORK_DIR/copy-errors" | paste -sd ' ')"
+  log "$folder: $(grep -c . <<<"$changes" || true) change(s)"
+}
+
+copy_release() {
+  local source_dir folder
+  COPY_STARTED=true
+  while IFS=$'\t' read -r source_dir folder; do
+    copy_folder "$source_dir" "$folder"
+  done < <(copy_targets)
+}
+
+# Written only after every folder was copied, so the note never names a commit half there.
+write_note() {
+  local note="$WORK_DIR/$NOTE_FILE"
+  printf '%s\ndeployed %s by bin/deploy\n' "$DEPLOY_COMMIT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$note"
+  rsync -q -e "$(ssh_command)" "$note" "$PLACE_SSH_HOST::$NOTE_FOLDER/$NOTE_FILE" 2>"$WORK_DIR/note-errors" ||
+    refuse "every folder was copied, but the note could not be written: $(tail -n 2 "$WORK_DIR/note-errors" | paste -sd ' ')"
+  log "$PLACE's note: ${DEPLOY_COMMIT:0:7}"
+}
+
+report_new_folders() {
+  local folder
+  for folder in "${NEW_FOLDERS[@]}"; do
+    [[ "$folder" == "$RELEASE_THEME" ]] && log "new on $PLACE: the theme $folder; activate it under Appearance > Themes" && continue
+    log "new on $PLACE: $folder; activate it under Plugins"
+  done
+}
+
+# Every check that can refuse, so "yes" is asked only for a deploy that can be carried out.
+prepare_deploy() {
   require_clean_working_copy
   resolve_deploy_commit
   load_github_repository_name
@@ -251,8 +449,29 @@ main() {
   require_staging_runs_commit
   read_server_commit "$PLACE"
   show_changes "$SERVER_COMMIT"
+  export_release
+  load_release_contents
+  require_known_allowed_lower
+  build_downloaded_plugins
+  verify_downloaded_plugins
+  check_server_folders
+  check_server_versions
+  show_copy_plan
+}
+
+main() {
+  read_arguments "$@"
+  require_tools
+  load_place_settings
+  WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }
+  trap remove_work_dir EXIT
+  trap on_interrupt INT TERM
+  prepare_deploy
   confirm
-  log "confirmed; the copy itself arrives with template plan 1.4d-2, so nothing was copied"
+  copy_release
+  write_note
+  report_new_folders
+  log "copied ${DEPLOY_COMMIT:0:7} to $PLACE; the page check and the PHP log follow with template plan 1.4d-3"
 }
 
 main "$@"

@@ -23,8 +23,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   handbook's `toolkit/github.md`).
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
   error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check, #90), 1.4c done
-  (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy); next is
-  1.4d-2, the copy.
+  (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy), 1.4d-2
+  done (the copy); next is 1.4d-3, the page check and PHP log after the copy, and the test
+  against a throwaway server.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -377,11 +378,33 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       ssh command at spaces itself; left as it is, reading only a commit's first 100 check runs.
       27 situations; thirteen planted faults caught. One test bug found on the way: jq's `//`
       turning `false` into the default, as at 1.2b.
-    - [ ] 1.4d-2 The copy: the downloaded plugins built from `composer.lock` in the pinned
+    - [x] 1.4d-2 The copy: the downloaded plugins built from `composer.lock` in the pinned
       Composer container and every file checked against WordPress.org's checksum file before
       sending; the server's plugin versions read first (never lowered without `--allow-lower`);
       the downloaded plugins, the site's own plugins, then the theme, each from `git archive` of
-      the commit; a folder empty on the server named, to activate by hand; then the note.
+      the commit; a folder empty on the server named, to activate by hand; then the note. Built
+      2026-11-21. Checked first on the real plugins: the strict comparison (nothing missing,
+      different or extra) holds exactly for Contact Form 7 6.2.5 (218 files) and Yoast SEO 28.9
+      (1,984). Every check that can refuse runs before "yes" (the build, the checksums, each
+      folder existing for the key, the versions), so only a deploy that can be carried out is
+      asked about; what is copied comes from the commit's own `site.json` and `composer.lock`, so
+      a rollback copies what that commit had. A copy failing midway says the place may run a mix,
+      and the note keeps the old commit. Shared, file-reading helpers in `tools/site-packages.sh`
+      (the pinned version, the checksum comparison, a plugin's main file and version, version
+      order). Tests: 39 situations (12 new), with stand-ins for the Composer build (a neutral
+      `example-download` plugin, the same files the checksum file is written from) and
+      WordPress.org's checksums, and the stand-in rsync now copying into stand-in server folders;
+      ten more planted faults caught (the order, the working folder copied instead of the commit,
+      each check skipped, the note before the copy, a copy failure ignored). The real build and
+      checksums against WordPress.org are first run for real at 1.4e (a run answered "no" changes
+      nothing). From the review (the user's choice): Ctrl+C or a stop during the copy now says the
+      place may run a mix, as a failed copy does (situation 40, status 130). Recorded, not
+      changed: (a) each plugin folder becomes exactly the release, so a plugin keeping its own
+      data inside its folder would lose it at a deploy (Contact Form 7 and Yoast do not); a
+      plugin added to `site-packages/` is checked for this first (for the plugin rules, H12, at
+      1.4e's handbook proposal); (b) under rootful Docker the build's files belong to root, so
+      the temporary folder might not be removed afterwards; `bin/dev-site` assumes the same
+      rootless setup.
     - [ ] 1.4d-3 After the copy: the page check, the PHP log's new lines, one deploy at a time on
       the computer; and the test from start to finish against the throwaway server.
   - [ ] 1.4e The server set up (the user's steps: two keys made on the user's computer, their

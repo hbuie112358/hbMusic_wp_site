@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Stand-in for curl in bin/deploy's tests (tests/tools/deploy/run.sh): answers WordPress.org's
+# checksum files, "https://downloads.wordpress.org/plugin-checksums/<slug>/<version>.json", from
+# checksums/<slug>/<version>.json in FAKE_SERVICES_DIR, written by the test; any other address,
+# or a release with no file there, gets curl's answer for a refused request. Nothing goes over
+# the network.
+set -Euo pipefail
+
+readonly CHECKSUMS_ADDRESS='^https://downloads\.wordpress\.org/plugin-checksums/([a-z0-9-]+)/([^/]+)\.json$'
+readonly CURL_HTTP_ERROR=22
+
+output="" address=""
+while (($# > 0)); do
+  case "$1" in
+    -o) output="$2" && shift 2 ;;
+    --max-time) shift 2 ;;
+    -fsS) shift ;;
+    -*) echo "fake curl: unexpected option $1" >&2; exit 2 ;;
+    *) address="$1" && shift ;;
+  esac
+done
+[[ "$address" =~ $CHECKSUMS_ADDRESS && -n "$output" ]] || { echo "fake curl: unexpected request $address" >&2; exit 2; }
+file="$FAKE_SERVICES_DIR/checksums/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}.json"
+[[ -f "$file" ]] || { echo "curl: (22) The requested URL returned error: 404" >&2; exit "$CURL_HTTP_ERROR"; }
+cp "$file" "$output"

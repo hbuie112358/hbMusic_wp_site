@@ -1,0 +1,11 @@
+{
+  "description": "Ctrl+C during the site's plugin's copy: it says the place may run a mix, writes no note, and stops with the status of an interruption.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "interruptAt": "example-plugin",
+  "expectStatus": 130,
+  "expectOutputNaming": ["INTERRUPTED", "mix"],
+  "expectWrites": ["example-staging::example-download", "example-staging::example-plugin"],
+  "expectServerFiles": { "example-staging/deploy-note/deployed-commit": "{A}" }
+}
