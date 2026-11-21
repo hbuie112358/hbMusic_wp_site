@@ -59,7 +59,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `docs/planning/rebuild-plan.md`: this site's own plan, paused for the template; its Current
   position keeps 9u waiting.
 - `site.json`: the site's facts the tools read instead of naming this site (template plan T7):
-  its slug, theme, plugins and the dev site's test pages; no secrets. Its fields are explained in
+  its slug, theme, plugins, the dev site's test pages and where `bin/deploy` copies to (live and
+  staging, by their short names in the user's SSH settings, template plan 1.4c); no secrets. Its fields are explained in
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each

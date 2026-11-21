@@ -1,9 +1,24 @@
 # The rules for site.json (template plan T7): every field the tools read, its type, whether it is
-# required and, for text that becomes part of other names, the characters it may use. The one definition of
+# required, for text that becomes part of other names the characters it may use, and for a
+# choice its allowed values. The one definition of
 # the fields: the check of site.json and the check of its explanation (tools/site-settings.md)
 # both read it, so they cannot disagree. Loaded with `jq -L tools 'include "site-settings"; ...'`.
 #
 # A yes/no field left out means the usual case, so only the exceptions are written.
+
+# A place bin/deploy copies to, the same fields for each.
+def site_settings_place_rules($is_required): {
+  type: "object", required: $is_required,
+  fields: {
+    # A short name from the user's SSH settings (~/.ssh/config), which hold the server's address,
+    # account, port and key; the characters ssh allows in such a name.
+    sshHost: { type: "string", required: true, pattern: "^[A-Za-z0-9][A-Za-z0-9._-]*$", patternMeaning: "a short name from the SSH settings: letters, digits, dots, dashes and underscores" },
+    # The site's root, which the page check opens: https only, nothing after the host, and no
+    # login before it ("user:password@"), so no password is ever written into this file.
+    address: { type: "string", required: true, pattern: "^https://[^/?#@\\s]+$", patternMeaning: "https:// and the site's host, with no login, path or slash, such as https://example.com" },
+    isBehindPassword: { type: "boolean", required: false }
+  }
+};
 
 def site_settings_rules: {
   type: "object",
@@ -30,7 +45,18 @@ def site_settings_rules: {
         }
       }
     },
-    namesSharedCodeMustNotUse: { type: "array", required: true, items: { type: "string" } }
+    namesSharedCodeMustNotUse: { type: "array", required: true, items: { type: "string" } },
+    # Where bin/deploy copies the site to (template plan T11). Left out by a site not deployed yet.
+    deploy: {
+      type: "object", required: false,
+      fields: {
+        # Stated, never assumed: a host with a page cache the tools cannot clear yet is refused,
+        # instead of a deploy leaving visitors the old pages.
+        pageCache: { type: "string", required: true, allowedValues: ["none"] },
+        live: site_settings_place_rules(true),
+        staging: site_settings_place_rules(false)
+      }
+    }
   }
 };
 
@@ -58,13 +84,29 @@ def site_settings_problems_at($rules; $where):
   elif $rules.type == "array" then
     to_entries[] | .key as $index | .value
     | site_settings_problems_at($rules.items; "\($where)[\($index)]")
+  elif ($rules.allowedValues // null) != null and (. as $value | $rules.allowedValues | any(.[]; . == $value) | not) then
+    "\(shown): \(tojson) must be one of \($rules.allowedValues | map(tojson) | join(", "))"
   elif ($rules.pattern // null) != null and (test($rules.pattern) | not) then
     "\(shown): \(tojson) must be \($rules.patternMeaning)"
   else
     empty
   end;
 
-def site_settings_problems: site_settings_problems_at(site_settings_rules; "");
+# Rules across fields, which the field-by-field rules cannot see. Staging and live must be two
+# places: with the same short name or address, a deploy to staging would land on live, skipping
+# the look at staging, and the page check would test the wrong site. Checked only when both are
+# objects; their own rules report anything else.
+def site_settings_deploy_problems:
+  (.deploy? // null) as $deploy
+  | if ($deploy | type) == "object" and ($deploy.live | type) == "object" and ($deploy.staging | type) == "object" then
+      ("sshHost", "address") as $field
+      | select($deploy.staging[$field] != null and $deploy.staging[$field] == $deploy.live[$field])
+      | "deploy.staging.\($field): the same as deploy.live.\($field); staging and live must be two places"
+    else
+      empty
+    end;
+
+def site_settings_problems: site_settings_problems_at(site_settings_rules; ""), site_settings_deploy_problems;
 
 # Every field's name as the explanation page heads it: "testPages", "testPages[].title".
 def site_settings_field_names_at($rules; $prefix):

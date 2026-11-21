@@ -1,0 +1,26 @@
+{
+  "slug": "example",
+  "devSiteTitle": "Example (dev)",
+  "theme": "example-child",
+  "localPlugins": [
+    "example-plugin"
+  ],
+  "testPages": [
+    {
+      "title": "Home",
+      "address": "home",
+      "isFrontPage": true
+    }
+  ],
+  "namesSharedCodeMustNotUse": [
+    "example"
+  ],
+  "deploy": {
+    "pageCache": "none",
+    "staging": {
+      "sshHost": "example-staging",
+      "address": "https://staging.example.com",
+      "isBehindPassword": true
+    }
+  }
+}

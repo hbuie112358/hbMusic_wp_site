@@ -92,3 +92,62 @@ host's. Shared code is the plugins and the tools (`bin/`, `tools/`, the GitHub w
 site's shared recipe and settings example), which serve every site, so they must name nothing of
 this one; `bin/check` searches them as plain text, without regard to case. Example:
 `["my-site", "jane", "doe", "examplehost"]`.
+
+### deploy
+
+Where `bin/deploy` copies the site to: live, and staging where the site keeps one on its host.
+Left out by a site that is not deployed yet; `bin/deploy` then refuses. It copies the downloaded
+plugins (`site-packages/`), the site's own plugins (`localPlugins`) and the theme (`theme`), so
+nothing here lists them. On the server, each place's SSH key may copy only into folders named
+after what they hold (the theme's or plugin's folder name), plus `deploy-note` and `php-log`.
+Where a site has staging, live accepts only the commit staging runs.
+
+### deploy.pageCache
+
+The host's page cache, which a deploy must clear so visitors get the new pages. `"none"` is the
+only value for now: a host that keeps no copies of pages. A host with a cache the tools cannot
+clear yet has no value, so its site is refused instead of a deploy leaving visitors the old
+pages; the tools gain the value when such a site comes.
+
+### deploy.live
+
+The public site. Required in `deploy`.
+
+### deploy.live.sshHost
+
+The short name for the live server in the user's SSH settings (`~/.ssh/config`), which hold its
+address, account, port and the live key; none of those is in the repository. Letters, digits,
+dots, dashes and underscores. Example: `"my-site-live"`. Changing it needs the same name in the
+SSH settings.
+
+### deploy.live.address
+
+The live site's root, which the page check opens after a deploy: `https://` and the host, nothing
+after it, and never a login before it (`user:password@`): logins live in `.env`. Example:
+`"https://example.com"`.
+
+### deploy.live.isBehindPassword
+
+`true` while the whole site is behind a password (a preview before launch); the page check then
+logs in with `LIVE_CHECK_USER` and `LIVE_CHECK_PASSWORD` from `.env`. Left out: open to everyone.
+
+### deploy.staging
+
+The staging site on the host, where the site has one (a Shop site, or a recorded exception).
+Left out: no staging; live is deployed straight from `main`.
+
+### deploy.staging.sshHost
+
+The short name for the staging server in the user's SSH settings, as for live, with its own key,
+which can reach only staging's folders. It must differ from live's, or a deploy to staging would
+land on live. Example: `"my-site-staging"`.
+
+### deploy.staging.address
+
+The staging site's root, as for live; it must differ from live's. Example:
+`"https://staging.example.com"`.
+
+### deploy.staging.isBehindPassword
+
+`true` when staging is behind a site-wide password, as it usually is; the page check then logs in
+with `STAGING_CHECK_USER` and `STAGING_CHECK_PASSWORD` from `.env`. Left out: open to everyone.

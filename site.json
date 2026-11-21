@@ -11,5 +11,10 @@
 		{ "title": "Book", "address": "hire-acoustic-guitarist" },
 		{ "title": "Privacy Policy", "address": "privacy-policy", "isPrivacyPolicy": true, "isInMenu": false }
 	],
-	"namesSharedCodeMustNotUse": ["hbmusic", "howard", "buie", "hostinger"]
+	"namesSharedCodeMustNotUse": ["hbmusic", "howard", "buie", "hostinger"],
+	"deploy": {
+		"pageCache": "none",
+		"live": { "sshHost": "hbmusic-live", "address": "https://howardbuiemusic.com" },
+		"staging": { "sshHost": "hbmusic-staging", "address": "https://staging.howardbuiemusic.com", "isBehindPassword": true }
+	}
 }
