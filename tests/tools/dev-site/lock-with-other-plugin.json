@@ -1,0 +1,19 @@
+{
+  "packages": [
+    {
+      "name": "wpackagist-plugin/example-plugin",
+      "version": "1.0.0",
+      "type": "wordpress-plugin"
+    },
+    {
+      "name": "example-vendor/other-plugin",
+      "version": "1.0.0",
+      "type": "wordpress-plugin"
+    },
+    {
+      "name": "composer/installers",
+      "version": "v2.3.0",
+      "type": "composer-plugin"
+    }
+  ]
+}

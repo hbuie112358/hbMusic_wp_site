@@ -14,6 +14,8 @@ readonly REPO_ROOT
 source "$REPO_ROOT/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"
+# shellcheck source=tools/site-packages.sh
+source "$REPO_ROOT/tools/site-packages.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
@@ -23,12 +25,14 @@ readonly SITE_SETTINGS_BAD_EXAMPLES=(
   'missing-field.json|devSiteTitle'
   'unknown-field.json|testPages[0].adress'
   'wrong-type.json|testPages[0].isInMenu'
-  'not-allowed-value.json|plugins[0].source'
 )
 readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
   'explanation-missing-field.md|theme'
   'explanation-stale-field.md|logoFile'
 )
+# The same for bin/dev-site's own refusals (tests/tools/dev-site/), which run before it changes
+# anything: each broken example must be refused naming what it breaks, each good one accepted.
+readonly DEV_SITE_EXAMPLES_DIR="$REPO_ROOT/tests/tools/dev-site"
 
 FAILED_CHECKS=()
 
@@ -47,6 +51,18 @@ in_composer() {
     -v "$REPO_ROOT/composer.json:/app/composer.json:ro" \
     -v "$REPO_ROOT/composer.lock:/app/composer.lock:ro" \
     -v "$REPO_ROOT/vendor:/app/vendor" \
+    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
+    "$COMPOSER_IMAGE" "$@"
+}
+
+# The site's downloaded plugins (site-packages/, template plan T8), all read-only: the lock file
+# must match composer.json, and no installed version may have a known advisory. Exact versions
+# are deliberate for a site, so --no-check-all leaves out Composer's advice against them; the
+# lock check stays.
+in_site_packages() {
+  docker run --rm -w /app \
+    -v "$SITE_PACKAGES_DIR/composer.json:/app/composer.json:ro" \
+    -v "$SITE_PACKAGES_LOCK:/app/composer.lock:ro" \
     -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
     "$COMPOSER_IMAGE" "$@"
 }
@@ -167,6 +183,38 @@ expect_explanation_difference() {
   differences="$(site_settings_explanation_differences "$SITE_SETTINGS_EXAMPLES_DIR/$example")"
   awk -F': ' '{ print $NF }' <<<"$differences" | grep -qxF -- "$broken_field" && return 0
   log "$example should show a difference naming $broken_field; reported: ${differences:-(nothing)}"
+  return 1
+}
+
+# bin/dev-site's refusals, tried on known examples (tests/tools/dev-site/): a test page without
+# its content file, a plugin it cannot install, and the booking form without its plugin are each
+# refused, naming what is wrong; the good examples are accepted.
+dev_site_refusals_refuse_bad_examples() {
+  local examples="$DEV_SITE_EXAMPLES_DIR" failed=0
+  expect_refusal "missing-test-page.json" "no-such-page" \
+    "$(site_settings_missing_test_pages "$examples/missing-test-page.json" "$examples/dev-content")" || failed=1
+  expect_refusal "lock-with-other-plugin.json" "example-vendor/other-plugin" \
+    "$(site_packages_unsupported_plugins "$examples/lock-with-other-plugin.json")" || failed=1
+  expect_refusal "lock-without-form-plugin.json" "$FORM_PLUGIN_PACKAGE" \
+    "$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-without-form-plugin.json")" || failed=1
+  expect_acceptance "the valid test pages" "$(site_settings_missing_test_pages "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/dev-content")" || failed=1
+  expect_acceptance "lock-with-form-plugin.json" \
+    "$(site_packages_unsupported_plugins "$examples/lock-with-form-plugin.json")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-with-form-plugin.json")" || failed=1
+  return "$failed"
+}
+
+# A refusal line starts with what it is about, then a colon.
+expect_refusal() {
+  local example="$1" expected="$2" problems="$3"
+  cut -d: -f1 <<<"$problems" | grep -qxF -- "$expected" && return 0
+  log "$example should be refused naming $expected; reported: ${problems:-(nothing)}"
+  return 1
+}
+
+expect_acceptance() {
+  local example="$1" problems="$2"
+  [[ -z "$problems" ]] && return 0
+  log "$example should be accepted; reported: $problems"
   return 1
 }
 
@@ -393,6 +441,8 @@ main() {
   run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
   run_check "Composer validation" in_composer composer validate --strict --no-check-publish
   run_check "Composer security audit" in_composer composer audit --no-interaction
+  run_check "Site packages: lock file matches composer.json" in_site_packages composer validate --strict --no-check-all --no-check-publish
+  run_check "Site packages: security audit" in_site_packages composer audit --locked --no-interaction
   run_check "npm security audit (browser tests)" npm_audit tests/e2e
   run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
@@ -404,6 +454,7 @@ main() {
   run_check "site.json follows its rules" site_json_is_valid
   run_check "site.json's fields are explained" site_json_fields_explained
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
+  run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress

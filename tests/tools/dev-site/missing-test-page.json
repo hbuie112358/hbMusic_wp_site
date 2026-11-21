@@ -2,17 +2,18 @@
   "slug": "example",
   "devSiteTitle": "Example (dev)",
   "theme": "example-child",
-  "plugins": [
-    {
-      "slug": "example-plugin",
-      "source": "lcal"
-    }
+  "localPlugins": [
+    "example-plugin"
   ],
   "testPages": [
     {
       "title": "Home",
       "address": "home",
       "isFrontPage": true
+    },
+    {
+      "title": "Extra",
+      "address": "no-such-page"
     }
   ],
   "namesPluginsMustNotUse": [

@@ -1,6 +1,6 @@
-# Weekly: compares the dev site's pinned plugins and theme with WordPress.org (bin/versions-check,
-# plan 8j) and proposes each newer one: a plugin as a pull request, the theme as an issue. It
-# merges nothing; the user approves the pull request's tests and merges on GitHub once they pass.
+# Weekly: compares the dev site's pinned parent theme with WordPress.org (bin/versions-check,
+# plan 8j) and opens an issue for a newer one. It changes no code. The downloaded plugins are
+# raised by Dependabot instead (site-packages/, template plan T8).
 name: versions
 
 on:
@@ -15,12 +15,10 @@ on:
         required: false
         default: "7"
 
-# Exactly what the proposals need: a branch (contents), its pull request and the theme's issue.
-# The pull request's tests start when the user approves them on its page. No secrets; the deploy
-# runs only on main.
+# Exactly what the check needs: reading the repository and opening the theme's issue. No secrets,
+# no write access to code.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
   issues: write
 
 # Two runs at once could both open the same proposal.
@@ -33,16 +31,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      # Pinned by commit, like check.yml. The token stays for this job's own push of the
-      # proposal branch; nothing else runs here.
+      # Pinned by commit, like check.yml. Nothing is pushed, so the token is not kept.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Commit as GitHub Actions' bot
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Compare the pins with WordPress.org and propose updates (bin/versions-check --act)
+      - name: Compare the theme's pin with WordPress.org and open an issue if it is behind (bin/versions-check --act)
         run: bin/versions-check --act
         env:
           GH_TOKEN: ${{ github.token }}

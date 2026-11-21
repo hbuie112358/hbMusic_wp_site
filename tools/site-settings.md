@@ -34,24 +34,13 @@ in its own admin.
 The folder of the site's own theme under `themes/`. Example: `"hbmusic-child"`. It must match the
 folder's name exactly; the dev site activates this theme and the checks read it.
 
-### plugins
+### localPlugins
 
-The plugins the dev site installs and activates, in order. Each is a slug and where it comes
-from. A plugin left out of this list is not installed on the dev site, so the tests do not see
-it.
-
-### plugins[].slug
-
-The plugin's folder name, as WordPress knows it. Example: `"contact-form-7"`.
-
-### plugins[].source
-
-Where the plugin comes from:
-- `"local"`: a folder in this repository, `plugins/<slug>/`, mounted read-only into the dev site;
-- `"wordpress.org"`: downloaded from WordPress.org at the version pinned in `tools/versions.sh`,
-  and checked against WordPress.org's checksums;
-- `"dts"`: a pinned release of a DTS plugin, checked against its checksum (when the shared
-  plugins exist).
+The plugins kept in this repository, `plugins/<slug>/`, by their folder names, in the order the
+dev site activates them. They are mounted read-only into the dev site, so an edit shows at once.
+Example: `["song-list", "site-hardening"]`; an empty list for a site with none. Downloaded
+plugins (from WordPress.org, and later DTS's own) are not listed here but in
+`site-packages/composer.json`, at their exact versions.
 
 ### testPages
 

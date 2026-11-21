@@ -2,9 +2,7 @@
 ### slug
 ### devSiteTitle
 ### theme
-### plugins
-### plugins[].slug
-### plugins[].source
+### localPlugins
 ### testPages
 ### testPages[].title
 ### testPages[].address

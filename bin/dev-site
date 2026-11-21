@@ -12,8 +12,8 @@ readonly REPO_ROOT
 readonly ENV_FILE="$REPO_ROOT/.env"
 readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
-# The plugins whose setup the tools know, set up only when site.json lists them.
-readonly FORM_PLUGIN="contact-form-7"
+# The SEO plugin, whose settings the tools know, set up only when the site has it. (The booking
+# form's plugin is named in tools/site-packages.sh.)
 readonly SEO_PLUGIN="wordpress-seo"
 # The booking form's files (config/); a site without them has no booking form on its dev site.
 readonly BOOKING_FORM_FILE="$REPO_ROOT/config/booking-form.txt"
@@ -32,6 +32,7 @@ readonly REQUIRED_SETTINGS=(
 readonly TEST_PAGE_FIELD_SEPARATOR=$'\x1f'
 CHILD_THEME=""
 DEV_SITE_TITLE=""
+# The site's own plugins come from site.json, its downloaded ones from site-packages/composer.lock.
 LOCAL_PLUGINS=()
 WORDPRESS_ORG_PLUGINS=()
 TEST_PAGES=()
@@ -51,6 +52,9 @@ source "$REPO_ROOT/tools/settings.sh"
 # site.json: the site's facts and their rules.
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"
+# site-packages/: the downloaded plugins, pinned with Composer.
+# shellcheck source=tools/site-packages.sh
+source "$REPO_ROOT/tools/site-packages.sh"
 
 compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
 
@@ -71,49 +75,27 @@ require_tools() {
 load_site_settings() {
   local problems
   [[ -f "$SITE_SETTINGS_FILE" ]] || fail "site.json is missing; tools/site-settings.md lists its fields"
+  [[ -f "$SITE_PACKAGES_LOCK" ]] || fail "site-packages/composer.lock is missing; composer update in site-packages/ writes it"
   problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || fail "site.json is not valid JSON"
-  [[ -z "$problems" ]] || fail "site.json does not follow its rules: $(paste -sd ';' <<<"$problems")"
+  refuse_if_any "$problems"
   CHILD_THEME="$(site_setting .theme)"
   DEV_SITE_TITLE="$(site_setting .devSiteTitle)"
-  mapfile -t LOCAL_PLUGINS < <(site_settings_query '.plugins[] | select(.source == "local") | .slug')
-  mapfile -t WORDPRESS_ORG_PLUGINS < <(site_settings_query '.plugins[] | select(.source == "wordpress.org") | .slug')
+  mapfile -t LOCAL_PLUGINS < <(site_settings_query '.localPlugins[]')
+  mapfile -t WORDPRESS_ORG_PLUGINS < <(site_packages_plugin_slugs "$SITE_PACKAGES_LOCK")
   mapfile -t TEST_PAGES < <(site_settings_query '.testPages[]
     | [.title, .address, (.pageTemplate // ""), (.isFrontPage // false), (.isPrivacyPolicy // false), (if has("isInMenu") then .isInMenu else true end)]
     | map(tostring) | join("\u001f")')
   readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
-  require_supported_plugin_sources
-  require_pinned_versions
-  require_test_page_files
-  require_booking_form_plugin
+  refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
+  refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
+  refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
 }
 
-require_booking_form_plugin() {
-  [[ -f "$BOOKING_FORM_FILE" ]] || return 0
-  site_has_plugin "$FORM_PLUGIN" || fail "config/booking-form.txt exists, but site.json does not list $FORM_PLUGIN"
-}
-
-# A DTS plugin release has no installer yet; it comes with the shared plugins (template plan 2.2).
-require_supported_plugin_sources() {
-  local dts_plugins
-  dts_plugins="$(site_settings_query '.plugins[] | select(.source == "dts") | .slug' | paste -sd ' ')"
-  [[ -z "$dts_plugins" ]] || fail "site.json lists DTS plugins ($dts_plugins); bin/dev-site cannot install them yet"
-}
-
-require_pinned_versions() {
-  local plugin_slug
-  for plugin_slug in "${WORDPRESS_ORG_PLUGINS[@]}"; do
-    wordpress_org_plugin_version "$plugin_slug" >/dev/null ||
-      fail "site.json lists $plugin_slug from WordPress.org, but tools/versions.sh pins no version for it"
-  done
-}
-
-require_test_page_files() {
-  local test_page title address
-  for test_page in "${TEST_PAGES[@]}"; do
-    IFS="$TEST_PAGE_FIELD_SEPARATOR" read -r title address _ <<<"$test_page"
-    [[ -f "$REPO_ROOT/tests/dev-content/$address.html" ]] ||
-      fail "site.json's test page \"$title\" has no content file tests/dev-content/$address.html"
-  done
+# Stops the build with the problems found, one per line, if there are any. The checks behind it
+# are tried on broken examples by bin/check.
+refuse_if_any() {
+  local problems="$1"
+  [[ -z "$problems" ]] || fail "$(paste -sd ';' <<<"$problems")"
 }
 
 site_has_plugin() {
@@ -177,10 +159,11 @@ remove_unused_code() {
     [[ "$theme" == "$PARENT_THEME_SLUG" || "$theme" == "$CHILD_THEME" ]] && continue
     wp_cli theme delete "$theme"
   done
-  # The site's own plugins are mounted read-only from the repository, so they could not be deleted.
-  local site_plugins
-  site_plugins="$(printf '%s\n' "${LOCAL_PLUGINS[@]}" "${WORDPRESS_ORG_PLUGINS[@]}" | paste -sd ',')"
-  wp_cli plugin delete --all --exclude="$site_plugins"
+  # The site's own plugins are mounted read-only from the repository, so they could not be deleted;
+  # the downloaded ones go too, and arrive fresh from Composer (install_site_packages).
+  local local_plugins
+  local_plugins="$(printf '%s\n' "${LOCAL_PLUGINS[@]}" | paste -sd ',')"
+  wp_cli plugin delete --all --exclude="$local_plugins"
 }
 
 configure_site() {
@@ -196,21 +179,38 @@ configure_site() {
   wp_cli rewrite structure '/%postname%/'
 }
 
-# Each WordPress.org plugin site.json lists, at the version tools/versions.sh pins, checked
-# against WordPress.org's checksums before the build goes on.
-install_wordpress_org_plugins() {
-  local plugin_slug version
+# Composer for site-packages/, in its pinned container, which sees only that folder: composer.json
+# and composer.lock read-only, so a build never changes the pinned versions; the installed
+# plugins and Composer's own files writable.
+in_site_packages() {
+  docker run --rm -w /app \
+    -v "$SITE_PACKAGES_DIR:/app" \
+    -v "$SITE_PACKAGES_DIR/composer.json:/app/composer.json:ro" \
+    -v "$SITE_PACKAGES_LOCK:/app/composer.lock:ro" \
+    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
+    "$COMPOSER_IMAGE" "$@"
+}
+
+# The downloaded plugins at the versions site-packages/composer.lock pins, each copied into the
+# dev site, activated and checked against WordPress.org's checksums before the build goes on:
+# the lock file holds no fingerprint for them, so this check is what proves the files are
+# WordPress.org's (template plan T8).
+install_site_packages() {
+  local plugin_slug
+  log "Installing the downloaded plugins from site-packages/composer.lock: ${WORDPRESS_ORG_PLUGINS[*]:-none}"
+  rm -rf "$SITE_PACKAGES_DIR/wp-content"
+  in_site_packages composer install --no-interaction --no-progress
   for plugin_slug in "${WORDPRESS_ORG_PLUGINS[@]}"; do
-    version="$(wordpress_org_plugin_version "$plugin_slug")"
-    log "Installing $plugin_slug $version from WordPress.org"
-    wp_cli plugin install "$plugin_slug" --version="$version" --force --activate
+    compose cp "$SITE_PACKAGES_PLUGINS_DIR/$plugin_slug" "wordpress:/var/www/html/wp-content/plugins/$plugin_slug"
+    compose exec -T wordpress chown -R www-data:www-data "/var/www/html/wp-content/plugins/$plugin_slug"
+    wp_cli plugin activate "$plugin_slug"
     wp_cli plugin verify-checksums "$plugin_slug"
   done
 }
 
 # The booking form as the real sites have it, from its files in config/, with stand-in Turnstile
 # keys that only the dev site's stand-in for Cloudflare accepts. A site without the files has no
-# booking form; one with them needs the form's plugin (require_booking_form_plugin).
+# booking form; one with them needs the form's plugin (site_packages_booking_form_problem).
 configure_booking_form() {
   [[ -f "$BOOKING_FORM_FILE" ]] || return 0
   log "Setting up the booking form"
@@ -376,7 +376,7 @@ main() {
   install_parent_theme
   remove_unused_code
   configure_site
-  install_wordpress_org_plugins
+  install_site_packages
   configure_booking_form
   configure_seo_plugin
   set_dev_organization

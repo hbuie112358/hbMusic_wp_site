@@ -1,11 +1,8 @@
 {
   "slug": "example",
   "theme": "example-child",
-  "plugins": [
-    {
-      "slug": "example-plugin",
-      "source": "local"
-    }
+  "localPlugins": [
+    "example-plugin"
   ],
   "testPages": [
     {

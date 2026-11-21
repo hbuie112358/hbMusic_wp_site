@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Compares the dev site's pinned plugins and theme (tools/versions.sh) with the newest versions on
+# Compares the dev site's pinned parent theme (tools/versions.sh) with the newest version on
 # WordPress.org (plan 8j), so the dev site's tests keep testing what staging and live will run.
+# The downloaded plugins are pinned with Composer (site-packages/) and raised by Dependabot, with
+# the same wait (template plan T8); the theme stays here because WordPress.org publishes no
+# checksums for themes, so its pin holds a fingerprint taken by hand.
 #
-#   bin/versions-check          reports what is behind; changes nothing (needs only curl and jq)
-#   bin/versions-check --act    also proposes each change on GitHub (the weekly workflow, versions.yml):
-#                           a plugin as a pull request, whose tests start once the user clicks
-#                           "Approve and run" on it, the theme as an issue only, since its pin
-#                           holds a fingerprint taken by hand
+#   bin/versions-check          reports whether the theme is behind; changes nothing (needs only
+#                               curl and jq)
+#   bin/versions-check --act    also opens an issue on GitHub for a newer theme (the weekly
+#                               workflow, versions.yml)
 #
 # A release is proposed only once it is PINS_COOLDOWN_DAYS old (default 7): a hijacked release is
 # usually found and pulled within days, the same wait Dependabot keeps here. Security fixes reach
@@ -25,8 +27,6 @@ readonly VERSION_PATTERN='^[0-9]+(\.[0-9]+){0,3}$'
 
 # kind|WordPress.org slug|variable in tools/versions.sh|name in messages
 readonly PINS=(
-  "plugin|contact-form-7|CONTACT_FORM_7_VERSION|Contact Form 7"
-  "plugin|wordpress-seo|YOAST_SEO_VERSION|Yoast SEO"
   "theme|twentytwentyfive|PARENT_THEME_VERSION|Twenty Twenty-Five"
 )
 
@@ -34,7 +34,7 @@ log() { printf '%s [versions-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
 
 # The newest version and its date, as "version|last_updated". WordPress.org's last_updated is the
-# plugin's latest change, never earlier than the release, so the wait can only come out longer.
+# theme's latest change, never earlier than the release, so the wait can only come out longer.
 newest_release() {
   local kind="$1" slug="$2" answer
   answer="$(curl -fsS --retry 3 --max-time 20 \
@@ -70,7 +70,7 @@ check_pin() {
     log "$name: $pinned is current"
     return 0
   fi
-  # Older on WordPress.org than here: a release withdrawn, or the plugin closed there.
+  # Older on WordPress.org than here: a release withdrawn there.
   if ! is_newer "$newest" "$pinned"; then
     log "$name: WordPress.org offers only $newest, older than the pinned $pinned; nothing proposed, worth a look"
     return 0
@@ -87,66 +87,9 @@ check_pin() {
 
 propose_change() {
   case "$1" in
-    plugin) propose_plugin_pull_request "${@:2}" ;;
     theme) propose_theme_issue "${@:2}" ;;
-    *) fail "unknown kind $1" ;;
+    *) fail "only the theme is checked here; plugins are raised by Dependabot (site-packages/composer.json), not $1" ;;
   esac
-}
-
-# A pull request raising the pin, from main, unless one for this version was ever opened (an open
-# one is waiting; a closed one was declined, and is not proposed again).
-propose_plugin_pull_request() {
-  local slug="$1" variable="$2" name="$3" pinned="$4" newest="$5" branch="versions/$1-$5"
-  if [[ -n "$(gh pr list --head "$branch" --state all --json number --jq '.[].number')" ]]; then
-    log "$name: a pull request for $newest exists already"
-    return 0
-  fi
-  remove_leftover_branch "$branch"
-  git -C "$REPO_ROOT" fetch --quiet origin main
-  git -C "$REPO_ROOT" switch --quiet -c "$branch" origin/main
-  raise_pin "$variable" "$pinned" "$newest"
-  git -C "$REPO_ROOT" commit --quiet -m "build(dev-site): raise $name to $newest in the dev site's pins" \
-    -m "$(pull_request_text "$name" "$pinned" "$newest")" -- "$VERSIONS_FILE"
-  git -C "$REPO_ROOT" push --quiet origin "$branch"
-  gh pr create --base main --head "$branch" --title "build(dev-site): raise $name to $newest" \
-    --body "$(pull_request_text "$name" "$pinned" "$newest")"
-  # GitHub holds the tests of a pull request opened with its own token until a person approves
-  # them, and only that run counts for the merge: one started by "Run workflow" passes on the
-  # commit but leaves the pull request blocked (seen on #33, plan 8j). So the user approves it.
-  git -C "$REPO_ROOT" switch --quiet -
-  log "$name: pull request for $newest opened; its tests wait for \"Approve and run\""
-}
-
-# A proposal branch without a pull request is what a run stopped half-way leaves behind (pushed,
-# then the pull request refused); it is made again from main rather than pushed over.
-remove_leftover_branch() {
-  local branch="$1"
-  git -C "$REPO_ROOT" ls-remote --exit-code --heads origin "$branch" >/dev/null || return 0
-  log "$branch exists without a pull request, left by an earlier run; removing it to start again"
-  git -C "$REPO_ROOT" push --quiet origin --delete "$branch"
-}
-
-# Changes exactly the one line, and proves it changed.
-raise_pin() {
-  local variable="$1" pinned="$2" newest="$3"
-  sed -i -E "s/^readonly $variable=\"$pinned\"$/readonly $variable=\"$newest\"/" "$REPO_ROOT/$VERSIONS_FILE"
-  [[ "$(pinned_version "$variable")" == "$newest" ]] || fail "main's $VERSIONS_FILE does not pin $variable at $pinned"
-}
-
-pull_request_text() {
-  printf '%s\n' \
-    "**$1 has a new version: $3.** The dev site still uses $2." \
-    "" \
-    "This pull request switches the dev site to $3, so the tests can try the new version before it goes onto staging and live." \
-    "" \
-    "**What to do**" \
-    "1. Click **Approve and run** on this page. GitHub waits for a person before testing a pull request that its own bot opened." \
-    "2. **Wait about 4 minutes** for the two checks, \`check\` and \`dev-site\`." \
-    "3. **Green ticks:** click **Rebase and merge**, then **Delete branch**. That's all. Staging and live get $3 when you perform your next monthly check (\`docs/ROUTINES.md\`, step 6)." \
-    "" \
-    "   **Red crosses:** don't merge. The new version breaks something the tests protect. Look at it with Claude before updating staging or live." \
-    "" \
-    "*Opened by the weekly versions check (\`bin/versions-check\`). Merging changes only the dev site's version list; nothing reaches staging or live from here.*"
 }
 
 # An issue only: the theme's pin holds a SHA-256 taken by hand, which a fingerprint computed here

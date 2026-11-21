@@ -85,12 +85,14 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 `db/` and `wordpress/`.
 
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run),
-  from the site's facts in `site.json` (its theme, title, plugins and test pages, checked against
-  their rules before anything is changed; template plan 1.2b):
+  from the site's facts in `site.json` (its theme, title, own plugins and test pages) and its
+  downloaded plugins in `site-packages/composer.lock`, all checked before anything is changed
+  (template plan 1.2b, 1.2c):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
-  `tools/versions.sh`, the child theme and the site's `local` plugins (Song List, Site Hardening,
-  Editing Help) mounted read-only and activated, its `wordpress.org` plugins at the versions in
-  `tools/versions.sh`, checked against WordPress.org's checksums: Contact Form 7
+  `tools/versions.sh`, the child theme and the site's own plugins (`localPlugins`: Song List,
+  Site Hardening, Editing Help) mounted read-only and activated, its downloaded plugins installed
+  by Composer from `site-packages/composer.lock` (in the pinned Composer container, which sees only
+  `site-packages/`), copied in and checked against WordPress.org's checksums: Contact Form 7
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
   and its messages after sending ("sent" and "sending failed") from
   `config/booking-form-messages.json` (merged into Contact Form 7's own messages; staging and live
@@ -163,12 +165,19 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   workflow" button (`.github/workflows/check.yml`); a pull request merges only when both pass and
   it is up to date with `main`. A merge to `main` then deploys to staging without running them
   again (the same code was just tested).
-- `bin/versions-check`: compares the dev site's pinned plugins and theme (`tools/versions.sh`) with
-  WordPress.org and reports what is behind, changing nothing. Every Monday GitHub runs it with
-  `--act` (`.github/workflows/versions.yml`, plan 8j): a plugin released at least 7 days ago gets a
-  pull request raising its pin; the theme gets an issue only. The user clicks "Approve and run"
-  on the pull request, which GitHub requires before testing a pull request its own token opened,
-  and merges it on GitHub once its checks pass (`docs/ROUTINES.md`).
+- `site-packages/`: the downloaded plugins the site runs (template plan T8), WordPress.org's
+  through WPackagist, at exact versions in `composer.json`, with `composer.lock` recording the
+  download addresses (all on `downloads.wordpress.org`, which the review gate checks in every
+  change to the lock file). Separate from the top-level `composer.json`, which holds only the
+  code-checking tools. Dependabot proposes each plugin's update as its own pull request, a release
+  at least 7 days old (`.github/dependabot.yml`); the user merges it on GitHub once its checks
+  pass, and staging and live get it in the monthly check (`docs/ROUTINES.md`). WPackagist is
+  needed only to change a version: installing from the lock file goes straight to WordPress.org.
+- `bin/versions-check`: compares the dev site's pinned parent theme (`tools/versions.sh`) with
+  WordPress.org and reports whether it is behind, changing nothing. Every Monday GitHub runs it
+  with `--act` (`.github/workflows/versions.yml`, plan 8j), which opens an issue for a theme
+  release at least 7 days old; its pin holds a fingerprint taken by hand, so it is raised in a
+  session. The workflow can read the repository and open issues, nothing more.
 - `bin/screenshots previews | baseline | compare` (plan D29): a before/after check of the look with
   the real content, for restyling; local only, never a gate. It shows each real page from
   `data/content/` (listed in its `pages.json`; photos written `{{photo:<file>}}` from
@@ -248,8 +257,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   *Why:* one text cannot drift from another; the commits credit both the user (author) and
   Claude (co-author), so a pull request line crediting only Claude would misstate the work.
   Exception: Dependabot's update commits keep the messages Dependabot writes
-  (`.github/dependabot.yml` shapes their subject line), and so do the versions check's
-  (`bin/versions-check`, as GitHub Actions' bot); they are neither the user's nor Claude's work.
+  (`.github/dependabot.yml` shapes their subject line); they are neither the user's nor Claude's
+  work.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
