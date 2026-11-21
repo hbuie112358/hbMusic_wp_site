@@ -16,7 +16,9 @@ fail() { log "FAILED: $*"; exit 1; }
 
 # --progress quiet keeps Compose's "Container ..." lines out of captured output, so a failure
 # message shows what the command itself printed.
-dev_compose() { docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
+# The recipe's site part, compose.site.yaml, is written from site.json by bin/dev-site, which the
+# scenario checks run after.
+dev_compose() { docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$REPO_ROOT/compose.site.yaml" "$@"; }
 
 load_settings() {
   [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/dev-site first"

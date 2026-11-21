@@ -41,8 +41,10 @@ activates this theme and the checks read it, and both stop at once if the folder
 
 ### localPlugins
 
-The plugins kept in this repository, `plugins/<slug>/`, by their folder names, in the order the
-dev site activates them. They are mounted read-only into the dev site, so an edit shows at once.
+The plugins kept in this repository, `plugins/<slug>/`, by their folder names (lower-case letters,
+digits and dashes), in the order the dev site activates them. They are mounted read-only into the
+dev site, so an edit shows at once: the scripts write those mounts into `compose.site.yaml` from
+this list. A name without its folder stops `bin/check` and `bin/dev-site` at once.
 Example: `["song-list", "site-hardening"]`; an empty list for a site with none. Downloaded
 plugins (from WordPress.org, and later DTS's own) are not listed here but in
 `site-packages/composer.json`, at their exact versions.

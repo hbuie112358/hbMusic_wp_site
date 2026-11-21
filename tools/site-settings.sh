@@ -6,6 +6,8 @@
 readonly SITE_SETTINGS_FILE="$REPO_ROOT/site.json"
 readonly SITE_SETTINGS_EXPLANATION="$REPO_ROOT/tools/site-settings.md"
 readonly SITE_SETTINGS_RULES_DIR="$REPO_ROOT/tools"
+# Written from site.json (write_site_compose_file); ignored by git, never edited by hand.
+readonly SITE_COMPOSE_FILE="$REPO_ROOT/compose.site.yaml"
 
 # The rules as a jq module, followed by a program using them.
 site_settings_jq() {
@@ -58,6 +60,37 @@ site_settings_missing_test_pages() {
   while IFS= read -r address; do
     [[ -f "$content_dir/$address.html" ]] || printf '%s: the test page has no content file %s.html\n' "$address" "$address"
   done < <(jq -r '.testPages[].address' "$settings_file")
+}
+
+# Prints a line for each of a settings file's own plugins with no folder in the plugins folder,
+# starting with its name. Docker would otherwise mount an empty folder in its place.
+site_settings_missing_local_plugins() {
+  local settings_file="$1" plugins_dir="$2" plugin_slug
+  while IFS= read -r plugin_slug; do
+    [[ -d "$plugins_dir/$plugin_slug" ]] || printf '%s: listed in localPlugins, but no folder %s/%s\n' "$plugin_slug" "${plugins_dir#"$REPO_ROOT"/}" "$plugin_slug"
+  done < <(jq -r '.localPlugins[]' "$settings_file")
+}
+
+# Writes compose.site.yaml, the dev site's own part of its recipe, from site.json (template plan
+# 1.2f): the project's name ("<slug>-dev", which also names the database volume) and the folders
+# mounted read-only, the theme and each of the site's own plugins, for the site and for WP-CLI.
+# compose.dev.yaml holds the rest, the same for every site; Docker Compose merges the two. Written
+# whole by bin/dev-site, bin/check and bin/screenshots each time they start, so it follows
+# site.json; replaced in one step, so a reader never sees half a file.
+write_site_compose_file() {
+  local slug theme plugin_slug mounts
+  slug="$(site_setting .slug)"
+  theme="$(site_setting .theme)"
+  mounts="      - ./themes/$theme:/var/www/html/wp-content/themes/$theme:ro"$'\n'
+  while IFS= read -r plugin_slug; do
+    mounts+="      - ./plugins/$plugin_slug:/var/www/html/wp-content/plugins/$plugin_slug:ro"$'\n'
+  done < <(site_settings_query '.localPlugins[]')
+  {
+    printf '# Written from site.json by tools/site-settings.sh (write_site_compose_file); do not edit:\n'
+    printf '# bin/dev-site, bin/check and bin/screenshots write it again. The rest is in compose.dev.yaml.\n'
+    printf 'name: %s-dev\n\nservices:\n  wordpress:\n    volumes:\n%s  cli:\n    volumes:\n%s' "$slug" "$mounts" "$mounts"
+  } >"$SITE_COMPOSE_FILE.new"
+  mv "$SITE_COMPOSE_FILE.new" "$SITE_COMPOSE_FILE"
 }
 
 # Prints a line, starting with "theme", when a settings file's theme names no folder in the themes

@@ -14,7 +14,8 @@ def site_settings_rules: {
     devSiteTitle: { type: "string", required: true },
     # A folder name under themes/, never a path: the same characters as the slug.
     theme: { type: "string", required: true, pattern: "^[a-z0-9][a-z0-9-]*$", patternMeaning: "a folder name under themes/: lower-case letters, digits and dashes, starting with a letter or digit" },
-    localPlugins: { type: "array", required: true, items: { type: "string" } },
+    # Folder names under plugins/, never paths: they become mounts in compose.site.yaml.
+    localPlugins: { type: "array", required: true, items: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$", patternMeaning: "a folder name under plugins/: lower-case letters, digits and dashes, starting with a letter or digit" } },
     testPages: {
       type: "array", required: true,
       items: {

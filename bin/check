@@ -26,6 +26,7 @@ readonly SITE_SETTINGS_BAD_EXAMPLES=(
   'unknown-field.json|testPages[0].adress'
   'wrong-type.json|testPages[0].isInMenu'
   'bad-slug.json|slug'
+  'bad-local-plugin.json|localPlugins[0]'
 )
 readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
   'explanation-missing-field.md|theme'
@@ -87,9 +88,10 @@ in_analysis() {
 }
 
 load_check_settings() {
-  local slug theme_problem
-  theme_problem="$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
-  [[ -z "$theme_problem" ]] || { log "site.json: $theme_problem"; exit 1; }
+  local slug folder_problems
+  # Every check below reads these folders; a missing one would fail them with unrelated errors.
+  folder_problems="$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")$(site_settings_missing_local_plugins "$SITE_SETTINGS_FILE" "$REPO_ROOT/plugins")"
+  [[ -z "$folder_problems" ]] || { log "site.json: $(paste -sd ';' <<<"$folder_problems")"; exit 1; }
   slug="$(site_setting .slug)"
   SITE_PHP_PREFIX="${slug^^}"
   SITE_PHP_PREFIX="${SITE_PHP_PREFIX//-/_}"
@@ -228,26 +230,42 @@ site_packages_downloads_from_wordpress_org() {
 # a test page without its content file, a plugin it cannot install, and the booking form without its plugin are each
 # refused, naming what is wrong; the good examples are accepted.
 dev_site_refusals_refuse_bad_examples() {
-  local examples="$DEV_SITE_EXAMPLES_DIR" failed=0
-  expect_refusal "lock-plugin-and-tool-update.json" "composer/installers" \
-    "$(site_packages_not_plugins_only "$examples/lock-with-form-plugin.json" "$examples/lock-plugin-and-tool-update.json")" || failed=1
-  # Dependabot's own Composer drops bookkeeping such as "published-time" (seen on #80): not a change.
-  expect_acceptance "lock-plugin-update.json" \
-    "$(site_packages_not_plugins_only "$examples/lock-with-form-plugin.json" "$examples/lock-plugin-update.json")" || failed=1
-  expect_refusal "lock-with-foreign-download.json" "wpackagist-plugin/example-plugin" \
-    "$(site_packages_download_problems "$examples/lock-with-foreign-download.json")" || failed=1
+  local failed=0
+  site_folder_refusals_refuse_bad_examples || failed=1
+  site_package_refusals_refuse_bad_examples || failed=1
+  return "$failed"
+}
+
+# site.json's folders and pages: the theme, the site's own plugins and the test pages' content.
+site_folder_refusals_refuse_bad_examples() {
+  local examples="$DEV_SITE_EXAMPLES_DIR" valid="$SITE_SETTINGS_EXAMPLES_DIR/valid.json" failed=0
   expect_refusal "missing-theme.json" "theme" \
     "$(site_settings_theme_problem "$examples/missing-theme.json" "$examples/themes")" || failed=1
+  expect_refusal "missing-local-plugin.json" "no-such-plugin" \
+    "$(site_settings_missing_local_plugins "$examples/missing-local-plugin.json" "$examples/plugins")" || failed=1
   expect_refusal "missing-test-page.json" "no-such-page" \
     "$(site_settings_missing_test_pages "$examples/missing-test-page.json" "$examples/dev-content")" || failed=1
+  expect_acceptance "the valid example's folders and pages" \
+    "$(site_settings_theme_problem "$valid" "$examples/themes")$(site_settings_missing_local_plugins "$valid" "$examples/plugins")$(site_settings_missing_test_pages "$valid" "$examples/dev-content")" || failed=1
+  return "$failed"
+}
+
+# site-packages/'s lock file: what may merge itself, where downloads come from, what can be installed.
+site_package_refusals_refuse_bad_examples() {
+  local examples="$DEV_SITE_EXAMPLES_DIR" good="$DEV_SITE_EXAMPLES_DIR/lock-with-form-plugin.json" failed=0
+  expect_refusal "lock-plugin-and-tool-update.json" "composer/installers" \
+    "$(site_packages_not_plugins_only "$good" "$examples/lock-plugin-and-tool-update.json")" || failed=1
+  # Dependabot's own Composer drops bookkeeping such as "published-time" (seen on #80): not a change.
+  expect_acceptance "lock-plugin-update.json" \
+    "$(site_packages_not_plugins_only "$good" "$examples/lock-plugin-update.json")" || failed=1
+  expect_refusal "lock-with-foreign-download.json" "wpackagist-plugin/example-plugin" \
+    "$(site_packages_download_problems "$examples/lock-with-foreign-download.json")" || failed=1
   expect_refusal "lock-with-other-plugin.json" "example-vendor/other-plugin" \
     "$(site_packages_unsupported_plugins "$examples/lock-with-other-plugin.json")" || failed=1
   expect_refusal "lock-without-form-plugin.json" "$FORM_PLUGIN_PACKAGE" \
     "$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-without-form-plugin.json")" || failed=1
-  expect_acceptance "the valid theme" "$(site_settings_theme_problem "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/themes")" || failed=1
-  expect_acceptance "the valid test pages" "$(site_settings_missing_test_pages "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/dev-content")" || failed=1
   expect_acceptance "lock-with-form-plugin.json" \
-    "$(site_packages_unsupported_plugins "$examples/lock-with-form-plugin.json")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-with-form-plugin.json")$(site_packages_download_problems "$examples/lock-with-form-plugin.json")" || failed=1
+    "$(site_packages_unsupported_plugins "$good")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$good")$(site_packages_download_problems "$good")" || failed=1
   return "$failed"
 }
 
@@ -457,8 +475,11 @@ actionlint_workflows() {
   docker run --rm -w /repo -v "$REPO_ROOT/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
 }
 
+# The dev site's recipe as Docker Compose reads it: the shared file and the site's own part, written
+# from site.json first (write_site_compose_file), with the example settings.
 compose_file_is_valid() {
-  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" \
+  write_site_compose_file
+  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" \
     --env-file "$REPO_ROOT/.env.example" config --quiet
 }
 

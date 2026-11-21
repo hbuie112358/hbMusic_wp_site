@@ -1,8 +1,10 @@
 # The dev site: a fresh WordPress with the child theme and scripted test content, for building
 # and testing the new theme and plugins (plan step 4b). It runs alone, also in CI, and never holds
 # real data. Never used in production.
-# Settings come from .env (the DEV_ names; bin/dev-site creates or completes it).
-name: hbmusic-dev
+# Settings come from .env (the DEV_ names; bin/dev-site creates or completes it). The site's own
+# part, its name and the folders it mounts (its theme and its own plugins), is compose.site.yaml,
+# written from site.json by bin/dev-site, bin/check and bin/screenshots (template plan 1.2f); this
+# file is the same for every site.
 
 x-wordpress-env: &wordpress-env
   WORDPRESS_DB_HOST: db
@@ -19,16 +21,6 @@ x-wordpress-env: &wordpress-env
     define( 'DISALLOW_FILE_EDIT', true );
     define( 'WP_DEBUG_LOG', true );
     define( 'WP_DEBUG_DISPLAY', false );
-
-# The child theme from the repository, read-only: WordPress can never write into the user's
-# files, and files the user creates on the host stay the user's (the permission check of 3c).
-x-theme-mount: &theme-mount ./themes/hbmusic-child:/var/www/html/wp-content/themes/hbmusic-child:ro
-# The Song List plugin, read-only for the same reasons.
-x-song-list-mount: &song-list-mount ./plugins/song-list:/var/www/html/wp-content/plugins/song-list:ro
-# The Site Hardening plugin, read-only for the same reasons; it sends the security headers.
-x-site-hardening-mount: &site-hardening-mount ./plugins/site-hardening:/var/www/html/wp-content/plugins/site-hardening:ro
-# The Editing Help plugin, read-only for the same reasons; it shows the content guide in the admin.
-x-editing-help-mount: &editing-help-mount ./plugins/editing-help:/var/www/html/wp-content/plugins/editing-help:ro
 
 services:
   db:
@@ -56,12 +48,11 @@ services:
     ports:
       # Bound to this computer only.
       - "127.0.0.1:${DEV_SITE_PORT:?set in .env}:80"
+    # The site's theme and its own plugins are mounted read-only by compose.site.yaml: WordPress
+    # can never write into the user's files, and files the user creates on the host stay the
+    # user's (the permission check of 3c).
     volumes:
       - wp_html:/var/www/html
-      - *theme-mount
-      - *song-list-mount
-      - *site-hardening-mount
-      - *editing-help-mount
       # Dev-only services: mail to Mailpit and a stand-in for Cloudflare. Never deployed.
       - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
@@ -88,10 +79,6 @@ services:
       WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
     volumes:
       - wp_html:/var/www/html
-      - *theme-mount
-      - *song-list-mount
-      - *site-hardening-mount
-      - *editing-help-mount
       # The dev-only services, as for the site: WP-CLI saving a page fetches its videos' pictures
       # (the theme, plan 9v), which must be answered here too, never by the real YouTube.
       - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro

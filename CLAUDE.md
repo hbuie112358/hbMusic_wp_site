@@ -141,9 +141,14 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   from ready to live, the full tests running three times). Every test runs even after a failure;
   exit status 1 if any failed.
 - Dev site: http://localhost:10102 (admin `/wp-admin`); mail inbox: http://localhost:10103.
-- `docker compose -f compose.dev.yaml stop` / `start`: stop and start without losing anything.
-- `docker compose -f compose.dev.yaml run --rm cli wp <command>`: WP-CLI against the dev site.
-- `docker compose -f compose.dev.yaml down -v` deletes the dev site's database and files (the
+- The dev site's recipe is two files (template plan 1.2f): `compose.dev.yaml`, the same for every
+  site, and `compose.site.yaml`, the site's own name and mounts, written from `site.json` by
+  `bin/dev-site`, `bin/check` and `bin/screenshots` (ignored by git; never edited). `.env`'s
+  `COMPOSE_FILE` names both, so the commands below, typed in the repository's folder, use them.
+  After changing `site.json`, run `bin/dev-site` before typing them, so the written file follows.
+- `docker compose stop` / `start`: stop and start without losing anything.
+- `docker compose run --rm cli wp <command>`: WP-CLI against the dev site.
+- `docker compose down -v` deletes the dev site's database and files (the
   volumes); Claude runs it only when the user asks. `bin/dev-site` rebuilds them.
 - `bin/check`: every code check, in pinned containers (only Docker and `jq` on the host; it
   stops at once if `jq` is missing):
