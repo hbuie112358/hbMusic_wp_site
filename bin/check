@@ -100,16 +100,31 @@ load_check_settings() {
   readonly SITE_PHP_PREFIX SITE_THEME_DIR SITE_LOCAL_PLUGINS
 }
 
-# A plugin may be shared with other sites, so it must name nothing of this one: the words in
-# site.json's namesPluginsMustNotUse (the site's names and its host's), matched as plain text,
-# whatever their case; the repository's rules keep everything else out already.
-plugins_name_nothing_of_this_site() {
+# Code shared with other sites (the plugins, the tools) must name nothing of this one: the words in
+# site.json's namesSharedCodeMustNotUse (the site's names and its host's), matched as plain text,
+# whatever their case, in the files and folders given; the repository's rules keep everything else
+# out already. Prints each line found and fails if there is one.
+shared_code_names_nothing_of_this_site() {
   local name patterns=()
   while IFS= read -r name; do
     patterns+=(-e "$name")
-  done < <(site_settings_query '.namesPluginsMustNotUse[]')
+  done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
   ((${#patterns[@]} > 0)) || return 0
-  ! grep -rniF "${patterns[@]}" "$REPO_ROOT/plugins"
+  ! grep -rniF --exclude-dir=node_modules --exclude=package-lock.json --exclude=deploy-staging \
+    "${patterns[@]}" "$@"
+}
+
+plugins_name_nothing_of_this_site() {
+  shared_code_names_nothing_of_this_site "$REPO_ROOT/plugins"
+}
+
+# The tools, which every site will share (template plan 1.2g): the scripts, their helpers and
+# checker configurations, the GitHub workflows, and the dev site's shared recipe and settings
+# example. Left out: outside code (the CSS linter's installed packages and lock file) and
+# bin/deploy-staging, which names this site's staging folders and is replaced by bin/deploy (1.4).
+tools_name_nothing_of_this_site() {
+  shared_code_names_nothing_of_this_site "$REPO_ROOT/bin" "$REPO_ROOT/tools" "$REPO_ROOT/.github" \
+    "$REPO_ROOT/compose.dev.yaml" "$REPO_ROOT/.env.example"
 }
 
 # Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
@@ -526,6 +541,7 @@ run_standards_and_rule_checks() {
       --standard="plugins/$plugin_slug/phpcs.xml.dist" --basepath="plugins/$plugin_slug" "plugins/$plugin_slug"
   done
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
+  run_check "The tools name nothing of this site" tools_name_nothing_of_this_site
   run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
   run_check "site.json follows its rules" site_json_is_valid
   run_check "site.json's fields are explained" site_json_fields_explained

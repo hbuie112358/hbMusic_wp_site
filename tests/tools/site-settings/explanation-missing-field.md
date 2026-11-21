@@ -9,4 +9,4 @@
 ### testPages[].isFrontPage
 ### testPages[].isPrivacyPolicy
 ### testPages[].isInMenu
-### namesPluginsMustNotUse
+### namesSharedCodeMustNotUse

@@ -22,7 +22,7 @@ it instead of having any site's names written into them, so the same tools serve
 A short name for the site, used to name the dev site's storage in Docker (its database and
 download caches) and, from there, other names. Lower-case letters, digits and dashes only,
 starting with a letter or digit, since Docker allows few characters in its names. Example:
-`"hbmusic"`. Changing it gives the dev site new, empty storage and new caches; the old ones stay
+`"my-site"`. Changing it gives the dev site new, empty storage and new caches; the old ones stay
 until they are removed. The site's theme names its PHP constants after the slug too, in capitals
 with dashes as underscores (`"my-site"` gives `MY_SITE_`), and `bin/check` finds the theme's
 component list by that name (`MY_SITE_COMPONENT_STYLES`).
@@ -30,12 +30,12 @@ component list by that name (`MY_SITE_COMPONENT_STYLES`).
 ### devSiteTitle
 
 The title of the local dev site, shown in its browser tab and admin. Example:
-`"Howard Buie Music (dev)"`. Changing it changes only the dev site; the live site's title is set
+`"My Site (dev)"`. Changing it changes only the dev site; the live site's title is set
 in its own admin.
 
 ### theme
 
-The folder of the site's own theme under `themes/`. Example: `"hbmusic-child"`. It must match the
+The folder of the site's own theme under `themes/`. Example: `"my-site-child"`. It must match the
 folder's name exactly, in lower-case letters, digits and dashes (a name, not a path); the dev site
 activates this theme and the checks read it, and both stop at once if the folder is not there.
 
@@ -52,17 +52,17 @@ plugins (from WordPress.org, and later DTS's own) are not listed here but in
 ### testPages
 
 The pages the dev site is built with, in menu order. Their content comes from
-`tests/dev-content/<address>.html`, neutral sample text; the browser tests visit each one.
-Adding a page here needs its content file too.
+`tests/dev-content/<address>.html`, neutral sample text; the browser tests read this list and visit
+each one. Adding a page here needs its content file too, or `bin/dev-site` stops at once.
 
 ### testPages[].title
 
-The page's title, as the menu shows it. Example: `"Book"`.
+The page's title, as the menu shows it. Example: `"Contact"`.
 
 ### testPages[].address
 
 The page's address on the site, without slashes, which is also its content file's name.
-Example: `"hire-acoustic-guitarist"` for `/hire-acoustic-guitarist/`.
+Example: `"contact-us"` for `/contact-us/`.
 
 ### testPages[].pageTemplate
 
@@ -85,8 +85,10 @@ out: not the privacy page.
 `false` for a page linked from elsewhere (the footer) but not from the menu. Left out: the page is
 in the menu.
 
-### namesPluginsMustNotUse
+### namesSharedCodeMustNotUse
 
-Words that must not appear anywhere in the plugins' code: the site's own names and its host's.
-A plugin may be shared with other sites, so it must name nothing of this one. Example:
-`["hbmusic", "howard", "buie", "hostinger"]`. Matched without regard to case.
+Words that must not appear in the code shared with other sites: the site's own names and its
+host's. Shared code is the plugins and the tools (`bin/`, `tools/`, the GitHub workflows, the dev
+site's shared recipe and settings example), which serve every site, so they must name nothing of
+this one; `bin/check` searches them as plain text, without regard to case. Example:
+`["my-site", "jane", "doe", "examplehost"]`.

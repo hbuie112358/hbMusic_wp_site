@@ -11,5 +11,5 @@
 		{ "title": "Book", "address": "hire-acoustic-guitarist" },
 		{ "title": "Privacy Policy", "address": "privacy-policy", "isPrivacyPolicy": true, "isInMenu": false }
 	],
-	"namesPluginsMustNotUse": ["hbmusic", "howard", "buie", "hostinger"]
+	"namesSharedCodeMustNotUse": ["hbmusic", "howard", "buie", "hostinger"]
 }
