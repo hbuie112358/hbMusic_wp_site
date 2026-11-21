@@ -299,11 +299,20 @@ expect_acceptance() {
   return 1
 }
 
+# The versions check's alerts on known situations (tests/tools/versions-check/, template plan
+# 1.3c): which issues it would open for plugin updates left waiting and releases never proposed,
+# against stand-ins for GitHub and WordPress.org; nothing goes over the network.
+versions_check_alerts() {
+  bash "$REPO_ROOT/tests/tools/versions-check/run.sh"
+}
+
 shellcheck_scripts() {
-  local script scenario_scripts scripts=()
+  local script scenario_scripts tool_test_scripts scripts=()
   # The scenario checks sit in their groups' folders (template plan 1.3a).
   mapfile -t scenario_scripts < <(find "$REPO_ROOT/tests/scenario" -name '*.sh' -type f | sort)
-  for script in "$REPO_ROOT"/bin/* "${scenario_scripts[@]}"; do
+  # The tools' tests and their stand-in commands, which have no extension (tests/tools/, 1.3c).
+  mapfile -t tool_test_scripts < <(find "$REPO_ROOT/tests/tools" -type f \( -name '*.sh' -o -path '*/fakes/*' \) | sort)
+  for script in "$REPO_ROOT"/bin/* "${scenario_scripts[@]}" "${tool_test_scripts[@]}"; do
     scripts+=("/src/${script#"$REPO_ROOT"/}")
   done
   # -x follows the scenario checks' `source lib.sh` and bin/dev-site's `source tests/dev-setup.sh`;
@@ -549,6 +558,7 @@ run_standards_and_rule_checks() {
   run_check "site.json's fields are explained" site_json_fields_explained
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
   run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
+  run_check "The versions check's alerts" versions_check_alerts
 }
 
 run_analysis_and_file_checks() {

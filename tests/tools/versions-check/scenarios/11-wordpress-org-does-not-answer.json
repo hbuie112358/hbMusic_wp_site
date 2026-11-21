@@ -1,0 +1,9 @@
+{
+  "description": "WordPress.org does not answer for the plugin: the check fails, naming it, and opens nothing.",
+  "act": true,
+  "pullRequests": [],
+  "pluginUnanswered": true,
+  "expectedIssues": [],
+  "expectFailure": true,
+  "expectOutputNaming": "example-plugin"
+}

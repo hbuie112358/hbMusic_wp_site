@@ -1,0 +1,19 @@
+{
+  "description": "A Dependabot pull request changing a file outside site-packages/ too: not a plugin update, so no issue for it.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 104,
+      "daysOpen": 3,
+      "paths": [
+        "site-packages/composer.lock",
+        ".github/workflows/check.yml"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "FAILURE"
+      ]
+    }
+  ],
+  "expectedIssues": []
+}

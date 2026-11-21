@@ -1,0 +1,9 @@
+{
+  "description": "No update open and a plugin release 13 days old: Dependabot may still propose it, no issue.",
+  "act": true,
+  "pullRequests": [],
+  "newerPluginRelease": {
+    "daysOld": 13
+  },
+  "expectedIssues": []
+}

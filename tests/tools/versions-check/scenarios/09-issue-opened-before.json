@@ -1,0 +1,22 @@
+{
+  "description": "The issue for a waiting update was opened before and closed: not opened again.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 101,
+      "daysOpen": 5,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "FAILURE"
+      ]
+    }
+  ],
+  "existingIssues": [
+    "Plugin update #101 is waiting: its checks failed"
+  ],
+  "expectedIssues": []
+}

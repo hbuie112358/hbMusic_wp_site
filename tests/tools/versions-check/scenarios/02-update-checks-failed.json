@@ -1,0 +1,22 @@
+{
+  "description": "A plugin update open 3 days whose checks failed.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 101,
+      "daysOpen": 3,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "SUCCESS",
+        "FAILURE"
+      ]
+    }
+  ],
+  "expectedIssues": [
+    "Plugin update #101 is waiting: its checks failed"
+  ]
+}

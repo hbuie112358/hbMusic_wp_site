@@ -1,0 +1,20 @@
+{
+  "description": "Without --act the check reports a waiting update and opens no issue.",
+  "act": false,
+  "pullRequests": [
+    {
+      "number": 101,
+      "daysOpen": 3,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "FAILURE"
+      ]
+    }
+  ],
+  "expectedIssues": [],
+  "expectOutputNaming": "#101"
+}

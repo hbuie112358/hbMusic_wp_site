@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Stand-in for GitHub's command-line tool in the versions check's tests
+# (tests/tools/versions-check/run.sh), answering from files in FAKE_SERVICES_DIR:
+#   pr list      the open pull requests (pull-requests.json), filtered by the caller's --jq
+#   issue list   the issues ever opened (issues.json), filtered by the caller's --jq
+#   issue create records the title in created-issues.txt instead of opening anything
+# The queries the versions check depends on are required as it sends them (Dependabot's open pull
+# requests; issues in every state), so a changed query fails here rather than passing on a file
+# that no longer matches it. Anything else is refused.
+set -Euo pipefail
+
+option_value() {
+  local wanted="$1"
+  shift
+  while (($# > 1)); do
+    [[ "$1" == "$wanted" ]] && { printf '%s' "$2"; return 0; }
+    shift
+  done
+  return 1
+}
+
+require_options() {
+  local arguments=" $* " required
+  for required in "${REQUIRED[@]}"; do
+    [[ "$arguments" == *" $required "* ]] && continue
+    printf 'fake gh: the query lacks "%s": gh %s\n' "$required" "$*" >&2
+    exit 2
+  done
+}
+
+case "${1:-} ${2:-}" in
+  "pr list")
+    REQUIRED=("--author app/dependabot" "--state open")
+    require_options "$@"
+    jq -rc "$(option_value --jq "$@")" "$FAKE_SERVICES_DIR/pull-requests.json" ;;
+  "issue list")
+    REQUIRED=("--state all")
+    require_options "$@"
+    jq -rc "$(option_value --jq "$@")" "$FAKE_SERVICES_DIR/issues.json" ;;
+  "issue create")
+    option_value --title "$@" >>"$FAKE_SERVICES_DIR/created-issues.txt"
+    printf '\n' >>"$FAKE_SERVICES_DIR/created-issues.txt" ;;
+  *)
+    printf 'fake gh: not a call the versions check makes: gh %s\n' "$*" >&2
+    exit 2 ;;
+esac

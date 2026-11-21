@@ -18,10 +18,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.3c, permanent tests for the versions check's plugin-update alerts, then 1.3d
-  (T10, decided 2026-11-21; 1.2, the per-site settings file, done 2026-11-21, #77 to #85; 1.3a
-  and 1.3b, the tests sorted into their groups' folders and the component tests finding their
-  pages, done 2026-11-21).
+- **Next:** step 1.3d, the starting set of tests for a new site written down (T10, decided
+  2026-11-21; 1.2, the per-site settings file, done 2026-11-21, #77 to #85; 1.3a to 1.3c, the
+  tests sorted into their groups' folders, the component tests finding their pages and the
+  versions check's alerts tested, done 2026-11-21).
 - **Then, in order:** 1.4 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -259,7 +259,17 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       test measured a page ending with a carousel wrongly (its dots lie below its box), fixed in
       the test. Planted faults caught: the carousels' naming switched off (on the example page
       and Music), a plain section's bottom padding left at the end of the content (Home).
-  - [ ] 1.3c Permanent tests for the versions check's plugin-update alerts.
+  - [x] 1.3c Permanent tests for the versions check's plugin-update alerts (2026-11-21), in
+    `bin/check` on every run (the user: every time; they take about a second, and a broken
+    alarm stays silent): `tests/tools/versions-check/run.sh` runs the real script, copied with
+    the files it reads beside a lock file of one neutral plugin, against stand-ins for `gh` and
+    `curl` (`fakes/`, first on the search path, checked before each run; no GitHub login), and
+    compares the issues it would open in eleven situations (`scenarios/`: an update within its
+    3 days, failed, behind `main`, neither; a pull request beyond `site-packages/`; a release at
+    14 and 13 days, with an update open; an issue opened before; without `--act`;
+    WordPress.org not answering), dates counted back from the run. The stand-in `gh` requires
+    the queries as the script sends them. Planted faults caught: the 3 days made 4, a week of
+    6 days, the `site-packages/` filter removed, an issue opened again.
   - [ ] 1.3d The starting set for a new site written down (the template notes and this plan): the
     generic and component tests, and only the site tests its own features need.
 - [ ] **1.4 `bin/deploy`**, generic from the start: handbook chapter 2's eight steps. The rebuild

@@ -1,0 +1,22 @@
+{
+  "description": "An old plugin release while an update is open (and still within its wait): the update is how it is proposed, no issue.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 105,
+      "daysOpen": 1,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "PENDING"
+      ]
+    }
+  ],
+  "newerPluginRelease": {
+    "daysOld": 30
+  },
+  "expectedIssues": []
+}
