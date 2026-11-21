@@ -8,10 +8,11 @@ template project starts; until then, a list, not a to-do.
 
 ## The site's name and prefix
 
-- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), until template plan 1.2f
-  builds it from `site.json`'s `slug`. The database volume's name follows from it; since 1.2d it is
-  built from the slug (`load_site_volume_names` in `tools/site-settings.sh`), and the scenario
-  check `dev-settings-guard.sh` uses the same function.
+- `hbmusic-dev`, the Compose project name, and the dev site's mounts of the theme and the site's
+  own plugins: written from `site.json` into `compose.site.yaml` by the scripts since template plan
+  1.2f (`write_site_compose_file`); `compose.dev.yaml` is the same for every site. The database
+  volume's name follows from the slug too (`load_site_volume_names`, 1.2d), and the scenario check
+  `dev-settings-guard.sh` uses the same function.
 - The dev site's title and test pages: `site.json` (`devSiteTitle`, `testPages`, since template
   plan 1.2b), their text in `tests/dev-content/`; the dev admin and Editor in `.env.example`
   (`DEV_*`); the browser tests' own list of the same pages, `TEST_PATHS` in

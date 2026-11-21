@@ -56,7 +56,7 @@ source "$REPO_ROOT/tools/site-settings.sh"
 # shellcheck source=tools/site-packages.sh
 source "$REPO_ROOT/tools/site-packages.sh"
 
-compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
+compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" "$@"; }
 
 # The dev site holds no code of its own beyond the theme, so plugins and themes are loaded;
 # --skip-plugins is used only before WordPress is installed.
@@ -85,10 +85,12 @@ load_site_settings() {
     | map(tostring) | join("\u001f")')
   readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
   refuse_if_any "$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
+  refuse_if_any "$(site_settings_missing_local_plugins "$SITE_SETTINGS_FILE" "$REPO_ROOT/plugins")"
   refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_packages_download_problems "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
+  write_site_compose_file
 }
 
 # Stops the build with the problems found, one per line, if there are any. The checks behind it

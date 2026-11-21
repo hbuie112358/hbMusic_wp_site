@@ -18,8 +18,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.2f, the compose file's project name and plugin mounts from `site.json` (1.2e,
-  plugin updates merging themselves, built 2026-11-21; its first real test is Dependabot's #80).
+- **Next:** step 1.2g, the browser tests reading the test pages from `site.json`, and the check that
+  the tools name nothing of this site (1.2f, the compose file from `site.json`, done 2026-11-21;
+  1.2e's plugin auto-merge proven on #80, which merged itself).
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -152,9 +153,23 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     files outside `site-packages/`. Tightened the same day (the user): only WordPress.org plugins
     in the lock file may merge themselves, the weekly group holds only them, and the exception
     to the AI security rules is recorded in T9.
-  - [ ] 1.2f The compose file's project name and plugin mounts from it. Not verified: whether
-    Docker Compose fills in a variable in `name:`; checked before this part is built, and if not,
-    `bin/dev-site` passes the name on the command line.
+  - [x] 1.2f The compose file's project name and plugin mounts from it (2026-11-21). Checked
+    first: Docker Compose 5.6 fills in a variable in `name:` (Docker's documentation is silent;
+    tried on a throwaway file), a second compose file adds mounts to the first, and `.env`'s
+    `COMPOSE_FILE` lets a plain `docker compose` find both from the repository's folder. Weighed:
+    keeping the lines in `compose.dev.yaml` with a check against `site.json` (less machinery);
+    the user chose one place for the facts, since a check that only compares two copies must be
+    remembered and explained. Built: `compose.dev.yaml` the same for every site; the site's name
+    and read-only mounts written from `site.json` into `compose.site.yaml` (ignored by git, never
+    edited) by `bin/dev-site`, `bin/check` and `bin/screenshots` (`write_site_compose_file`);
+    `.env.example` gains `COMPOSE_FILE`, added to an existing `.env` by `bin/dev-site`, so the
+    hand-typed commands are shorter (`docker compose run --rm cli wp …`); `localPlugins` entries
+    limited to folder names, and one without its folder stops `bin/check` and `bin/dev-site` at
+    once (a broken example each). Proven: Docker reads the two files exactly as the old one
+    (`docker compose config`, every service, setting and mount, only the unused mount labels
+    gone); the rebuild identical to 1.2d's snapshot apart from Yoast 28.9 (#80); the hand-typed
+    form tried; planted faults caught (a plugin without its folder, one first missed by
+    `bin/check` and fixed; a path as a plugin name; the written file deleted and written again).
   - [ ] 1.2g The browser tests reading the test pages from it (`theme.spec.ts`'s own list goes),
     and the new check that the tools name nothing of this site.
   Staying with the site, not in `site.json`: the test pages' content (`tests/dev-content/`),
