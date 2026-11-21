@@ -11,8 +11,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 ## Current position
 
 - **Where the work stands:** planned 2026-11-20 (T1-T4); step 1.1 decided 2026-11-21 (T5, T6);
-  `site.json` built (1.2a) and read by `bin/dev-site` (1.2b), the downloaded plugins pinned with
-  Composer (1.2c), 2026-11-21 (#77 to #79). The plan reviewed the
+  step 1.2, the per-site settings file, done (#77 to #85); 1.3a to 1.3c done (#86 to #89): the
+  tests in their groups' folders, the components' example page, each component tested on every
+  page using it (246 browser tests), the versions check's alerts tested, all 2026-11-21. The plan reviewed the
   same day as a whole for overkill and gaps (the user's request): pinning moves to Composer (T8);
   new sites start with fewer site tests (1.3); `bin/detach` stays, built in 2.1; a routine for a
   new site's first content and a developer guide added (2.4). The GitHub organization
