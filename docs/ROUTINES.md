@@ -108,6 +108,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    means a copy was saved in the Site Editor, which overrides the theme's file and no longer
    follows the code. Then ask Claude in a session to compare it with the theme's file and fold
    in any change worth keeping, and only then choose Reset.
+10. **GitHub:** anything open in the repository's **Pull requests** or **Issues** tabs? A plugin
+    update normally merges itself; one still open, or an issue the weekly check opened, needs a
+    look (see "When GitHub proposes a new plugin version" below). A safety net in case an email
+    was missed.
 
 **What it protects:**
 - Steps 1-2 prove the whole path a visitor's request takes (the form, FluentSMTP, Brevo, Gmail),
@@ -183,23 +187,26 @@ The privacy policy promises a reply within 30 days, usually within a few days.
 ## When GitHub proposes a new plugin version
 
 Every Monday Dependabot compares the dev site's plugins (`site-packages/composer.json`) with
-WordPress.org (template plan T8). A plugin released at least a week ago arrives as an email about
-a pull request, such as "Bump wpackagist-plugin/contact-form-7 from 6.2.5 to 6.2.6". Nothing else
-is needed on the user's computer, and no session with Claude:
+WordPress.org (template plan T8, T9). Releases at least a week old arrive together in one pull
+request, such as "Bump the site-plugins group in /site-packages". **Normally nothing is needed:**
+its checks run by themselves (the dev site rebuilt with the new versions, every file checked
+against WordPress.org's checksums, every test), and once they pass it merges itself. GitHub's
+emails about it can be read and archived.
 
-1. Open the pull request from the email, or the repository's **Pull requests** tab on GitHub.
-2. Its checks start by themselves. About 4 minutes later, **green ticks** for `check` and
-   `dev-site`: the new version passed the dev site's tests, including WordPress.org's checksum
-   check of every file.
-3. Look at its **Files changed**: `composer.json` and `composer.lock`, and in the lock file the new
-   download address still on `downloads.wordpress.org`.
-4. **Rebase and merge**, then **Delete branch**. GitHub allows the merge only once the checks
-   pass.
-5. The new version reaches staging and live in the next monthly check (step 6), now as a tested
-   one.
+The new versions reach staging and live only in the next monthly check (step 6), as tested ones.
 
-**Red crosses:** the new version breaks something the tests protect. Nothing is merged, and
-staging and live stay on their version until it has been looked at with Claude.
+**When it needs the user,** the weekly versions check opens an issue after 3 days, which GitHub
+emails, titled "Plugin update #… is waiting: …":
+- **its checks failed:** a new version breaks something the tests protect. Nothing is merged, and
+  staging and live stay on their versions until it has been looked at with Claude. The failing
+  check names the plugin.
+- **it is behind main:** something else was merged after it was opened. Click **Update branch** on
+  its page; its checks run again and it merges itself. (Dependabot brings its pull requests up to
+  date only when they conflict.)
+- **it has not merged** for another reason: open it and read what GitHub says at the bottom.
+
+An issue titled "Dependabot has not proposed …" means a plugin's release is 14 days old with no
+update proposed: Dependabot's run may have failed. Ask Claude in a session.
 
 **An issue about Twenty Twenty-Five**, from the weekly versions check (`bin/versions-check`, plan
 8j), instead of a pull request: the theme's pin includes a fingerprint taken by hand, so a new

@@ -1,0 +1,50 @@
+# Lets Dependabot's weekly plugin update merge itself once its checks pass (template plan T9): only
+# a pull request opened by Dependabot into main that changes nothing but site-packages/. It
+# switches on GitHub's auto-merge, by rebase as the project merges; the required checks (check,
+# dev-site) still decide, and the merge changes nothing on staging or live, which get a tested
+# version only when the user deploys. A pull request that fails, or falls behind main, stays open,
+# and the weekly versions check opens an issue about it after a few days (versions.yml).
+#
+# Nothing from the pull request runs here: no checkout, only GitHub's own API.
+name: plugin-updates
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+# Nothing by default; the one job asks for what switching on auto-merge needs.
+permissions: {}
+
+concurrency:
+  group: plugin-updates-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-merge:
+    # Dependabot's own pull requests into main only; Dependabot's workflows get a read-only token
+    # unless the permissions below raise it.
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Change only site-packages/?
+        id: scope
+        run: |
+          outside="$(gh pr view "$PR_URL" --json files --jq '.files[].path' | grep -v '^site-packages/' || true)"
+          if [ -n "$outside" ]; then
+            echo "Changes outside site-packages/, so this pull request waits for the user:"
+            printf '  %s\n' "$outside"
+            echo "only-site-packages=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "only-site-packages=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Switch on auto-merge (by rebase, once the required checks pass)
+        if: steps.scope.outputs.only-site-packages == 'true'
+        run: gh pr merge --auto --rebase "$PR_URL"

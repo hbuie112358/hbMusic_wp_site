@@ -211,11 +211,25 @@ expect_explanation_difference() {
   return 1
 }
 
-# bin/dev-site's refusals, tried on known examples (tests/tools/dev-site/): a theme with no folder,
+# Every WordPress.org plugin in site-packages/composer.lock downloads from WordPress.org's own
+# server; the lock file's addresses come from WPackagist, a third party (template plan T8).
+site_packages_downloads_from_wordpress_org() {
+  local problems
+  problems="$(site_packages_download_problems "$SITE_PACKAGES_LOCK")"
+  [[ -z "$problems" ]] && return 0
+  log "site-packages/composer.lock downloads from outside WordPress.org:"
+  printf '%s\n' "$problems" | sed 's/^/    /' >&2
+  return 1
+}
+
+# bin/dev-site's refusals, and the site packages' download check, tried on known examples
+# (tests/tools/dev-site/): a download from outside WordPress.org, a theme with no folder,
 # a test page without its content file, a plugin it cannot install, and the booking form without its plugin are each
 # refused, naming what is wrong; the good examples are accepted.
 dev_site_refusals_refuse_bad_examples() {
   local examples="$DEV_SITE_EXAMPLES_DIR" failed=0
+  expect_refusal "lock-with-foreign-download.json" "wpackagist-plugin/example-plugin" \
+    "$(site_packages_download_problems "$examples/lock-with-foreign-download.json")" || failed=1
   expect_refusal "missing-theme.json" "theme" \
     "$(site_settings_theme_problem "$examples/missing-theme.json" "$examples/themes")" || failed=1
   expect_refusal "missing-test-page.json" "no-such-page" \
@@ -227,7 +241,7 @@ dev_site_refusals_refuse_bad_examples() {
   expect_acceptance "the valid theme" "$(site_settings_theme_problem "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/themes")" || failed=1
   expect_acceptance "the valid test pages" "$(site_settings_missing_test_pages "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/dev-content")" || failed=1
   expect_acceptance "lock-with-form-plugin.json" \
-    "$(site_packages_unsupported_plugins "$examples/lock-with-form-plugin.json")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-with-form-plugin.json")" || failed=1
+    "$(site_packages_unsupported_plugins "$examples/lock-with-form-plugin.json")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-with-form-plugin.json")$(site_packages_download_problems "$examples/lock-with-form-plugin.json")" || failed=1
   return "$failed"
 }
 
@@ -470,6 +484,7 @@ run_dependency_checks() {
   run_check "Composer security audit" in_composer composer audit --no-interaction
   run_check "Site packages: lock file matches composer.json" in_site_packages composer validate --strict --no-check-all --no-check-publish
   run_check "Site packages: security audit" in_site_packages composer audit --locked --no-interaction
+  run_check "Site packages: downloads come from WordPress.org" site_packages_downloads_from_wordpress_org
   run_check "npm security audit (browser tests)" npm_audit tests/e2e
   run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
 }

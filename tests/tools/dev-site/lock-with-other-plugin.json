@@ -3,7 +3,11 @@
     {
       "name": "wpackagist-plugin/example-plugin",
       "version": "1.0.0",
-      "type": "wordpress-plugin"
+      "type": "wordpress-plugin",
+      "dist": {
+        "type": "zip",
+        "url": "https://downloads.wordpress.org/plugin/example-plugin.1.0.0.zip"
+      }
     },
     {
       "name": "example-vendor/other-plugin",
