@@ -46,6 +46,12 @@ new findings added as steps.
   (`bin/deploy`, ending D33's exception; until then a change reaches live as a zip uploaded by
   hand), item 3's parts 3-3 to 3-9, item 4, item 5b, 9o (restore test), 9q, 9r, 9s, then 6b, 6c
   and 7.
+- **Found 2026-11-21 (template plan 1.4a), not yet looked into:** 9w, live's PHP error log
+  (Hostinger's `~/.logs/`, one file per site) holds 13 lines, the last four (18 to 20 November)
+  "WordPress database error Commands out of sync" on Wordfence's `wp_wfhits` (`wfLog->logHit`);
+  staging's holds one, 10 November, a cron reschedule error for Action Scheduler's
+  `action_scheduler_run_queue` (`invalid_schedule`, "every_minute"). Read before 9n, so the
+  cleanup does not hide a cause.
 - **Next, in order (the user, 2026-11-14):**
   1. `[x]` The Privacy Policy review, done 2026-11-15: staging's page rewritten from the
      handbook's model (`customer/privacy-policy.md`, the `videos-scroll` block until the
