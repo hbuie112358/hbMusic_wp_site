@@ -2,14 +2,14 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-20T07:17:00-05:00
-# The pause commits are on the branch chore/pause-2026-11-17-evening until the user says "push";
-# then main. last_commit is HEAD before this pause commit: the previous pause commit, on top of
-# main's a1e5271, "fix(theme): no black space above the click-to-load videos" (#74).
-current_branch: chore/pause-2026-11-17-evening
-last_commit: eadc33f
+timestamp: 2026-11-20T18:00:00-05:00
+# The pause commit is on the branch chore/pause-2026-11-20 until the user says "push"; then main.
+# last_commit is main's tip before the pause commit, after #75 (the template plan and the
+# withdrawn npm advisory) merged.
+current_branch: chore/pause-2026-11-20
+last_commit: b1317da
 working_mode: rolling-wave
-active_plan: docs/planning/rebuild-plan.md
+active_plan: docs/planning/template-plan.md
 
 last_work: >
   2026-11-02: live site secured and current (step 0), inventory (2), local tooling (3a-3f),
@@ -228,12 +228,27 @@ last_work: >
   files changed; the child theme's PHP (functions.php, includes/, patterns/) read through and
   explained, and how to ask Google to show the pages' new search wording (Search Console). 9u
   not started.
+  Later on 2026-11-20 (after a resume): the brochure-site template, to start the user's second
+  site from it, chosen before this site's remaining items (9u kept waiting). Talked through: a
+  WooCommerce template later comes from a real shop (D18); the template is three pieces (plugin
+  repositories, dts-site-tools, dts-site-starter, handbook chapter 7); a repository per plugin
+  with reusable workflows (T2, after weighing one repository for all); the site tools made
+  generic in place, then moved (T1); time kept in this project (T3). The GitHub organization
+  direct-technical-solutions created by the user (renamed to lowercase), the handbook transferred
+  into it and its local copy re-pointed; the handbook's toolkit/github.md records the
+  organization's settings (a3ab02d, pushed). docs/planning/template-plan.md written, the active
+  plan now. #75 (the plan and the two pause commits) first failed bin/check: GitHub withdrew the
+  picomatch advisory on 2026-11-18, and bin/check refuses a stale exception; the exception list
+  emptied (3d2ffaa). Step 1.1(a) begun: the shared dts-site-components plugin explained.
+  Memory gained ask-before-every-commit, after Claude committed the handbook page without asking.
 
 next_action: >
-  9u (the booking form's message when the spam check fails: the box not ticked), giving the user
-  the steps one at a time; then item 5 (bin/deploy, ending D33's hand uploads), item 3's parts 3-3
-  to 3-8, item 4, 5b, 9o, 9q, 9r, 9s, then 6b, 6c and 7 (plan, Current position). 9n from about
-  2026-12-01. The npm advisory's review date is 2026-12-17.
+  The template plan's step 1.1(a): the user decides where the generic theme code lives (Claude
+  recommends the shared dts-site-components plugin, after or as the first step of a dev-site test
+  that a plugin's block styles show in the Site Editor as the theme's do); then 1.1(b), how a site
+  pulls in the pinned tools; then 1.2 to 1.6 (template plan, Current position). Kept waiting, not
+  forgotten: the rebuild plan's 9u, at the first break that suits the user. 9n from about
+  2026-12-01.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -254,7 +269,8 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 22 checks all passing; bin/test 11 scenario checks + 175 browser tests + the final debug-log check, all passing (2026-11-17, on a1e5271's code); bin/screenshots for before/after looks
+  checks: bin/check 22 checks all passing (locally 2026-11-20, the CSS linter's audit exceptions empty); bin/test 11 scenario checks + 175 browser tests + the final debug-log check, all passing (2026-11-17, on a1e5271's code; dev-site passed on #75); bin/screenshots for before/after looks
+  github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
@@ -265,7 +281,7 @@ verification:
 
 uncommitted_changes:
   - file: none in this repository
-    why: the plan and this file are the pause commits, on chore/pause-2026-11-17-evening (2 commits, not pushed; they wait for the user's "push"); main is even with origin/main at a1e5271
+    why: this file and the template plan's Current position are the pause commit, on chore/pause-2026-11-20 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #75
   - file: data/ (not versioned)
     why: >
       New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
@@ -283,15 +299,18 @@ uncommitted_changes:
   - file: the session scratchpad (deleted when the session ends)
     why: >
       Holds the learning session's write-up of the child theme's PHP (2026-11-18), which the user
-      copies if wanted; it is not part of the project. Everything else there is throwaway from
-      earlier work.
+      copies if wanted; it is not part of the project. Everything else there (#75's merge script
+      and logs included) is throwaway from earlier work.
 
 pending_decisions:
   - >
     The handbook's follow-ups for the user (the lawyer, the accountant, the payment service, the
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
-    handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is on GitHub as a
-    private repository on the user's account (all pushed, 2026-11-17).
+    handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is a private
+    repository in the organization direct-technical-solutions since 2026-11-20 (all pushed).
+  - >
+    The template plan's open decisions: step 1.1(a) and (b), and the second site's facts (a new
+    build or a takeover; the user's own or a customer's), in docs/planning/template-plan.md.
   - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
   - >
     For the user, not done yet (2026-11-20): in Search Console, URL Inspection, Test live URL, then
@@ -312,9 +331,12 @@ pending_decisions:
   - Decided 2026-11-17, kept for the record: the time report stays as it is (busy gaps over 10 minutes counted 0 lose about 42 minutes in the project so far).
 
 reference_documents: |
-  - docs/planning/rebuild-plan.md: the active plan. Current position (read first: where the work
-    stands, the next items in order, holds and open decisions), Decisions D1-D31, the steps with
+  - docs/planning/template-plan.md: the active plan (since 2026-11-20), the brochure-site
+    template. Current position, Decisions T1-T4, stage 1 and stage 2 steps.
+  - docs/planning/rebuild-plan.md: this site's plan, paused for the template. Current position
+    (9u kept waiting; item 5 is the template plan's step 1.4), Decisions D1-D34, the steps with
     their status and details (D29's story is step 5g), "Earlier positions (archived)" at the end.
+  - docs/planning/template-notes.md: what a new site sets differently, and what is generic.
   - CLAUDE.md (the project's): what is true of this project, its commands, tests and rules.
   - docs/ENVIRONMENTS.md: the intended differences between the dev site, staging and live.
   - docs/ROUTINES.md: the monthly site check.
@@ -329,6 +351,6 @@ reference_documents: |
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
-  2. working_mode is rolling-wave: read the plan's Current position, its Decisions table, and the
-     entries of step 9 (9m to 9v) and of the item in progress.
-  3. Then next_action: 9u, giving the user the steps for each item, one at a time.
+  2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
+     and the entries of steps 1.1 and 1.2; and the rebuild plan's Current position (9u waiting).
+  3. Then next_action: step 1.1(a), the user's decision, one question at a time.
