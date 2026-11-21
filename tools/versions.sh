@@ -24,6 +24,5 @@ readonly PARENT_THEME_SHA256="f333ce53aaa4049639298247d03480a4bd9b56fa8f0fea0440
 # The downloaded plugins (Contact Form 7, Yoast SEO) are pinned in site-packages/composer.json and
 # its lock file, and raised by Dependabot (template plan T8).
 
-# Download caches survive between runs in named volumes, not in the project folder.
-readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
-readonly NPM_CACHE_VOLUME="hbmusic_npm_cache"
+# The download caches' volume names are built from the site's slug (load_site_volume_names in
+# tools/site-settings.sh).

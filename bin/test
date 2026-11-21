@@ -10,6 +10,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 FAILED_TESTS=()
 
@@ -80,6 +82,7 @@ run_all_tests() {
 }
 
 main() {
+  load_site_volume_names || exit 1
   load_settings
   run_all_tests
   report

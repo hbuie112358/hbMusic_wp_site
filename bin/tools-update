@@ -12,6 +12,8 @@ readonly REPO_ROOT
 # The same images as bin/check and bin/test, so npm resolves with the Node that runs the tests.
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 log() { printf '%s [tools-update] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 trap 'log "ERROR: failed in ${FUNCNAME[*]:-main} (line $LINENO): $BASH_COMMAND"' ERR
@@ -54,6 +56,7 @@ update_npm_lock() {
 }
 
 main() {
+  load_site_volume_names || exit 1
   copy_composer_files_in
   log "Updating the tools within the limits in composer.json"
   run_update

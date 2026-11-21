@@ -73,11 +73,9 @@ require_tools() {
 # Reads the site's facts, after checking site.json against its rules, so a mistake in it stops
 # the build before anything is changed rather than halfway through.
 load_site_settings() {
-  local problems
-  [[ -f "$SITE_SETTINGS_FILE" ]] || fail "site.json is missing; tools/site-settings.md lists its fields"
+  # Checks site.json against its rules first, and names the Docker volumes from its slug.
+  load_site_volume_names || exit 1
   [[ -f "$SITE_PACKAGES_LOCK" ]] || fail "site-packages/composer.lock is missing; composer update in site-packages/ writes it"
-  problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || fail "site.json is not valid JSON"
-  refuse_if_any "$problems"
   CHILD_THEME="$(site_setting .theme)"
   DEV_SITE_TITLE="$(site_setting .devSiteTitle)"
   mapfile -t LOCAL_PLUGINS < <(site_settings_query '.localPlugins[]')
@@ -86,6 +84,7 @@ load_site_settings() {
     | [.title, .address, (.pageTemplate // ""), (.isFrontPage // false), (.isPrivacyPolicy // false), (if has("isInMenu") then .isInMenu else true end)]
     | map(tostring) | join("\u001f")')
   readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
+  refuse_if_any "$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
   refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"

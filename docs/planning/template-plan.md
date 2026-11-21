@@ -18,8 +18,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.2d, `bin/check` reading `site.json` (1.2c, the plugins through Composer, done
-  2026-11-21).
+- **Next:** step 1.2e, the compose file's project name and plugin mounts from `site.json` (1.2d,
+  `bin/check` reading it, done 2026-11-21).
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -110,12 +110,26 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     `tests/tools/dev-site/`. Proven: the rebuild identical to 1.2b's snapshot; full `bin/test`
     passed (175 browser tests); four planted faults caught (three stopping `bin/dev-site` at its
     start, one, the booking refusal broken, caught only by the new examples).
-  - [ ] 1.2d `bin/check` reading it (the theme folder, each plugin's coding standards, the names
-    the plugins must not use), and the volume and cache names built from the slug.
-    First in this step (the user, 2026-11-21, from 1.2c's review): `bin/check`'s `main` is 31
-    lines, over the coding standards' 25 (1.2a took it to 28, missed at that review, and 1.2c to
-    31); split it into short groups (dependency, code and project checks), the same checks in the
-    same order, proven by `bin/check` running all of them.
+  - [x] 1.2d `bin/check` reading it (2026-11-21). First, as the user asked at 1.2c's review:
+    `bin/check`'s `main` (31 lines) split into three groups of neighboring checks, the same
+    checks in the same order (dependencies; coding standards and the project's rules; analysis
+    and file checks), `main` now 9 lines. Then: the theme folder and the theme's PHP prefix (the
+    slug in capitals) from `site.json`; one coding-standards check per `localPlugins` entry; the
+    words plugins must not use from `namesPluginsMustNotUse`, matched as plain text. The cache
+    and dev-database volume names built from the slug by one shared function
+    (`load_site_volume_names`), used by `bin/check`, `bin/dev-site`, `bin/test`,
+    `bin/screenshots`, `bin/tools-update` and the scenario check of the `.env` safety stop; the
+    same names as before, so nothing was lost. `slug` gained a rule (lower-case letters, digits
+    and dashes), since Docker allows few characters, with its broken example. `jq` is now needed
+    by all these scripts, stated in the project's `CLAUDE.md`. Proven: `bin/check` 28 checks
+    passing; planted faults caught (a slug Docker would refuse stopping `bin/check`,
+    `bin/dev-site` and `bin/test` at once; a planted word in capitals; a word with a pattern
+    character matched only as text); the rebuild identical to 1.2c's snapshot; full `bin/test`
+    passed (175 browser tests, the safety stop's scenario check reading the shared name). At
+    review, two LOW findings fixed (the user): the theme's PHP prefix convention written into
+    `tools/site-settings.md`, and a `theme` naming no folder now stopping `bin/check` and
+    `bin/dev-site` at once (a shared function with its broken example), `theme` limited to a
+    folder name like the slug, so a path such as `../plugins` is refused.
   - [ ] 1.2e The compose file's project name and plugin mounts from it. Not verified: whether
     Docker Compose fills in a variable in `name:`; checked before this part is built, and if not,
     `bin/dev-site` passes the name on the command line.

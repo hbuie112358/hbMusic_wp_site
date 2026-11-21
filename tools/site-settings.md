@@ -19,9 +19,13 @@ it instead of having any site's names written into them, so the same tools serve
 
 ### slug
 
-A short name for the site, in lower case, used to name the dev site's storage (its database and
-download caches). Example: `"hbmusic"`. Changing it gives the dev site new, empty storage; the
-old one stays until it is removed.
+A short name for the site, used to name the dev site's storage in Docker (its database and
+download caches) and, from there, other names. Lower-case letters, digits and dashes only,
+starting with a letter or digit, since Docker allows few characters in its names. Example:
+`"hbmusic"`. Changing it gives the dev site new, empty storage and new caches; the old ones stay
+until they are removed. The site's theme names its PHP constants after the slug too, in capitals
+with dashes as underscores (`"my-site"` gives `MY_SITE_`), and `bin/check` finds the theme's
+component list by that name (`MY_SITE_COMPONENT_STYLES`).
 
 ### devSiteTitle
 
@@ -32,7 +36,8 @@ in its own admin.
 ### theme
 
 The folder of the site's own theme under `themes/`. Example: `"hbmusic-child"`. It must match the
-folder's name exactly; the dev site activates this theme and the checks read it.
+folder's name exactly, in lower-case letters, digits and dashes (a name, not a path); the dev site
+activates this theme and the checks read it, and both stop at once if the folder is not there.
 
 ### localPlugins
 

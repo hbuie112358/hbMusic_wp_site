@@ -3,11 +3,10 @@
 # secrets, new settings are appended, and every setting the script needs is checked. Sourced,
 # never run.
 #
-# The sourcing script defines REPO_ROOT, ENV_FILE, REQUIRED_SETTINGS (an array), log and fail.
-
-# The dev site's database keeps the passwords it was first started with, so a new .env is refused
-# while that database exists.
-readonly SETTINGS_DATABASE_VOLUMES=(hbmusic-dev_db_data)
+# The sourcing script defines REPO_ROOT, ENV_FILE, REQUIRED_SETTINGS (an array), log and fail, and
+# DEV_DATABASE_VOLUME, the dev site's database volume (load_site_volume_names in
+# tools/site-settings.sh). The dev site's database keeps the passwords it was first started
+# with, so a new .env is refused while that database exists.
 
 random_secret() { od -An -N24 -tx1 /dev/urandom | tr -d ' \n'; }
 
@@ -19,10 +18,7 @@ expand_setting_line() {
 }
 
 existing_database_volumes() {
-  local volume
-  for volume in "${SETTINGS_DATABASE_VOLUMES[@]}"; do
-    docker volume inspect "$volume" >/dev/null 2>&1 && printf '%s ' "$volume"
-  done
+  docker volume inspect "$DEV_DATABASE_VOLUME" >/dev/null 2>&1 && printf '%s ' "$DEV_DATABASE_VOLUME"
   return 0
 }
 

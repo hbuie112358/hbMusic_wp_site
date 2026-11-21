@@ -25,6 +25,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 readonly CONTENT_DIR="${SCREENSHOTS_CONTENT_DIR:-$REPO_ROOT/data/content}"
 readonly PHOTOS_DIR="${SCREENSHOTS_PHOTOS_DIR:-$REPO_ROOT/data/photos/web}"
@@ -178,6 +180,7 @@ main() {
     previews | baseline | compare) ;;
     *) fail "usage: bin/screenshots previews | baseline | compare" ;;
   esac
+  load_site_volume_names || exit 1
   load_settings
   show_previews
   case "$command" in
