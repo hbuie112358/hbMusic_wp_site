@@ -2,12 +2,11 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-20T18:00:00-05:00
-# The pause commit is on the branch chore/pause-2026-11-20 until the user says "push"; then main.
-# last_commit is main's tip before the pause commit, after #75 (the template plan and the
-# withdrawn npm advisory) merged.
-current_branch: chore/pause-2026-11-20
-last_commit: b1317da
+timestamp: 2026-11-21T15:35:18-05:00
+# The pause commit is on the branch chore/pause-2026-11-21 until the user says "push"; then main.
+# last_commit is main's tip before the pause commit, after #89 (1.3c) merged.
+current_branch: chore/pause-2026-11-21
+last_commit: 488f547
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
@@ -241,14 +240,33 @@ last_work: >
   picomatch advisory on 2026-11-18, and bin/check refuses a stale exception; the exception list
   emptied (3d2ffaa). Step 1.1(a) begun: the shared dts-site-components plugin explained.
   Memory gained ask-before-every-commit, after Claude committed the handbook page without asking.
+  2026-11-21 (after a resume): decisions T5 to T10 (the shared components plugin; managed sites
+  central, handed-over ones detached with bin/detach; site.json; Composer and WPackagist for the
+  downloaded plugins in site-packages/; Dependabot's plugin updates merging themselves, a recorded
+  exception to AI_SECURITY's line-by-line reading; component tests finding their pages). Step 1.2
+  done (#77 to #85): site.json with its rules (tools/site-settings.jq/.md/.sh), bin/dev-site and
+  the tests reading it, the dev site's compose recipe split (compose.site.yaml written from it),
+  the plugins pinned in site-packages/ (Yoast 28.9 on the dev site, #80, merged by itself after
+  "@dependabot rebase"), the versions check's alerts for waiting and unproposed plugin updates,
+  checks that the plugins and tools name nothing of this site. Step 1.3a to 1.3c done (#86 to
+  #89): the tests sorted into generic/, components/, plugins/<plugin>/ and site/; one components'
+  example page on every dev site (/component-examples/, one page instead of one per component,
+  the user: run time); each component's tests on every page using it (pagesUsing), 186 to 246
+  browser tests, about 17 s more on GitHub; the versions check's alerts tested in eleven situations
+  against stand-ins for gh and curl, in bin/check every time (the user's choice). Found on the real
+  pages and fixed in form.css (aedde5e, the user's choice): the Book page's 22px of extra space
+  before the footer; deployed to staging with #88, not yet to live. Pipeline timing measured: push
+  to main passing about 5.5 minutes. Memory gained read-before-editing (the user: context is
+  summarized, only the file is reliable) and pause-and-compact-between-steps (usage allowance).
 
 next_action: >
-  The template plan's step 1.1(a): the user decides where the generic theme code lives (Claude
-  recommends the shared dts-site-components plugin, after or as the first step of a dev-site test
-  that a plugin's block styles show in the Site Editor as the theme's do); then 1.1(b), how a site
-  pulls in the pinned tools; then 1.2 to 1.6 (template plan, Current position). Kept waiting, not
-  forgotten: the rebuild plan's 9u, at the first break that suits the user. 9n from about
-  2026-12-01.
+  The template plan's step 1.3d: the starting set of tests for a new site written down (the
+  template notes and the plan: the generic and component tests, and only the site tests its own
+  features need); documentation only. Then 1.4 (bin/deploy, generic, delivering site-packages/'s
+  pinned plugins), 1.5, 1.6, then stage 2. Working approach (the user, 2026-11-21, to save usage):
+  at each step's end Claude says it is a good moment to pause and compact, never mid-step; the
+  user types /compact. Kept waiting, not forgotten: the rebuild plan's 9u, at the first break that
+  suits the user; Dependabot's #56 for the user to review; 9n from about 2026-12-01.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -269,38 +287,35 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 22 checks all passing (locally 2026-11-20, the CSS linter's audit exceptions empty); bin/test 11 scenario checks + 175 browser tests + the final debug-log check, all passing (2026-11-17, on a1e5271's code; dev-site passed on #75); bin/screenshots for before/after looks
+  checks: bin/check 31 checks all passing (2026-11-21, with "The versions check's alerts", eleven situations); bin/test 11 scenario checks (in tests/scenario/<group>/) + 246 browser tests (242 passed, 4 skipped with their reasons, in specs/dev/<group>/) + the final debug-log check, all passing (2026-11-21, locally and on #88/#89); bin/screenshots for before/after looks
+  staging_theme: deployed by main's run after each merge; latest 488f547 (#89), which includes the form.css fix (aedde5e); live still has the zip of a1e5271
+  dev_site_plugins: Contact Form 7 6.2.5 and Yoast SEO 28.9 (site-packages/composer.lock, #80); live and staging have Yoast 28.8 until the next deploy in the monthly check
   github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
-  dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter); alerts and security updates on; #43 and #44 reviewed line by line and merged 2026-11-12, none open
+  dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter, and site-packages/ with a 7-day wait); alerts and security updates on; plugin updates merge themselves once their checks pass (.github/workflows/plugin-updates.yml, T9; "Allow auto-merge" on); tools updates wait for the user, and one is open (2026-11-21, number 56)
   commit_identity: GitHub noreply address, set in this repository's git config only
   hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
   not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes:
   - file: none in this repository
-    why: this file and the template plan's Current position are the pause commit, on chore/pause-2026-11-20 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #75
+    why: this file and the template plan's Current position are the pause commit, on chore/pause-2026-11-21 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #89; no other local branches
   - file: data/ (not versioned)
     why: >
       New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
       data/exports/ (staging's and live's exports of 2026-11-17, the theme zips live-upload-181eef0
       to live-upload-a1e5271 with their SHA256SUMS), data/photos/web/howard-buie-share.png. Covered
       only by the user's off-computer backup of data/ (D27), which should be brought up to date.
-  - file: the dev site (not versioned)
-    why: >
-      Four "Unfiltered HTML probe" drafts left on it (IDs 23, 24, 43, 44): 43 and 44 most likely from
-      a full test run Claude started by mistake and stopped; 23 and 24 older, so
-      tests/scenario/dev-site-hardening.sh's cleanup may not be deleting its drafts. Not looked into
-      yet (an existing test); the next bin/dev-site clears them.
   - file: ~/.claude (the user commits it on the host)
     why: see the pause output's git status of ~/.claude.
   - file: the session scratchpad (deleted when the session ends)
     why: >
-      Holds the learning session's write-up of the child theme's PHP (2026-11-18), which the user
-      copies if wanted; it is not part of the project. Everything else there (#75's merge script
-      and logs included) is throwaway from earlier work.
+      Throwaway: the merge scripts (merge-86.sh to merge-89.sh; a new session writes its own by
+      the rules in memory's github-waits-in-background, with a 20-second wait before watching the
+      checks), run-specs.sh (runs chosen specs as bin/test does), probes and logs. The learning
+      write-up of 2026-11-18 is lost with it unless the user copied it.
 
 pending_decisions:
   - >
@@ -309,14 +324,20 @@ pending_decisions:
     handbook's WORKING_DRAFT.md, "Open items", not repeated here. The handbook is a private
     repository in the organization direct-technical-solutions since 2026-11-20 (all pushed).
   - >
-    The template plan's open decisions: step 1.1(a) and (b), and the second site's facts (a new
-    build or a takeover; the user's own or a customer's), in docs/planning/template-plan.md.
+    The template plan's open decisions (its Current position): the handbook's wording for T5 and
+    T6, proposed when each is built; whether the new site's repository is public or private (2.5).
+  - >
+    Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to
+    review, later.
+  - >
+    Deploying to live in the monthly check: the form.css fix and Yoast 28.9 are on main and
+    staging, not live.
   - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
   - >
     For the user, not done yet (2026-11-20): in Search Console, URL Inspection, Test live URL, then
     Request indexing for the Book page (and any other page whose search wording changed), so
     Google shows the new "book" wording sooner; Google still chooses the snippet it shows.
-  - Whether to look into the Site Hardening check's leftover probe drafts (see uncommitted_changes).
+  - Whether to look into the Site Hardening check's leftover probe drafts (seen 2026-11-20; none on the dev site at this pause, after its rebuilds and test runs of 2026-11-21).
   - Optional, from the review of #74: a pasted-code video on a test page (the CSS for pasted players is kept but no longer shown on a test page; live has none). Claude advised leaving it out.
   - >
     Optional tidy-up: keep Search Console in the business Google account only (remove the other
@@ -332,7 +353,7 @@ pending_decisions:
 
 reference_documents: |
   - docs/planning/template-plan.md: the active plan (since 2026-11-20), the brochure-site
-    template. Current position, Decisions T1-T4, stage 1 and stage 2 steps.
+    template. Current position, Decisions T1-T10, stage 1 and stage 2 steps.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template. Current position
     (9u kept waiting; item 5 is the template plan's step 1.4), Decisions D1-D34, the steps with
     their status and details (D29's story is step 5g), "Earlier positions (archived)" at the end.
@@ -352,5 +373,5 @@ resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     and the entries of steps 1.1 and 1.2; and the rebuild plan's Current position (9u waiting).
-  3. Then next_action: step 1.1(a), the user's decision, one question at a time.
+     and the entries of steps 1.3 and 1.4; and the rebuild plan's Current position (9u waiting).
+  3. Then next_action: step 1.3d. At its end, say it is a good moment to pause and compact.
