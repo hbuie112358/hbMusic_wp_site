@@ -177,7 +177,7 @@ waiting_update_text() {
     "" \
     "**What to do** ($3)" \
     "- **Its checks failed:** a plugin's new version breaks something the tests protect. Don't merge; look at it with Claude in a session. The failing check names the plugin." \
-    "- **It is behind main:** click **Update branch** on its page. Its checks run again and it merges itself." \
+    "- **It is behind main:** on its page, write a comment containing only \`@dependabot rebase\`. Dependabot redoes the branch on top of main, its checks run again and it merges itself. (Not **Update branch**, which stops Dependabot looking after it.)" \
     "- **It has not merged** for another reason: open it and look at what GitHub says at the bottom of the page." \
     "" \
     "Staging and live are not affected: they get a plugin's new version only when the user deploys it." \

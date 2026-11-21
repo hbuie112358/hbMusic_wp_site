@@ -222,12 +222,18 @@ site_packages_downloads_from_wordpress_org() {
   return 1
 }
 
-# bin/dev-site's refusals, and the site packages' download check, tried on known examples
-# (tests/tools/dev-site/): a download from outside WordPress.org, a theme with no folder,
+# bin/dev-site's refusals, and the site packages' rules, tried on known examples
+# (tests/tools/dev-site/): an update that changes more than WordPress.org plugins (it may not merge
+# itself), a download from outside WordPress.org, a theme with no folder,
 # a test page without its content file, a plugin it cannot install, and the booking form without its plugin are each
 # refused, naming what is wrong; the good examples are accepted.
 dev_site_refusals_refuse_bad_examples() {
   local examples="$DEV_SITE_EXAMPLES_DIR" failed=0
+  expect_refusal "lock-plugin-and-tool-update.json" "composer/installers" \
+    "$(site_packages_not_plugins_only "$examples/lock-with-form-plugin.json" "$examples/lock-plugin-and-tool-update.json")" || failed=1
+  # Dependabot's own Composer drops bookkeeping such as "published-time" (seen on #80): not a change.
+  expect_acceptance "lock-plugin-update.json" \
+    "$(site_packages_not_plugins_only "$examples/lock-with-form-plugin.json" "$examples/lock-plugin-update.json")" || failed=1
   expect_refusal "lock-with-foreign-download.json" "wpackagist-plugin/example-plugin" \
     "$(site_packages_download_problems "$examples/lock-with-foreign-download.json")" || failed=1
   expect_refusal "missing-theme.json" "theme" \

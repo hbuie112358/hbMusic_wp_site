@@ -130,7 +130,8 @@ template project starts; until then, a list, not a to-do.
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
 - The plugin updates (template plan T8, T9): `site-packages/` with Dependabot's weekly group,
   `.github/workflows/plugin-updates.yml` (auto-merge for Dependabot's `site-packages/` pull
-  requests) and the versions check's two alerts (a waiting update, an update never proposed); the
+  requests that change only WordPress.org plugins; a recorded exception to the AI security rules'
+  line-by-line reading of lock files, T9) and the versions check's two alerts (a waiting update, an update never proposed); the
   repository needs GitHub's "Allow auto-merge" setting on. Generic for any site.
 - The weekly versions check (plan 8j): `bin/versions-check` and `.github/workflows/versions.yml` are generic;
   the list `PINS` at the top of the script names each site's pinned plugins and theme. Kept for

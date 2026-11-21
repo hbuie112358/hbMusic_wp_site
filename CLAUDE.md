@@ -177,7 +177,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   Dependabot proposes the plugins' updates weekly, a release at least 7 days old, in one pull
   request (`.github/dependabot.yml`), which merges itself by rebase once its checks pass
   (`.github/workflows/plugin-updates.yml`, template plan T9: only Dependabot's pull requests into
-  `main` changing nothing but `site-packages/`; it runs nothing from the pull request). A merge
+  `main` changing nothing but `site-packages/`, and in its lock file nothing but WordPress.org
+  plugins; it runs `main`'s own code, never the pull request's). Updates to
+  `composer/installers` and to the tools wait for the user's review. A merge
   done this way starts no run on `main` (GitHub does not start workflows from its own token's
   merges); nothing needs one, since staging's deploy copies only this repository's theme and
   plugins, and the weekly run checks `main`. Staging and live get a new version only when the
@@ -188,7 +190,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   with `--act` (`.github/workflows/versions.yml`, plan 8j), which opens an issue for a theme
   release at least 7 days old; its pin holds a fingerprint taken by hand, so it is raised in a
   session. It also watches the plugin updates (template plan T9): an issue for one still open
-  after 3 days (its checks failed, or it fell behind `main` and waits for "Update branch"), and
+  after 3 days (its checks failed, or it fell behind `main` and waits for a comment
+  `@dependabot rebase`), and
   for a plugin release 14 days old that Dependabot never proposed. GitHub emails the owner about
   new issues; one with the same title is never opened twice. The workflow can read the repository
   and its pull requests and open issues, nothing more.
