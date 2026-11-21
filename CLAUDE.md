@@ -103,7 +103,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `config/booking-form-messages.json` (merged into Contact Form 7's own messages; staging and live
   get the same texts typed in by hand, in the form's Messages tab),
   and Yoast SEO, test pages (`site.json`'s list, their text in `tests/dev-content/`, each with the
-  page template its real page uses), a stand-in Yoast organization (a neutral name and a picture
+  page template its real page uses) and the components' example page (every component on neutral
+  content, outside the menu), a stand-in Yoast organization (a neutral name and a picture
   WordPress itself ships), then the site's own steps in `tests/dev-setup.sh` (here, the Song
   List's sample songs, neutral text), a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role
@@ -168,8 +169,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `audit-exceptions.json`, each with its reason and a review-by date after which it fails again,
   and an accepted one that npm no longer reports also fails; none accepted since 2026-11-20); the theme's component list in `functions.php` matching the files in
   `assets/css/components/`, both ways; a type check of the theme's browser scripts (`assets/js/`) with
-  the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on a test page in
-  `tests/dev-content/` (so the browser tests see it); `site.json` following the rules in
+  the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
+  (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
+  outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in
   `tools/site-settings.jq` (a missing or unknown field, or a wrong kind of value, fails and is
   named), every field explained in `tools/site-settings.md` and nothing else, and those checks
   refusing the broken examples in `tests/tools/site-settings/`; ShellCheck on `bin/`; the compose file. Runs every check even

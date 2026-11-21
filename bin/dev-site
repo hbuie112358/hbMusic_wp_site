@@ -89,6 +89,7 @@ load_site_settings() {
   refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_packages_download_problems "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
+  refuse_if_any "$(test_pages_taking_example_addresses)"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
   write_site_compose_file
 }
@@ -98,6 +99,21 @@ load_site_settings() {
 refuse_if_any() {
   local problems="$1"
   [[ -z "$problems" ]] || fail "$(paste -sd ';' <<<"$problems")"
+}
+
+# A test page at an example page's address would make WordPress give one of them another address,
+# and the tests would check the wrong page; named before anything is built.
+test_pages_taking_example_addresses() {
+  local example address
+  for example in "$COMPONENT_EXAMPLES_DIR"/*.html; do
+    [[ -f "$example" ]] || continue
+    address="$(basename "$example" .html)"
+    # grep reads every line (no -q): stopping at the first could end jq with an error, which
+    # pipefail would count as no clash.
+    if site_settings_query '.testPages[].address' | grep -Fx "$address" >/dev/null; then
+      printf 'testPages: "%s" is the address of the component example page %s\n' "$address" "${example#"$REPO_ROOT"/}"
+    fi
+  done
 }
 
 site_has_plugin() {
@@ -308,6 +324,24 @@ create_test_content() {
   done
   wp_cli option update show_on_front page >/dev/null
   create_navigation_menu
+  create_component_example_pages
+}
+
+# The components' example pages, after the menu so they stay out of it, with WordPress's default
+# page template: they show the components, not this site's templates. Their title comes from the
+# file's name ("component-examples" becomes "Component examples").
+create_component_example_pages() {
+  local example address title
+  for example in "$COMPONENT_EXAMPLES_DIR"/*.html; do
+    [[ -f "$example" ]] || continue
+    address="$(basename "$example" .html)"
+    title="${address//-/ }"
+    log "Creating the component example page /$address/"
+    # As the admin, like the test pages: WordPress strips video frames from anyone else's content.
+    wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
+      --post_title="${title^}" --post_name="$address" --porcelain \
+      --post_content="$(cat "$example")" >/dev/null
+  done
 }
 
 # One test page: created, given its template, and chosen as the front page or the privacy page

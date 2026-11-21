@@ -378,16 +378,16 @@ component_styles_match_files() {
   return 1
 }
 
-# Every one of the site's own components (named site-…) appears on the dev site's test pages or in
-# the theme's template parts, so the browser tests (accessibility, policy, debug log) see it; a
-# component only on real pages would go untested. Components named after a WordPress block
-# (buttons) are seen wherever that block is. A class counts by its prefix, so site-media covers
-# site-media-placeholder and site-hero covers site-hero__photo.
-components_shown_on_test_pages() {
+# Every one of the theme's own components (named site-…) appears on the components' example pages
+# or in the theme's template parts, so the browser tests (accessibility, policy, debug log) see it
+# on neutral content whatever the site's own pages hold (template plan T10). Components named
+# after a WordPress block (buttons) are seen wherever that block is. A class counts by its prefix,
+# so site-media covers site-media-placeholder and site-hero covers site-hero__photo.
+components_shown_on_example_pages() {
   local theme_dir="$SITE_THEME_DIR" component missing=0
   for component in $(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
-    grep -qE "class=\"[^\"]*\\b$component\\b" "$REPO_ROOT"/tests/dev-content/*.html "$theme_dir"/parts/*.html && continue
-    log "$component appears on no test page (tests/dev-content/) or template part; add a neutral example"
+    grep -qE "class=\"[^\"]*\\b$component\\b" "$COMPONENT_EXAMPLES_DIR"/*.html "$theme_dir"/parts/*.html && continue
+    log "$component appears on no component example page (${COMPONENT_EXAMPLES_DIR#"$REPO_ROOT"/}/) or template part; add a neutral example"
     missing=1
   done
   return "$missing"
@@ -556,7 +556,7 @@ run_analysis_and_file_checks() {
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "Component stylesheets match their list" component_styles_match_files
-  run_check "Components appear on the test pages" components_shown_on_test_pages
+  run_check "Components appear on the example pages" components_shown_on_example_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check
   run_check "CSS (Stylelint)" css_lint
