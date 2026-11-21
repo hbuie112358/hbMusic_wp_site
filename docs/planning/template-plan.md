@@ -13,19 +13,16 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Where the work stands:** planned 2026-11-20 (T1-T4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (2026-11-20; its settings in
   the handbook's `toolkit/github.md`). Nothing else is built.
-- **Next:** step 1.1, the two technical decisions, talked through one at a time: where the
-  generic theme code lives, then how a site pulls in the pinned tools. **1.1(a) begun
-  (2026-11-20):** the shared `dts-site-components` plugin explained (what moves, what stays the
-  site's, why a plugin and not the theme, what goes in it and what gets a plugin of its own); the
-  user's decision is waiting, with the question whether the dev-site test (a plugin's block
-  styles shown in the Site Editor as the theme's are) comes before deciding or as the first step
-  of building it.
+- **Next:** step 1.1(b), how a site pulls in the pinned tools. 1.1(a) decided 2026-11-21 (T5):
+  the shared `dts-site-components` plugin, its first check passed on the dev site.
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
-- **Open decisions waiting on the user:** the two of step 1.1; the second site's facts (a new
+- **Open decisions waiting on the user:** step 1.1(b); the wording of handbook chapter 7 for
+  T5 (proposed when the plugin is built, approved by the user before anything is written there);
+  the second site's facts (a new
   build or a takeover; the user's own or a customer's, which decides a public or private
   repository).
 - **Shared with the rebuild plan:** `bin/deploy` is this plan's step 1.4 and the rebuild plan's
@@ -40,12 +37,14 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 | T2 | Each DTS plugin has its own repository, as H28 says (the user, 2026-11-20), with its checks and release workflow called from `dts-site-tools` as reusable workflows, so a new plugin's repository is a few lines. | One repository for all plugins was weighed: less setup, but a custom release workflow, a required summary check, a guard against plugins depending on each other, and no plugin could be private, sold or handed over without being split out. With reusable workflows, separate repositories lose most of their cost. Rollback is the same either way: a site lowers its pin to the old release, which is kept. |
 | T3 | The template work's time is logged in this project (the user, 2026-11-20). | Stage 1 is done in this repository; the user does not need it apart. |
 | T4 | The shared repositories' histories are the template's history. A site is tied to the template by its pins (tools and plugins), the starter version it was created from (in its records), and issues and pull requests in the shared repositories that name the site that prompted them. Each shared repository keeps a changelog. A template change that is really a rule goes to the handbook, with the user's approval. | So a site can tell which template it runs, and the template can tell why it changed. |
+| T5 | The generic theme code lives in a shared plugin, `dts-site-components` (the user, 2026-11-21): the component stylesheets and their per-block loader, the carousels' screen-reader work, the empty-heading drop, the click-to-load videos, the video and menu scripts, the lazy-loading and embed-title fix, the current-page mark, the privacy link, the redirect function, the emoji removal and the booking form's page-only loading. Each site's child theme keeps the site layer (`theme.json`, `parts/`, the logo) and its own lists, handed to the plugin through filters (old addresses, areas served, the organization's type, the policy's outside sources). A piece goes into the plugin if almost every site would want it and it is about how pages look or behave; anything else gets a plugin of its own (D19). The plugin documents the token names its CSS needs, and `bin/check` verifies each site's `theme.json` defines them; the deploy's page check confirms the plugin is active, since a theme cannot require a plugin. Handbook chapter 7's empty starter child theme and "no shared parent theme" stay; its wording gains the plugin, with the user's approval. | A site's child theme cannot reach another site's, WordPress allows one parent and no grandchild themes, so shared code needs a home beside each site's theme: a plugin, released and pinned like the others (H28, T2). A full child theme copied into each site would drift; a shared parent theme would mean maintaining a whole standalone theme; copies locked by a check would add a copy step and files no one may edit. Checked first on the dev site (2026-11-21): a stylesheet a plugin hands to `wp_enqueue_block_style()` loads on the public page, in the page editor's canvas and in the Site Editor's canvas, as the theme's `buttons.css` does; with the probe plugin deactivated, its marker was missing in all three (the fault caught). Whether a plugin can supply the call-to-action page templates is checked when the plugin is built; until then they stay in the starter's child theme. |
 
 ## Steps
 
 ### Stage 1: in this repository
 
-- [ ] **1.1 Two technical decisions.** (a) Where the generic theme code lives: the component
+- [~] **1.1 Two technical decisions.** (a) `[x]` decided 2026-11-21: the shared plugin (T5).
+  Where the generic theme code lives: the component
   stylesheets and their loader, the carousels' screen-reader work, the click-to-load videos, the
   video and menu scripts, the current-page mark, the privacy link, the redirects function and
   the emoji removal (`docs/planning/template-notes.md`, "Generic already"). Options: a shared
