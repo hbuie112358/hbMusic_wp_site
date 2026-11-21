@@ -1,0 +1,8 @@
+{
+  "description": "A working copy whose state git cannot read: refused, never taken as clean.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "workingCopy": "broken",
+  "expectStatus": 1,
+  "expectOutputNaming": ["git status"]
+}

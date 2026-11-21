@@ -1,0 +1,8 @@
+{
+  "description": "main's commit with no checks of its own (a rebase merge), holding the same files as its pull request's tested last commit: accepted.",
+  "place": "staging",
+  "pullRequest": { "holds": ["{B}"], "number": 7, "sameFiles": true, "checks": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["#7", "{H7}"]
+}

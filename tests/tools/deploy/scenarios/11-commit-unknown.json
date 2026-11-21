@@ -1,0 +1,7 @@
+{
+  "description": "A commit name that does not exist: refused, naming it.",
+  "place": "staging",
+  "options": ["--commit", "0123abc"],
+  "expectStatus": 1,
+  "expectOutputNaming": ["0123abc"]
+}

@@ -1,0 +1,7 @@
+{
+  "description": "main's commit with only one of the two required checks: refused, naming the one that never ran.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"]] },
+  "expectStatus": 1,
+  "expectOutputNaming": ["dev-site: never ran"]
+}

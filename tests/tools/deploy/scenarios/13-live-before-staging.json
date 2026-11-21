@@ -1,0 +1,8 @@
+{
+  "description": "live while staging still runs the commit before: refused, naming both commits.",
+  "place": "live",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}", "example-live": "{A}" },
+  "expectStatus": 1,
+  "expectOutputNaming": ["{A7}", "{B7}"]
+}

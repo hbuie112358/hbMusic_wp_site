@@ -23,7 +23,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   handbook's `toolkit/github.md`).
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
   error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check, #90), 1.4c done
-  (`site.json`'s `deploy` section); next is 1.4d, `bin/deploy` itself.
+  (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy); next is
+  1.4d-2, the copy.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -348,7 +349,41 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   - [ ] 1.4d `bin/deploy staging|live [--commit <commit>]`, with its tests: the refusals as
     functions on examples in `bin/check`, and a run from start to finish against a throwaway
     server container (sshd and rsync with the same forced-command restriction, a stand-in `gh`),
-    proving that one place's key reaches neither the other place nor a shell.
+    proving that one place's key reaches neither the other place nor a shell. Decided with the
+    user, 2026-11-21: (1) `bin/deploy` uses the `rsync`, `ssh` and `gh` installed on the user's
+    computer, beside Docker and `jq`, since `ssh` needs the user's keys and SSH settings where
+    they are; (2) a deploy that would lower a downloaded plugin's version on the server refuses
+    unless it names it with `--allow-lower <plugin>` (a rollback says what it lowers); (3) `ssh`
+    never asks for a password (`BatchMode`): the account's password opens a full shell, so a key
+    that does not work stops the deploy instead; the keys get a passphrase, unlocked with
+    `ssh-add`; (4) `--ssh-config <file>` for another SSH settings file (the tests need it); (5)
+    the test server built from a pinned Alpine image with exact `openssh` and `rsync` versions,
+    checked as `AI_SECURITY.md` section 4 says. In three pull requests:
+    - [x] 1.4d-1 Before anything is copied (nothing on the server changes): the refusals (a
+      working copy not clean, a commit not on GitHub's `main`, checks not passed on it or on its
+      merged pull request's last commit with an identical tree), the server's note read, the
+      commits shown and "yes" awaited, live only taking staging's commit. Built 2026-11-21.
+      Checked first on the real GitHub: a rebase-merged commit links to its pull request (both
+      of #90's commits name #90 and its tested last commit 2f24564); only the last one has the
+      same tree. A check run again counts by its newest run. The note is one file in the
+      `deploy-note` folder (first line, the commit); rsync's status 23 (no such file) means a
+      first deploy, any other failure stops it, and the note is read in the script's own shell
+      (found on reading back: read inside `$(…)`, a refusal would have ended only that subshell
+      and the deploy gone on as a first deploy). Tests: 24 situations in a throwaway Git
+      repository with a bare "GitHub", stand-ins for `gh` and `rsync` (which refuses any copy to
+      a server and any `ssh` allowed to ask for a password), in `bin/check` (about 8 s). From the
+      review (the user's choice): a `git status` that fails stops the deploy instead of reading
+      as clean; an `--ssh-config` path with spaces or quotes is refused, since rsync splits its
+      ssh command at spaces itself; left as it is, reading only a commit's first 100 check runs.
+      27 situations; thirteen planted faults caught. One test bug found on the way: jq's `//`
+      turning `false` into the default, as at 1.2b.
+    - [ ] 1.4d-2 The copy: the downloaded plugins built from `composer.lock` in the pinned
+      Composer container and every file checked against WordPress.org's checksum file before
+      sending; the server's plugin versions read first (never lowered without `--allow-lower`);
+      the downloaded plugins, the site's own plugins, then the theme, each from `git archive` of
+      the commit; a folder empty on the server named, to activate by hand; then the note.
+    - [ ] 1.4d-3 After the copy: the page check, the PHP log's new lines, one deploy at a time on
+      the computer; and the test from start to finish against the throwaway server.
   - [ ] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
     restrictions and folders in hPanel), the first `bin/deploy staging`, then `bin/deploy live`;
     removed: the `deploy-staging` job and the push trigger in `check.yml`, `bin/deploy-staging`,

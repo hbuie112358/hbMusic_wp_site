@@ -1,0 +1,6 @@
+{
+  "description": "A place that is neither staging nor live: refused at the start.",
+  "place": "production",
+  "expectStatus": 2,
+  "expectOutputNaming": ["production"]
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Anything but yes at the question: it stops.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "answer": "y",
+  "expectStatus": 1,
+  "expectOutputNaming": ["not confirmed"]
+}

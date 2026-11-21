@@ -1,0 +1,7 @@
+{
+  "description": "A computer without rsync: refused at the start, naming it.",
+  "place": "staging",
+  "missingTool": "rsync",
+  "expectStatus": 2,
+  "expectOutputNaming": ["rsync"]
+}

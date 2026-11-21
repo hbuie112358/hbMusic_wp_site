@@ -1,0 +1,8 @@
+{
+  "description": "live on a site with no staging: deployed straight from main, no staging asked about.",
+  "place": "live",
+  "noStaging": true,
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-live": "{A}" },
+  "expectStatus": 0
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Going back to the commit before: it names the commit taken away.",
+  "place": "staging",
+  "options": ["--commit", "{A}"],
+  "checks": { "{A}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{B}" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["takes away", "B: a change"]
+}
