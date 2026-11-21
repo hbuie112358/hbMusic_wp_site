@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { TEST_PATHS } from './test-pages';
+import { TEST_PATHS } from '../helpers/test-pages';
 
 // Protects every link between the site's own pages (plan 1c, 2026-11-16): renaming the Book page's
 // address once left the call-to-action panel's "Book Howard" button, which comes from the theme,

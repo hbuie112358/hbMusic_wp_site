@@ -9,7 +9,7 @@
 # and the resulting title attribute is read back as a browser decodes it. No YouTube needed.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # Each case: the title as written, then as the provider escapes it in its player code.
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Runs the tests against the dev site (bin/dev-site): the scenario checks named
-# tests/scenario/dev-*.sh, then the browser tests in tests/e2e/specs/dev/, then a last check that
-# WordPress's debug log is still empty (tests/scenario/final-debug-log.sh). If the site does not
-# answer, the run fails; it is never skipped. Every test runs even after a failure; the exit
-# status is 1 if any failed.
+# Runs the tests against the dev site (bin/dev-site): the scenario checks named dev-*.sh in
+# tests/scenario/'s group folders, then the browser tests in tests/e2e/specs/dev/, then a last
+# check that WordPress's debug log is still empty (tests/scenario/generic/final-debug-log.sh).
+# If the site does not answer, the run fails; it is never skipped. Every test runs even after a
+# failure; the exit status is 1 if any failed.
 set -Euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -50,6 +50,12 @@ browser_tests() {
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
 }
 
+scenarios_found() {
+  (($1 > 0)) && return 0
+  log "no dev-*.sh found under tests/scenario/"
+  return 1
+}
+
 run_test() {
   local name="$1"
   shift
@@ -74,13 +80,18 @@ report() {
 
 run_all_tests() {
   run_test "Dev site answers on port ${DEV_SITE_PORT}" site_answers || return 0
-  local scenario
-  for scenario in "$REPO_ROOT"/tests/scenario/dev-*.sh; do
+  local scenario scenarios
+  # Searched in every group's folder (template plan 1.3a), so a group without scenario checks
+  # needs no folder; run in the order of their names, as before they were sorted into groups.
+  mapfile -t scenarios < <(find "$REPO_ROOT/tests/scenario" -name 'dev-*.sh' -type f -printf '%f\t%p\n' | sort | cut -f2)
+  # A moved or misnamed folder must fail the run, not leave it passing with no scenario checks.
+  run_test "Scenario checks found" scenarios_found "${#scenarios[@]}" || return 0
+  for scenario in "${scenarios[@]}"; do
     run_test "Scenario: $(basename "$scenario" .sh)" bash "$scenario"
   done
   run_test "Browser tests (Playwright)" browser_tests
   # Last, so it sees what every test before it caused.
-  run_test "Debug log empty after all tests" bash "$REPO_ROOT/tests/scenario/final-debug-log.sh"
+  run_test "Debug log empty after all tests" bash "$REPO_ROOT/tests/scenario/generic/final-debug-log.sh"
 }
 
 main() {

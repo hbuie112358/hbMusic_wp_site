@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { ADMIN_STORAGE_STATE } from './admin-session';
+import { ADMIN_STORAGE_STATE } from '../../helpers/admin-session';
 
 // Protects the Song List plugin (plan step 5a): the block shows songs sorted and escaped, the
 // editor offers the block, and the admin form saves an artist only with a valid nonce. The

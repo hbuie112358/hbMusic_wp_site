@@ -300,8 +300,10 @@ expect_acceptance() {
 }
 
 shellcheck_scripts() {
-  local script scripts=()
-  for script in "$REPO_ROOT"/bin/* "$REPO_ROOT"/tests/scenario/*.sh; do
+  local script scenario_scripts scripts=()
+  # The scenario checks sit in their groups' folders (template plan 1.3a).
+  mapfile -t scenario_scripts < <(find "$REPO_ROOT/tests/scenario" -name '*.sh' -type f | sort)
+  for script in "$REPO_ROOT"/bin/* "${scenario_scripts[@]}"; do
     scripts+=("/src/${script#"$REPO_ROOT"/}")
   done
   # -x follows the scenario checks' `source lib.sh` and bin/dev-site's `source tests/dev-setup.sh`;

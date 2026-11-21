@@ -1,5 +1,5 @@
 import { test as setup } from '@playwright/test';
-import { ADMIN_STORAGE_STATE, logInAndSave } from './admin-session';
+import { ADMIN_STORAGE_STATE, logInAndSave } from '../helpers/admin-session';
 
 // Logs in as the dev admin once per run, before the browser tests, and saves the login for the
 // specs that use the admin screens (plan step 8d; why once, and why by request: admin-session.ts).

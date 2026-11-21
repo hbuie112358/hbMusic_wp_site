@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN_STORAGE_STATE } from './admin-session';
+import { ADMIN_STORAGE_STATE } from '../../helpers/admin-session';
 
 // Protects what the Site Hardening plugin does in the admin (plan step 8a, D26): Application
 // Passwords are off, so no program can log in to the REST API around two-factor login
-// (docs/SITE_CHECKLIST.md 4.7). The headers are checked on every page in theme.spec.ts; XML-RPC,
-// the X-Pingback header, the version comments and the PHP version header in
-// tests/scenario/dev-site-hardening.sh.
+// (docs/SITE_CHECKLIST.md 4.7). The headers are checked on every page in generic/theme.spec.ts;
+// XML-RPC, the X-Pingback header, the version comments and the PHP version header in
+// tests/scenario/plugins/site-hardening/dev-site-hardening.sh.
 // WordPress's own id for the section on the profile page (wp-admin/user-edit.php, 7.1).
 const APPLICATION_PASSWORDS_SECTION = '#application-passwords-section';
 

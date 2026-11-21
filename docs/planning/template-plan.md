@@ -18,9 +18,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.3a, the tests sorted into four folders (generic, components, plugins, this site's),
-  then 1.3b to 1.3d (T10, decided 2026-11-21; 1.2, the per-site settings file, done 2026-11-21,
-  #77 to #85).
+- **Next:** step 1.3b, the component tests finding their pages by the component's class, then
+  1.3c and 1.3d (T10, decided 2026-11-21; 1.2, the per-site settings file, done 2026-11-21,
+  #77 to #85; 1.3a, the tests sorted into their groups' folders, done 2026-11-21).
 - **Then, in order:** 1.4 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -206,9 +206,21 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   `song-list` and the song table's part of `component-styles`; `editing-help`; `hardening` and
   the scenario `dev-site-hardening`. **This site's**: `redirects`, the organization part of `seo`.
   In four parts, each its own pull request (T10):
-  - [ ] 1.3a The spec files and scenario checks sorted into four folders by those groups, the test
+  - [x] 1.3a The spec files and scenario checks sorted into four folders by those groups, the test
     runner set to find them there, `seo` and `component-styles` split along the lines above; the
-    same tests and scenario checks run, only their places change.
+    same tests and scenario checks run, only their places change (2026-11-21). Folders
+    `generic/`, `components/`, `plugins/<plugin>/` and `site/` in `tests/e2e/specs/dev/` (the
+    shared helpers in `helpers/`) and in `tests/scenario/` (no `site/` there: none of the
+    scenario checks is this site's alone). The runner already searched `specs/dev/` with its
+    subfolders; `bin/test` and `bin/check` now find the scenario checks in every folder, run in
+    the order of their names as before, and `bin/test` fails if it finds none (from the review;
+    shown on a copy pointed at a missing folder). Splits: the organization test into
+    `site/organization.spec.ts`, the song table's two into
+    `plugins/song-list/song-list-styles.spec.ts`, sharing `helpers/stylesheets.ts`. Shown
+    unchanged: Playwright's list, 175 tests before and after (in 20 files, then 22), every project
+    and test name the same; the same 12 scenario checks; `bin/check` passed; one scenario check
+    from each folder depth and the changed and plugin specs (44) passed on the dev site, the logins
+    saved in `tests/e2e/.auth/` as before.
   - [ ] 1.3b Component tests find their pages themselves: a shared helper finds the site's test
     pages that use a component, by its class, and the component's tests run on every such page
     instead of on named pages; each component gets its own neutral test page, built by the dev

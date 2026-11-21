@@ -4,8 +4,8 @@
 # and fail. A site without such steps has no such file.
 
 # Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
-# shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
-# expects them sorted and escaped. Neutral text, no real data.
+# shown as plain text, and one song without an artist:
+# tests/e2e/specs/dev/plugins/song-list/song-list.spec.ts expects them sorted and escaped. Neutral text, no real data.
 readonly TEST_SONGS=(
   'Zulu Sample Song|'
   'Rock & Roll <em>Sample</em>|Sample Artist Two'

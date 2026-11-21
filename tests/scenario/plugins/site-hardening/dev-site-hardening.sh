@@ -4,10 +4,11 @@
 # X-Pingback header, Yoast SEO's version comment is gone, and no response names the PHP version
 # (3.6). Also (handbook 12, 3.1 and 4.10): HSTS only on HTTPS requests, and unfiltered HTML for
 # Administrators only. The headers on every page are
-# checked in tests/e2e/specs/dev/theme.spec.ts, Application Passwords in hardening.spec.ts.
+# checked in tests/e2e/specs/dev/generic/theme.spec.ts, Application Passwords in
+# tests/e2e/specs/dev/plugins/site-hardening/hardening.spec.ts.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../lib.sh"
 
 readonly XML_RPC_REFUSED_STATUS=403
 readonly HSTS_HEADER='Strict-Transport-Security: max-age=31536000'

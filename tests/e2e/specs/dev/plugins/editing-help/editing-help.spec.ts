@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { WCAG_TAGS } from './accessibility';
-import { ADMIN_STORAGE_STATE, EDITOR_STORAGE_STATE } from './admin-session';
+import { WCAG_TAGS } from '../../helpers/accessibility';
+import { ADMIN_STORAGE_STATE, EDITOR_STORAGE_STATE } from '../../helpers/admin-session';
 
 // Protects the Editing Help plugin (handbook H89): the content guide in the admin, for the people
 // who edit pages. Its last section lists the site's own templates and ready-made sections, read

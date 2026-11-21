@@ -1,5 +1,5 @@
 import { test as setup } from '@playwright/test';
-import { EDITOR_STORAGE_STATE, logInAndSave } from './admin-session';
+import { EDITOR_STORAGE_STATE, logInAndSave } from '../helpers/admin-session';
 
 // Logs in as the dev Editor once per run and saves the login, for the specs that check what a
 // customer sees in the admin (why once, and why by request: admin-session.ts). A different user

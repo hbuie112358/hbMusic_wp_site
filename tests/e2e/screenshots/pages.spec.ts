@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
-import { answerOutsideServices } from '../specs/dev/csp-violations';
+import { answerOutsideServices } from '../specs/dev/helpers/csp-violations';
 
 // Shoots every page bin/screenshots names (SCREENSHOT_PATHS, a JSON list of addresses) at desktop
 // and phone width, keeps each screenshot in SCREENSHOTS_DIR/latest/ for looking at, and compares it

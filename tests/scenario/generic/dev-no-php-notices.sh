@@ -5,7 +5,7 @@
 # theme's 404 template).
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 page_addresses() {
   local address="http://localhost:${DEV_SITE_PORT}"

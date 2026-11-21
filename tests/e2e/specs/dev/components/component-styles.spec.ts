@@ -1,19 +1,13 @@
-import { expect, test, type Page } from '@playwright/test';
-import { TEST_PATHS } from './test-pages';
+import { expect, test } from '@playwright/test';
+import { loadsStylesheet } from '../helpers/stylesheets';
+import { TEST_PATHS } from '../helpers/test-pages';
 
-// Protects how the site's stylesheets load (plan D29): the theme's component styles come with the
-// blocks they style, the form's only to pages with a form, and the Song List plugin brings its
-// table's styles itself, only where the song list appears. WordPress inlines small stylesheets,
-// so a stylesheet shows as a <style> or <link> whose id starts with its handle.
-const SONG_LIST_PATH = '/songlist/';
+// Protects how the theme's stylesheets load (plan D29): the component styles come with the blocks
+// they style, the form's only to pages with a form. The Song List's table styles are checked with
+// the plugin (plugins/song-list/song-list-styles.spec.ts).
 const FORM_PATH = '/hire-acoustic-guitarist/';
 const EVERY_PAGE_STYLES = ['hbmusic-site-header', 'hbmusic-site-footer'];
 const FORM_STYLES = 'hbmusic-form';
-const SONG_TABLE_STYLES = 'songlist-song-list';
-
-async function loadsStylesheet(page: Page, handle: string): Promise<boolean> {
-	return (await page.locator(`style[id^="${handle}-"], link[id^="${handle}-"]`).count()) > 0;
-}
 
 test('the header and footer styles load on every page', async ({ page }) => {
 	for (const path of TEST_PATHS) {
@@ -28,13 +22,6 @@ test("the form's styles load only on the page with a form", async ({ page }) => 
 	for (const path of TEST_PATHS) {
 		await page.goto(path);
 		expect(await loadsStylesheet(page, FORM_STYLES), `${FORM_STYLES} on ${path}`).toBe(path === FORM_PATH);
-	}
-});
-
-test("the song table's styles load only where the song list appears", async ({ page }) => {
-	for (const path of TEST_PATHS) {
-		await page.goto(path);
-		expect(await loadsStylesheet(page, SONG_TABLE_STYLES), `${SONG_TABLE_STYLES} on ${path}`).toBe(path === SONG_LIST_PATH);
 	}
 });
 
@@ -68,14 +55,6 @@ test('the hero, features and call-to-action bands carry their texture', async ({
 	expect(green, `the call-to-action panel's green in ${ctaColour}`).toBeGreaterThan(40);
 	const grainAddress = /url\("([^"]+grain\.png)"\)/.exec(heroLayers)?.[1] ?? '';
 	expect((await request.get(grainAddress)).status(), `the grain image at ${grainAddress}`).toBe(200);
-});
-
-// Loading is not enough: the plugin's selectors must still match its own markup.
-test("the song table's styles apply to the table", async ({ page }) => {
-	await page.goto(SONG_LIST_PATH);
-	const heading = page.locator('.wp-block-songlist-song-list th').first();
-	await expect(heading, 'a column heading').toBeVisible();
-	expect(await heading.evaluate((cell) => getComputedStyle(cell).borderBottomWidth), 'the line under the headings').toBe('2px');
 });
 
 // A lead is the larger opening statement; it was once smaller than body text without anyone

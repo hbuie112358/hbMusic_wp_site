@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { WCAG_TAGS } from './accessibility';
+import { WCAG_TAGS } from '../helpers/accessibility';
 
 // Protects the booking form (plan step 5e): a visitor's request reaches the site owner's inbox
 // (Mailpit here) with the visitor as the reply address and without the visitor's name in the

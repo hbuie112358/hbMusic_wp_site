@@ -6,7 +6,7 @@
 # a fault once gave only the first listed page a preview.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 readonly FIXTURE_DIR="$REPO_ROOT/tests/scenario/fixtures/screenshots"
 readonly PREVIEW_SLUG="preview-screenshots-fixture"
