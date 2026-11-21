@@ -8,6 +8,12 @@ readonly SITE_SETTINGS_EXPLANATION="$REPO_ROOT/tools/site-settings.md"
 readonly SITE_SETTINGS_RULES_DIR="$REPO_ROOT/tools"
 # Written from site.json (write_site_compose_file); ignored by git, never edited by hand.
 readonly SITE_COMPOSE_FILE="$REPO_ROOT/compose.site.yaml"
+# The components' example pages (template plan T10): neutral content showing each component,
+# which travels with the component tests; bin/dev-site builds one page per file, at the file's
+# name, outside the menu, and bin/check looks there for every component. The browser tests find
+# the same folder from their own (tests/e2e/specs/dev/helpers/test-pages.ts), as the test
+# container cannot read this file.
+readonly COMPONENT_EXAMPLES_DIR="$REPO_ROOT/tests/e2e/specs/dev/components/pages"
 
 # The rules as a jq module, followed by a program using them.
 site_settings_jq() {
