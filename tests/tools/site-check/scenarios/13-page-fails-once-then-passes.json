@@ -1,0 +1,8 @@
+{
+  "description": "A page failing once, as just after a deploy: tried again, it passes; the good page is not opened twice.",
+  "options": ["--deadline", "5", "--retry-every", "1"],
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "failTimes": 1 } },
+  "expectStatus": 0,
+  "expectAskedTimes": { "https://site.test/about/": 2, "https://site.test/": 1 }
+}

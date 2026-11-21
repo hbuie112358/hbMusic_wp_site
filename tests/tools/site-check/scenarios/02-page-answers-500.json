@@ -1,0 +1,7 @@
+{
+  "description": "A page answering 500, as WordPress's error page does: it fails, naming the page and the status.",
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "status": 500 } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "500"]
+}

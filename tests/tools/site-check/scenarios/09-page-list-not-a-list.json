@@ -1,0 +1,7 @@
+{
+  "description": "The page list answering with something that is not a list of pages: it fails and opens no page.",
+  "pageList": { "body": "{\"code\":\"rest_disabled\"}" },
+  "pages": {},
+  "expectStatus": 1,
+  "expectNotAsked": ["https://site.test/"]
+}

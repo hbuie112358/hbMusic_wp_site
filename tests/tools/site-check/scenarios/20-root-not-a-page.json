@@ -1,0 +1,7 @@
+{
+  "description": "A front page that is not a page (the latest posts), so the list leaves out the root: the root is checked anyway, once.",
+  "pageList": { "links": ["/about/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 0,
+  "expectAskedTimes": { "https://site.test/": 1, "https://site.test/about/": 1 }
+}

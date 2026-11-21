@@ -36,17 +36,25 @@ site_setting() {
   jq -er "$path | strings" "$SITE_SETTINGS_FILE"
 }
 
-# The Docker names built from the site's slug (template plan T7): the download caches, and the dev
-# site's database volume, which Docker Compose names "<project>_db_data" after compose.dev.yaml's
-# project, "<slug>-dev". They are the names this site always had, so no cache or database is lost.
-# Sets COMPOSER_CACHE_VOLUME, NPM_CACHE_VOLUME and DEV_DATABASE_VOLUME. Refuses, with a message,
-# when jq is missing or site.json breaks its rules, rather than going on with another name.
-load_site_volume_names() {
-  local problems slug
+# Refuses, with a message, when jq is missing or site.json is missing or breaks its rules, so a
+# script never goes on with a wrong or empty setting.
+require_valid_site_settings() {
+  local problems
   command -v jq >/dev/null || { printf 'jq is not installed; the tools need it to read site.json\n' >&2; return 1; }
   [[ -f "$SITE_SETTINGS_FILE" ]] || { printf 'site.json is missing; tools/site-settings.md lists its fields\n' >&2; return 1; }
   problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || { printf 'site.json is not valid JSON\n' >&2; return 1; }
   [[ -z "$problems" ]] || { printf 'site.json does not follow its rules: %s\n' "$(paste -sd ';' <<<"$problems")" >&2; return 1; }
+}
+
+# The Docker names built from the site's slug (template plan T7): the download caches, and the dev
+# site's database volume, which Docker Compose names "<project>_db_data" after compose.dev.yaml's
+# project, "<slug>-dev". They are the names this site always had, so no cache or database is lost.
+# Sets COMPOSER_CACHE_VOLUME, NPM_CACHE_VOLUME and DEV_DATABASE_VOLUME. Refuses, with a message,
+# when site.json cannot be trusted (require_valid_site_settings), rather than going on with another
+# name.
+load_site_volume_names() {
+  local slug
+  require_valid_site_settings || return 1
   slug="$(site_setting .slug)"
   declare -gr COMPOSER_CACHE_VOLUME="${slug}_composer_cache"
   declare -gr NPM_CACHE_VOLUME="${slug}_npm_cache"

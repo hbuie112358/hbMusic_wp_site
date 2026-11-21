@@ -1,0 +1,7 @@
+{
+  "description": "A page answering 200 with half a page, as after a PHP crash: it fails, naming the page.",
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "kind": "cut-off" } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "</html>"]
+}

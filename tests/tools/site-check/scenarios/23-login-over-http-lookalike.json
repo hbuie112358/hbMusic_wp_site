@@ -1,0 +1,9 @@
+{
+  "description": "A login for http:// to a host only starting with localhost's name: refused like any other computer.",
+  "address": "http://localhost.site.test",
+  "login": { "SITE_CHECK_USER": "checker", "SITE_CHECK_PASSWORD": "secret" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 2,
+  "expectNotAsked": ["http://localhost.site.test/"]
+}

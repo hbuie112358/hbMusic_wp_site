@@ -1,0 +1,8 @@
+{
+  "description": "The page list answering 503: it fails, naming the status, and opens no page.",
+  "pageList": { "status": 503, "links": ["/"] },
+  "pages": {},
+  "expectStatus": 1,
+  "expectOutputNaming": ["503"],
+  "expectNotAsked": ["https://site.test/"]
+}

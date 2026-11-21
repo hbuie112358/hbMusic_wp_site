@@ -1,0 +1,7 @@
+{
+  "description": "Two good pages: it passes and opens each once.",
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": {},
+  "expectStatus": 0,
+  "expectAskedTimes": { "https://site.test/": 1, "https://site.test/about/": 1 }
+}

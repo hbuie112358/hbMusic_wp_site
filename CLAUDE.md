@@ -177,7 +177,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   named), every field explained in `tools/site-settings.md` and nothing else, and those checks
   refusing the broken examples in `tests/tools/site-settings/`; the versions check's alerts on
   known situations (`tests/tools/versions-check/`: the real script against stand-ins for GitHub
-  and WordPress.org, which issues it would open, template plan 1.3c); ShellCheck on `bin/`, the
+  and WordPress.org, which issues it would open, template plan 1.3c); the page check on known
+  situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); ShellCheck on `bin/`, the
   scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
@@ -211,6 +212,16 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   for a plugin release 14 days old that Dependabot never proposed. GitHub emails the owner about
   new issues; one with the same title is never opened twice. The workflow can read the repository
   and its pull requests and open issues, nothing more.
+- `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan
+  1.4b, handbook chapter 2's step 7): every published page of the site at the address, from
+  WordPress's page list, and the site's root, answers 200 directly, shows the child theme named
+  in `site.json` active and ends with `</html>`; failing pages are tried again for up to 2
+  minutes, and an unusable or empty page list fails. Only pages at that address are opened. A
+  site behind a site-wide password gets its login from `SITE_CHECK_USER` and
+  `SITE_CHECK_PASSWORD`, refused over plain `http://` except to this computer. Needs `curl` and
+  `jq`. Run by
+  `bin/deploy` after a copy (1.4d) and, against the dev site, by the scenario check
+  `dev-site-check.sh` (which also switches the parent theme on and expects it to fail).
 - `bin/screenshots previews | baseline | compare` (plan D29): a before/after check of the look with
   the real content, for restyling; local only, never a gate. It shows each real page from
   `data/content/` (listed in its `pages.json`; photos written `{{photo:<file>}}` from

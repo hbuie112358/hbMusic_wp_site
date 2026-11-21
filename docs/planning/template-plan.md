@@ -22,7 +22,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
-  error log found, `log_errors` on); next is 1.4b, `bin/site-check`, the generic page check.
+  error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check); next is 1.4c,
+  `site.json`'s `deploy` section.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -302,11 +303,31 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     to its own site's file. `~/error_log` in the home folder is the command-line PHP's (startup
     warnings, 2024 and August 2026), not the site's. Two findings for the rebuild plan (9w).
     `log_errors` switched on in hPanel by the user, 2026-11-21 (`display_errors` off).
-  - [ ] 1.4b `bin/site-check <address>`, the generic page check (handbook chapter 2, step 7): the
+  - [x] 1.4b `bin/site-check <address>`, the generic page check (handbook chapter 2, step 7): the
     site's published pages from WordPress's page list, each answering with the theme active and no
     critical-error page, retried up to 2 minutes; an unreachable or empty list fails. Run against
     the dev site in `bin/test`, shown failing on planted faults (a broken page, the theme not
-    active, the page list unavailable).
+    active, the page list unavailable). Built 2026-11-21: each page must answer 200 directly (no
+    redirect followed), show `wp-child-theme-<theme>` as a whole class name and end with
+    `</html>` (a PHP crash after the page has started still answers 200); only the failing pages
+    are tried again (every 5 s, `--deadline`, `--retry-every`); more than 100 pages fails rather
+    than checking some; a link at another address is never opened; the staging login from
+    `SITE_CHECK_USER`/`SITE_CHECK_PASSWORD` through curl's configuration on standard input.
+    From the review (the user's choice, the two MEDIUM and two of the three LOW findings): the
+    site's root always checked as well (a front page showing the latest posts is not in the page
+    list); curl and jq required at the start (without curl every page looked like a server not
+    answering); a login refused over plain http:// unless the host is this computer (compared by
+    host name, so `localhost.example` counts as another computer); a temporary folder that cannot
+    be made stops the check. The limits stay named constants in the script (the third LOW).
+    Tests: 25 situations against a stand-in for curl (`tests/tools/site-check/`, in `bin/check`,
+    about 10 s; the missing-curl one with a search path of every command but curl), and
+    `dev-site-check.sh` against the dev site, with the parent theme switched on as a real fault
+    and the child theme always switched back. Twelve planted faults caught (each check removed in
+    turn, a redirect accepted, a half login allowed, a look-alike host taken as this computer; one
+    first missed, an empty list refused for the wrong reason, fixed). Passed on the dev site's 7 pages and live's 6. Found on
+    the way, not caused by it: one PHP warning in the dev site's debug log from WordPress's theme
+    update check failing to reach WordPress.org, most likely from a hand-typed `wp theme list`
+    (WP-CLI asks WordPress.org first); not seen again in a clean run.
   - [ ] 1.4c `site.json`'s `deploy` section (each place's SSH name, address and whether it is
     behind a password; live only after staging; the page cache), with its rules, explanations and
     broken examples.

@@ -1,0 +1,9 @@
+{
+  "description": "Only the login's user given: it refuses to start, naming the missing setting, and asks for nothing.",
+  "login": { "SITE_CHECK_USER": "checker" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 2,
+  "expectOutputNaming": ["SITE_CHECK_PASSWORD"],
+  "expectNotAsked": ["https://site.test/"]
+}

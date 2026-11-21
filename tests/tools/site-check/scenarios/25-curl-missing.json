@@ -1,0 +1,8 @@
+{
+  "description": "A computer without curl: it refuses to start, naming curl, instead of reporting every page as not answering.",
+  "curlMissing": true,
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 2,
+  "expectOutputNaming": ["curl"]
+}

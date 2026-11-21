@@ -1,0 +1,8 @@
+{
+  "description": "A site behind a password, no login given: it fails, naming the status.",
+  "siteRequiresLogin": { "user": "checker", "password": "secret" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 1,
+  "expectOutputNaming": ["401"]
+}

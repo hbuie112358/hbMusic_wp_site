@@ -1,0 +1,7 @@
+{
+  "description": "The root, not in the page list, failing: the check fails, naming it.",
+  "pageList": { "links": ["/about/"], "total": 1 },
+  "pages": { "/": { "status": 500 } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/ answered 500"]
+}

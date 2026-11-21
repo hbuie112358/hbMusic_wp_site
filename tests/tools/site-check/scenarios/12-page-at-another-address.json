@@ -1,0 +1,8 @@
+{
+  "description": "The page list naming a page on another site: it fails, naming it, and never opens it.",
+  "pageList": { "links": ["/", "https://elsewhere.test/page/"], "total": 2 },
+  "pages": {},
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://elsewhere.test/page/"],
+  "expectNotAsked": ["https://elsewhere.test/page/"]
+}

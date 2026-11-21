@@ -1,0 +1,9 @@
+{
+  "description": "A login for http:// to this computer, as for the dev site: allowed, and it passes.",
+  "address": "http://localhost:8080",
+  "login": { "SITE_CHECK_USER": "checker", "SITE_CHECK_PASSWORD": "secret" },
+  "siteRequiresLogin": { "user": "checker", "password": "secret" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 0
+}

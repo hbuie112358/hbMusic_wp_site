@@ -1,0 +1,7 @@
+{
+  "description": "A page answering with a redirect: it is not followed, and the page fails.",
+  "pageList": { "links": ["/about/"], "total": 1 },
+  "pages": { "/about/": { "status": 301 } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "301"]
+}

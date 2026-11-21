@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# Stand-in for curl in the page check's tests (tests/tools/site-check/run.sh): answers the site
+# at the situation's address (https://site.test unless it names another) as the situation
+# (scenario.json in FAKE_SITE_DIR) describes it, the way
+# WordPress and a web server would. Nothing goes over the network. It accepts exactly the options
+# bin/site-check sends, so a changed request shows up here instead of passing unnoticed.
+#
+# Every address asked for is written to requests.txt; a page or page list with "failTimes" fails
+# that many times first, counted in counts/. A situation with "siteRequiresLogin" refuses with 401
+# unless curl's configuration on standard input holds exactly that login.
+set -Euo pipefail
+
+readonly SCENARIO="$FAKE_SITE_DIR/scenario.json"
+SITE="$(jq -r '.address // "https://site.test"' "$SCENARIO")"
+readonly SITE
+readonly THEME_CLASS="wp-child-theme-example-child"
+# curl's exit status when its time limit runs out.
+readonly CURL_TIMED_OUT=28
+
+body_file=""
+headers_file=""
+address=""
+
+read_options() {
+  while (($# > 0)); do
+    case "$1" in
+      --config) [[ "$2" == - ]] || { echo "fake curl: --config must be - (standard input)" >&2; exit 2; }; shift 2 ;;
+      -sS) shift ;;
+      --max-time) shift 2 ;;
+      -D) headers_file="$2" && shift 2 ;;
+      -o) body_file="$2" && shift 2 ;;
+      -w) [[ "$2" == '%{http_code}' ]] || { echo "fake curl: unexpected -w $2" >&2; exit 2; }; shift 2 ;;
+      -*) echo "fake curl: unexpected option $1" >&2; exit 2 ;;
+      *) address="$1" && shift ;;
+    esac
+  done
+  [[ -n "$address" && -n "$body_file" && -n "$headers_file" ]] || { echo "fake curl: needs -D, -o and an address" >&2; exit 2; }
+}
+
+# The login in curl's configuration, unescaped as curl reads a quoted value.
+login_given() {
+  local configuration="$1" value
+  value="$(sed -nE 's/^user = "(.*)"$/\1/p' <<<"$configuration")"
+  value="${value//\\\"/\"}"
+  printf '%s' "${value//\\\\/\\}"
+}
+
+login_refused() {
+  local configuration="$1" required
+  required="$(jq -r '.siteRequiresLogin // empty | "\(.user):\(.password)"' "$SCENARIO")"
+  [[ -n "$required" && "$(login_given "$configuration")" != "$required" ]]
+}
+
+# How many times this address has been asked for before, counting this time.
+times_asked() {
+  local key count_file count
+  key="$(printf '%s' "$1" | md5sum | cut -d' ' -f1)"
+  count_file="$FAKE_SITE_DIR/counts/$key"
+  count=$(($(cat "$count_file" 2>/dev/null || echo 0) + 1))
+  printf '%s' "$count" >"$count_file"
+  printf '%s' "$count"
+}
+
+# The page's or page list's description in the situation, by its path.
+description_of() {
+  local path="$1"
+  if [[ "$path" == /wp-json/wp/v2/pages* ]]; then
+    jq -c '.pageList' "$SCENARIO"
+  else
+    jq -c --arg path "$path" '.pages[$path] // {}' "$SCENARIO"
+  fi
+}
+
+page_body() {
+  local kind="$1"
+  case "$kind" in
+    good) printf '<!DOCTYPE html>\n<html><head></head><body class="page %s">ok</body></html>\n' "$THEME_CLASS" ;;
+    no-theme) printf '<!DOCTYPE html>\n<html><head></head><body class="page wp-child-theme-another">ok</body></html>\n' ;;
+    longer-theme-name) printf '<!DOCTYPE html>\n<html><head></head><body class="page %s-old">ok</body></html>\n' "$THEME_CLASS" ;;
+    cut-off) printf '<!DOCTYPE html>\n<html><head></head><body class="page %s"><p>There has been a crit' "$THEME_CLASS" ;;
+    *) echo "fake curl: unknown page kind $kind" >&2; exit 2 ;;
+  esac
+}
+
+# The page list: its links (relative ones on the site) or a raw body, and WordPress's total.
+page_list_body() {
+  local description="$1"
+  jq -e 'has("body")' <<<"$description" >/dev/null && { jq -r '.body' <<<"$description"; return; }
+  jq --arg site "$SITE" '[.links[] | {link: (if startswith("/") then $site + . else . end)}]' <<<"$description"
+}
+
+answer() {
+  local status="$1" body="$2" total="${3:-}"
+  {
+    printf 'HTTP/1.1 %s\r\n' "$status"
+    [[ -z "$total" ]] || printf 'X-WP-Total: %s\r\n' "$total"
+  } >"$headers_file"
+  printf '%s' "$body" >"$body_file"
+  printf '%s' "$status"
+}
+
+main() {
+  local configuration path description fail_times asked
+  configuration="$(cat)"
+  read_options "$@"
+  printf '%s\n' "$address" >>"$FAKE_SITE_DIR/requests.txt"
+  [[ "$address" == "$SITE"/* ]] || { echo "curl: (6) Could not resolve host" >&2; printf '000'; exit 6; }
+  path="${address#"$SITE"}"
+  login_refused "$configuration" && { answer 401 'Unauthorized'; return; }
+  description="$(description_of "$path")"
+  fail_times="$(jq -r '.failTimes // 0' <<<"$description")"
+  asked="$(times_asked "$address")"
+  if jq -e '.noAnswer // false' <<<"$description" >/dev/null; then
+    printf '000'
+    exit "$CURL_TIMED_OUT"
+  fi
+  # The first failTimes requests fail with failStatus (500 unless given), the later ones answer.
+  if ((asked <= fail_times)); then
+    answer "$(jq -r '.failStatus // 500' <<<"$description")" 'failing'
+    return
+  fi
+  if [[ "$path" == /wp-json/wp/v2/pages* ]]; then
+    answer "$(jq -r '.status // 200' <<<"$description")" "$(page_list_body "$description")" "$(jq -r '.total // empty' <<<"$description")"
+  else
+    answer "$(jq -r '.status // 200' <<<"$description")" "$(page_body "$(jq -r '.kind // "good"' <<<"$description")")"
+  fi
+}
+
+main "$@"
