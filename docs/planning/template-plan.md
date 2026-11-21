@@ -18,10 +18,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.3b-2, the component specs finding their pages by the component's class, then
-  1.3c and 1.3d (T10, decided 2026-11-21; 1.2, the per-site settings file, done 2026-11-21,
-  #77 to #85; 1.3a, the tests sorted into their groups' folders, and 1.3b-1, the components'
-  example page, done 2026-11-21).
+- **Next:** step 1.3c, permanent tests for the versions check's plugin-update alerts, then 1.3d
+  (T10, decided 2026-11-21; 1.2, the per-site settings file, done 2026-11-21, #77 to #85; 1.3a
+  and 1.3b, the tests sorted into their groups' folders and the component tests finding their
+  pages, done 2026-11-21).
 - **Then, in order:** 1.4 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -222,7 +222,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     and test name the same; the same 12 scenario checks; `bin/check` passed; one scenario check
     from each folder depth and the changed and plugin specs (44) passed on the dev site, the logins
     saved in `tests/e2e/.auth/` as before.
-  - [ ] 1.3b Component tests find their pages themselves: a shared helper finds the site's test
+  - [x] 1.3b Component tests find their pages themselves: a shared helper finds the site's test
     pages that use a component, by its class, and the component's tests run on every such page
     instead of on named pages; one neutral page holding every component, built by the dev site
     outside the menu, as the baseline (T10). Test counts change here; every change reported. In
@@ -240,9 +240,25 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       parts instead of `tests/dev-content/`. Planted faults caught: a component removed from the
       page (`site-features`; `site-lead` was rightly still found, in the call to action), and a
       test page at the example page's address.
-    - [ ] 1.3b-2 The component specs switched to the helper, `pagesUsing(class)`: the example
+    - [x] 1.3b-2 The component specs switched to the helper, `pagesUsing(class)`: the example
       page plus every site page whose file in `tests/dev-content/` (lent to the test container
-      read-only) has the class; the counts reported spec by spec.
+      read-only) has the class; the counts reported spec by spec (2026-11-21). The parts a page
+      template adds (header, footer, call to action) are checked on every page that has them,
+      none at all failing; the header's behaviour on the front page, every site's. A test of an
+      arrangement (two carousels, a carousel under a heading, two panels in a row, a video
+      outside a carousel) checks it wherever a page has it and requires it on the example page;
+      video-pause reports a site page without its arrangement as skipped, with the reason. No
+      test names this site's pages, titles or videos any more: the menu's pages and titles come
+      from `site.json`, a video's name and ID from its own picture, Media & Text's sides from
+      WordPress's class (the test-only classes in the content removed). Counts (186 to 246, 4
+      of them skipped): buttons 10 to 19, carousel 10 to 18, component-styles 9 to 17, frame 10
+      to 19, header 15 to 17, media-text 5 to 10, video-facade 7 to 15, video-pause 5 to 16.
+      Found on the site's own pages: the Book page had 22px more space before the footer (the
+      form's last paragraph's margin, and Contact Form 7's rule outranking the theme's for the
+      message after sending), fixed in `form.css` (the user); and the call to action's spacing
+      test measured a page ending with a carousel wrongly (its dots lie below its box), fixed in
+      the test. Planted faults caught: the carousels' naming switched off (on the example page
+      and Music), a plain section's bottom padding left at the end of the content (Home).
   - [ ] 1.3c Permanent tests for the versions check's plugin-update alerts.
   - [ ] 1.3d The starting set for a new site written down (the template notes and this plan): the
     generic and component tests, and only the site tests its own features need.

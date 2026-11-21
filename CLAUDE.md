@@ -119,8 +119,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   PHP debug log, the `.env` safety stop, every stylesheet of the theme and the Song List labelled
   by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
-  `config/booking-form-messages.json` and `site.json`, whose test pages the specs that check every
-  page read): child theme active,
+  `config/booking-form-messages.json`, `site.json`, whose test pages the specs that check every
+  page read, and `tests/dev-content/`, where each component's tests find the pages that use it,
+  the example page and every site page with the component's class, template plan T10): child theme active,
   security headers sent, no CSP violation, no axe accessibility error at WCAG 2.2 AA, the Song
   List's page and admin form, the booking form's mail (no visitor's name in the subject), its
   message when sending fails (Mailpit made to refuse mail, in a serial group) and refusals, and its files loading only

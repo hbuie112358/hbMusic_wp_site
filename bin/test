@@ -32,7 +32,9 @@ site_answers() {
 }
 
 # The container sees only tests/e2e/ and, read-only, the booking form's messages, which a test
-# expects the visitor to see, and site.json, whose test pages the specs check (template plan 1.2g). Host networking lets it reach the site on localhost, as
+# expects the visitor to see, site.json, whose test pages the specs check (template plan 1.2g),
+# and the test pages' files in tests/dev-content/, where the component tests find the pages that
+# use their component (1.3b). Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
 # The admin's and the Editor's logins go by name, so the dev site's generated passwords stay off
 # the command line. They unlock only this throwaway site, whose admin screens the tests use.
@@ -41,10 +43,11 @@ browser_tests() {
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$REPO_ROOT/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
     -v "$SITE_SETTINGS_FILE:/config/site.json:ro" \
+    -v "$REPO_ROOT/tests/dev-content:/config/dev-content:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e "DEV_MAIL_URL=http://localhost:${DEV_MAIL_UI_PORT}" \
     -e BOOKING_FORM_MESSAGES=/config/booking-form-messages.json \
-    -e SITE_SETTINGS=/config/site.json \
+    -e SITE_SETTINGS=/config/site.json -e DEV_CONTENT=/config/dev-content \
     -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD -e DEV_ADMIN_EMAIL \
     -e DEV_EDITOR_USER -e DEV_EDITOR_PASSWORD \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
