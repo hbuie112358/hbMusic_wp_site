@@ -81,8 +81,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    live untried (it happened with Wordfence 9.1.1, plan 8j).
 
    **Has the dev site tested it?** The versions the dev site's tests ran are in
+   [`site-packages/composer.json`](https://github.com/hbuie112358/hbMusic_wp_site/blob/main/site-packages/composer.json)
+   for the plugins (`wpackagist-plugin/contact-form-7`, `wpackagist-plugin/wordpress-seo`) and in
    [`tools/versions.sh`](https://github.com/hbuie112358/hbMusic_wp_site/blob/main/tools/versions.sh)
-   (`CONTACT_FORM_7_VERSION`, `YOAST_SEO_VERSION`, `PARENT_THEME_VERSION` for Twenty Twenty-Five).
+   for the theme (`PARENT_THEME_VERSION`, Twenty Twenty-Five).
    For each update waiting on staging:
    - **The same version as there:** tested; update staging, then live.
    - **Newer than there:** not tested yet. Wait until the version there is raised and its tests
@@ -91,7 +93,8 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
      test, as above.
 
    A security fix Hostinger installs by itself does not wait for the dev site: closing a hole comes
-   first, and the version in `tools/versions.sh` is raised to it afterwards.
+   first, and the version in `site-packages/composer.json` (a plugin) or `tools/versions.sh` (the
+   theme) is raised to it afterwards.
 7. **Log into HetrixTools** (the uptime monitor, plan 8m) and glance at the monitor: up, and the
    certificate and domain dates moving on after each renewal. A free account not logged into for
    90 days has its monitors stopped.
@@ -179,16 +182,17 @@ The privacy policy promises a reply within 30 days, usually within a few days.
 
 ## When GitHub proposes a new plugin version
 
-Every Monday GitHub compares the dev site's pinned versions with WordPress.org (plan 8j). A
-plugin released at least a week ago arrives as an email about a pull request, such as "raise
-Contact Form 7 to 6.2.5". Nothing else is needed on the user's computer, and no session with
-Claude:
+Every Monday Dependabot compares the dev site's plugins (`site-packages/composer.json`) with
+WordPress.org (template plan T8). A plugin released at least a week ago arrives as an email about
+a pull request, such as "Bump wpackagist-plugin/contact-form-7 from 6.2.5 to 6.2.6". Nothing else
+is needed on the user's computer, and no session with Claude:
 
 1. Open the pull request from the email, or the repository's **Pull requests** tab on GitHub.
-2. Click **Approve and run** on its page. GitHub holds the tests of a pull request that its own
-   token opened until a person approves them (plan 8j chose this click over a stored key).
-3. About 4 minutes later, **green ticks** for `check` and `dev-site`: the new version passed the
-   dev site's tests.
+2. Its checks start by themselves. About 4 minutes later, **green ticks** for `check` and
+   `dev-site`: the new version passed the dev site's tests, including WordPress.org's checksum
+   check of every file.
+3. Look at its **Files changed**: `composer.json` and `composer.lock`, and in the lock file the new
+   download address still on `downloads.wordpress.org`.
 4. **Rebase and merge**, then **Delete branch**. GitHub allows the merge only once the checks
    pass.
 5. The new version reaches staging and live in the next monthly check (step 6), now as a tested
@@ -197,8 +201,9 @@ Claude:
 **Red crosses:** the new version breaks something the tests protect. Nothing is merged, and
 staging and live stay on their version until it has been looked at with Claude.
 
-**An issue about Twenty Twenty-Five** instead of a pull request: the theme's pin includes a
-fingerprint taken by hand, so a new theme version is raised in a session with Claude. In that
+**An issue about Twenty Twenty-Five**, from the weekly versions check (`bin/versions-check`, plan
+8j), instead of a pull request: the theme's pin includes a fingerprint taken by hand, so a new
+theme version is raised in a session with Claude. In that
 session Claude also compares the new version's `templates/page.html` and
 `templates/page-no-title.html` with the child theme's two "with call to action" templates (plan
 D29), which add only the call-to-action part and the same bottom space, and the new version's

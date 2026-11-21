@@ -34,6 +34,15 @@ site_settings_query() {
   jq -r "$program" "$SITE_SETTINGS_FILE"
 }
 
+# Prints a line for each test page in a settings file whose content file is missing from the
+# content folder, starting with the page's address. bin/dev-site refuses to build without them.
+site_settings_missing_test_pages() {
+  local settings_file="$1" content_dir="$2" address
+  while IFS= read -r address; do
+    [[ -f "$content_dir/$address.html" ]] || printf '%s: the test page has no content file %s.html\n' "$address" "$address"
+  done < <(jq -r '.testPages[].address' "$settings_file")
+}
+
 site_settings_field_names() {
   site_settings_jq 'site_settings_field_names' -n -r
 }

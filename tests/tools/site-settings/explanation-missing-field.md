@@ -1,9 +1,7 @@
 # Example explanation without the theme field
 ### slug
 ### devSiteTitle
-### plugins
-### plugins[].slug
-### plugins[].source
+### localPlugins
 ### testPages
 ### testPages[].title
 ### testPages[].address

@@ -2,11 +2,8 @@
   "slug": "example",
   "devSiteTitle": "Example (dev)",
   "theme": "example-child",
-  "plugins": [
-    {
-      "slug": "example-plugin",
-      "source": "local"
-    }
+  "localPlugins": [
+    "example-plugin"
   ],
   "testPages": [
     {

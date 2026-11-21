@@ -1,5 +1,5 @@
-# The rules for site.json (template plan T7): every field the tools read, its type, whether it is
-# required and, where the tools know the only sensible values, which ones. The one definition of
+# The rules for site.json (template plan T7): every field the tools read, its type and whether it
+# is required. The one definition of
 # the fields: the check of site.json and the check of its explanation (tools/site-settings.md)
 # both read it, so they cannot disagree. Loaded with `jq -L tools 'include "site-settings"; ...'`.
 #
@@ -11,16 +11,7 @@ def site_settings_rules: {
     slug: { type: "string", required: true },
     devSiteTitle: { type: "string", required: true },
     theme: { type: "string", required: true },
-    plugins: {
-      type: "array", required: true,
-      items: {
-        type: "object",
-        fields: {
-          slug: { type: "string", required: true },
-          source: { type: "string", required: true, allowed: ["local", "wordpress.org", "dts"] }
-        }
-      }
-    },
+    localPlugins: { type: "array", required: true, items: { type: "string" } },
     testPages: {
       type: "array", required: true,
       items: {
@@ -39,7 +30,7 @@ def site_settings_rules: {
   }
 };
 
-# "plugins" and "source" become "plugins[2].source"; at the top level a field is its own name.
+# "testPages" and "title" become "testPages[2].title"; at the top level a field is its own name.
 def site_settings_join_path($where; $key):
   if $where == "" then $key else "\($where).\($key)" end;
 
@@ -63,15 +54,13 @@ def site_settings_problems_at($rules; $where):
   elif $rules.type == "array" then
     to_entries[] | .key as $index | .value
     | site_settings_problems_at($rules.items; "\($where)[\($index)]")
-  elif ($rules.allowed // null) != null and (. as $value | $rules.allowed | index([$value]) | not) then
-    "\(shown): \(tojson) is not one of \($rules.allowed | map(tojson) | join(", "))"
   else
     empty
   end;
 
 def site_settings_problems: site_settings_problems_at(site_settings_rules; "");
 
-# Every field's name as the explanation page heads it: "plugins", "plugins[].source".
+# Every field's name as the explanation page heads it: "testPages", "testPages[].title".
 def site_settings_field_names_at($rules; $prefix):
   if $rules.type == "object" then
     $rules.fields | to_entries[]

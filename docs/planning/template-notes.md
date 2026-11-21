@@ -38,15 +38,14 @@ template project starts; until then, a list, not a to-do.
 
 ## Plugins
 
-- A site chooses its plugins (plan D19), listed in `site.json` (`plugins`, each with its source;
-  from 1.2b `bin/dev-site` installs and activates them from that list; the list moves to
-  `composer.json`, template plan T8). Each one of its own sits in `plugins/<name>/`, needs a line
-  in `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an
-  entry in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync
-  settings. A WordPress.org plugin needs its pinned version in `tools/versions.sh` (and its line
-  in `wordpress_org_plugin_version()`) until the move to Composer.
+- A site chooses its plugins (plan D19). Its downloaded ones (WordPress.org's, later DTS's own)
+  are listed at exact versions in `site-packages/composer.json`, with its lock file (template plan
+  T8, 1.2c); Dependabot raises them. The ones it keeps itself are listed in `site.json`
+  (`localPlugins`); each sits in `plugins/<name>/`, needs a line in `.gitignore`, a mount in
+  `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry in `DEPLOY_TARGETS` in
+  `bin/deploy-staging`, and a destination in the server's rsync settings.
 
-- The booking form: `config/booking-form.txt`, `config/booking-form-mail.json` and `config/booking-form-messages.json` (its "sending failed" text points to the contact links below the form on this site's Book page), and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
+- The booking form: `config/booking-form.txt`, `config/booking-form-mail.json` and `config/booking-form-messages.json` (its "sending failed" text points to the contact links below the form on this site's Book page), and Contact Form 7 in `site-packages/composer.json`.
 
 - Site mail: a mail service through FluentSMTP (plan D24), set up per site with its own account, DNS records and retention rule; it works before a site is live, unlike Gmail through Google's API.
 - Uptime monitoring (plan 8m): one HetrixTools account for every site, a monitor per live site

@@ -21,24 +21,8 @@ readonly PARENT_THEME_SLUG="twentytwentyfive"
 readonly PARENT_THEME_VERSION="1.5"
 readonly PARENT_THEME_SHA256="f333ce53aaa4049639298247d03480a4bd9b56fa8f0fea0440da262d7d595ba4"
 
-# The booking form's plugin (bin/dev-site, plan step 5e), checked against WordPress.org's checksums.
-readonly CONTACT_FORM_7_VERSION="6.2.5"
-
-# The SEO plugin (bin/dev-site, plan step 6, D25), the version live runs, checked against
-# WordPress.org's checksums.
-readonly YOAST_SEO_VERSION="28.8"
-
-# The pinned version of a WordPress.org plugin by its slug, for the plugins site.json lists with
-# the source "wordpress.org" (bin/dev-site); fails for a plugin with no pin here. The versions
-# stay in the lines above, which bin/versions-check reads and raises (template plan T7).
-wordpress_org_plugin_version() {
-  local plugin_slug="$1"
-  case "$plugin_slug" in
-    contact-form-7) printf '%s\n' "$CONTACT_FORM_7_VERSION" ;;
-    wordpress-seo) printf '%s\n' "$YOAST_SEO_VERSION" ;;
-    *) return 1 ;;
-  esac
-}
+# The downloaded plugins (Contact Form 7, Yoast SEO) are pinned in site-packages/composer.json and
+# its lock file, and raised by Dependabot (template plan T8).
 
 # Download caches survive between runs in named volumes, not in the project folder.
 readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"

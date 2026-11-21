@@ -18,6 +18,7 @@
 !/phpcs.xml.dist
 !/phpstan.neon.dist
 !/site.json
+!/site-packages/
 !/themes/
 /themes/*
 !/themes/hbmusic-child/
@@ -42,6 +43,8 @@ tests/e2e/.auth/
 # Dependencies and build output are installed from lock files, never versioned.
 node_modules/
 vendor/
+# The downloaded plugins, installed from site-packages/composer.lock by bin/dev-site.
+/site-packages/wp-content/
 
 # Playwright's run output (traces, screenshots of failures).
 test-results/

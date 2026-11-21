@@ -17,9 +17,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.2c, the site's plugins through Composer (T8). Waiting on its result: the
-  Dependabot trial (a throwaway public repository, direct-technical-solutions/
-  composer-dependabot-trial, created 2026-11-21, which the user deletes afterwards).
+- **Next:** step 1.2d, `bin/check` reading `site.json` (1.2c, the plugins through Composer, done
+  2026-11-21).
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -91,17 +90,34 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     separator; `isInMenu: false` read as true, jq's `//` replacing false). Full `bin/test`: all
     passed (175 browser tests). Five planted faults stopped the build at its start, naming the
     cause.
-  - [ ] 1.2c The site's plugins through Composer (T8): `composer.json` the one plugin list,
-    `bin/dev-site` installing from `composer.lock` and still running WordPress.org's checksum
-    check, `site.json`'s `plugins` and the plugin pins in `tools/versions.sh` removed, the plugin
-    part of `bin/versions-check` retired, the review gate's check of download addresses. To
-    decide first: the parent theme (its hand-pinned fingerprint) and how `local` plugins are
-    listed. Also here (the user, 2026-11-21, from 1.2b's review): permanent tests for
-    `bin/dev-site`'s refusals (a test page without its content file, and the plugin refusals in
-    their Composer form), as functions taking a file with broken examples in `bin/check`, as for
-    1.2a; 1.2b's were shown only on planted faults.
+  - [x] 1.2c The site's plugins through Composer (T8), 2026-11-21. Decided first (the user): the
+    parent theme stays outside Composer with its hand-pinned fingerprint, since WordPress.org
+    publishes no checksums for themes; the site's own plugins stay listed in `site.json`
+    (`localPlugins`, a plain list) until they get repositories of their own (2.2); the downloaded
+    plugins in their own folder, `site-packages/` (`composer.json` at exact versions and its lock
+    file), apart from the top-level `composer.json` of the checking tools, so `bin/check` and
+    `bin/tools-update` never touch plugins (option B). Built: `bin/dev-site` installs them with
+    Composer from the lock file in the pinned container, copies them in, activates them and runs
+    WordPress.org's checksum check; the cleanup keeps only the site's own plugins, so a rebuild
+    gets fresh copies; `tools/site-packages.sh` reads the lock file. The plugin pins and their
+    lookup left `tools/versions.sh`; `bin/versions-check` checks the theme only, its plugin
+    pull-request code removed, and its workflow can read the repository and open issues, no
+    longer push or open pull requests; Dependabot gained the `site-packages` folder, one pull
+    request per plugin with the 7-day wait. `bin/check` validates the lock file against
+    `composer.json` (an out-of-date lock fails; `--no-check-all` leaves out only Composer's advice
+    against exact versions) and audits it. `site.json`'s `source` field and the rules' "allowed
+    values" went with it. Permanent tests for `bin/dev-site`'s refusals (decided at 1.2b's
+    review): a test page without its content file, a plugin not from WordPress.org, the booking
+    form without its plugin, as functions taking files, tried by `bin/check` on examples in
+    `tests/tools/dev-site/`. Proven: the rebuild identical to 1.2b's snapshot; full `bin/test`
+    passed (175 browser tests); four planted faults caught (three stopping `bin/dev-site` at its
+    start, one, the booking refusal broken, caught only by the new examples).
   - [ ] 1.2d `bin/check` reading it (the theme folder, each plugin's coding standards, the names
     the plugins must not use), and the volume and cache names built from the slug.
+    First in this step (the user, 2026-11-21, from 1.2c's review): `bin/check`'s `main` is 31
+    lines, over the coding standards' 25 (1.2a took it to 28, missed at that review, and 1.2c to
+    31); split it into short groups (dependency, code and project checks), the same checks in the
+    same order, proven by `bin/check` running all of them.
   - [ ] 1.2e The compose file's project name and plugin mounts from it. Not verified: whether
     Docker Compose fills in a variable in `name:`; checked before this part is built, and if not,
     `bin/dev-site` passes the name on the command line.

@@ -48,6 +48,22 @@ updates:
       prefix: "build"
       include: "scope"
 
+  # The downloaded plugins the site runs (site-packages/, template plan T8): WordPress.org's
+  # plugins through WPackagist, each at an exact version. One pull request per plugin, so each
+  # update is tested and reviewed on its own before staging and live get it in the monthly check.
+  - package-ecosystem: "composer"
+    directory: "/site-packages"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/New_York"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "build"
+      include: "scope"
+
   # The browser tests' packages (tests/e2e/package.json and its lock file).
   - package-ecosystem: "npm"
     directory: "/tests/e2e"
