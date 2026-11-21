@@ -27,6 +27,14 @@ readonly SITE_SETTINGS_BAD_EXAMPLES=(
   'wrong-type.json|testPages[0].isInMenu'
   'bad-slug.json|slug'
   'bad-local-plugin.json|localPlugins[0]'
+  'deploy-missing-live.json|deploy.live'
+  'deploy-http-address.json|deploy.live.address'
+  'deploy-address-with-path.json|deploy.staging.address'
+  'deploy-unknown-page-cache.json|deploy.pageCache'
+  'deploy-bad-ssh-host.json|deploy.live.sshHost'
+  'deploy-login-in-address.json|deploy.live.address'
+  'deploy-same-ssh-host.json|deploy.staging.sshHost'
+  'deploy-same-address.json|deploy.staging.address'
 )
 readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
   'explanation-missing-field.md|theme'

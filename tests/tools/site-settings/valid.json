@@ -14,5 +14,17 @@
   ],
   "namesSharedCodeMustNotUse": [
     "example"
-  ]
+  ],
+  "deploy": {
+    "pageCache": "none",
+    "live": {
+      "sshHost": "example-live",
+      "address": "https://example.com"
+    },
+    "staging": {
+      "sshHost": "example-staging",
+      "address": "https://staging.example.com",
+      "isBehindPassword": true
+    }
+  }
 }

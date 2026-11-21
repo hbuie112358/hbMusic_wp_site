@@ -22,8 +22,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
-  error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check); next is 1.4c,
-  `site.json`'s `deploy` section.
+  error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check, #90), 1.4c done
+  (`site.json`'s `deploy` section); next is 1.4d, `bin/deploy` itself.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -328,9 +328,23 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     the way, not caused by it: one PHP warning in the dev site's debug log from WordPress's theme
     update check failing to reach WordPress.org, most likely from a hand-typed `wp theme list`
     (WP-CLI asks WordPress.org first); not seen again in a clean run.
-  - [ ] 1.4c `site.json`'s `deploy` section (each place's SSH name, address and whether it is
+  - [x] 1.4c `site.json`'s `deploy` section (each place's SSH name, address and whether it is
     behind a password; live only after staging; the page cache), with its rules, explanations and
-    broken examples.
+    broken examples. Built 2026-11-21: `deploy` optional (a site not deployed yet), with
+    `pageCache` (required, `"none"` the only value: a cache the tools cannot clear yet is refused,
+    not skipped), `live` (required) and `staging` (optional), each with `sshHost` (a short name in
+    the user's SSH settings, which hold the server, account, port and key), `address` (`https://`
+    and the host only) and `isBehindPassword` (its login from `.env` as
+    `<PLACE>_CHECK_USER`/`_PASSWORD`). "Live only after staging" needs no field: it is the
+    handbook's rule wherever staging exists. No field lists what is copied or the server's
+    folders, which follow the theme's and plugins' folder names, plus `deploy-note` and
+    `php-log`. The rules gained allowed values again (removed at 1.2c when unused). The two
+    addresses in `site.json` approved by the user (the project rule against the domain in the
+    repository covers theme code and server files). From the review (the user's choice, both
+    findings): staging and live must differ in `sshHost` and `address` (a rule across fields, so
+    a deploy to staging can never land on live), and an address may hold no login
+    (`user:password@`). Eight broken examples refused, five planted faults in the rules caught;
+    nothing reads the section until 1.4d.
   - [ ] 1.4d `bin/deploy staging|live [--commit <commit>]`, with its tests: the refusals as
     functions on examples in `bin/check`, and a run from start to finish against a throwaway
     server container (sshd and rsync with the same forced-command restriction, a stand-in `gh`),
