@@ -28,6 +28,18 @@ readonly CONTACT_FORM_7_VERSION="6.2.5"
 # WordPress.org's checksums.
 readonly YOAST_SEO_VERSION="28.8"
 
+# The pinned version of a WordPress.org plugin by its slug, for the plugins site.json lists with
+# the source "wordpress.org" (bin/dev-site); fails for a plugin with no pin here. The versions
+# stay in the lines above, which bin/versions-check reads and raises (template plan T7).
+wordpress_org_plugin_version() {
+  local plugin_slug="$1"
+  case "$plugin_slug" in
+    contact-form-7) printf '%s\n' "$CONTACT_FORM_7_VERSION" ;;
+    wordpress-seo) printf '%s\n' "$YOAST_SEO_VERSION" ;;
+    *) return 1 ;;
+  esac
+}
+
 # Download caches survive between runs in named volumes, not in the project folder.
 readonly COMPOSER_CACHE_VOLUME="hbmusic_composer_cache"
 readonly NPM_CACHE_VOLUME="hbmusic_npm_cache"

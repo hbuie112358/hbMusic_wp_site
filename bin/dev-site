@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Builds or rebuilds the dev site (plan step 4b): a fresh WordPress with the child theme from
-# themes/hbmusic-child/ (mounted read-only), the parent theme at its pinned version and
-# fingerprint, and scripted test content; no real data. Each run starts from an empty
-# database, so the site is the same every time. Runs alone: no backup needed, so CI can build it
-# too (step 4d).
+# Builds or rebuilds the dev site (plan step 4b): a fresh WordPress with the site's own theme
+# (mounted read-only), the parent theme at its pinned version and fingerprint, the site's
+# plugins, and scripted test content; no real data. The site's facts (its theme, plugins, title
+# and test pages) come from site.json (template plan T7); its own extra steps, if any, from
+# tests/dev-setup.sh. Each run starts from an empty database, so the site is the same every
+# time. Runs alone: no backup needed, so CI can build it too (step 4d).
 set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -11,42 +12,29 @@ readonly REPO_ROOT
 readonly ENV_FILE="$REPO_ROOT/.env"
 readonly WAIT_SECONDS=120
 readonly WAIT_INTERVAL_SECONDS=2
-readonly CHILD_THEME="hbmusic-child"
-readonly SONG_LIST_PLUGIN="song-list"
-readonly SITE_HARDENING_PLUGIN="site-hardening"
-readonly EDITING_HELP_PLUGIN="editing-help"
+# The plugins whose setup the tools know, set up only when site.json lists them.
 readonly FORM_PLUGIN="contact-form-7"
 readonly SEO_PLUGIN="wordpress-seo"
+# The booking form's files (config/); a site without them has no booking form on its dev site.
+readonly BOOKING_FORM_FILE="$REPO_ROOT/config/booking-form.txt"
+readonly SITE_DEV_SETUP="$REPO_ROOT/tests/dev-setup.sh"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
   DEV_ADMIN_USER DEV_ADMIN_PASSWORD DEV_ADMIN_EMAIL DEV_EDITOR_USER DEV_EDITOR_PASSWORD DEV_EDITOR_EMAIL
 )
-# The test pages as "title|address|template", in menu order: the new site's pages (plan D22), with
-# the templates the real pages use (empty: WordPress's default), so templates and navigation are
-# exercised as the real site will use them; their text is neutral sample text (no real data). Home
-# opens with its own headline, so it uses a template without WordPress's page title.
-readonly TEST_PAGES=(
-  'Home|home|page-no-title-with-call-to-action'
-  'Music|music|page-with-call-to-action'
-  'Songs|songlist|page-with-call-to-action'
-  'About|about|page-with-call-to-action'
-  'Book|hire-acoustic-guitarist|'
-  'Privacy Policy|privacy-policy|'
-)
-# Linked from the footer, not the menu.
-readonly PAGE_OUTSIDE_MENU="Privacy Policy"
-# Chosen in Settings → Privacy, as on staging and live: the footer's link follows that setting
-# (the theme's hbmusic_link_privacy_policy()).
-readonly PRIVACY_POLICY_PAGE="Privacy Policy"
-# Sample songs as "title|artist", deliberately out of order, with an ampersand and tags to be
-# shown as plain text, and one song without an artist: tests/e2e/specs/dev/song-list.spec.ts
-# expects them sorted and escaped. Neutral text, no real data.
-readonly TEST_SONGS=(
-  'Zulu Sample Song|'
-  'Rock & Roll <em>Sample</em>|Sample Artist Two'
-  'Alpha Sample Song|Sample Artist One'
-)
+
+# The site's facts from site.json, read once at the start (load_site_settings). The test pages
+# are lines of fields: title, address, page template (empty: WordPress's default), and whether
+# the page is the front page, the privacy page, and in the menu. The fields are separated by the
+# ASCII unit separator, not a tab: bash's read merges consecutive tabs, so an empty template
+# would shift every later field one place left.
+readonly TEST_PAGE_FIELD_SEPARATOR=$'\x1f'
+CHILD_THEME=""
+DEV_SITE_TITLE=""
+LOCAL_PLUGINS=()
+WORDPRESS_ORG_PLUGINS=()
+TEST_PAGES=()
 
 log() { printf '%s [dev-site] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
@@ -60,6 +48,9 @@ source "$REPO_ROOT/tools/versions.sh"
 # .env: creating it, adding new settings, loading and checking them.
 # shellcheck source=tools/settings.sh
 source "$REPO_ROOT/tools/settings.sh"
+# site.json: the site's facts and their rules.
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" "$@"; }
 
@@ -69,10 +60,68 @@ wp_cli() { compose run --rm -T cli wp "$@"; }
 
 require_tools() {
   local tool
-  for tool in docker curl sha256sum; do
+  for tool in docker curl sha256sum jq; do
     command -v "$tool" >/dev/null || fail "$tool is not installed"
   done
   docker compose version >/dev/null 2>&1 || fail "the docker compose plugin is not installed"
+}
+
+# Reads the site's facts, after checking site.json against its rules, so a mistake in it stops
+# the build before anything is changed rather than halfway through.
+load_site_settings() {
+  local problems
+  [[ -f "$SITE_SETTINGS_FILE" ]] || fail "site.json is missing; tools/site-settings.md lists its fields"
+  problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || fail "site.json is not valid JSON"
+  [[ -z "$problems" ]] || fail "site.json does not follow its rules: $(paste -sd ';' <<<"$problems")"
+  CHILD_THEME="$(site_setting .theme)"
+  DEV_SITE_TITLE="$(site_setting .devSiteTitle)"
+  mapfile -t LOCAL_PLUGINS < <(site_settings_query '.plugins[] | select(.source == "local") | .slug')
+  mapfile -t WORDPRESS_ORG_PLUGINS < <(site_settings_query '.plugins[] | select(.source == "wordpress.org") | .slug')
+  mapfile -t TEST_PAGES < <(site_settings_query '.testPages[]
+    | [.title, .address, (.pageTemplate // ""), (.isFrontPage // false), (.isPrivacyPolicy // false), (if has("isInMenu") then .isInMenu else true end)]
+    | map(tostring) | join("\u001f")')
+  readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
+  require_supported_plugin_sources
+  require_pinned_versions
+  require_test_page_files
+  require_booking_form_plugin
+}
+
+require_booking_form_plugin() {
+  [[ -f "$BOOKING_FORM_FILE" ]] || return 0
+  site_has_plugin "$FORM_PLUGIN" || fail "config/booking-form.txt exists, but site.json does not list $FORM_PLUGIN"
+}
+
+# A DTS plugin release has no installer yet; it comes with the shared plugins (template plan 2.2).
+require_supported_plugin_sources() {
+  local dts_plugins
+  dts_plugins="$(site_settings_query '.plugins[] | select(.source == "dts") | .slug' | paste -sd ' ')"
+  [[ -z "$dts_plugins" ]] || fail "site.json lists DTS plugins ($dts_plugins); bin/dev-site cannot install them yet"
+}
+
+require_pinned_versions() {
+  local plugin_slug
+  for plugin_slug in "${WORDPRESS_ORG_PLUGINS[@]}"; do
+    wordpress_org_plugin_version "$plugin_slug" >/dev/null ||
+      fail "site.json lists $plugin_slug from WordPress.org, but tools/versions.sh pins no version for it"
+  done
+}
+
+require_test_page_files() {
+  local test_page title address
+  for test_page in "${TEST_PAGES[@]}"; do
+    IFS="$TEST_PAGE_FIELD_SEPARATOR" read -r title address _ <<<"$test_page"
+    [[ -f "$REPO_ROOT/tests/dev-content/$address.html" ]] ||
+      fail "site.json's test page \"$title\" has no content file tests/dev-content/$address.html"
+  done
+}
+
+site_has_plugin() {
+  local wanted_slug="$1" plugin_slug
+  for plugin_slug in "${LOCAL_PLUGINS[@]}" "${WORDPRESS_ORG_PLUGINS[@]}"; do
+    [[ "$plugin_slug" == "$wanted_slug" ]] && return 0
+  done
+  return 1
 }
 
 wait_for_wordpress_files() {
@@ -90,7 +139,7 @@ install_wordpress() {
   log "Emptying the dev site's database and installing WordPress at $address"
   wp_cli --skip-plugins --skip-themes db reset --yes
   # --skip-email: the dev site sends no mail. The password comes from .env and is never printed.
-  wp_cli --skip-plugins --skip-themes core install --url="$address" --title="Howard Buie Music (dev)" \
+  wp_cli --skip-plugins --skip-themes core install --url="$address" --title="$DEV_SITE_TITLE" \
     --admin_user="$DEV_ADMIN_USER" --admin_password="$DEV_ADMIN_PASSWORD" \
     --admin_email="$DEV_ADMIN_EMAIL" --skip-email >/dev/null
 }
@@ -128,14 +177,16 @@ remove_unused_code() {
     [[ "$theme" == "$PARENT_THEME_SLUG" || "$theme" == "$CHILD_THEME" ]] && continue
     wp_cli theme delete "$theme"
   done
-  # The project's own plugins are mounted read-only from the repository, so they could not be deleted.
-  wp_cli plugin delete --all --exclude="$SONG_LIST_PLUGIN,$SITE_HARDENING_PLUGIN,$EDITING_HELP_PLUGIN,$FORM_PLUGIN,$SEO_PLUGIN"
+  # The site's own plugins are mounted read-only from the repository, so they could not be deleted.
+  local site_plugins
+  site_plugins="$(printf '%s\n' "${LOCAL_PLUGINS[@]}" "${WORDPRESS_ORG_PLUGINS[@]}" | paste -sd ',')"
+  wp_cli plugin delete --all --exclude="$site_plugins"
 }
 
 configure_site() {
-  log "Activating $CHILD_THEME, $SONG_LIST_PLUGIN, $SITE_HARDENING_PLUGIN and $EDITING_HELP_PLUGIN, discouraging search engines, setting the live site's permalinks"
+  log "Activating $CHILD_THEME and the site's own plugins (${LOCAL_PLUGINS[*]:-none}), discouraging search engines, setting the live site's permalinks"
   wp_cli theme activate "$CHILD_THEME"
-  wp_cli plugin activate "$SONG_LIST_PLUGIN" "$SITE_HARDENING_PLUGIN" "$EDITING_HELP_PLUGIN"
+  ((${#LOCAL_PLUGINS[@]} == 0)) || wp_cli plugin activate "${LOCAL_PLUGINS[@]}"
   wp_cli option update blog_public 0
   # Avatars off, as on staging and live: the site has no comments, and WordPress would otherwise
   # show logged-in users' pictures from Gravatar, which the policy refuses and which sends a code
@@ -145,22 +196,24 @@ configure_site() {
   wp_cli rewrite structure '/%postname%/'
 }
 
-create_test_songs() {
-  local song title artist
-  for song in "${TEST_SONGS[@]}"; do
-    title="${song%%|*}"
-    artist="${song#*|}"
-    wp_cli post create --post_type=songlist_song --post_status=publish --post_title="$title" \
-      --meta_input="{\"songlist_artist\":\"$artist\"}" --porcelain >/dev/null
+# Each WordPress.org plugin site.json lists, at the version tools/versions.sh pins, checked
+# against WordPress.org's checksums before the build goes on.
+install_wordpress_org_plugins() {
+  local plugin_slug version
+  for plugin_slug in "${WORDPRESS_ORG_PLUGINS[@]}"; do
+    version="$(wordpress_org_plugin_version "$plugin_slug")"
+    log "Installing $plugin_slug $version from WordPress.org"
+    wp_cli plugin install "$plugin_slug" --version="$version" --force --activate
+    wp_cli plugin verify-checksums "$plugin_slug"
   done
 }
 
 # The booking form as the real sites have it, from its files in config/, with stand-in Turnstile
-# keys that only the dev site's stand-in for Cloudflare accepts.
-install_booking_form() {
-  log "Installing $FORM_PLUGIN $CONTACT_FORM_7_VERSION and the booking form"
-  wp_cli plugin install "$FORM_PLUGIN" --version="$CONTACT_FORM_7_VERSION" --force --activate
-  wp_cli plugin verify-checksums "$FORM_PLUGIN"
+# keys that only the dev site's stand-in for Cloudflare accepts. A site without the files has no
+# booking form; one with them needs the form's plugin (require_booking_form_plugin).
+configure_booking_form() {
+  [[ -f "$BOOKING_FORM_FILE" ]] || return 0
+  log "Setting up the booking form"
   local form_id
   form_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=wpcf7_contact_form --post_status=publish \
     --post_title="Booking form" --porcelain)"
@@ -196,10 +249,9 @@ set_booking_form_messages() {
 # As a PHP array, shared by the step that saves the settings and the one that checks them.
 readonly YOAST_SETTINGS_PHP='array( "disable-author" => true, "tracking" => false, "enable_ai_generator" => false )'
 
-install_seo_plugin() {
-  log "Installing $SEO_PLUGIN $YOAST_SEO_VERSION; author archives, usage tracking and the AI generator off"
-  wp_cli plugin install "$SEO_PLUGIN" --version="$YOAST_SEO_VERSION" --force --activate
-  wp_cli plugin verify-checksums "$SEO_PLUGIN"
+configure_seo_plugin() {
+  site_has_plugin "$SEO_PLUGIN" || return 0
+  log "Setting up $SEO_PLUGIN: author archives, usage tracking and the AI generator off"
   # A name Yoast does not know stops the build: Yoast ignores unknown names, so a setting renamed
   # in a new version would otherwise stop applying without a sign (plan step 8g).
   wp_cli eval "\$known = WPSEO_Options::get_all();
@@ -217,13 +269,15 @@ install_seo_plugin() {
 # Yoast writes its Organization into the page data only for a company with a name and a logo
 # (its Meta_Tags_Context::generate_site_represents, 28.8), and the child theme extends that piece
 # (plan 8h). The real name and logo are content, set by hand on staging and live
-# (docs/ENVIRONMENTS.md); the dev site gets a neutral name and the theme's own logo, imported into
-# the media library, so the extension has something to extend.
+# (docs/ENVIRONMENTS.md); the dev site gets a neutral name and a picture WordPress itself ships,
+# imported into the media library, so the extension has something to extend whatever the site's
+# theme holds (the tests check only that a logo is there).
 readonly DEV_ORGANIZATION_NAME="Dev site organization"
-readonly DEV_ORGANIZATION_LOGO="/var/www/html/wp-content/themes/hbmusic-child/assets/images/howard-buie-logo.png"
+readonly DEV_ORGANIZATION_LOGO="/var/www/html/wp-admin/images/w-logo-blue.png"
 
 set_dev_organization() {
-  log "Giving Yoast a stand-in organization: \"$DEV_ORGANIZATION_NAME\" with the theme's logo"
+  site_has_plugin "$SEO_PLUGIN" || return 0
+  log "Giving Yoast a stand-in organization: \"$DEV_ORGANIZATION_NAME\" with WordPress's own logo"
   local logo_id logo_url
   logo_id="$(wp_cli media import "$DEV_ORGANIZATION_LOGO" --title="Organization logo" --porcelain)"
   [[ "$logo_id" =~ ^[0-9]+$ ]] || fail "the logo's import gave no attachment ID: $logo_id"
@@ -238,43 +292,46 @@ set_dev_organization() {
     }"
 }
 
+# The test pages from site.json, in its order, with the templates the real pages use, so templates
+# and navigation are exercised as the real site uses them; their text is neutral sample text.
 create_test_content() {
-  log "Replacing WordPress's sample content with the test pages: ${TEST_PAGES[*]}"
-  local ids position=0 test_page title address template page_id
+  log "Replacing WordPress's sample content with the test pages from site.json"
+  local ids position=0 test_page
   ids="$(wp_cli post list --post_type=post,page --post_status=any --format=ids)"
   # shellcheck disable=SC2086 # a space-separated list of post IDs
   [[ -n "$ids" ]] && wp_cli post delete $ids --force >/dev/null
   for test_page in "${TEST_PAGES[@]}"; do
-    IFS='|' read -r title address template <<<"$test_page"
     position=$((position + 1))
-    # As the admin: WordPress strips the Music page's video frame from anyone else's content.
-    page_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
-      --post_title="$title" --post_name="$address" --menu_order="$position" --porcelain \
-      --post_content="$(cat "$REPO_ROOT/tests/dev-content/$address.html")")"
-    if [[ -n "$template" ]]; then
-      wp_cli post meta update "$page_id" _wp_page_template "$template" >/dev/null
-    fi
-    if [[ "$title" == "Home" ]]; then
-      wp_cli option update page_on_front "$page_id" >/dev/null
-    fi
-    if [[ "$title" == "$PRIVACY_POLICY_PAGE" ]]; then
-      wp_cli option update wp_page_for_privacy_policy "$page_id" >/dev/null
-    fi
+    create_test_page "$test_page" "$position"
   done
   wp_cli option update show_on_front page >/dev/null
   create_navigation_menu
-  create_test_songs
+}
+
+# One test page: created, given its template, and chosen as the front page or the privacy page
+# (Settings → Privacy, which the footer's link follows) when site.json says so.
+create_test_page() {
+  local test_page="$1" position="$2" title address template is_front_page is_privacy_policy page_id
+  IFS="$TEST_PAGE_FIELD_SEPARATOR" read -r title address template is_front_page is_privacy_policy _ <<<"$test_page"
+  # As the admin: WordPress strips the Music page's video frame from anyone else's content.
+  page_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
+    --post_title="$title" --post_name="$address" --menu_order="$position" --porcelain \
+    --post_content="$(cat "$REPO_ROOT/tests/dev-content/$address.html")")"
+  [[ -z "$template" ]] || wp_cli post meta update "$page_id" _wp_page_template "$template" >/dev/null
+  [[ "$is_front_page" != true ]] || wp_cli option update page_on_front "$page_id" >/dev/null
+  [[ "$is_privacy_policy" != true ]] || wp_cli option update wp_page_for_privacy_policy "$page_id" >/dev/null
 }
 
 # A real navigation menu with the test pages, as the live site will have. Without one, the
 # theme's header falls back to WordPress's automatic page list, which nests a list directly in
 # a list (an accessibility error the real site would not have). The navigation block uses the
-# newest menu when none is chosen.
+# newest menu when none is chosen. A page site.json keeps out of the menu (the privacy page,
+# linked from the footer) is left out.
 create_navigation_menu() {
-  local test_page title links="" address
+  local test_page title links="" address is_in_menu
   for test_page in "${TEST_PAGES[@]}"; do
-    title="${test_page%%|*}"
-    [[ "$title" == "$PAGE_OUTSIDE_MENU" ]] && continue
+    IFS="$TEST_PAGE_FIELD_SEPARATOR" read -r title _ _ _ _ is_in_menu <<<"$test_page"
+    [[ "$is_in_menu" == true ]] || continue
     address="$(wp_cli post list --post_type=page --title="$title" --field=url)"
     links+="<!-- wp:navigation-link {\"label\":\"$title\",\"url\":\"$address\",\"kind\":\"post-type\",\"type\":\"page\"} /-->"
   done
@@ -293,8 +350,18 @@ clear_uploads() {
   compose exec -T wordpress sh -c 'rm -rf /var/www/html/wp-content/uploads/*'
 }
 
+# The site's own build steps, if it has any: sourced after the rest, so they can use wp_cli, log
+# and fail like the steps above.
+run_site_dev_setup() {
+  [[ -f "$SITE_DEV_SETUP" ]] || return 0
+  log "Running the site's own build steps (tests/dev-setup.sh)"
+  # shellcheck source=tests/dev-setup.sh
+  source "$SITE_DEV_SETUP"
+}
+
 main() {
   require_tools
+  load_site_settings
   ensure_env_file
   load_env
   require_settings
@@ -309,10 +376,12 @@ main() {
   install_parent_theme
   remove_unused_code
   configure_site
-  install_booking_form
-  install_seo_plugin
+  install_wordpress_org_plugins
+  configure_booking_form
+  configure_seo_plugin
   set_dev_organization
   create_test_content
+  run_site_dev_setup
   clear_debug_log
   log "Done. Dev site: http://localhost:${DEV_SITE_PORT}  Admin: http://localhost:${DEV_SITE_PORT}/wp-admin"
   log "Log in as ${DEV_ADMIN_USER}; the password is DEV_ADMIN_PASSWORD in .env (the Editor: ${DEV_EDITOR_USER}, DEV_EDITOR_PASSWORD)"
