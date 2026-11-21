@@ -13,8 +13,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Where the work stands:** planned 2026-11-20 (T1-T4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (2026-11-20; its settings in
   the handbook's `toolkit/github.md`). Nothing else is built.
-- **Next:** step 1.2, the per-site settings file, designed 2026-11-21 (T7); its first part,
-  1.2a, is next. Step 1.1 decided 2026-11-21: the shared `dts-site-components` plugin (T5, its
+- **Next:** step 1.2b, `bin/dev-site` reading `site.json` (T7; 1.2a, the file and its checks,
+  done 2026-11-21). Step 1.1 decided 2026-11-21: the shared `dts-site-components` plugin (T5, its
   first check passed on the dev site), and two modes for a site, central while DTS manages it
   and detached at a handover (T6).
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
@@ -64,8 +64,14 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   naming this site (25 files outside the theme named `hbmusic` on 2026-11-20; `bin/dev-site` the
   most). In small pull requests, each with the checks and the review gate, this site's
   `bin/check` and `bin/test` passing unchanged after each:
-  - [ ] 1.2a `site.json`, its loader for the scripts, its check in `bin/check`, and
-    `site-settings.md` with the two-way check of its headings.
+  - [x] 1.2a `site.json`, its loader for the scripts, its check in `bin/check`, and
+    `site-settings.md` with the two-way check of its headings (2026-11-21): the rules in
+    `tools/site-settings.jq`, the shared functions in `tools/site-settings.sh`, three new checks
+    in `bin/check` (the file, its explanation, and broken examples in
+    `tests/tools/site-settings/` that must stay refused), `jq` checked at `bin/check`'s start.
+    Five planted faults caught (a typo'd field, a wrong type, a missing and a stale heading, and
+    the typo rule itself removed, which only the broken examples noticed); `jq` missing from the
+    computer was not planted. Nothing reads `site.json` yet besides its checks.
   - [ ] 1.2b `bin/dev-site` reading it (the theme, the plugins, the test pages, the title, the
     stand-in organization's logo).
   - [ ] 1.2c `bin/check` reading it (the theme folder, each plugin's coding standards, the names

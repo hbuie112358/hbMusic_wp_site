@@ -17,6 +17,7 @@
 !/composer.lock
 !/phpcs.xml.dist
 !/phpstan.neon.dist
+!/site.json
 !/themes/
 /themes/*
 !/themes/hbmusic-child/

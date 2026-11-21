@@ -1,0 +1,22 @@
+{
+  "slug": "example",
+  "devSiteTitle": "Example (dev)",
+  "theme": "example-child",
+  "plugins": [
+    {
+      "slug": "example-plugin",
+      "source": "local"
+    }
+  ],
+  "testPages": [
+    {
+      "title": "Home",
+      "address": "home",
+      "isFrontPage": true,
+      "isInMenu": "no"
+    }
+  ],
+  "namesPluginsMustNotUse": [
+    "example"
+  ]
+}

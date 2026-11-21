@@ -1,0 +1,21 @@
+{
+	"slug": "hbmusic",
+	"devSiteTitle": "Howard Buie Music (dev)",
+	"theme": "hbmusic-child",
+	"plugins": [
+		{ "slug": "song-list", "source": "local" },
+		{ "slug": "site-hardening", "source": "local" },
+		{ "slug": "editing-help", "source": "local" },
+		{ "slug": "contact-form-7", "source": "wordpress.org" },
+		{ "slug": "wordpress-seo", "source": "wordpress.org" }
+	],
+	"testPages": [
+		{ "title": "Home", "address": "home", "pageTemplate": "page-no-title-with-call-to-action", "isFrontPage": true },
+		{ "title": "Music", "address": "music", "pageTemplate": "page-with-call-to-action" },
+		{ "title": "Songs", "address": "songlist", "pageTemplate": "page-with-call-to-action" },
+		{ "title": "About", "address": "about", "pageTemplate": "page-with-call-to-action" },
+		{ "title": "Book", "address": "hire-acoustic-guitarist" },
+		{ "title": "Privacy Policy", "address": "privacy-policy", "isPrivacyPolicy": true, "isInMenu": false }
+	],
+	"namesPluginsMustNotUse": ["hbmusic", "howard", "buie", "hostinger"]
+}
