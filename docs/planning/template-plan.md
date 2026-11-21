@@ -11,7 +11,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 ## Current position
 
 - **Where the work stands:** planned 2026-11-20 (T1-T4); step 1.1 decided 2026-11-21 (T5, T6);
-  `site.json` built (1.2a) and read by `bin/dev-site` (1.2b), 2026-11-21. The plan reviewed the
+  `site.json` built (1.2a) and read by `bin/dev-site` (1.2b), the downloaded plugins pinned with
+  Composer (1.2c), 2026-11-21 (#77 to #79). The plan reviewed the
   same day as a whole for overkill and gaps (the user's request): pinning moves to Composer (T8);
   new sites start with fewer site tests (1.3); `bin/detach` stays, built in 2.1; a routine for a
   new site's first content and a developer guide added (2.4). The GitHub organization
@@ -24,13 +25,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
-- **Waiting on the user:** deleting the trial repository once its result is in (the tools here
-  cannot delete repositories).
 - **Open decisions waiting on the user:** the handbook's wording for T5 (chapter 7) and T6
   (chapters 7 and 9), proposed when each is built and approved by the user before anything is
   written there; whether tools updates merge by themselves once their checks pass (GitHub's
-  auto-merge, T6); the second site's facts (a new build or a takeover; the user's own or a
-  customer's, which decides a public or private repository).
+  auto-merge, T6); whether the new site's repository is public or private (2.5).
 - **Shared with the rebuild plan:** `bin/deploy` is this plan's step 1.4 and the rebuild plan's
   item 5, done once.
 - **Stale:** nothing yet.
@@ -162,3 +160,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     host preview, H102).
 - [ ] **2.5 The second site** started from the starter; the template adjusted along the way
   (H29: what is truly shared is only known with a second site in view).
+  The second site (the user, 2026-11-21): DTS's own website, a new WordPress build, the user's own
+  site (no separate type; the user is its customer). The organization's `website` repository
+  holds an earlier Hugo version that is only a shell; only its logo is kept. At this step: the
+  logo saved into the new site's theme (or its data folder) and checked first, then `website`
+  deleted on GitHub, and the site created fresh from the starter as `dts-website` (clean history,
+  the organization's lowercase naming), with the starter version it began from recorded (T4).
+  The trial repository `composer-dependabot-trial` was deleted by the user, 2026-11-21.
