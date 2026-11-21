@@ -14,7 +14,12 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   direct-technical-solutions exists and the handbook moved into it (2026-11-20; its settings in
   the handbook's `toolkit/github.md`). Nothing else is built.
 - **Next:** step 1.1, the two technical decisions, talked through one at a time: where the
-  generic theme code lives, then how a site pulls in the pinned tools.
+  generic theme code lives, then how a site pulls in the pinned tools. **1.1(a) begun
+  (2026-11-20):** the shared `dts-site-components` plugin explained (what moves, what stays the
+  site's, why a plugin and not the theme, what goes in it and what gets a plugin of its own); the
+  user's decision is waiting, with the question whether the dev-site test (a plugin's block
+  styles shown in the Site Editor as the theme's are) comes before deciding or as the first step
+  of building it.
 - **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
