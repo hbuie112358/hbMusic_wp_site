@@ -1,0 +1,9 @@
+{
+  "description": "A page failing every time: tried again until the deadline, then it fails, naming the page.",
+  "options": ["--deadline", "2", "--retry-every", "1"],
+  "pageList": { "links": ["/about/"], "total": 1 },
+  "pages": { "/about/": { "failTimes": 1000 } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/"],
+  "expectAskedAtLeast": { "https://site.test/about/": 2 }
+}

@@ -1,0 +1,10 @@
+{
+  "description": "A login for a plain http:// address on another computer: it refuses to start, naming the address, and asks for nothing.",
+  "address": "http://site.test",
+  "login": { "SITE_CHECK_USER": "checker", "SITE_CHECK_PASSWORD": "secret" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 2,
+  "expectOutputNaming": ["http://site.test"],
+  "expectNotAsked": ["http://site.test/"]
+}

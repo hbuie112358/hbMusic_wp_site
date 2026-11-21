@@ -1,0 +1,7 @@
+{
+  "description": "A page showing another theme: it fails, naming the page and the theme's class.",
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "kind": "no-theme" } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "wp-child-theme-example-child"]
+}

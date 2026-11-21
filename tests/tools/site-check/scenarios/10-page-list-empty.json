@@ -1,0 +1,6 @@
+{
+  "description": "An empty page list: it fails, never passing with nothing checked.",
+  "pageList": { "links": [], "total": 0 },
+  "pages": {},
+  "expectStatus": 1
+}

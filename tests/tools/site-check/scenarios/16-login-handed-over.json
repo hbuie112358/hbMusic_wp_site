@@ -1,0 +1,8 @@
+{
+  "description": "A site behind a password, the login given (a password with a quote and a backslash): it passes.",
+  "login": { "SITE_CHECK_USER": "checker", "SITE_CHECK_PASSWORD": "pa\"ss\\word" },
+  "siteRequiresLogin": { "user": "checker", "password": "pa\"ss\\word" },
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 0
+}

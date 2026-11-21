@@ -1,0 +1,7 @@
+{
+  "description": "The page list failing once: tried again, it answers and the pages pass.",
+  "options": ["--deadline", "5", "--retry-every", "1"],
+  "pageList": { "links": ["/"], "total": 1, "failTimes": 1, "failStatus": 503 },
+  "pages": {},
+  "expectStatus": 0
+}

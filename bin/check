@@ -306,6 +306,13 @@ versions_check_alerts() {
   bash "$REPO_ROOT/tests/tools/versions-check/run.sh"
 }
 
+# The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
+# redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
+# against a stand-in site; nothing goes over the network.
+site_check_situations() {
+  bash "$REPO_ROOT/tests/tools/site-check/run.sh"
+}
+
 shellcheck_scripts() {
   local script scenario_scripts tool_test_scripts scripts=()
   # The scenario checks sit in their groups' folders (template plan 1.3a).
@@ -559,6 +566,7 @@ run_standards_and_rule_checks() {
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
   run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
   run_check "The versions check's alerts" versions_check_alerts
+  run_check "The page check on known situations" site_check_situations
 }
 
 run_analysis_and_file_checks() {

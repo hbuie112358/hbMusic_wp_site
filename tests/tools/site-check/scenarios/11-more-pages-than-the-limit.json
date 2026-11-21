@@ -1,0 +1,8 @@
+{
+  "description": "A site with 101 pages, more than the 100 checked: it fails, naming the total, and opens no page.",
+  "pageList": { "links": ["/"], "total": 101 },
+  "pages": {},
+  "expectStatus": 1,
+  "expectOutputNaming": ["101"],
+  "expectNotAsked": ["https://site.test/"]
+}

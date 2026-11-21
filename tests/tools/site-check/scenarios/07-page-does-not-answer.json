@@ -1,0 +1,7 @@
+{
+  "description": "A page that does not answer in time: it fails, naming the page.",
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "noAnswer": true } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/"]
+}

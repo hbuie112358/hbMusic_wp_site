@@ -1,0 +1,7 @@
+{
+  "description": "A page whose theme's class only starts with the site's theme's name: it fails.",
+  "pageList": { "links": ["/about/"], "total": 1 },
+  "pages": { "/about/": { "kind": "longer-theme-name" } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "wp-child-theme-example-child"]
+}

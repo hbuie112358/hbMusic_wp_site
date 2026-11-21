@@ -1,0 +1,8 @@
+{
+  "description": "A deadline that is not a number: it refuses to start, naming the option.",
+  "options": ["--deadline", "soon"],
+  "pageList": { "links": ["/"], "total": 1 },
+  "pages": {},
+  "expectStatus": 2,
+  "expectOutputNaming": ["--deadline"]
+}
