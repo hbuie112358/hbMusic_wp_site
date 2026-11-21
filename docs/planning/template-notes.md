@@ -148,6 +148,29 @@ template project starts; until then, a list, not a to-do.
   `HBMUSIC_AREAS_SERVED`, both the site's; the dev site's stand-in organization in `bin/dev-site`
   (`DEV_ORGANIZATION_NAME`) is generic.
 
+## Tests a new site starts with
+
+Decided at template plan 1.3d (2026-11-21, T10): a new site starts with the tests that come with
+its pieces and writes few of its own.
+
+- **Generic tests** (with the tools; `tests/e2e/specs/dev/generic/`, `tests/scenario/generic/`):
+  every site, unchanged. They run on every page in `site.json`'s `testPages`: the security
+  headers, no CSP violation, no axe error at WCAG 2.2 AA, the links between pages, the logged-in
+  view, no PHP notices, the empty debug log. The booking form's and Yoast's tests come with the
+  handbook's standard plugins (chapter 3); a site without one of them is the open point in
+  template plan 2.1.
+- **Component tests** (with the components; `components/`): every site, unchanged. They find
+  their pages by the component's class and also run on the components' example page. The site's
+  test pages in `tests/dev-content/` use real blocks, never stand-ins (T10), so the tests see the
+  components with the site's own look around them.
+- **Plugin tests** (with each plugin; `plugins/<plugin>/`): for the plugins the site uses: Site
+  Hardening and Editing Help on every site (handbook chapter 3), Song List only where it is used.
+- **Site tests** (`site/`): none at the start. One is written only for code or settings the site
+  adds itself: an old-address list (a moved site; this site's `redirects.spec.ts` is the model), an
+  addition to the page data (`organization.spec.ts`), its own build steps in `tests/dev-setup.sh`.
+  A site test checks facts, never the pages' wording, and is shown failing on a planted fault
+  before it counts.
+
 ## To build in
 
 - `~/.claude/CLIENT_DATA.md` (not implemented yet): the template includes its settings block, so
