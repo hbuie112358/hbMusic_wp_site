@@ -111,8 +111,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never
   deployed (and mounted for WP-CLI too), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
   too.
-- `bin/test`: the tests against the dev site: the scenario checks named
-  `tests/scenario/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
+- `bin/test`: the tests against the dev site, each in its group's folder (template plan 1.3a:
+  `generic/`, `components/`, `plugins/<plugin>/` and `site/`, the site's own; the browser tests'
+  shared helpers in `helpers/`), so each group can later go with its own repository: the
+  scenario checks named `tests/scenario/<group>/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
   PHP debug log, the `.env` safety stop, every stylesheet of the theme and the Song List labelled
   by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
@@ -132,7 +134,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   guide for the admin and the dev Editor (its panel first on the Dashboard, and on the Editor's first screen, headings and accessibility, the
   site's templates, sections and link example, and every editor label it names found in the real
   editor, on a draft page of its own); then, last, a check that the PHP debug
-  log is still empty after everything (`tests/scenario/final-debug-log.sh`). If the site does not
+  log is still empty after everything (`tests/scenario/generic/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
   Before a commit that touches the site, the theme or a plugin, Claude runs `bin/check` and the
   browser tests of the part changed (their spec files, in the Playwright container as `bin/test`

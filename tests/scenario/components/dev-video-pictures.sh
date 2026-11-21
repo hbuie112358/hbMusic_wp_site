@@ -6,7 +6,7 @@
 # dev site's stand-in (config/dev-mu-plugins/), which answers "not found" for noPicture01.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 readonly VIDEO_WITH_PICTURE='pictureTst1'
 readonly VIDEO_WITHOUT_PICTURE='noPicture01'

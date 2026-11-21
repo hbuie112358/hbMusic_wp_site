@@ -4,7 +4,7 @@ import { expect, type APIRequestContext } from '@playwright/test';
 // Where the login setups save the dev site's logins, for the specs that use the admin screens
 // (plan step 8d): they start from one with test.use({ storageState: ... }). Outside specs/, and
 // ignored by git (.gitignore), since they hold session cookies.
-const AUTH_FOLDER = path.join(__dirname, '..', '..', '.auth');
+const AUTH_FOLDER = path.join(__dirname, '..', '..', '..', '.auth');
 export const ADMIN_STORAGE_STATE = path.join(AUTH_FOLDER, 'admin.json');
 // The dev Editor, the role a customer gets (handbook chapter 6).
 export const EDITOR_STORAGE_STATE = path.join(AUTH_FOLDER, 'editor.json');

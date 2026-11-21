@@ -4,7 +4,7 @@
 # invalid address once reached staging that way.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.
 # shellcheck disable=SC2016

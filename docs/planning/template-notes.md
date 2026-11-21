@@ -16,7 +16,7 @@ template project starts; until then, a list, not a to-do.
 - The dev site's title and test pages: `site.json` (`devSiteTitle`, `testPages`, since template
   plan 1.2b), their text in `tests/dev-content/`; the dev admin and Editor in `.env.example`
   (`DEV_*`); the browser tests read the same list from `site.json` (`TEST_PATHS` in
-  `tests/e2e/specs/dev/test-pages.ts`, since 1.2g). The site's own extra build
+  `tests/e2e/specs/dev/helpers/test-pages.ts`, since 1.2g). The site's own extra build
   steps (here, the Song List's sample songs) go in `tests/dev-setup.sh`.
 - The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and

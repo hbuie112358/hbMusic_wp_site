@@ -9,7 +9,7 @@
 # label for screen readers, whose direct children are YouTube embeds.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.
 # shellcheck disable=SC2016

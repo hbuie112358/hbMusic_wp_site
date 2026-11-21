@@ -6,7 +6,7 @@
 # it changes a setting every page shares; the setting is put back however the check ends.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 readonly PRIVACY_SETTING="wp_page_for_privacy_policy"
 readonly LINK_CLASS="site-privacy-link"

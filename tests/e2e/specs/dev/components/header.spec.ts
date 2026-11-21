@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { WCAG_TAGS } from './accessibility';
+import { WCAG_TAGS } from '../helpers/accessibility';
 import { CLOSE_MENU_BUTTON, OPEN_MENU_BUTTON, OPEN_MENU_PANEL, PHONE, TAP_BELOW_PANEL, expectTapOnPlainPageClosesMenu, openPhoneMenu, unreachableLinks } from './hamburger-menu';
 
 // Protects the sticky header and the menu (plan D29): the header stays at the top while the page

@@ -5,7 +5,7 @@
 # host every file there belongs to the user and none is writable by others.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
 

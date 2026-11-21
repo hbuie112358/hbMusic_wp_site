@@ -1,8 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { WCAG_TAGS } from './accessibility';
-import { answerOutsideServices, recordCspViolations, recordedCspViolations } from './csp-violations';
-import { TEST_PATHS } from './test-pages';
+import { WCAG_TAGS } from '../helpers/accessibility';
+import { answerOutsideServices, recordCspViolations, recordedCspViolations } from '../helpers/csp-violations';
+import { TEST_PATHS } from '../helpers/test-pages';
 
 // Protects the child theme on the dev site (plan step 4c): every test page loads through the
 // child theme, carries the security headers, causes no Content-Security-Policy violation and
@@ -41,7 +41,8 @@ for (const path of TEST_PATHS) {
 		});
 
 		// The page chosen in Settings → Privacy (bin/dev-site chooses the Privacy Policy test page);
-		// tests/scenario/dev-privacy-link.sh checks that the link follows another choice, or none.
+		// tests/scenario/components/dev-privacy-link.sh checks that the link follows another
+		// choice, or none.
 		test('links to the privacy policy from the footer', async ({ page }) => {
 			await page.goto(path);
 			const link = page.locator('footer a.site-privacy-link');

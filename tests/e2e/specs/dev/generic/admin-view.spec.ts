@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN_STORAGE_STATE } from './admin-session';
-import { answerOutsideServices, recordCspViolations, recordedCspViolations } from './csp-violations';
-import { TEST_PATHS } from './test-pages';
+import { ADMIN_STORAGE_STATE } from '../helpers/admin-session';
+import { answerOutsideServices, recordCspViolations, recordedCspViolations } from '../helpers/csp-violations';
+import { TEST_PATHS } from '../helpers/test-pages';
 
 // Protects what a logged-in admin sees on the site's pages (plan step 8e): WordPress then adds its
 // toolbar, with an embedded icon font and, if avatars are on, a picture from Gravatar, which the

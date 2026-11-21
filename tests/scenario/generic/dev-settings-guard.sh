@@ -4,7 +4,7 @@
 # against a temporary path, never the real .env.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"

@@ -9,7 +9,7 @@
 # The fingerprints are computed here from the repository's files, independently of the theme.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # One block of each kind with component stylesheets in functions.php, and the Song List block.
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.

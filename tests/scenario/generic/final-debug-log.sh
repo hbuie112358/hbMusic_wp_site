@@ -5,7 +5,7 @@
 # tests use. Named outside the dev-*.sh pattern, so bin/test runs it last, on its own.
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 main() {
   load_settings
