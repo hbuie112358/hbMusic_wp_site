@@ -12,7 +12,7 @@
       "adress": "home"
     }
   ],
-  "namesPluginsMustNotUse": [
+  "namesSharedCodeMustNotUse": [
     "example"
   ]
 }

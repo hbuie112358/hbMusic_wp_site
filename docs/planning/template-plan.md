@@ -18,10 +18,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.2g, the browser tests reading the test pages from `site.json`, and the check that
-  the tools name nothing of this site (1.2f, the compose file from `site.json`, done 2026-11-21;
-  1.2e's plugin auto-merge proven on #80, which merged itself).
-- **Then, in order:** 1.2 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
+- **Next:** step 1.3, the tests split three ways (generic, component, site), with a new site starting
+  with fewer site tests and permanent tests for the versions check's alerts (1.2, the per-site
+  settings file, done 2026-11-21).
+- **Then, in order:** 1.4 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
@@ -68,7 +68,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   starter an empty child theme. (b) How a site pulls in the pinned tools: a released zip checked
   against its checksum, or a git submodule (H28 says "released and pinned per site the same way"
   as the plugins, not how the files arrive).
-- [~] **1.2 A per-site settings file** (T7, designed 2026-11-21), read by the tools instead of
+- [x] **1.2 A per-site settings file** (T7, designed 2026-11-21), read by the tools instead of
   naming this site (25 files outside the theme named `hbmusic` on 2026-11-20; `bin/dev-site` the
   most). In small pull requests, each with the checks and the review gate, this site's
   `bin/check` and `bin/test` passing unchanged after each:
@@ -170,8 +170,20 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     gone); the rebuild identical to 1.2d's snapshot apart from Yoast 28.9 (#80); the hand-typed
     form tried; planted faults caught (a plugin without its folder, one first missed by
     `bin/check` and fixed; a path as a plugin name; the written file deleted and written again).
-  - [ ] 1.2g The browser tests reading the test pages from it (`theme.spec.ts`'s own list goes),
-    and the new check that the tools name nothing of this site.
+  - [x] 1.2g The browser tests reading the test pages from it, and the check that the tools name
+    nothing of this site (2026-11-21). `tests/e2e/specs/dev/test-pages.ts` builds its list from
+    `site.json`, which `bin/test` lends read-only to the test container; without it the specs stop
+    with a plain message. The words list renamed `namesSharedCodeMustNotUse` (the user), since it
+    guards the tools as well as the plugins; `bin/check`'s new check searches `bin/`, `tools/`,
+    the workflows, `compose.dev.yaml` and `.env.example` for them, leaving out outside code and
+    `bin/deploy-staging` (replaced at 1.4). Made neutral for it: `tools/site-settings.md`'s
+    examples (`my-site`, "My Site (dev)", `my-site-child`) and one comment in
+    `bin/versions-check`. Other specs naming particular pages (`/music/`, the Book page) are this
+    site's tests, sorted at 1.3. Proven: `bin/check` 30 checks; a planted name in a tool caught;
+    the specs listed with and without `site.json` (175 tests in 20 files with it, as before; a
+    plain refusal without).
+  Step 1.2 done 2026-11-21 (#77 to #84 and this one): the tools read the site's facts from
+  `site.json` and name nothing of it, apart from `bin/deploy-staging`, which 1.4 replaces.
   Staying with the site, not in `site.json`: the test pages' content (`tests/dev-content/`),
   the coding-standards file (`phpcs.xml.dist`), and the site's own build steps
   (`tests/dev-setup.sh`).

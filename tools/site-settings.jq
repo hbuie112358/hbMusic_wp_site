@@ -30,7 +30,7 @@ def site_settings_rules: {
         }
       }
     },
-    namesPluginsMustNotUse: { type: "array", required: true, items: { type: "string" } }
+    namesSharedCodeMustNotUse: { type: "array", required: true, items: { type: "string" } }
   }
 };
 

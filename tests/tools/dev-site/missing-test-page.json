@@ -16,7 +16,7 @@
       "address": "no-such-page"
     }
   ],
-  "namesPluginsMustNotUse": [
+  "namesSharedCodeMustNotUse": [
     "example"
   ]
 }

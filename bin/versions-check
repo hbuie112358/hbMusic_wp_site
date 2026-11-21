@@ -16,7 +16,7 @@
 #
 # A release is proposed only once it is PINS_COOLDOWN_DAYS old (default 7): a hijacked release is
 # usually found and pulled within days, the same wait Dependabot keeps here. Security fixes reach
-# staging and live through Hostinger regardless (8j).
+# staging and live through the host's own security updates regardless (8j).
 set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

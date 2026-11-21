@@ -12,7 +12,7 @@
       "isFrontPage": true
     }
   ],
-  "namesPluginsMustNotUse": [
+  "namesSharedCodeMustNotUse": [
     "example"
   ]
 }
