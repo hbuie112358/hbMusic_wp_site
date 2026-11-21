@@ -1,19 +1,18 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { WCAG_TAGS } from '../helpers/accessibility';
+import { MENU_PAGES, TEST_PATHS } from '../helpers/test-pages';
 import { CLOSE_MENU_BUTTON, OPEN_MENU_BUTTON, OPEN_MENU_PANEL, PHONE, TAP_BELOW_PANEL, expectTapOnPlainPageClosesMenu, openPhoneMenu, unreachableLinks } from './hamburger-menu';
 
 // Protects the sticky header and the menu (plan D29): the header stays at the top while the page
 // scrolls, a link reached with the keyboard is never hidden under it (WCAG 2.2, 2.4.11), the menu
 // marks the page being shown, the header is slimmer on phones, a page that ends with a panel has
 // the same space before the footer as a page that ends with text, and the hamburger menu on a
-// phone opens over the whole window with the header still frosted (plan 9t).
+// phone opens over the whole window with the header still frosted (plan 9t). The header is on
+// every page, so its behaviour is checked on the front page, which every site has; the menu's mark
+// on every page in it, and the space before the footer across every page (template plan T10).
 const HEADER = 'header.wp-block-template-part';
-const ABOUT_PATH = '/about/';
-// Ends with a paragraph (tests/dev-content/privacy-policy.html).
-const PAGE_ENDING_WITH_TEXT = '/privacy-policy/';
-// Home uses the "Page No Title" template, About the default "Page" template (bin/dev-site).
-const PAGES_ENDING_WITH_A_PANEL = ['/', ABOUT_PATH];
+const FRONT_PAGE = '/';
 const MAXIMUM_TABS = 40;
 
 async function scrollToBottom(page: Page): Promise<void> {
@@ -34,34 +33,32 @@ async function shiftTabTo(page: Page, target: Locator): Promise<void> {
 
 test('the header stays at the top while the page scrolls', async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 600 });
-	await page.goto('/');
+	await page.goto(FRONT_PAGE);
 	await scrollToBottom(page);
 	const header = await page.locator(HEADER).boundingBox();
 	expect(header?.y, 'the header\'s distance from the top of the window').toBe(0);
 });
 
+// Reached backwards from the bottom, so the page scrolls up to it under the header.
 test('a link reached with the keyboard is not hidden under the header', async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 600 });
-	await page.goto('/');
+	await page.goto(FRONT_PAGE);
 	await page.locator('footer a').last().focus();
 	await scrollToBottom(page);
-	const target = page.locator('.site-hero .wp-block-button__link').first();
+	const target = page.locator('main .wp-block-post-content a').first();
 	await shiftTabTo(page, target);
 	const header = await page.locator(HEADER).boundingBox();
 	const focused = await target.boundingBox();
 	expect(focused?.y, 'the focused button\'s top').toBeGreaterThanOrEqual((header?.y ?? 0) + (header?.height ?? 0));
 });
 
-for (const [path, label] of [
-	[ABOUT_PATH, 'About'],
-	['/music/', 'Music'],
-] as const) {
-	test(`the menu marks ${label} as the page being shown, and nothing else`, async ({ page }) => {
+for (const { path, title } of MENU_PAGES) {
+	test(`the menu marks ${title} as the page being shown, and nothing else`, async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
 		await page.goto(path);
 		const marked = page.locator(`${HEADER} .wp-block-navigation-item__content[aria-current="page"]`);
 		await expect(marked, 'the marked menu links').toHaveCount(1);
-		await expect(marked, 'the marked link').toHaveText(label);
+		await expect(marked, 'the marked link').toHaveText(title);
 	});
 }
 
@@ -80,23 +77,22 @@ async function spaceBeforeFooter(page: Page, path: string): Promise<number> {
 	});
 }
 
-// A page ending with the call-to-action panel (from its "with call to action" template) keeps the
-// template's own space before the footer, the same as a page ending with text, in both templates
+// Every page keeps its template's own space before the footer, whatever ends it: the
+// call-to-action panel from a "with call to action" template, text or a section, in every template
 // the pages use: no strip added (the full-width band once had one) and no rule of ours.
-for (const path of PAGES_ENDING_WITH_A_PANEL) {
-	test(`${path} ends with the call-to-action panel and has the same space before the footer as a page that ends with text`, async ({ page }) => {
-		await page.goto(path);
-		await expect(page.locator('main .wp-block-template-part > .site-cta.site-panel'), `the panel ending ${path}`).toHaveCount(1);
-		const afterPanel = await spaceBeforeFooter(page, path);
-		const afterText = await spaceBeforeFooter(page, PAGE_ENDING_WITH_TEXT);
-		expect(afterText, 'the space after text').toBeGreaterThan(0);
-		expect(afterPanel, 'the space after the panel').toBe(afterText);
-	});
-}
+test('every page has the same space before the footer, whatever ends it', async ({ page }) => {
+	const spaces: Record<string, number> = {};
+	for (const path of TEST_PATHS) {
+		spaces[path] = await spaceBeforeFooter(page, path);
+	}
+	const values = Object.values(spaces);
+	expect(Math.min(...values), 'the smallest space before the footer').toBeGreaterThan(0);
+	expect(new Set(values).size, `the spaces before the footer ${JSON.stringify(spaces)}`).toBe(1);
+});
 
 test('the header is slimmer on a phone than on a computer', async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 800 });
-	await page.goto('/');
+	await page.goto(FRONT_PAGE);
 	const desktop = (await page.locator(HEADER).boundingBox())?.height ?? 0;
 	await page.setViewportSize({ width: 390, height: 800 });
 	const phone = (await page.locator(HEADER).boundingBox())?.height ?? 0;
