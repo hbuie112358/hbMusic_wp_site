@@ -21,6 +21,19 @@ site_settings_problems() {
   site_settings_jq 'site_settings_problems' -r "$settings_file"
 }
 
+# One text value of site.json by its jq path, such as ".theme"; fails when it is missing or not
+# text, so a script never goes on with an empty name.
+site_setting() {
+  local path="$1"
+  jq -er "$path | strings" "$SITE_SETTINGS_FILE"
+}
+
+# The lines a jq program prints from site.json, for lists such as the plugins' slugs.
+site_settings_query() {
+  local program="$1"
+  jq -r "$program" "$SITE_SETTINGS_FILE"
+}
+
 site_settings_field_names() {
   site_settings_jq 'site_settings_field_names' -n -r
 }

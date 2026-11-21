@@ -84,17 +84,21 @@ site on 10102, its Mailpit inbox on 10103, the rest of the block for later needs
 plan step 5a-2; the real old site stays online until go-live, and the export stays in `backups/`,
 `db/` and `wordpress/`.
 
-- `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run):
+- `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run),
+  from the site's facts in `site.json` (its theme, title, plugins and test pages, checked against
+  their rules before anything is changed; template plan 1.2b):
   WordPress, the parent theme Twenty Twenty-Five at the version and SHA-256 pinned in
-  `tools/versions.sh`, the child theme and the project's three plugins (Song List, Site Hardening,
-  Editing Help) mounted read-only and activated,
-  Contact Form 7 at the version in `tools/versions.sh`, checked against WordPress.org's checksums,
+  `tools/versions.sh`, the child theme and the site's `local` plugins (Song List, Site Hardening,
+  Editing Help) mounted read-only and activated, its `wordpress.org` plugins at the versions in
+  `tools/versions.sh`, checked against WordPress.org's checksums: Contact Form 7
   with the real booking form from `config/booking-form.txt` and `config/booking-form-mail.json`,
   and its messages after sending ("sent" and "sending failed") from
   `config/booking-form-messages.json` (merged into Contact Form 7's own messages; staging and live
   get the same texts typed in by hand, in the form's Messages tab),
-  test pages (`tests/dev-content/`, each with the page template its real page uses) and songs with neutral text, a stand-in Yoast organization
-  (a neutral name and the theme's logo), a dev admin (`devadmin`, password
+  and Yoast SEO, test pages (`site.json`'s list, their text in `tests/dev-content/`, each with the
+  page template its real page uses), a stand-in Yoast organization (a neutral name and a picture
+  WordPress itself ships), then the site's own steps in `tests/dev-setup.sh` (here, the Song
+  List's sample songs, neutral text), a dev admin (`devadmin`, password
   `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role
   a customer gets. To log in by hand, copy a password without showing it:
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never

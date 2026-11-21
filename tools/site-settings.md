@@ -11,6 +11,9 @@ it instead of having any site's names written into them, so the same tools serve
   explained on this page, and that this page explains no field that no longer exists.
 - A yes/no field that is left out means the usual case, so only the exceptions are written.
 - The rules themselves are in `tools/site-settings.jq`; this page explains them.
+- Steps of the dev site's build that only this site needs (sample data for one of its plugins,
+  for example) are not settings: they go in `tests/dev-setup.sh`, which `bin/dev-site` runs last
+  when it exists.
 
 ## The fields
 

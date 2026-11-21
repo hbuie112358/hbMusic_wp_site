@@ -175,9 +175,10 @@ shellcheck_scripts() {
   for script in "$REPO_ROOT"/bin/* "$REPO_ROOT"/tests/scenario/*.sh; do
     scripts+=("/src/${script#"$REPO_ROOT"/}")
   done
-  # -x follows the scenario checks' `source lib.sh`; the project root is the source path.
+  # -x follows the scenario checks' `source lib.sh` and bin/dev-site's `source tests/dev-setup.sh`;
+  # the project root is the source path.
   docker run --rm -w /src \
-    -v "$REPO_ROOT/bin:/src/bin:ro" -v "$REPO_ROOT/tests/scenario:/src/tests/scenario:ro" \
+    -v "$REPO_ROOT/bin:/src/bin:ro" -v "$REPO_ROOT/tests:/src/tests:ro" \
     -v "$REPO_ROOT/tools:/src/tools:ro" \
     "$SHELLCHECK_IMAGE" --severity=style -x --source-path=/src "${scripts[@]}"
 }

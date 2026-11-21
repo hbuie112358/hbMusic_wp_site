@@ -11,9 +11,11 @@ template project starts; until then, a list, not a to-do.
 - `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), and the database volume
   name derived from it in `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`) and
   `tests/scenario/dev-settings-guard.sh`.
-- The dev site's title, test pages and admin: `bin/dev-site` (`TEST_PAGES`, the title in
-  `install_wordpress`) and `.env.example` (`DEV_*`); the browser tests' list of the same pages,
-  `TEST_PATHS` in `tests/e2e/specs/dev/theme.spec.ts`.
+- The dev site's title and test pages: `site.json` (`devSiteTitle`, `testPages`, since template
+  plan 1.2b), their text in `tests/dev-content/`; the dev admin and Editor in `.env.example`
+  (`DEV_*`); the browser tests' own list of the same pages, `TEST_PATHS` in
+  `tests/e2e/specs/dev/theme.spec.ts`, until 1.2f reads `site.json`. The site's own extra build
+  steps (here, the Song List's sample songs) go in `tests/dev-setup.sh`.
 - The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and
   `@package` tag in the theme.
@@ -36,9 +38,13 @@ template project starts; until then, a list, not a to-do.
 
 ## Plugins
 
-- A site chooses its plugins (plan D19). Each one sits in `plugins/<name>/`, needs a line in
-  `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry
-  in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync settings.
+- A site chooses its plugins (plan D19), listed in `site.json` (`plugins`, each with its source;
+  from 1.2b `bin/dev-site` installs and activates them from that list; the list moves to
+  `composer.json`, template plan T8). Each one of its own sits in `plugins/<name>/`, needs a line
+  in `.gitignore`, a mount in `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an
+  entry in `DEPLOY_TARGETS` in `bin/deploy-staging`, and a destination in the server's rsync
+  settings. A WordPress.org plugin needs its pinned version in `tools/versions.sh` (and its line
+  in `wordpress_org_plugin_version()`) until the move to Composer.
 
 - The booking form: `config/booking-form.txt`, `config/booking-form-mail.json` and `config/booking-form-messages.json` (its "sending failed" text points to the contact links below the form on this site's Book page), and `CONTACT_FORM_7_VERSION` in `tools/versions.sh`.
 
