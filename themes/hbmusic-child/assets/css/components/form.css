@@ -82,7 +82,21 @@
 	color: var(--wp--custom--color--form-error);
 }
 
-.wpcf7 .wpcf7-response-output {
+/*
+ * The form ends without space of its own below, like any other block, so a page ending with a
+ * form has the same space before the footer as every other page (template plan 1.3b): the send
+ * button's line, the form's last paragraph, had a bottom margin that reached past the form.
+ */
+.wpcf7 form > p:last-of-type {
+	margin-bottom: 0;
+}
+
+/*
+ * The message after sending, under the send button, also without space below. As specific as
+ * Contact Form 7's own rule (.wpcf7 form .wpcf7-response-output), which otherwise wins and adds
+ * its margin around the message.
+ */
+.wpcf7 form .wpcf7-response-output {
 	margin: var(--wp--custom--spacing--form-field) 0 0;
 	padding: 12px;
 	border-radius: var(--wp--custom--radius);
