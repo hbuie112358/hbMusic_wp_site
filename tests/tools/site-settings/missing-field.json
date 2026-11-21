@@ -1,0 +1,20 @@
+{
+  "slug": "example",
+  "theme": "example-child",
+  "plugins": [
+    {
+      "slug": "example-plugin",
+      "source": "local"
+    }
+  ],
+  "testPages": [
+    {
+      "title": "Home",
+      "address": "home",
+      "isFrontPage": true
+    }
+  ],
+  "namesPluginsMustNotUse": [
+    "example"
+  ]
+}

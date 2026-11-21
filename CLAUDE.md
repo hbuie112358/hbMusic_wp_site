@@ -53,8 +53,14 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   (`customer/content-guide.md`), with the same version number; a change goes into both.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
   wording and import file, and the photos.
-- `docs/planning/rebuild-plan.md`: the active plan (rolling-wave mode); its Current position
-  says where the work stands.
+- `docs/planning/template-plan.md`: the active plan since 2026-11-20 (rolling-wave mode), the
+  brochure-site template built from this project; its Current position says where the work
+  stands.
+- `docs/planning/rebuild-plan.md`: this site's own plan, paused for the template; its Current
+  position keeps 9u waiting.
+- `site.json`: the site's facts the tools read instead of naming this site (template plan T7):
+  its slug, theme, plugins and the dev site's test pages; no secrets. Its fields are explained in
+  `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
@@ -128,7 +134,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 - `docker compose -f compose.dev.yaml run --rm cli wp <command>`: WP-CLI against the dev site.
 - `docker compose -f compose.dev.yaml down -v` deletes the dev site's database and files (the
   volumes); Claude runs it only when the user asks. `bin/dev-site` rebuilds them.
-- `bin/check`: every code check, in pinned containers (nothing installed on the host):
+- `bin/check`: every code check, in pinned containers (only Docker and `jq` on the host; it
+  stops at once if `jq` is missing):
   Composer install from `composer.lock`, validation and security audit; PHPCS with the
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
   stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
@@ -141,7 +148,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   and an accepted one that npm no longer reports also fails; none accepted since 2026-11-20); the theme's component list in `functions.php` matching the files in
   `assets/css/components/`, both ways; a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on a test page in
-  `tests/dev-content/` (so the browser tests see it); ShellCheck on `bin/`; the compose file. Runs every check even
+  `tests/dev-content/` (so the browser tests see it); `site.json` following the rules in
+  `tools/site-settings.jq` (a missing or unknown field, or a wrong kind of value, fails and is
+  named), every field explained in `tools/site-settings.md` and nothing else, and those checks
+  refusing the broken examples in `tests/tools/site-settings/`; ShellCheck on `bin/`; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.

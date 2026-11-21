@@ -2,15 +2,33 @@
 # Runs every check the project's code must pass (plan step 3d): installing the tools at the
 # versions in composer.lock, Composer's own validation and its security audit, the WordPress
 # Coding Standards (PHPCS), static analysis (PHPStan), the CSS (Stylelint, D29), ShellCheck on
-# the scripts, and the compose file. All tools run in pinned containers; nothing is installed on the host.
-# Every check runs even after a failure, so one run shows everything; the exit status is 1 if
-# any check failed.
+# the scripts, the compose file, and site.json with its explanation (template plan T7). The tools
+# run in pinned containers; only Docker and jq are needed on the host (jq reads the npm audits'
+# reports and site.json). Every check runs even after a failure, so one run shows everything;
+# the exit status is 1 if any check failed.
 set -Euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
+
+# The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
+# with the field it breaks, which the refusal must name; the wording around it may change. So a
+# check that refuses for the wrong field, or accepts everything after a later edit, fails too.
+readonly SITE_SETTINGS_EXAMPLES_DIR="$REPO_ROOT/tests/tools/site-settings"
+readonly SITE_SETTINGS_BAD_EXAMPLES=(
+  'missing-field.json|devSiteTitle'
+  'unknown-field.json|testPages[0].adress'
+  'wrong-type.json|testPages[0].isInMenu'
+  'not-allowed-value.json|plugins[0].source'
+)
+readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
+  'explanation-missing-field.md|theme'
+  'explanation-stale-field.md|logoFile'
+)
 
 FAILED_CHECKS=()
 
@@ -69,6 +87,87 @@ require_lock_file() {
   [[ -f "$REPO_ROOT/composer.lock" ]] && return 0
   log "composer.lock is missing; bin/tools-update creates it"
   exit 1
+}
+
+# Without jq, the npm audits and the site.json checks would fail with an unrelated-looking error.
+require_jq() {
+  command -v jq >/dev/null && return 0
+  log "jq is not installed; bin/check needs it on this computer (for example: sudo apt install jq)"
+  exit 1
+}
+
+# site.json, the site's facts (template plan T7), against the rules in tools/site-settings.jq.
+site_json_is_valid() {
+  local problems shown="${SITE_SETTINGS_FILE#"$REPO_ROOT"/}"
+  [[ -f "$SITE_SETTINGS_FILE" ]] || {
+    log "$shown is missing; tools/site-settings.md lists its fields"
+    return 1
+  }
+  problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || {
+    log "$shown is not valid JSON (jq's message is above)"
+    return 1
+  }
+  [[ -z "$problems" ]] && return 0
+  log "$shown does not follow the rules in tools/site-settings.jq:"
+  printf '%s\n' "$problems" | sed 's/^/    /' >&2
+  return 1
+}
+
+# Every field is explained in tools/site-settings.md, and nothing else is.
+site_json_fields_explained() {
+  local differences
+  differences="$(site_settings_explanation_differences "$SITE_SETTINGS_EXPLANATION")"
+  [[ -z "$differences" ]] && return 0
+  log "tools/site-settings.md and tools/site-settings.jq disagree:"
+  printf '%s\n' "$differences" | sed 's/^/    /' >&2
+  return 1
+}
+
+# The two checks above, tried on known examples: the valid one accepted, text that is not JSON
+# refused, and each broken one refused with the problem it was made to show.
+site_json_checks_refuse_bad_examples() {
+  local failed=0 example
+  expect_settings_accepted "valid.json" || failed=1
+  expect_settings_not_json "not-json.json" || failed=1
+  for example in "${SITE_SETTINGS_BAD_EXAMPLES[@]}"; do
+    expect_settings_problem "${example%%|*}" "${example#*|}" || failed=1
+  done
+  for example in "${SITE_SETTINGS_BAD_EXPLANATIONS[@]}"; do
+    expect_explanation_difference "${example%%|*}" "${example#*|}" || failed=1
+  done
+  return "$failed"
+}
+
+expect_settings_accepted() {
+  local example="$1" problems
+  problems="$(site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example")" && [[ -z "$problems" ]] && return 0
+  log "the valid example $example was refused: $problems"
+  return 1
+}
+
+expect_settings_not_json() {
+  local example="$1"
+  site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example" >/dev/null 2>&1 || return 0
+  log "$example is not JSON, but was read as JSON"
+  return 1
+}
+
+# A problem line starts with the field it is about, then a colon; the rest is wording.
+expect_settings_problem() {
+  local example="$1" broken_field="$2" problems
+  problems="$(site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example" 2>&1)"
+  cut -d: -f1 <<<"$problems" | grep -qxF -- "$broken_field" && return 0
+  log "$example should be refused naming $broken_field; reported: ${problems:-(nothing)}"
+  return 1
+}
+
+# A difference line ends with the field it is about, after a colon.
+expect_explanation_difference() {
+  local example="$1" broken_field="$2" differences
+  differences="$(site_settings_explanation_differences "$SITE_SETTINGS_EXAMPLES_DIR/$example")"
+  awk -F': ' '{ print $NF }' <<<"$differences" | grep -qxF -- "$broken_field" && return 0
+  log "$example should show a difference naming $broken_field; reported: ${differences:-(nothing)}"
+  return 1
 }
 
 shellcheck_scripts() {
@@ -289,6 +388,7 @@ report() {
 
 main() {
   require_lock_file
+  require_jq
   run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
   run_check "Composer validation" in_composer composer validate --strict --no-check-publish
   run_check "Composer security audit" in_composer composer audit --no-interaction
@@ -300,6 +400,9 @@ main() {
   run_check "WordPress Coding Standards (Editing Help plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/editing-help/phpcs.xml.dist --basepath=plugins/editing-help plugins/editing-help
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
+  run_check "site.json follows its rules" site_json_is_valid
+  run_check "site.json's fields are explained" site_json_fields_explained
+  run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
