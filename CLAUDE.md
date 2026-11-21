@@ -77,6 +77,11 @@ The old site, as exported:
 
 ## Commands
 
+The scripts below need only Docker and `jq` on this computer; every tool they use runs in a
+pinned container. They read the site's facts from `site.json` and name their Docker volumes
+from its `slug` (template plan 1.2d), and stop at once, naming the problem, if `site.json` breaks
+its rules.
+
 The **dev site** runs in Docker Compose (`compose.dev.yaml`): a fresh WordPress with the new child
 theme, the plugins and test content, with its settings in `.env` (created from `.env.example`
 with random secrets; never committed). This project's ports are the **101xx** block: the dev

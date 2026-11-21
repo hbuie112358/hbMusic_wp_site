@@ -25,6 +25,7 @@ readonly SITE_SETTINGS_BAD_EXAMPLES=(
   'missing-field.json|devSiteTitle'
   'unknown-field.json|testPages[0].adress'
   'wrong-type.json|testPages[0].isInMenu'
+  'bad-slug.json|slug'
 )
 readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
   'explanation-missing-field.md|theme'
@@ -35,6 +36,12 @@ readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
 readonly DEV_SITE_EXAMPLES_DIR="$REPO_ROOT/tests/tools/dev-site"
 
 FAILED_CHECKS=()
+# The site's facts the checks need, from site.json (load_check_settings): its theme's folder, the
+# prefix of the theme's PHP names (the slug in capitals with dashes as underscores, the theme's
+# convention: a slug "my-site" gives MY_SITE_), and its own plugins.
+SITE_THEME_DIR=""
+SITE_PHP_PREFIX=""
+SITE_LOCAL_PLUGINS=()
 
 log() { printf '%s [check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 
@@ -79,10 +86,28 @@ in_analysis() {
     "$COMPOSER_IMAGE" "$@"
 }
 
-# A plugin may be shared with other sites, so it must name nothing of this one. The names are
-# the site's prefix and the host's; the repository's rules keep everything else out already.
+load_check_settings() {
+  local slug theme_problem
+  theme_problem="$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
+  [[ -z "$theme_problem" ]] || { log "site.json: $theme_problem"; exit 1; }
+  slug="$(site_setting .slug)"
+  SITE_PHP_PREFIX="${slug^^}"
+  SITE_PHP_PREFIX="${SITE_PHP_PREFIX//-/_}"
+  SITE_THEME_DIR="$REPO_ROOT/themes/$(site_setting .theme)"
+  mapfile -t SITE_LOCAL_PLUGINS < <(site_settings_query '.localPlugins[]')
+  readonly SITE_PHP_PREFIX SITE_THEME_DIR SITE_LOCAL_PLUGINS
+}
+
+# A plugin may be shared with other sites, so it must name nothing of this one: the words in
+# site.json's namesPluginsMustNotUse (the site's names and its host's), matched as plain text,
+# whatever their case; the repository's rules keep everything else out already.
 plugins_name_nothing_of_this_site() {
-  ! grep -rniE 'hbmusic|howard|buie|hostinger' "$REPO_ROOT/plugins"
+  local name patterns=()
+  while IFS= read -r name; do
+    patterns+=(-e "$name")
+  done < <(site_settings_query '.namesPluginsMustNotUse[]')
+  ((${#patterns[@]} > 0)) || return 0
+  ! grep -rniF "${patterns[@]}" "$REPO_ROOT/plugins"
 }
 
 # Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
@@ -186,17 +211,20 @@ expect_explanation_difference() {
   return 1
 }
 
-# bin/dev-site's refusals, tried on known examples (tests/tools/dev-site/): a test page without
-# its content file, a plugin it cannot install, and the booking form without its plugin are each
+# bin/dev-site's refusals, tried on known examples (tests/tools/dev-site/): a theme with no folder,
+# a test page without its content file, a plugin it cannot install, and the booking form without its plugin are each
 # refused, naming what is wrong; the good examples are accepted.
 dev_site_refusals_refuse_bad_examples() {
   local examples="$DEV_SITE_EXAMPLES_DIR" failed=0
+  expect_refusal "missing-theme.json" "theme" \
+    "$(site_settings_theme_problem "$examples/missing-theme.json" "$examples/themes")" || failed=1
   expect_refusal "missing-test-page.json" "no-such-page" \
     "$(site_settings_missing_test_pages "$examples/missing-test-page.json" "$examples/dev-content")" || failed=1
   expect_refusal "lock-with-other-plugin.json" "example-vendor/other-plugin" \
     "$(site_packages_unsupported_plugins "$examples/lock-with-other-plugin.json")" || failed=1
   expect_refusal "lock-without-form-plugin.json" "$FORM_PLUGIN_PACKAGE" \
     "$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-without-form-plugin.json")" || failed=1
+  expect_acceptance "the valid theme" "$(site_settings_theme_problem "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/themes")" || failed=1
   expect_acceptance "the valid test pages" "$(site_settings_missing_test_pages "$SITE_SETTINGS_EXAMPLES_DIR/valid.json" "$examples/dev-content")" || failed=1
   expect_acceptance "lock-with-form-plugin.json" \
     "$(site_packages_unsupported_plugins "$examples/lock-with-form-plugin.json")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-with-form-plugin.json")" || failed=1
@@ -246,7 +274,7 @@ typescript_check() {
 theme_scripts_check() {
   docker run --rm -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
-    -v "$REPO_ROOT/themes/hbmusic-child/assets/js:/theme-js:ro" \
+    -v "$SITE_THEME_DIR/assets/js:/theme-js:ro" \
     -v "$REPO_ROOT/tools/js-check:/js-check:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p /js-check/tsconfig.json'
@@ -268,21 +296,21 @@ theme_json_schema_matches_wordpress() {
   local wordpress_version schema_version
   wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.dev.yaml")"
   # [$] matches the literal "$schema" key without looking like a shell variable.
-  schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$REPO_ROOT/themes/hbmusic-child/theme.json")"
+  schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$SITE_THEME_DIR/theme.json")"
   [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
-  log "themes/hbmusic-child/theme.json uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
+  log "${SITE_THEME_DIR#"$REPO_ROOT"/}/theme.json uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
   return 1
 }
 
-# The theme's component stylesheets load by name (plan D29): HBMUSIC_COMPONENT_STYLES and
-# HBMUSIC_FORM_STYLESHEET in functions.php name them, and WordPress silently loads nothing for a
+# The theme's component stylesheets load by name (plan D29): <PREFIX>_COMPONENT_STYLES and
+# <PREFIX>_FORM_STYLESHEET in functions.php name them (the prefix: SITE_PHP_PREFIX), and WordPress silently loads nothing for a
 # name without a file. So the names and the files in assets/css/components/ must match, both ways.
 component_styles_match_files() {
-  local theme_dir="$REPO_ROOT/themes/hbmusic-child" listed on_disk
+  local theme_dir="$SITE_THEME_DIR" listed on_disk
   # The block components, the form's stylesheet (loaded by page) and the video facade's (loaded
   # with a page's videos, includes/video-facade.php).
-  listed="$(sed -n '/^const HBMUSIC_COMPONENT_STYLES/,/^);/p' "$theme_dir/functions.php" | grep -oE "'[a-z0-9-]+'" | tr -d "'"
-    sed -nE "s#^const HBMUSIC_(FORM|VIDEO_FACADE)_STYLESHEET *= 'assets/css/components/([a-z0-9-]+)\.css';#\2#p" "$theme_dir/functions.php" "$theme_dir/includes/video-facade.php")"
+  listed="$(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'[a-z0-9-]+'" | tr -d "'"
+    sed -nE "s#^const ${SITE_PHP_PREFIX}_(FORM|VIDEO_FACADE)_STYLESHEET *= 'assets/css/components/([a-z0-9-]+)\.css';#\2#p" "$theme_dir/functions.php" "$theme_dir/includes/video-facade.php")"
   on_disk="$(find "$theme_dir/assets/css/components" -maxdepth 1 -name '*.css' -printf '%f\n' | sed 's/\.css$//')"
   if [[ -z "$listed" ]]; then
     log "functions.php lists no component stylesheets; the list or this check's pattern changed"
@@ -301,8 +329,8 @@ component_styles_match_files() {
 # (buttons) are seen wherever that block is. A class counts by its prefix, so site-media covers
 # site-media-placeholder and site-hero covers site-hero__photo.
 components_shown_on_test_pages() {
-  local theme_dir="$REPO_ROOT/themes/hbmusic-child" component missing=0
-  for component in $(sed -n '/^const HBMUSIC_COMPONENT_STYLES/,/^);/p' "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
+  local theme_dir="$SITE_THEME_DIR" component missing=0
+  for component in $(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
     grep -qE "class=\"[^\"]*\\b$component\\b" "$REPO_ROOT"/tests/dev-content/*.html "$theme_dir"/parts/*.html && continue
     log "$component appears on no test page (tests/dev-content/) or template part; add a neutral example"
     missing=1
@@ -435,9 +463,8 @@ report() {
   return 1
 }
 
-main() {
-  require_lock_file
-  require_jq
+# The checks in the order they have always run, in three groups of neighbors, each a plain list.
+run_dependency_checks() {
   run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
   run_check "Composer validation" in_composer composer validate --strict --no-check-publish
   run_check "Composer security audit" in_composer composer audit --no-interaction
@@ -445,16 +472,26 @@ main() {
   run_check "Site packages: security audit" in_site_packages composer audit --locked --no-interaction
   run_check "npm security audit (browser tests)" npm_audit tests/e2e
   run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
+}
+
+# The coding standards (the theme's ruleset, then each of the site's own plugins with its own),
+# then the rules for plugins and for site.json.
+run_standards_and_rule_checks() {
+  local plugin_slug
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
-  run_check "WordPress Coding Standards (Song List plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/song-list/phpcs.xml.dist --basepath=plugins/song-list plugins/song-list
-  run_check "WordPress Coding Standards (Site Hardening plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/site-hardening/phpcs.xml.dist --basepath=plugins/site-hardening plugins/site-hardening
-  run_check "WordPress Coding Standards (Editing Help plugin)" in_analysis php vendor/bin/phpcs --standard=plugins/editing-help/phpcs.xml.dist --basepath=plugins/editing-help plugins/editing-help
+  for plugin_slug in "${SITE_LOCAL_PLUGINS[@]}"; do
+    run_check "WordPress Coding Standards ($plugin_slug plugin)" in_analysis php vendor/bin/phpcs \
+      --standard="plugins/$plugin_slug/phpcs.xml.dist" --basepath="plugins/$plugin_slug" "plugins/$plugin_slug"
+  done
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
   run_check "site.json follows its rules" site_json_is_valid
   run_check "site.json's fields are explained" site_json_fields_explained
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
   run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
+}
+
+run_analysis_and_file_checks() {
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
@@ -466,6 +503,16 @@ main() {
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
   run_check "Compose file" compose_file_is_valid
+}
+
+main() {
+  require_lock_file
+  require_jq
+  load_site_volume_names || exit 1
+  load_check_settings
+  run_dependency_checks
+  run_standards_and_rule_checks
+  run_analysis_and_file_checks
   report
 }
 

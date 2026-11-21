@@ -1,5 +1,5 @@
-# The rules for site.json (template plan T7): every field the tools read, its type and whether it
-# is required. The one definition of
+# The rules for site.json (template plan T7): every field the tools read, its type, whether it is
+# required and, for text that becomes part of other names, the characters it may use. The one definition of
 # the fields: the check of site.json and the check of its explanation (tools/site-settings.md)
 # both read it, so they cannot disagree. Loaded with `jq -L tools 'include "site-settings"; ...'`.
 #
@@ -8,9 +8,12 @@
 def site_settings_rules: {
   type: "object",
   fields: {
-    slug: { type: "string", required: true },
+    # The slug becomes part of Docker's names (the caches, the dev site's database, the compose
+    # project), which allow only some characters; lower case keeps them all alike.
+    slug: { type: "string", required: true, pattern: "^[a-z0-9][a-z0-9-]*$", patternMeaning: "lower-case letters, digits and dashes, starting with a letter or digit" },
     devSiteTitle: { type: "string", required: true },
-    theme: { type: "string", required: true },
+    # A folder name under themes/, never a path: the same characters as the slug.
+    theme: { type: "string", required: true, pattern: "^[a-z0-9][a-z0-9-]*$", patternMeaning: "a folder name under themes/: lower-case letters, digits and dashes, starting with a letter or digit" },
     localPlugins: { type: "array", required: true, items: { type: "string" } },
     testPages: {
       type: "array", required: true,
@@ -54,6 +57,8 @@ def site_settings_problems_at($rules; $where):
   elif $rules.type == "array" then
     to_entries[] | .key as $index | .value
     | site_settings_problems_at($rules.items; "\($where)[\($index)]")
+  elif ($rules.pattern // null) != null and (test($rules.pattern) | not) then
+    "\(shown): \(tojson) must be \($rules.patternMeaning)"
   else
     empty
   end;

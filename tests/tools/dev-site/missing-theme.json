@@ -1,0 +1,18 @@
+{
+  "slug": "example",
+  "devSiteTitle": "Example (dev)",
+  "theme": "no-such-theme",
+  "localPlugins": [
+    "example-plugin"
+  ],
+  "testPages": [
+    {
+      "title": "Home",
+      "address": "home",
+      "isFrontPage": true
+    }
+  ],
+  "namesPluginsMustNotUse": [
+    "example"
+  ]
+}

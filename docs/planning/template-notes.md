@@ -8,9 +8,10 @@ template project starts; until then, a list, not a to-do.
 
 ## The site's name and prefix
 
-- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), and the database volume
-  name derived from it in `tools/settings.sh` (`SETTINGS_DATABASE_VOLUMES`) and
-  `tests/scenario/dev-settings-guard.sh`.
+- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), until template plan 1.2e
+  builds it from `site.json`'s `slug`. The database volume's name follows from it; since 1.2d it is
+  built from the slug (`load_site_volume_names` in `tools/site-settings.sh`), and the scenario
+  check `dev-settings-guard.sh` uses the same function.
 - The dev site's title and test pages: `site.json` (`devSiteTitle`, `testPages`, since template
   plan 1.2b), their text in `tests/dev-content/`; the dev admin and Editor in `.env.example`
   (`DEV_*`); the browser tests' own list of the same pages, `TEST_PATHS` in
@@ -21,7 +22,8 @@ template project starts; until then, a list, not a to-do.
   `@package` tag in the theme.
 - The package names: `composer.json` (`hbmusic/site-tools`), `tests/e2e/package.json` and its
   lock file (`hbmusic-e2e`).
-- The cache volumes: `tools/versions.sh` (`hbmusic_composer_cache`, `hbmusic_npm_cache`).
+- The cache volumes (`hbmusic_composer_cache`, `hbmusic_npm_cache`): built from `site.json`'s
+  `slug` since template plan 1.2d (`load_site_volume_names`), for every script that uses them.
 - The theme folder: `themes/hbmusic-child/` and its line in `.gitignore`.
 - The site's design and logo (plan D29, the site layer): `themes/hbmusic-child/theme.json` (the
   palette, the font, the frame's width as WordPress's `settings.layout.wideSize`, which page
