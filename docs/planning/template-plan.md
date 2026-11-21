@@ -13,17 +13,17 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Where the work stands:** planned 2026-11-20 (T1-T4); step 1.1 decided 2026-11-21 (T5, T6);
   step 1.2, the per-site settings file, done (#77 to #85); 1.3a to 1.3c done (#86 to #89): the
   tests in their groups' folders, the components' example page, each component tested on every
-  page using it (246 browser tests), the versions check's alerts tested, all 2026-11-21. The plan reviewed the
+  page using it (246 browser tests), the versions check's alerts tested, all 2026-11-21; 1.3d, the
+  starting set of tests for a new site, written down in `template-notes.md` (2026-11-21), so step
+  1.3 is done. The plan reviewed the
   same day as a whole for overkill and gaps (the user's request): pinning moves to Composer (T8);
   new sites start with fewer site tests (1.3); `bin/detach` stays, built in 2.1; a routine for a
   new site's first content and a developer guide added (2.4). The GitHub organization
   direct-technical-solutions exists and the handbook moved into it (its settings in the
   handbook's `toolkit/github.md`).
-- **Next:** step 1.3d, the starting set of tests for a new site written down (T10, decided
-  2026-11-21; 1.2, the per-site settings file, done 2026-11-21, #77 to #85; 1.3a to 1.3c, the
-  tests sorted into their groups' folders, the component tests finding their pages and the
-  versions check's alerts tested, done 2026-11-21).
-- **Then, in order:** 1.4 to 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
+- **Next:** step 1.4, `bin/deploy`, generic from the start (handbook chapter 2's eight steps,
+  delivering `site-packages/`'s pinned plugins; the rebuild plan's item 5).
+- **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
@@ -190,7 +190,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   Staying with the site, not in `site.json`: the test pages' content (`tests/dev-content/`),
   the coding-standards file (`phpcs.xml.dist`), and the site's own build steps
   (`tests/dev-setup.sh`).
-- [ ] **1.3 The tests split** three ways: generic (headers, no CSP violation, no accessibility
+- [x] **1.3 The tests split** three ways (done 2026-11-21, #86 to #89 and 1.3d): generic (headers, no CSP violation, no accessibility
   error, the debug log empty) with the tools; component tests with the components; this site's
   own (Song List, the redirects) staying here. A new site starts with the generic and component
   tests and only the site tests its own features need, not copies of this site's (the user,
@@ -271,8 +271,14 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     WordPress.org not answering), dates counted back from the run. The stand-in `gh` requires
     the queries as the script sends them. Planted faults caught: the 3 days made 4, a week of
     6 days, the `site-packages/` filter removed, an issue opened again.
-  - [ ] 1.3d The starting set for a new site written down (the template notes and this plan): the
-    generic and component tests, and only the site tests its own features need.
+  - [x] 1.3d The starting set for a new site written down (the template notes and this plan): the
+    generic and component tests, and only the site tests its own features need (2026-11-21).
+    Written in `template-notes.md`, "Tests a new site starts with": the generic and component
+    tests on every site unchanged, each plugin's tests where the plugin is used (Site Hardening
+    and Editing Help on every site by handbook chapter 3, Song List only where used), and no site
+    tests at the start: one is written only for code or settings the site adds itself (this
+    site's `redirects` and `organization` as the models). Found on the way: the form's and Yoast's
+    tests assume their plugins and never skip, a note on 2.1 (the user, 2026-11-21).
 - [ ] **1.4 `bin/deploy`**, generic from the start: handbook chapter 2's eight steps. The rebuild
   plan's item 5; replaces `bin/deploy-staging`, whose GitHub-based design is stale (D14). It also
   delivers the downloaded plugins at the versions `site-packages/` pins (T9), instead of updating
@@ -291,7 +297,13 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   (T6; kept by the user, 2026-11-21, so detaching is real, not only a note); this site switched
   to it. To verify then: whether the organization's pinning rule applies to reusable
   workflows (handbook `toolkit/github.md`), and whether a repository outside the organization
-  (such as this one, on the user's personal account) may call them.
+  (such as this one, on the user's personal account) may call them. Note from 1.3d (the user,
+  2026-11-21): the generic tests of the booking form (`booking-form.spec.ts`, the scenario check
+  `dev-booking-form-settings.sh`) and of Yoast (the Yoast part of `seo.spec.ts`) assume their
+  plugin and never skip, so a site without it would fail them, and once the tests live in
+  `dts-site-tools` a site cannot delete them. When they move, they follow the site's own list,
+  `site-packages/composer.json`: a plugin listed means its tests run and must pass; a plugin not
+  listed means `bin/test` names the tests left out and why, never skipping them silently.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help; Song List is a musician's
   plugin, for any site that wants it): each released by a Git tag, this site requiring them
   through Composer.
