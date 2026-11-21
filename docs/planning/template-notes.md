@@ -8,14 +8,14 @@ template project starts; until then, a list, not a to-do.
 
 ## The site's name and prefix
 
-- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), until template plan 1.2e
+- `hbmusic-dev`, the Compose project name: `compose.dev.yaml` (`name:`), until template plan 1.2f
   builds it from `site.json`'s `slug`. The database volume's name follows from it; since 1.2d it is
   built from the slug (`load_site_volume_names` in `tools/site-settings.sh`), and the scenario
   check `dev-settings-guard.sh` uses the same function.
 - The dev site's title and test pages: `site.json` (`devSiteTitle`, `testPages`, since template
   plan 1.2b), their text in `tests/dev-content/`; the dev admin and Editor in `.env.example`
   (`DEV_*`); the browser tests' own list of the same pages, `TEST_PATHS` in
-  `tests/e2e/specs/dev/theme.spec.ts`, until 1.2f reads `site.json`. The site's own extra build
+  `tests/e2e/specs/dev/theme.spec.ts`, until 1.2g reads `site.json`. The site's own extra build
   steps (here, the Song List's sample songs) go in `tests/dev-setup.sh`.
 - The parent theme and its pinned fingerprint: `tools/versions.sh` (`PARENT_THEME_*`).
 - `hbmusic`, the PHP prefix and text domain: `phpcs.xml.dist` (both), and every function and
@@ -128,6 +128,10 @@ template project starts; until then, a list, not a to-do.
   `site-css-lint` is neutral already.
 - `bin/check`, `bin/test`, `bin/tools-update`, `tools/versions.sh` (apart from the names above),
   `.github/workflows/check.yml`, `.github/dependabot.yml`, the allow-list `.gitignore`.
+- The plugin updates (template plan T8, T9): `site-packages/` with Dependabot's weekly group,
+  `.github/workflows/plugin-updates.yml` (auto-merge for Dependabot's `site-packages/` pull
+  requests) and the versions check's two alerts (a waiting update, an update never proposed); the
+  repository needs GitHub's "Allow auto-merge" setting on. Generic for any site.
 - The weekly versions check (plan 8j): `bin/versions-check` and `.github/workflows/versions.yml` are generic;
   the list `PINS` at the top of the script names each site's pinned plugins and theme. Kept for
   many sites, where checking every site's Plugins page by eye does not scale.

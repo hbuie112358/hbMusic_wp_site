@@ -1,6 +1,7 @@
 # Weekly: compares the dev site's pinned parent theme with WordPress.org (bin/versions-check,
-# plan 8j) and opens an issue for a newer one. It changes no code. The downloaded plugins are
-# raised by Dependabot instead (site-packages/, template plan T8).
+# plan 8j) and watches Dependabot's plugin updates (template plan T9): an issue for a newer theme,
+# for a plugin update still waiting after a few days, and for a plugin release Dependabot never
+# proposed. GitHub emails the owner about new issues. It changes no code.
 name: versions
 
 on:
@@ -15,10 +16,11 @@ on:
         required: false
         default: "7"
 
-# Exactly what the check needs: reading the repository and opening the theme's issue. No secrets,
-# no write access to code.
+# Exactly what the check needs: reading the repository and its pull requests, and opening issues.
+# No secrets, no write access to code.
 permissions:
   contents: read
+  pull-requests: read
   issues: write
 
 # Two runs at once could both open the same proposal.
@@ -36,7 +38,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Compare the theme's pin with WordPress.org and open an issue if it is behind (bin/versions-check --act)
+      - name: Compare the theme with WordPress.org and watch the plugin updates; open issues for what needs the user (bin/versions-check --act)
         run: bin/versions-check --act
         env:
           GH_TOKEN: ${{ github.token }}

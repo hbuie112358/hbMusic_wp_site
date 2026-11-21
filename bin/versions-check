@@ -5,10 +5,14 @@
 # the same wait (template plan T8); the theme stays here because WordPress.org publishes no
 # checksums for themes, so its pin holds a fingerprint taken by hand.
 #
-#   bin/versions-check          reports whether the theme is behind; changes nothing (needs only
-#                               curl and jq)
-#   bin/versions-check --act    also opens an issue on GitHub for a newer theme (the weekly
-#                               workflow, versions.yml)
+# It also watches Dependabot's plugin updates (template plan T9), which merge themselves once their
+# checks pass: an update still open after STALE_UPDATE_DAYS is waiting for the user (its checks
+# failed, or it fell behind main), and a plugin release past the wait with no update proposed means
+# Dependabot has stopped proposing; each gets an issue, which GitHub emails to the owner.
+#
+#   bin/versions-check          reports what it finds; changes nothing (needs curl, jq and gh)
+#   bin/versions-check --act    also opens an issue on GitHub for each finding (the weekly
+#                               workflow, versions.yml), once per title
 #
 # A release is proposed only once it is PINS_COOLDOWN_DAYS old (default 7): a hijacked release is
 # usually found and pulled within days, the same wait Dependabot keeps here. Security fixes reach
@@ -21,6 +25,10 @@ readonly VERSIONS_FILE="tools/versions.sh"
 readonly API_ROOT="https://api.wordpress.org"
 readonly SECONDS_PER_DAY=86400
 readonly COOLDOWN_DAYS="${PINS_COOLDOWN_DAYS:-7}"
+# Dependabot's plugin update normally merges itself within minutes; three days open means it waits.
+readonly STALE_UPDATE_DAYS=3
+# Dependabot proposes weekly, so a release this much past the wait should have been proposed.
+readonly DAYS_PER_WEEK=7
 # What WordPress.org sends is never trusted: a version is digits and dots only, so it cannot carry
 # anything into a branch name, a file or a command.
 readonly VERSION_PATTERN='^[0-9]+(\.[0-9]+){0,3}$'
@@ -33,8 +41,11 @@ readonly PINS=(
 log() { printf '%s [versions-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
 
+# shellcheck source=tools/site-packages.sh
+source "$REPO_ROOT/tools/site-packages.sh"
+
 # The newest version and its date, as "version|last_updated". WordPress.org's last_updated is the
-# theme's latest change, never earlier than the release, so the wait can only come out longer.
+# item's latest change, never earlier than the release, so the wait can only come out longer.
 newest_release() {
   local kind="$1" slug="$2" answer
   answer="$(curl -fsS --retry 3 --max-time 20 \
@@ -95,15 +106,21 @@ propose_change() {
 # An issue only: the theme's pin holds a SHA-256 taken by hand, which a fingerprint computed here
 # from the same download would not prove (tools/versions.sh).
 propose_theme_issue() {
-  local name="$3" pinned="$4" newest="$5" title
-  title="$name $newest is out; the dev site pins $pinned"
-  if [[ -n "$(gh issue list --state all --search "in:title \"$name $newest is out\"" --json title \
-    --jq ".[] | select(.title == \"$title\") | .title")" ]]; then
-    log "$name: an issue for $newest exists already"
+  local name="$3" pinned="$4" newest="$5"
+  open_issue_once "$name $newest is out; the dev site pins $pinned" "$(theme_issue_text "$name" "$pinned" "$newest")"
+}
+
+# Opens an issue unless one with exactly this title was ever opened: an open one is waiting, a
+# closed one was dealt with, and neither is opened again.
+open_issue_once() {
+  local title="$1" body="$2" existing
+  existing="$(gh issue list --state all --search "in:title \"$title\"" --json title --jq '.[].title')"
+  if grep -qxF -- "$title" <<<"$existing"; then
+    log "an issue \"$title\" exists already"
     return 0
   fi
-  gh issue create --title "$title" --body "$(theme_issue_text "$name" "$pinned" "$newest")"
-  log "$name: issue for $newest opened"
+  gh issue create --title "$title" --body "$body" >/dev/null
+  log "issue opened: $title"
 }
 
 theme_issue_text() {
@@ -117,6 +134,100 @@ theme_issue_text() {
     "Opened by the weekly versions check (bin/versions-check, .github/workflows/versions.yml)."
 }
 
+# Dependabot's open pull requests that change nothing but site-packages/, one JSON object a line.
+dependabot_plugin_updates() {
+  gh pr list --author app/dependabot --state open \
+    --json number,url,createdAt,files,mergeStateStatus,statusCheckRollup \
+    --jq '.[] | select([.files[].path | startswith("site-packages/")] | all)'
+}
+
+# Why an update has not merged, in plain words, from its checks and its place behind main.
+waiting_reason() {
+  local plugin_update="$1"
+  jq -r '
+    if [.statusCheckRollup[]? | (.conclusion // .state // "")
+        | select(. == "FAILURE" or . == "ERROR" or . == "TIMED_OUT" or . == "CANCELLED")] | length > 0
+    then "its checks failed"
+    elif .mergeStateStatus == "BEHIND" then "it is behind main"
+    else "it has not merged" end' <<<"$plugin_update"
+}
+
+# An issue for each plugin update open STALE_UPDATE_DAYS or longer.
+check_waiting_updates() {
+  local is_acting="$1" plugin_update number age reason title
+  while IFS= read -r plugin_update; do
+    number="$(jq -r '.number' <<<"$plugin_update")"
+    age="$(days_since "$(jq -r '.createdAt' <<<"$plugin_update")")"
+    if (( age < STALE_UPDATE_DAYS )); then
+      log "plugin update #$number: open $age of $STALE_UPDATE_DAYS days; merges itself once its checks pass"
+      continue
+    fi
+    reason="$(waiting_reason "$plugin_update")"
+    title="Plugin update #$number is waiting: $reason"
+    log "$title (open $age days)"
+    if [[ "$is_acting" == "--act" ]]; then
+      open_issue_once "$title" "$(waiting_update_text "$number" "$reason" "$(jq -r '.url' <<<"$plugin_update")")"
+    fi
+  done < <(dependabot_plugin_updates)
+}
+
+waiting_update_text() {
+  printf '%s\n' \
+    "Dependabot's plugin update #$1 is still open after $STALE_UPDATE_DAYS days: $2. Normally it merges itself within minutes of its checks passing." \
+    "" \
+    "**What to do** ($3)" \
+    "- **Its checks failed:** a plugin's new version breaks something the tests protect. Don't merge; look at it with Claude in a session. The failing check names the plugin." \
+    "- **It is behind main:** click **Update branch** on its page. Its checks run again and it merges itself." \
+    "- **It has not merged** for another reason: open it and look at what GitHub says at the bottom of the page." \
+    "" \
+    "Staging and live are not affected: they get a plugin's new version only when the user deploys it." \
+    "" \
+    "Opened by the weekly versions check (bin/versions-check, .github/workflows/versions.yml); closing this issue stops it being opened again."
+}
+
+# A plugin whose newest release is past the wait and a week's Dependabot run, with no update open:
+# Dependabot has stopped proposing (its run failed, or WPackagist could not be reached).
+check_unproposed_plugins() {
+  local is_acting="$1" plugin_slug
+  if [[ -n "$(dependabot_plugin_updates)" ]]; then
+    log "plugins: a Dependabot update is open, so none is missing"
+    return 0
+  fi
+  while IFS= read -r plugin_slug; do
+    check_unproposed_plugin "$is_acting" "$plugin_slug"
+  done < <(site_packages_plugin_slugs "$SITE_PACKAGES_LOCK")
+}
+
+check_unproposed_plugin() {
+  local is_acting="$1" plugin_slug="$2" pinned newest updated age title
+  pinned="$(jq -r --arg name "$WORDPRESS_ORG_PLUGIN_VENDOR/$plugin_slug" '.packages[] | select(.name == $name) | .version' "$SITE_PACKAGES_LOCK")"
+  IFS='|' read -r newest updated <<<"$(newest_release plugin "$plugin_slug")"
+  [[ "$newest" =~ $VERSION_PATTERN && "$pinned" =~ $VERSION_PATTERN ]] || fail "$plugin_slug: no usable versions (pinned '$pinned', WordPress.org '$newest')"
+  if ! is_newer "$newest" "$pinned"; then
+    log "$plugin_slug: $pinned is current"
+    return 0
+  fi
+  age="$(days_since "$updated")"
+  if (( age < COOLDOWN_DAYS + DAYS_PER_WEEK )); then
+    log "$plugin_slug: $newest is out ($age days); Dependabot proposes it after its wait"
+    return 0
+  fi
+  title="Dependabot has not proposed $plugin_slug $newest"
+  log "$title (out $age days, site-packages pins $pinned)"
+  if [[ "$is_acting" == "--act" ]]; then
+    open_issue_once "$title" "$(unproposed_plugin_text "$plugin_slug" "$pinned" "$newest" "$age")"
+  fi
+}
+
+unproposed_plugin_text() {
+  printf '%s\n' \
+    "WordPress.org has had $1 $3 for $4 days; site-packages/composer.json pins $2, and Dependabot has proposed no update." \
+    "" \
+    "Dependabot proposes plugin updates weekly, once a release is $COOLDOWN_DAYS days old, so this one is overdue: its last run may have failed. Look at the repository's **Insights → Dependency graph → Dependabot** tab for the error, or ask Claude in a session." \
+    "" \
+    "Opened by the weekly versions check (bin/versions-check, .github/workflows/versions.yml); closing this issue stops it being opened again."
+}
+
 main() {
   local is_acting="${1:-}" pin
   [[ -z "$is_acting" || "$is_acting" == "--act" ]] || fail "unknown option $is_acting (only --act)"
@@ -124,6 +235,8 @@ main() {
   for pin in "${PINS[@]}"; do
     check_pin "$is_acting" "$pin"
   done
+  check_waiting_updates "$is_acting"
+  check_unproposed_plugins "$is_acting"
 }
 
 main "$@"

@@ -172,17 +172,26 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   again (the same code was just tested).
 - `site-packages/`: the downloaded plugins the site runs (template plan T8), WordPress.org's
   through WPackagist, at exact versions in `composer.json`, with `composer.lock` recording the
-  download addresses (all on `downloads.wordpress.org`, which the review gate checks in every
-  change to the lock file). Separate from the top-level `composer.json`, which holds only the
-  code-checking tools. Dependabot proposes each plugin's update as its own pull request, a release
-  at least 7 days old (`.github/dependabot.yml`); the user merges it on GitHub once its checks
-  pass, and staging and live get it in the monthly check (`docs/ROUTINES.md`). WPackagist is
-  needed only to change a version: installing from the lock file goes straight to WordPress.org.
+  download addresses (all on `downloads.wordpress.org`, which `bin/check` and `bin/dev-site`
+  require). Separate from the top-level `composer.json`, which holds only the code-checking tools.
+  Dependabot proposes the plugins' updates weekly, a release at least 7 days old, in one pull
+  request (`.github/dependabot.yml`), which merges itself by rebase once its checks pass
+  (`.github/workflows/plugin-updates.yml`, template plan T9: only Dependabot's pull requests into
+  `main` changing nothing but `site-packages/`; it runs nothing from the pull request). A merge
+  done this way starts no run on `main` (GitHub does not start workflows from its own token's
+  merges); nothing needs one, since staging's deploy copies only this repository's theme and
+  plugins, and the weekly run checks `main`. Staging and live get a new version only when the
+  user deploys it, in the monthly check (`docs/ROUTINES.md`). WPackagist is needed only to change
+  a version: installing from the lock file goes straight to WordPress.org.
 - `bin/versions-check`: compares the dev site's pinned parent theme (`tools/versions.sh`) with
   WordPress.org and reports whether it is behind, changing nothing. Every Monday GitHub runs it
   with `--act` (`.github/workflows/versions.yml`, plan 8j), which opens an issue for a theme
   release at least 7 days old; its pin holds a fingerprint taken by hand, so it is raised in a
-  session. The workflow can read the repository and open issues, nothing more.
+  session. It also watches the plugin updates (template plan T9): an issue for one still open
+  after 3 days (its checks failed, or it fell behind `main` and waits for "Update branch"), and
+  for a plugin release 14 days old that Dependabot never proposed. GitHub emails the owner about
+  new issues; one with the same title is never opened twice. The workflow can read the repository
+  and its pull requests and open issues, nothing more.
 - `bin/screenshots previews | baseline | compare` (plan D29): a before/after check of the look with
   the real content, for restyling; local only, never a gate. It shows each real page from
   `data/content/` (listed in its `pages.json`; photos written `{{photo:<file>}}` from

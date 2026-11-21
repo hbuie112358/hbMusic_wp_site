@@ -1,0 +1,27 @@
+{
+  "packages": [
+    {
+      "name": "wpackagist-plugin/contact-form-7",
+      "version": "1.0.0",
+      "type": "wordpress-plugin",
+      "dist": {
+        "type": "zip",
+        "url": "https://downloads.wordpress.org/plugin/contact-form-7.1.0.0.zip"
+      }
+    },
+    {
+      "name": "wpackagist-plugin/example-plugin",
+      "version": "1.0.0",
+      "type": "wordpress-plugin",
+      "dist": {
+        "type": "zip",
+        "url": "https://downloads.example.net/example-plugin.zip"
+      }
+    },
+    {
+      "name": "composer/installers",
+      "version": "v2.3.0",
+      "type": "composer-plugin"
+    }
+  ]
+}

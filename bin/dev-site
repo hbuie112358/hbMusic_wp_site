@@ -86,6 +86,7 @@ load_site_settings() {
   readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
   refuse_if_any "$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
   refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
+  refuse_if_any "$(site_packages_download_problems "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
 }

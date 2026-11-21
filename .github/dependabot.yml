@@ -48,9 +48,11 @@ updates:
       prefix: "build"
       include: "scope"
 
-  # The downloaded plugins the site runs (site-packages/, template plan T8): WordPress.org's
-  # plugins through WPackagist, each at an exact version. One pull request per plugin, so each
-  # update is tested and reviewed on its own before staging and live get it in the monthly check.
+  # The downloaded plugins the site runs (site-packages/, template plan T8, T9): WordPress.org's
+  # plugins through WPackagist, each at an exact version. All in one weekly pull request, which
+  # merges itself once its checks pass (plugin-updates.yml): two pull requests merging on their
+  # own would leave the second behind main, where it waits, since Dependabot rebases only on a
+  # conflict. A failing update holds the others back that week; the failure names the plugin.
   - package-ecosystem: "composer"
     directory: "/site-packages"
     schedule:
@@ -60,6 +62,10 @@ updates:
       timezone: "America/New_York"
     cooldown:
       default-days: 7
+    groups:
+      site-plugins:
+        patterns:
+          - "*"
     commit-message:
       prefix: "build"
       include: "scope"
