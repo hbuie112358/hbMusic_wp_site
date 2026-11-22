@@ -26,7 +26,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy), 1.4d-2
   done (the copy, #91), 1.4d-3 done (after the copy, and the test against a throwaway server,
   #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
-  next is 1.4e, the real servers set up with the user and the first deploys.
+  1.4e under way: the server set up and staging and live deployed with `bin/deploy`
+  (2026-11-22), GitHub's staging deploy removed from the repository; left: the old key and
+  settings on the server, GitHub's `staging` environment, the handbook's wording.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -457,7 +459,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       parts are named as failed), each package listed after a look-alike whose name begins with
       its own; 12 planted faults caught, among them running a part under `||`, which turns `set -e` off
       inside it and opened a wrong issue against an unusable pin.
-  - [ ] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
+  - [~] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
     restrictions and folders in hPanel), the first `bin/deploy staging`, then `bin/deploy live`;
     removed: the `deploy-staging` job and the push trigger in `check.yml`, `bin/deploy-staging`,
     the GitHub environment `staging` with its secrets, and the old key on the server. Ends D33's
@@ -467,6 +469,49 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     (status 23 for a missing file, "Unknown module", the log folder's filter and "read only") are
     proven on the real server here, first by a run answered "no" (it reads the notes and the log
     and lists every folder, changing nothing), then by the first staging deploy.
+    **Done 2026-11-22, the user running every server and key command, Claude writing them:**
+    - Two ed25519 keys made on the user's computer, each with its own passphrase (in the user's
+      password notes), unlocked with `ssh-add`; `hbmusic-staging` and `hbmusic-live` in the
+      user's SSH settings (port 65002, `IdentitiesOnly`, strict host checking against the
+      identity recorded at 3g-2). One setup script sent over the user's password login (kept in
+      `data/records/server-setup-1.4e.sh`, not versioned: it names this site's folders): it
+      checks both sites' folders, logs and keys before writing, backs up `authorized_keys`, and
+      writes `~/.deploy/rsyncd-hbmusic-<place>.conf` (the 7 folders, `deploy-note`, the
+      read-only `php-log` filtered to that site's log; 3g-2's web permissions, one connection,
+      a log), the empty folders (staging's `editing-help`, both note folders) and each key's
+      forced-command line; tried twice on a throwaway home first (ShellCheck caught a `local`
+      ordering slip). A password login now needs `-o PubkeyAuthentication=no`, or a deploy key
+      from the agent would be accepted and land in rsync.
+    - Probes from the user's computer: no shell (`@RSYNCD: 31.0` only), each key sees only its
+      own site's log, `../../` stripped, the old module names unknown, a write to the log
+      refused. **Rsync 3.1.3 differs from the test server here:** the client sees only
+      "connection unexpectedly closed", and the reason ("module is read only") is in the server's
+      rsync log.
+    - `bin/deploy staging` answered "no" (the tested-commit rule on real GitHub data, a missing
+      note as status 23, the real build and WordPress.org's checksums, every folder listed,
+      `editing-help` named new, the versions read), then "yes": 6 pages passed behind the
+      site-wide password (the `github-check` login, now in `.env`), no new log lines; Editing
+      Help activated by the user. `bin/deploy live` the same (Yoast 28.8 to 28.9, the form.css
+      fix); the user saw the Book page right. The first deploy's large change counts (260 for an
+      unchanged Contact Form 7) were the files' dates: a second staging deploy of the same commit
+      showed 0 everywhere.
+    - Found: `bin/deploy` committed without the executable bit (its tests start it with `bash`);
+      fixed, with a `bin/check` rule that every script in `bin/` can be run, shown failing first.
+    - Removed in the repository: GitHub's `deploy-staging` job and the push trigger
+      (`check.yml`), `bin/deploy-staging`, the name check's exception for it. The rebuild plan's
+      item 5, 9b, 9p, D14 and D33 marked done or replaced; `docs/ROUTINES.md` gained
+      "Deploying", and the monthly check deploys `main` instead of updating Contact Form 7 and
+      Yoast by hand.
+    - Still open: the server's old GitHub key line, `rsyncd-staging.conf` and its log (the
+      user, after this pull request); GitHub's `staging` environment and its secrets (Claude with
+      `gh`, approved by the user); the handbook's wording for the downloaded plugins (T11),
+      proposed for the user's approval.
+  - Later, its own small part (found 2026-11-22): `bin/deploy`'s change count could tell
+    content changes from date-only ones (rsync's itemized `c` and `t` flags), so a first deploy
+    does not look larger than it is.
+  - For 2.1 or a new site's routine (found 2026-11-22): 1.4e's server setup script made generic
+    (the place's folders from `site.json`, the domains and log names as settings), so a new
+    site's server is set up the same way.
   - Later, its own part (the user, 2026-11-21): the search checks added to the page check on
     2026-11-15 (H62's title and description limits, one main heading, picture descriptions).
 - [ ] **1.5 The records and care pieces** the handbook expects of every site: a `records/`

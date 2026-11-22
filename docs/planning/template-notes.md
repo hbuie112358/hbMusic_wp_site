@@ -45,8 +45,9 @@ template project starts; until then, a list, not a to-do.
   are listed at exact versions in `site-packages/composer.json`, with its lock file (template plan
   T8, 1.2c); Dependabot raises them. The ones it keeps itself are listed in `site.json`
   (`localPlugins`); each sits in `plugins/<name>/`, needs a line in `.gitignore`, a mount in
-  `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, an entry in `DEPLOY_TARGETS` in
-  `bin/deploy-staging`, and a destination in the server's rsync settings.
+  `compose.dev.yaml`, its `phpcs.xml.dist` run in `bin/check`, and a folder of its name in each
+  place's rsync settings on the server, created empty there before its first deploy (`bin/deploy`
+  copies every plugin `site.json` and `site-packages/` list, template plan 1.4e).
 
 - The booking form: `config/booking-form.txt`, `config/booking-form-mail.json` and `config/booking-form-messages.json` (its "sending failed" text points to the contact links below the form on this site's Book page), and Contact Form 7 in `site-packages/composer.json`.
 
