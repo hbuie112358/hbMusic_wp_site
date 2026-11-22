@@ -24,8 +24,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
   error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check, #90), 1.4c done
   (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy), 1.4d-2
-  done (the copy); next is 1.4d-3, the page check and PHP log after the copy, and the test
-  against a throwaway server.
+  done (the copy, #91), 1.4d-3 done (after the copy, and the test against a throwaway server);
+  next is 1.4d-4, the weekly warning for the test server's packages, then 1.4e.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -405,14 +405,55 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       1.4e's handbook proposal); (b) under rootful Docker the build's files belong to root, so
       the temporary folder might not be removed afterwards; `bin/dev-site` assumes the same
       rootless setup.
-    - [ ] 1.4d-3 After the copy: the page check, the PHP log's new lines, one deploy at a time on
-      the computer; and the test from start to finish against the throwaway server.
+    - [x] 1.4d-3 After the copy: the page check, the PHP log's new lines, one deploy at a time on
+      the computer; and the test from start to finish against the throwaway server. Built
+      2026-11-21: the page check failing fails the deploy, naming the way back (`--commit` with
+      the commit the place ran before); a place's login refused before the copy when missing
+      from `.env`, and exported to the page check inside a subshell only. Stand-in situations
+      41-50 (a stand-in page check recording its address and login, and writing log lines as a
+      broken page would); eight planted faults caught. The throwaway server
+      (`tests/scenario/generic/dev-deploy-server.sh` with `deploy-server/`, about 18 s in
+      `bin/test`): fresh keys per run, the host key known in advance and checked strictly, each
+      key forced into rsync's daemon mode with its own settings written from the situation;
+      `tests/tools/deploy/run.sh --real-server` runs five situations over it with the real
+      `rsync` and `ssh` (a first deploy, live after staging, a folder not set up, the log's
+      filter, a newer plugin), reading the server back for the same expectations; then probes
+      (no shell, the log not writable, no climbing into live's folder, an unknown key refused at
+      once). Seen for real: a missing note is rsync's status 23, an unknown folder is refused,
+      the plugin version reads over the daemon. Three weakened restrictions planted in the
+      server's setup, all caught after one probe was corrected (it wrote a name the log folder's
+      filter already refused, so it tested the filter, not "read only"; it now writes the log's
+      own name). Decided with
+      the user, 2026-11-21: the page check (`bin/site-check`) fails the deploy, a place behind a
+      password giving it `<PLACE>_CHECK_USER`/`_PASSWORD`, read from `.env` by exact name alone;
+      the PHP log's new lines found by position (its size before the copy), not by the lines'
+      times, so a clock difference cannot hide any, shown prominently but not failing the deploy
+      (visitors' requests write there too, such as 9w's Wordfence lines), a shorter log (a new
+      one) shown whole, and a missing `php-log` folder refused before the copy; one deploy at a
+      time by a `flock` lock in the computer's temporary folder, outside the repository. The
+      throwaway server: a scenario check in `bin/test`, Alpine 3.24.4 by digest
+      (`sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf`, Docker's
+      official image, published 2026-11-08) with `openssh-server` 10.3_p1-r2 (2026-11-05) and
+      `rsync` 3.5.2-r1 (2026-11-07) from Alpine's own `main` repository, at exact versions
+      (option a; all three under a month old, reported to the user, `AI_SECURITY.md` section 4);
+      real `ssh`, `rsync` and `bin/deploy`, stand-ins for GitHub and for `bin/site-check`
+      (tested on its own; a real one would need a web server with a certificate in the test).
+    - [ ] 1.4d-4 The weekly warning for the test server's packages (the user, 2026-11-21): Alpine
+      keeps only each package's newest version, so an exact pin breaks the test server's build
+      the day a new one appears; `bin/versions-check` also compares the pinned `openssh-server`
+      and `rsync` with Alpine's index and opens an issue (GitHub emails the owner), so the pin
+      is raised in a session within the week, through the usual age check. With its tests in
+      `tests/tools/versions-check/`.
   - [ ] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
     restrictions and folders in hPanel), the first `bin/deploy staging`, then `bin/deploy live`;
     removed: the `deploy-staging` job and the push trigger in `check.yml`, `bin/deploy-staging`,
     the GitHub environment `staging` with its secrets, and the old key on the server. Ends D33's
     exception; the rebuild plan's 9b, item 5 and D14 rewritten. The handbook's wording for the
-    downloaded plugins (T11) proposed here, for the user's approval.
+    downloaded plugins (T11) proposed here, for the user's approval. From 1.4d-3's review: the
+    test server runs rsync 3.5.2, the host 3.1.3 (3g-2), so the behaviors `bin/deploy` relies on
+    (status 23 for a missing file, "Unknown module", the log folder's filter and "read only") are
+    proven on the real server here, first by a run answered "no" (it reads the notes and the log
+    and lists every folder, changing nothing), then by the first staging deploy.
   - Later, its own part (the user, 2026-11-21): the search checks added to the page check on
     2026-11-15 (H62's title and description limits, one main heading, picture descriptions).
 - [ ] **1.5 The records and care pieces** the handbook expects of every site: a `records/`
@@ -429,7 +470,11 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   (T6; kept by the user, 2026-11-21, so detaching is real, not only a note); this site switched
   to it. To verify then: whether the organization's pinning rule applies to reusable
   workflows (handbook `toolkit/github.md`), and whether a repository outside the organization
-  (such as this one, on the user's personal account) may call them. Note from 1.3d (the user,
+  (such as this one, on the user's personal account) may call them. Also here (the user,
+  2026-11-21, from 1.4d-3): the deploy test's throwaway server built once by `dts-site-tools`'
+  release workflow and stored in the organization's GitHub container registry, pinned by
+  digest, so the tests never download Alpine's packages and never break when Alpine replaces a
+  version; updated deliberately, replacing 1.4d-4's weekly warning. Note from 1.3d (the user,
   2026-11-21): the generic tests of the booking form (`booking-form.spec.ts`, the scenario check
   `dev-booking-form-settings.sh`) and of Yoast (the Yoast part of `seo.spec.ts`) assume their
   plugin and never skip, so a site without it would fail them, and once the tests live in

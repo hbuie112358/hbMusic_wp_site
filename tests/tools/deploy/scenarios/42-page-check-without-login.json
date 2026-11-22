@@ -1,0 +1,8 @@
+{
+  "description": "live, open to everyone: the page check runs with no login at all.",
+  "place": "live",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{B}", "example-live": "{A}" },
+  "expectStatus": 0,
+  "expectPageCheck": "https://example.com\tuser=\tpassword="
+}

@@ -1,0 +1,11 @@
+{
+  "description": "A page failing after the copy: the deploy fails, the note names the new commit (the code is there), and the way back names the commit before.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "pageCheckFails": true,
+  "expectStatus": 1,
+  "expectOutputNaming": ["/about/", "bin/deploy staging --commit {A7}"],
+  "expectWrites": ["example-staging::example-download", "example-staging::example-plugin", "example-staging::example-child", "example-staging::deploy-note"],
+  "expectServerFiles": { "example-staging/deploy-note/deployed-commit": "{B}" }
+}

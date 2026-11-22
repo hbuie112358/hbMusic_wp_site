@@ -1,0 +1,14 @@
+{
+  "description": "A first deploy to staging over the real rsync daemon: no note yet (rsync's own status for a missing file), every folder made the commit's, the note written, live untouched.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "expectStatus": 0,
+  "expectOutputNaming": ["no note yet", "every page passed"],
+  "expectServerFiles": {
+    "example-staging/deploy-note/deployed-commit": "{B}",
+    "example-staging/example-download/example-download.php": "Version: 1.1.0",
+    "example-staging/example-child/style.css": "/* B */",
+    "example-live/example-child/old.txt": "old"
+  },
+  "expectServerMissing": ["example-staging/example-child/old.txt", "example-staging/example-plugin/old.txt"]
+}

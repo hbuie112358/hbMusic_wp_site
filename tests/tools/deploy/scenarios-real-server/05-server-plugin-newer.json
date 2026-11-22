@@ -1,0 +1,10 @@
+{
+  "description": "The downloaded plugin newer on the real server: its version read over the daemon, the deploy refused, nothing copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "serverPluginVersion": { "example-staging": "1.10.0" },
+  "expectStatus": 1,
+  "expectOutputNaming": ["1.10.0"],
+  "expectServerFiles": { "example-staging/deploy-note/deployed-commit": "{A}" }
+}

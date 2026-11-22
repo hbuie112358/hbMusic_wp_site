@@ -1,0 +1,11 @@
+{
+  "description": "Another bin/deploy of the site running on the computer: refused at once, nothing read or copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "lockHeld": true,
+  "expectStatus": 1,
+  "expectOutputNaming": ["another bin/deploy"],
+  "expectWrites": [],
+  "expectNoPageCheck": true
+}

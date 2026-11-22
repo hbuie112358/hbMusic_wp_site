@@ -1,0 +1,10 @@
+{
+  "description": "PHP log lines written while the pages were checked: shown, the old ones not, and the deploy still passes.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "pageCheckAddsLogLines": ["[01-Jan-2026 00:00:02 UTC] PHP Warning:  Undefined variable $planted"],
+  "expectStatus": 0,
+  "expectOutputNaming": ["1 new line", "Undefined variable $planted"],
+  "expectOutputLacking": ["an old line"]
+}

@@ -1,0 +1,10 @@
+{
+  "description": "The php-log folder showing another file besides the site's log (a wrongly set folder): refused before anything is copied, naming it.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "phpLogExtraFile": true,
+  "expectStatus": 1,
+  "expectOutputNaming": ["mail.log"],
+  "expectWrites": []
+}

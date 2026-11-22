@@ -1,0 +1,10 @@
+# The test server's ssh settings: keys only, no passwords of any kind, no root; the host key and
+# the account's authorized keys are copied in by the test before the server starts.
+Port 22
+HostKey /etc/ssh/ssh_host_ed25519_key
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin no
+AuthorizedKeysFile .ssh/authorized_keys
+StrictModes yes

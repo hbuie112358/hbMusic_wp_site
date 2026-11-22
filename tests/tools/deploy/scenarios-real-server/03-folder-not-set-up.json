@@ -1,0 +1,13 @@
+{
+  "description": "A folder the key's settings do not name: the real daemon refuses it, and nothing is copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "missingFolders": ["example-staging/example-child"],
+  "expectStatus": 1,
+  "expectOutputNaming": ["example-child"],
+  "expectServerFiles": {
+    "example-staging/deploy-note/deployed-commit": "{A}",
+    "example-staging/example-download/example-download.php": "Version: 1.0.0"
+  }
+}

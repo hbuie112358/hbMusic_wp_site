@@ -1,0 +1,9 @@
+{
+  "description": "No PHP log lines during the deploy: said so, the old ones not shown.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "expectStatus": 0,
+  "expectOutputNaming": ["no new lines"],
+  "expectOutputLacking": ["an old line"]
+}
