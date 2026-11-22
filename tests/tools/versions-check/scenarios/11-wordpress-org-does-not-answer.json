@@ -5,5 +5,8 @@
   "pluginUnanswered": true,
   "expectedIssues": [],
   "expectFailure": true,
-  "expectOutputNaming": "example-plugin"
+  "expectOutputNaming": "example-plugin",
+  "expectFailedParts": [
+    "the plugins Dependabot never proposed"
+  ]
 }

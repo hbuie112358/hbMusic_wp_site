@@ -1,0 +1,15 @@
+{
+  "description": "WordPress.org does not answer for the plugin and Alpine does not answer: the check names both failed parts, in the order they ran.",
+  "act": true,
+  "pullRequests": [],
+  "pluginUnanswered": true,
+  "alpine": {
+    "unanswered": true
+  },
+  "expectedIssues": [],
+  "expectFailure": true,
+  "expectFailedParts": [
+    "the plugins Dependabot never proposed",
+    "the test server's Alpine packages"
+  ]
+}

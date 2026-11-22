@@ -1,0 +1,16 @@
+{
+  "description": "openssh-server is missing from Alpine's list (only its look-alike is there): the check fails, naming it, never taking the look-alike.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "missing": [
+      "openssh-server"
+    ]
+  },
+  "expectedIssues": [],
+  "expectFailure": true,
+  "expectOutputNaming": "no usable version and build time for openssh-server",
+  "expectFailedParts": [
+    "the test server's Alpine packages"
+  ]
+}

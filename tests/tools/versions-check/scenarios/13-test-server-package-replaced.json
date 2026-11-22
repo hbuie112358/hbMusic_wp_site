@@ -1,0 +1,13 @@
+{
+  "description": "Alpine has replaced the pinned rsync: an issue at once, with no wait.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "replaced": {
+      "rsync": "3.9.9-r1"
+    }
+  },
+  "expectedIssues": [
+    "The deploy test server's rsync {pinned:rsync} is gone from Alpine; it now has 3.9.9-r1"
+  ]
+}

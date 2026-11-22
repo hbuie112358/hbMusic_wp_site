@@ -26,7 +26,8 @@ readonly PARENT_THEME_SHA256="f333ce53aaa4049639298247d03480a4bd9b56fa8f0fea0440
 # from Alpine's own repository at exact versions, all checked by the user's rules on 2026-11-21
 # (image published 2026-11-08, packages 2026-11-05 and 2026-11-07). Alpine keeps only each
 # package's newest version, so these break the test's build when Alpine replaces one; the weekly
-# versions check warns of that (1.4d-4), until the image is built once and stored (2.1).
+# versions check (bin/versions-check) opens an issue that day, and the pin is raised at once, with
+# no wait (1.4d-4), until the image is built once and stored (2.1).
 readonly DEPLOY_TEST_SERVER_BASE_IMAGE="alpine:3.24.4@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf"
 readonly DEPLOY_TEST_SERVER_OPENSSH_VERSION="10.3_p1-r2"
 readonly DEPLOY_TEST_SERVER_RSYNC_VERSION="3.5.2-r1"

@@ -1,0 +1,29 @@
+{
+  "description": "Alpine does not answer while a plugin update waits: the update's issue still opens, and the check still fails, naming Alpine's list.",
+  "act": true,
+  "pullRequests": [
+    {
+      "number": 101,
+      "daysOpen": 5,
+      "paths": [
+        "site-packages/composer.json",
+        "site-packages/composer.lock"
+      ],
+      "mergeState": "BLOCKED",
+      "checks": [
+        "FAILURE"
+      ]
+    }
+  ],
+  "alpine": {
+    "unanswered": true
+  },
+  "expectedIssues": [
+    "Plugin update #101 is waiting: its checks failed"
+  ],
+  "expectFailure": true,
+  "expectOutputNaming": "Alpine's package list could not be read",
+  "expectFailedParts": [
+    "the test server's Alpine packages"
+  ]
+}

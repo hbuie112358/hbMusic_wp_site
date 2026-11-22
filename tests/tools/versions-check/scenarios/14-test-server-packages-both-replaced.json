@@ -1,0 +1,15 @@
+{
+  "description": "Alpine has replaced both pinned packages: an issue for each.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "replaced": {
+      "openssh-server": "11.0_p1-r0",
+      "rsync": "3.9.9-r1"
+    }
+  },
+  "expectedIssues": [
+    "The deploy test server's openssh-server {pinned:openssh-server} is gone from Alpine; it now has 11.0_p1-r0",
+    "The deploy test server's rsync {pinned:rsync} is gone from Alpine; it now has 3.9.9-r1"
+  ]
+}

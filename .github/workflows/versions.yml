@@ -1,7 +1,8 @@
 # Weekly: compares the dev site's pinned parent theme with WordPress.org (bin/versions-check,
 # plan 8j) and watches Dependabot's plugin updates (template plan T9): an issue for a newer theme,
-# for a plugin update still waiting after a few days, and for a plugin release Dependabot never
-# proposed. GitHub emails the owner about new issues. It changes no code.
+# for a plugin update still waiting after a few days, for a plugin release Dependabot never
+# proposed, and for a package of bin/deploy's test server that Alpine replaced (template plan
+# 1.4d-4). GitHub emails the owner about new issues. It changes no code.
 name: versions
 
 on:
@@ -38,7 +39,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Compare the theme with WordPress.org and watch the plugin updates; open issues for what needs the user (bin/versions-check --act)
+      - name: Compare the theme with WordPress.org, watch the plugin updates and the test server's Alpine packages; open issues for what needs the user (bin/versions-check --act)
         run: bin/versions-check --act
         env:
           GH_TOKEN: ${{ github.token }}

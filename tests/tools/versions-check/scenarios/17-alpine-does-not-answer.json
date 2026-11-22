@@ -1,0 +1,14 @@
+{
+  "description": "Alpine's package list does not answer: the check fails, naming it, and opens nothing for the test server.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "unanswered": true
+  },
+  "expectedIssues": [],
+  "expectFailure": true,
+  "expectOutputNaming": "Alpine's package list could not be read",
+  "expectFailedParts": [
+    "the test server's Alpine packages"
+  ]
+}
