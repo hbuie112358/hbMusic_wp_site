@@ -162,9 +162,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
   stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
   ruleset), and checks that the plugins and the tools (`bin/`, `tools/`, the workflows, the shared
-  compose file and settings example; not yet `bin/deploy-staging`, replaced at template plan 1.4)
+  compose file and settings example)
   name nothing of this site (`site.json`'s `namesSharedCodeMustNotUse`) and that each plugin declares
-  `Update URI: false`; `theme.json`'s schema matching
+  `Update URI: false`; every script in `bin/` executable; `theme.json`'s schema matching
   the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
   rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
   packages (every advisory fails, except any the user accepted in that folder's
@@ -189,8 +189,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `wordpress/`; `composer.lock` is read-only to them.
 - GitHub runs `bin/check` and the dev site's tests on every pull request, weekly and by the "Run
   workflow" button (`.github/workflows/check.yml`); a pull request merges only when both pass and
-  it is up to date with `main`. A merge to `main` then deploys to staging without running them
-  again (the same code was just tested).
+  it is up to date with `main`. A merge deploys nothing: the user deploys with `bin/deploy`
+  (template plan 1.4e removed GitHub's staging deploy, its key and its environment).
 - `site-packages/`: the downloaded plugins the site runs (template plan T8), WordPress.org's
   through WPackagist, at exact versions in `composer.json`, with `composer.lock` recording the
   download addresses (all on `downloads.wordpress.org`, which `bin/check` and `bin/dev-site`
@@ -202,9 +202,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   plugins; it runs `main`'s own code, never the pull request's). Updates to
   `composer/installers` and to the tools wait for the user's review. A merge
   done this way starts no run on `main` (GitHub does not start workflows from its own token's
-  merges); nothing needs one, since staging's deploy copies only this repository's theme and
-  plugins, and the weekly run checks `main`. Staging and live get a new version only when the
-  user deploys it, in the monthly check (`docs/ROUTINES.md`). WPackagist is needed only to change
+  merges); nothing needs one: `bin/deploy` accepts a commit whose pull request's last commit
+  passed with the same files, and the weekly run checks `main`. Staging and live get a new
+  version only when the user deploys it with `bin/deploy`, in the monthly check
+  (`docs/ROUTINES.md`). WPackagist is needed only to change
   a version: installing from the lock file goes straight to WordPress.org.
 - `bin/versions-check`: compares the dev site's pinned parent theme (`tools/versions.sh`) with
   WordPress.org and reports whether it is behind, changing nothing. Every Monday GitHub runs it
@@ -221,8 +222,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   new issues; one with the same title is never opened twice. The workflow can read the repository
   and its pull requests and open issues, nothing more.
 - `bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]`
-  (template plan 1.4d, T11; handbook chapter 2), run by the user: being built in parts. So far
-  (1.4d-1, 1.4d-2) it refuses unless the working copy is clean, the commit is on GitHub's `main`
+  (template plan 1.4, T11; handbook chapter 2), run by the user from this computer, the way every
+  change reaches staging and live since 2026-11-22 (1.4e; `docs/ROUTINES.md`, "Deploying"). It
+  refuses unless the working copy is clean, the commit is on GitHub's `main`
   and its required checks (`check`, `dev-site`) passed on it or on its merged pull request's last
   commit with the same files, and on live unless staging runs that commit; it reads the place's
   note on the server and shows the commits arriving or taken away. Before asking "yes", it exports
@@ -231,7 +233,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   exists on the server for the key, and refuses to lower a downloaded plugin the host updated
   unless `--allow-lower` names it. After "yes" it copies the downloaded plugins, the site's own
   plugins and the theme, each folder made exactly the commit's, then writes the note, and names
-  any folder that was empty there (to activate by hand). Then (1.4d-3) the page check
+  any folder that was empty there (to activate by hand). Then the page check
   (`bin/site-check`; failing, it fails the deploy and names the way back, `--commit` with the
   commit the place ran before), given a place's password login from `.env`
   (`<PLACE>_CHECK_USER`, `<PLACE>_CHECK_PASSWORD`, read by exact name), and the PHP log's lines
@@ -242,7 +244,12 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   up like the host, the real `ssh` and `rsync`, and probes that each key opens no shell, cannot
   write the log or climb out of its folders, and that an unknown key is refused at once. Unlike the other scripts it uses programs on the
   user's computer besides Docker and `jq`: `git`, `gh` (logged in), `rsync`, `ssh`, `curl` and `flock`;
-  `ssh` never asks for a password (`BatchMode`), so a key that does not work stops it.
+  `ssh` never asks for a password (`BatchMode`), so a key that does not work stops it. On the
+  server, each place has its own key, made on the user's computer with a passphrase and unlocked
+  with `ssh-add`, forced in `~/.ssh/authorized_keys` into rsync's daemon mode with that place's
+  settings file in `~/.deploy/` (`rsyncd-hbmusic-<place>.conf`: the theme's and plugins' folders,
+  the `deploy-note` folder and the read-only `php-log`), named `hbmusic-staging` and
+  `hbmusic-live` in the user's SSH settings.
 - `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan
   1.4b, handbook chapter 2's step 7): every published page of the site at the address, from
   WordPress's page list, and the site's root, answers 200 directly, shows the child theme named

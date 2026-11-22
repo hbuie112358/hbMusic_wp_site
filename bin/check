@@ -118,8 +118,7 @@ shared_code_names_nothing_of_this_site() {
     patterns+=(-e "$name")
   done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
   ((${#patterns[@]} > 0)) || return 0
-  ! grep -rniF --exclude-dir=node_modules --exclude=package-lock.json --exclude=deploy-staging \
-    "${patterns[@]}" "$@"
+  ! grep -rniF --exclude-dir=node_modules --exclude=package-lock.json "${patterns[@]}" "$@"
 }
 
 plugins_name_nothing_of_this_site() {
@@ -128,8 +127,7 @@ plugins_name_nothing_of_this_site() {
 
 # The tools, which every site will share (template plan 1.2g): the scripts, their helpers and
 # checker configurations, the GitHub workflows, and the dev site's shared recipe and settings
-# example. Left out: outside code (the CSS linter's installed packages and lock file) and
-# bin/deploy-staging, which names this site's staging folders and is replaced by bin/deploy (1.4).
+# example. Left out: outside code (the CSS linter's installed packages and lock file).
 tools_name_nothing_of_this_site() {
   shared_code_names_nothing_of_this_site "$REPO_ROOT/bin" "$REPO_ROOT/tools" "$REPO_ROOT/.github" \
     "$REPO_ROOT/compose.dev.yaml" "$REPO_ROOT/.env.example"
@@ -138,6 +136,19 @@ tools_name_nothing_of_this_site() {
 # Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
 # would offer a WordPress.org plugin of the same name as an update and replace the site's code
 # with a stranger's (plan step 8b).
+# Every script in bin/ can be started by its name, as the documentation shows it. A script
+# committed without that permission still passes its tests, which start it with bash (bin/deploy
+# was, until template plan 1.4e).
+scripts_can_be_run() {
+  local script missing=0
+  for script in "$REPO_ROOT"/bin/*; do
+    [[ -f "$script" && ! -x "$script" ]] || continue
+    log "${script#"$REPO_ROOT"/} cannot be run by its name: it lacks the permission (chmod +x, committed)"
+    missing=1
+  done
+  return "$missing"
+}
+
 plugins_never_updated_from_wordpress_org() {
   local plugin_folder main_file missing=0
   for plugin_folder in "$REPO_ROOT"/plugins/*/; do
@@ -576,6 +587,7 @@ run_standards_and_rule_checks() {
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "The tools name nothing of this site" tools_name_nothing_of_this_site
   run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
+  run_check "Every script in bin/ can be run" scripts_can_be_run
   run_check "site.json follows its rules" site_json_is_valid
   run_check "site.json's fields are explained" site_json_fields_explained
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples

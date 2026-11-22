@@ -14,15 +14,16 @@ environments: the **dev site** with GitHub's checks is development and integrati
 the user on 2026-11-12 (plan D31, 9q).
 
 **Code moves up; content is edited in production.** Code (the theme, the site's own plugins) never
-changes on live: it is tried on the dev site, merged into `main`, deployed to staging by itself,
-accepted there by the user, and only then deployed to live, the same code. Content (page text,
+changes on live: it is tried on the dev site, merged into `main`, deployed to staging by the
+user (`bin/deploy staging`), accepted there, and only then deployed to live (`bin/deploy live`),
+the same commit; `bin/deploy` refuses live any commit staging does not run. Content (page text,
 photos, videos, songs) is data, like the customer records of a business application: it is
 entered straight on live and never sent up from staging. So the three kinds of change go like this:
 
 | The change | Where | How |
 |---|---|---|
 | Content: a word, a paragraph, a photo, a video link, a song | live | The block editor. Revisions allow going back. After real changes, the content export (monthly check, step 4) |
-| The look or behaviour: the theme, the carousel, the call to action, the site's own plugins | dev site → staging → live | In a session with Claude. Staging gets it by itself after the merge; the user looks there and approves the deploy to live |
+| The look or behaviour: the theme, the carousel, the call to action, the site's own plugins | dev site → staging → live | In a session with Claude. After the merge the user runs `bin/deploy staging`, looks there, then runs `bin/deploy live` (see "Deploying" below) |
 | Updates of WordPress and other people's plugins | staging → live | The monthly check, step 6 |
 
 A code change that needs a matching content change (such as a renamed class in the pages) is made
@@ -33,6 +34,29 @@ without visitors seeing it.
 **Staging's content drifts, and that is fine for small changes.** Before judging a major change to
 the look on staging, its content is brought level with live's, so that the change is judged on
 the real pages (their real lengths, blocks and pictures): see the next section.
+
+## Deploying (`bin/deploy`)
+
+From the user's computer, in the project's folder (template plan 1.4, the handbook's chapter 2).
+After logging in to the computer, the two deploy keys are unlocked once, with the passphrases from
+the user's password notes: `ssh-add -q ~/.ssh/hbmusic-staging-deploy ~/.ssh/hbmusic-live-deploy`.
+Without that, `bin/deploy` stops at its first server step; it never asks for the server's password.
+
+1. **`bin/deploy staging`.** It checks that the commit passed GitHub's checks, shows the commits
+   that arrive (or are taken away), builds the downloaded plugins and checks them against
+   WordPress.org, and asks. `yes` copies, then opens every page and shows any new PHP log lines.
+2. **A look at staging:** the pages the change touches. A plugin it names as new is activated
+   under Plugins.
+3. **`bin/deploy live`:** the same, for the commit staging runs; it refuses any other.
+
+- **Refused before the question:** nothing changed; its last line says why.
+- **A page failing after the copy:** it names the way back, `bin/deploy <place> --commit <the
+  commit the place ran before>`.
+- **A plugin "newer than the … pinned"** (Hostinger installed a security release): looked at
+  with Claude; normally the pin is raised, and nothing is lowered with `--allow-lower` without a
+  reason.
+- **Its working copy must be clean,** so a deploy waits while Claude has changes open in the
+  repository.
 
 ## Refreshing staging's content from live (about 20 minutes)
 
@@ -72,9 +96,17 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    Export File. The file goes into the project's `data/exports/`, named with the date
    (for example `2026-12-01-content.xml`). The originals of new photos go into `data/photos/`.
 5. **The data folder's off-computer copy** is brought up to date.
-6. **Updates (plan 8j):** live's Plugins page (and Appearance → Themes, and Dashboard → Updates
-   for WordPress itself). Hostinger installs only security updates; anything else waiting is
-   installed by hand, **on staging first**: update there, open the pages and log in (with
+6. **Deploy `main`** (see "Deploying" below): `bin/deploy staging`, a look at staging, then
+   `bin/deploy live`. This brings the downloaded plugins (Contact Form 7, Yoast SEO) at the
+   versions the dev site tested, and any code merged since the last deploy. With nothing new, it
+   says the place already runs that commit; answering `no` then changes nothing. **Never "Update now" for those two plugins:** that installs
+   WordPress.org's newest release, untested here, and the next deploy then refuses to lower it
+   until it is looked at with Claude.
+
+   **Then the other updates (plan 8j):** live's Plugins page (and Appearance → Themes, and
+   Dashboard → Updates for WordPress itself), for what `bin/deploy` does not bring (WordPress,
+   Twenty Twenty-Five, Wordfence, FluentSMTP). Hostinger installs only security updates; anything
+   else waiting is installed by hand, **on staging first**: update there, open the pages and log in (with
    two-factor), and only then update live the same way and look at its pages. Both in the same
    sitting, and before updating live, its waiting version is checked to be the one staging just
    got: "Update now" always installs the newest release, so one published in between would reach
@@ -86,11 +118,12 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    [`tools/versions.sh`](https://github.com/hbuie112358/hbMusic_wp_site/blob/main/tools/versions.sh)
    for the theme (`PARENT_THEME_VERSION`, Twenty Twenty-Five).
    For each update waiting on staging:
-   - **The same version as there:** tested; update staging, then live.
-   - **Newer than there:** not tested yet. Wait until the version there is raised and its tests
-     pass, or ask Claude in a session to raise it and run the tests first.
-   - **Not in that file** (Wordfence, FluentSMTP, which the dev site does not run): staging is the
-     test, as above.
+   - **Contact Form 7 or Yoast SEO:** left to `bin/deploy`, as above.
+   - **Twenty Twenty-Five, the same version as `tools/versions.sh`:** tested; update staging, then
+     live. **Newer than there:** not tested yet; ask Claude in a session to raise it and run the
+     tests first.
+   - **Not in those files** (WordPress, Wordfence, FluentSMTP, which the dev site does not pin):
+     staging is the test, as above.
 
    A security fix Hostinger installs by itself does not wait for the dev site: closing a hole comes
    first, and the version in `site-packages/composer.json` (a plugin) or `tools/versions.sh` (the
@@ -195,7 +228,8 @@ its checks run by themselves (the dev site rebuilt with the new versions, every 
 against WordPress.org's checksums, every test), and once they pass it merges itself. GitHub's
 emails about it can be read and archived.
 
-The new versions reach staging and live only in the next monthly check (step 6), as tested ones.
+The new versions reach staging and live only with the next deploy (the monthly check's step 6),
+as tested ones.
 
 **When it needs the user,** the weekly versions check opens an issue after 3 days, which GitHub
 emails, titled "Plugin update #… is waiting: …":
