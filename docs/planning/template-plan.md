@@ -26,9 +26,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy), 1.4d-2
   done (the copy, #91), 1.4d-3 done (after the copy, and the test against a throwaway server,
   #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
-  1.4e under way: the server set up and staging and live deployed with `bin/deploy`
-  (2026-11-22), GitHub's staging deploy removed from the repository; left: the old key and
-  settings on the server, GitHub's `staging` environment, the handbook's wording.
+  1.4e done (2026-11-22: the server set up, staging and live deployed with `bin/deploy`, GitHub's
+  staging deploy, key and environment removed, #95; the handbook's H103), so step 1.4 is done;
+  next is 1.5, the records and care pieces.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -286,7 +286,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     tests at the start: one is written only for code or settings the site adds itself (this
     site's `redirects` and `organization` as the models). Found on the way: the form's and Yoast's
     tests assume their plugins and never skip, a note on 2.1 (the user, 2026-11-21).
-- [~] **1.4 `bin/deploy`**, generic from the start: handbook chapter 2's eight steps. The rebuild
+- [x] **1.4 `bin/deploy`**, generic from the start: handbook chapter 2's eight steps. The rebuild
   plan's item 5; replaces `bin/deploy-staging`, whose GitHub-based design is stale (D14). It also
   delivers the downloaded plugins at the versions `site-packages/` pins (T9), instead of updating
   them in each site's admin, so staging and live get exactly the tested versions. Designed
@@ -459,7 +459,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       parts are named as failed), each package listed after a look-alike whose name begins with
       its own; 12 planted faults caught, among them running a part under `||`, which turns `set -e` off
       inside it and opened a wrong issue against an unusable pin.
-  - [~] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
+  - [x] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
     restrictions and folders in hPanel), the first `bin/deploy staging`, then `bin/deploy live`;
     removed: the `deploy-staging` job and the push trigger in `check.yml`, `bin/deploy-staging`,
     the GitHub environment `staging` with its secrets, and the old key on the server. Ends D33's
@@ -502,10 +502,22 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       item 5, 9b, 9p, D14 and D33 marked done or replaced; `docs/ROUTINES.md` gained
       "Deploying", and the monthly check deploys `main` instead of updating Contact Form 7 and
       Yoast by hand.
-    - Still open: the server's old GitHub key line, `rsyncd-staging.conf` and its log (the
-      user, after this pull request); GitHub's `staging` environment and its secrets (Claude with
-      `gh`, approved by the user); the handbook's wording for the downloaded plugins (T11),
-      proposed for the user's approval.
+    - After #95 merged (no run started on `main`): the user removed the old GitHub key's line,
+      `rsyncd-staging.conf` with its two backup copies, its log and lock (a second script, tried
+      on a throwaway home first, refusing unless both new key lines stay); both keys then read
+      their place's note (91a01ff). Claude deleted GitHub's `staging` environment with its six
+      secrets and one variable (`gh`, approved by the user); GitHub holds no environment or
+      server key now. The handbook (`ee49e7b`, approved by the user change by change): chapter
+      2's step 1 (the tested commit's files) and step 4 (what is copied, in order), each place's
+      restricted key, and H103 (the downloaded plugins pinned, raised by Dependabot and delivered
+      by `bin/deploy`, replacing H11 for them; a plugin keeping its data in its own folder not
+      delivered by `bin/deploy`).
+    - Found on the way: Brevo's "Verify a new IP" email at 10:35 UTC, two minutes after GitHub's
+      old staging deploy opened a staging page (WordPress's scheduled jobs run on a page visit):
+      staging's key, sent from the server's IPv6 address, which the user confirmed from the
+      server and added to Brevo's Authorized IPs (`data/records/settings.md`). The email itself
+      was refused (blocking is on): the user found it in staging's FluentSMTP failed emails and
+      resent it successfully once the address was added.
   - Later, its own small part (found 2026-11-22): `bin/deploy`'s change count could tell
     content changes from date-only ones (rsync's itemized `c` and `t` flags), so a first deploy
     does not look larger than it is.
