@@ -325,6 +325,12 @@ versions_check_alerts() {
   bash "$REPO_ROOT/tests/tools/versions-check/run.sh"
 }
 
+# The debug log rule on sample lines (tests/scenario/debug-log.sh, template plan 1.5b): the site's
+# own code and fatal errors fail, other people's notices, warnings and deprecations are shown.
+debug_log_rule() {
+  bash "$REPO_ROOT/tests/tools/debug-log/run.sh"
+}
+
 # The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
 # redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
 # against a stand-in site; nothing goes over the network.
@@ -593,6 +599,7 @@ run_standards_and_rule_checks() {
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
   run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
   run_check "The versions check's alerts" versions_check_alerts
+  run_check "The debug log rule on known lines" debug_log_rule
   run_check "The page check on known situations" site_check_situations
   run_check "The deploy's checks on known situations" deploy_situations
 }

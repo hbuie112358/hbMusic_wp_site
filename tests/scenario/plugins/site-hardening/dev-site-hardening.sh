@@ -129,7 +129,7 @@ main() {
   expect_unfiltered_html_for_administrators_only
   # Checked here as well as at the end of bin/test, so a refusal that costs a PHP notice is
   # named by this scenario.
-  expect_empty_debug_log
+  expect_clean_debug_log
   log "PASSED"
 }
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Scenario (dev site): visiting every page of the dev site leaves WordPress's debug log empty:
-# no PHP error, warning, notice or deprecation (plan step 4c, docs/SITE_CHECKLIST.md 6.9). The
+# Scenario (dev site): visiting every page of the dev site leaves WordPress's debug log clean: no
+# PHP error, and no warning, notice or deprecation from the site's own code (plan step 4c,
+# docs/SITE_CHECKLIST.md 6.9; the rule in tests/scenario/debug-log.sh, template plan 1.5b). The
 # pages are every published page WordPress lists, the login page and a missing page (the
 # theme's 404 template).
 set -Eeuo pipefail
@@ -28,7 +29,7 @@ visit_every_page() {
 main() {
   load_settings
   visit_every_page
-  expect_empty_debug_log
+  expect_clean_debug_log
 }
 
 main "$@"

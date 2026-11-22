@@ -55,7 +55,7 @@ main() {
   expect_no_link
   # Checked here as well as at the end of bin/test, so a notice from the theme's filter is named
   # by this scenario.
-  expect_empty_debug_log
+  expect_clean_debug_log
   log "PASSED"
 }
 

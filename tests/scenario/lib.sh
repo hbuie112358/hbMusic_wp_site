@@ -46,13 +46,22 @@ assert_status() {
 # WordPress's debug log on the dev site: any PHP error, warning, notice or deprecation lands here
 # (docs/SITE_CHECKLIST.md 6.9).
 readonly DEBUG_LOG="/var/www/html/wp-content/debug.log"
+# shellcheck source=tests/scenario/debug-log.sh
+source "$REPO_ROOT/tests/scenario/debug-log.sh"
 
-expect_empty_debug_log() {
-  local entries
+# The debug log holds nothing from the site's own code and no fatal error; other people's notices,
+# warnings and deprecations are shown (the rule in tests/scenario/debug-log.sh, template plan 1.5b).
+expect_clean_debug_log() {
+  local entries verdicts shown failing
   entries="$(dev_compose exec -T wordpress sh -c "[ -f '$DEBUG_LOG' ] && cat '$DEBUG_LOG' || true")"
-  [[ -z "$entries" ]] || fail "WordPress's debug log is not empty:
-$entries"
-  log "the debug log is empty"
+  verdicts="$(debug_log_verdicts "$entries" "$(own_code_places "$REPO_ROOT/site.json")")"
+  shown="$(sed -n 's/^shown\t//p' <<<"$verdicts")"
+  failing="$(sed -n 's/^fail\t//p' <<<"$verdicts")"
+  [[ -z "$shown" ]] || log "other people's code wrote to the debug log (shown, not failed):
+$shown"
+  [[ -z "$failing" ]] || fail "the debug log holds the site's own code's messages or an error:
+$failing"
+  log "the debug log holds nothing from the site's own code and no error"
 }
 
 # Error messages are checked for the name of the offending setting, never for their wording.

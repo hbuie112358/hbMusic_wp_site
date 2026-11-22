@@ -357,9 +357,24 @@ verify_downloaded_plugins() {
       refuse "could not fetch WordPress.org's checksums for $plugin_slug $version"
     problems="$(site_packages_checksum_problems "$(downloaded_plugin_dir "$plugin_slug")" "$checksums")" ||
       refuse "$plugin_slug $version: $problems"
-    [[ -z "$problems" ]] || refuse "$plugin_slug $version does not match WordPress.org's release: $(head -n "$PROBLEMS_SHOWN" <<<"$problems" | paste -sd ';')"
-    log "$plugin_slug $version: every file matches WordPress.org's release"
+    report_checksum_problems "$plugin_slug" "$version" "$problems"
   done
+}
+
+# A changed or added file refuses the deploy: that is how a stranger's code would arrive. A file
+# WordPress.org lists but the download lacks is only shown (template plan 1.5b): it adds no one's
+# code, WP-CLI's check on the dev site accepts it too, and some releases list files their zip
+# leaves out (Simple History's planning notes).
+report_checksum_problems() {
+  local plugin_slug="$1" version="$2" problems="$3" refusing missing
+  refusing="$(grep -v ': missing$' <<<"$problems" || true)"
+  missing="$(grep ': missing$' <<<"$problems" | sed 's/: missing$//' || true)"
+  [[ -z "$refusing" ]] || refuse "$plugin_slug $version does not match WordPress.org's release: $(head -n "$PROBLEMS_SHOWN" <<<"$refusing" | paste -sd ';')"
+  if [[ -n "$missing" ]]; then
+    log "$plugin_slug $version: no file changed or added; $(grep -c . <<<"$missing") file(s) WordPress.org lists are not in the download: $(head -n "$PROBLEMS_SHOWN" <<<"$missing" | paste -sd ' ')"
+    return 0
+  fi
+  log "$plugin_slug $version: every file matches WordPress.org's release"
 }
 
 # The folders this commit copies into, by their names on the server, in the order copied: the

@@ -541,12 +541,51 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     here); a customer's private repository keeps everything in `records/`. A record is created
     when there is something to write, not ahead of time. The starter's copy, without this site's
     section, is noted in `template-notes.md` for 2.4.
-  - [ ] 1.5b The activity log: Simple History pinned in `site-packages/` (Dependabot, `bin/deploy`),
+  - [~] 1.5b The activity log: Simple History pinned in `site-packages/` (Dependabot, `bin/deploy`),
     checked first under the plugin rules (`AI_SECURITY.md` section 4; no data kept in its own
     folder, H103); a dev site test that it records a page edit and a plugin switched off, shown
     failing first; H94's question answered on the dev site (does it log the SEO plugin's
     fields?); deployed and activated on staging and live; the privacy policy checked for
     "logins and changes are recorded".
+    **Built 2026-11-22 (deploying to staging and live still open):**
+    - Simple History 5.36.0 (since 2010, about 300,000 sites, rated 98%; released in October, past
+      the wait) pinned in `site-packages/`. Read before use: its outside calls only for paid
+      add-ons and a GitHub readme on request, no telemetry found, data in its own tables, the file
+      log and weekly email off by default, addresses anonymized (`127.0.0.x`), 30 days kept on a
+      fresh install; both defaults kept (the user). Compared with Activity Log (Elementor), Stream
+      and WP Activity Log (Freemius); kept by the user for its quality.
+    - Its releases list `todos/` notes that WordPress.org's zip leaves out (5 of 363 files in
+      5.36.0, 4 in each earlier one); every other file matches. WP-CLI's check on the dev site
+      refuses a changed or added file but accepts a missing one (seen with planted faults), so
+      `bin/deploy` now does the same (the user, 2026-11-22: a missing file adds no one's code):
+      changed or added refuses, missing is shown. Situation 35 changed, a planted fault letting
+      everything through caught by 33 and 34. A narrower exception file was designed first and
+      dropped as overkill (the user's question); the author not asked to change it (the user).
+    - `dev-activity-log.sh` (`tests/scenario/plugins/simple-history/`): a page's title changed and
+      a plugin switched off and on, read back through Simple History's WP-CLI by logger, message
+      key and ID, every address anonymized; caught with the plugin off and with anonymizing off.
+      Found on the way in the check itself: `docker compose run` inside a loop read the loop's
+      own input (fixed with no input).
+    - The full `bin/test` then found Simple History 5.36.0 writing a deprecation (`trim()` given
+      null, through WordPress's `normalize_whitespace`, from its diff drawing) whenever a screen
+      shows an entry with an empty side. **The debug log rule changed** (the user, 2026-11-22):
+      the site's own code (its theme, its plugins, the dev site's must-use plugins) and any fatal
+      error fail; other people's notices, warnings and deprecations are shown, not failed, since
+      expecting every plugin to be silent is not reasonable and the browser tests show whether
+      something breaks. No list of accepted messages (it would grow). The origin comes from a
+      dev-only must-use plugin (`config/dev-mu-plugins/dev-error-origin.php`, the first file
+      under `wp-content/` on the call path), because the logged file is often WordPress's even
+      when a plugin or the theme caused it; a line without an origin fails. The rule in
+      `tests/scenario/debug-log.sh`, tested on ten sample lines in `bin/check`
+      (`tests/tools/debug-log/`), and on the dev site with a planted theme warning (fails), the
+      plugin's deprecation (shown) and a throwaway plugin's fatal error (fails).
+    - H94's question, answered by the user saving a page's Yoast title in the dev site's editor:
+      Simple History names the field (`_yoast_wpseo_title`) added or removed, with who and when,
+      not its text (a change is `post_meta_changed` in its code, not seen live). The handbook's
+      H94 correction proposed separately, for the user's approval.
+    - The privacy policy on staging (`data/content/privacy-policy.html`) already says the
+      security tools record technical details such as IP addresses; Simple History's failed
+      logins (anonymized) fall under it, and only the user has a login.
   - [ ] 1.5c The routines file: `docs/ROUTINES.md` split into what every site does (the monthly
     check, deploying, the alerts) and this site's own details.
   - [ ] 1.5d The status sheet: this site's `records/status.md` against chapter 12's 74 items,
