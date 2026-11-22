@@ -213,7 +213,11 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   session. It also watches the plugin updates (template plan T9): an issue for one still open
   after 3 days (its checks failed, or it fell behind `main` and waits for a comment
   `@dependabot rebase`), and
-  for a plugin release 14 days old that Dependabot never proposed. GitHub emails the owner about
+  for a plugin release 14 days old that Dependabot never proposed. And (1.4d-4) it compares the
+  deploy test server's `openssh-server` and `rsync` (`tools/versions.sh`) with Alpine's package
+  list for the pinned image's branch: Alpine keeps only each package's newest version, so a
+  replaced one gets an issue at once, raised in a session without the 7-day wait (waiting cannot
+  keep the old version; apk checks Alpine's signature on every package). GitHub emails the owner about
   new issues; one with the same title is never opened twice. The workflow can read the repository
   and its pull requests and open issues, nothing more.
 - `bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]`

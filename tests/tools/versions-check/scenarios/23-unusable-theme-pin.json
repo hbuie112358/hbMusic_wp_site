@@ -1,0 +1,19 @@
+{
+  "description": "The theme's pin is unusable: its part stops there, opening no issue against an empty pin, while the other parts still run; the check fails, naming the pin.",
+  "act": true,
+  "pullRequests": [],
+  "brokenPin": "PARENT_THEME_VERSION",
+  "alpine": {
+    "replaced": {
+      "rsync": "3.9.9-r1"
+    }
+  },
+  "expectedIssues": [
+    "The deploy test server's rsync {pinned:rsync} is gone from Alpine; it now has 3.9.9-r1"
+  ],
+  "expectFailure": true,
+  "expectOutputNaming": "no usable PARENT_THEME_VERSION",
+  "expectFailedParts": [
+    "the theme Twenty Twenty-Five"
+  ]
+}

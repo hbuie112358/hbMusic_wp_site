@@ -1,0 +1,7 @@
+{
+  "description": "Alpine still offers both test server packages at their pinned versions, each listed after a look-alike whose name begins with its own: no issue.",
+  "act": true,
+  "pullRequests": [],
+  "expectedIssues": [],
+  "expectOutputNaming": "rsync: {pinned:rsync} is current"
+}

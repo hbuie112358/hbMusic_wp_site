@@ -1,0 +1,14 @@
+{
+  "description": "The issue for a replaced package was opened before: not opened again.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "replaced": {
+      "rsync": "3.9.9-r1"
+    }
+  },
+  "existingIssues": [
+    "The deploy test server's rsync {pinned:rsync} is gone from Alpine; it now has 3.9.9-r1"
+  ],
+  "expectedIssues": []
+}

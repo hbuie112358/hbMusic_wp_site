@@ -1,0 +1,16 @@
+{
+  "description": "Alpine's list gives rsync a version that is not a version: the check fails, naming the package, and opens nothing.",
+  "act": true,
+  "pullRequests": [],
+  "alpine": {
+    "malformed": [
+      "rsync"
+    ]
+  },
+  "expectedIssues": [],
+  "expectFailure": true,
+  "expectOutputNaming": "no usable version and build time for rsync",
+  "expectFailedParts": [
+    "the test server's Alpine packages"
+  ]
+}

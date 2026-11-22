@@ -1,0 +1,12 @@
+{
+  "description": "Without --act, a replaced package is named in the output and no issue is opened.",
+  "act": false,
+  "pullRequests": [],
+  "alpine": {
+    "replaced": {
+      "openssh-server": "11.0_p1-r0"
+    }
+  },
+  "expectedIssues": [],
+  "expectOutputNaming": "openssh-server {pinned:openssh-server} is gone from Alpine; it now has 11.0_p1-r0"
+}

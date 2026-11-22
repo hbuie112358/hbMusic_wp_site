@@ -1,0 +1,19 @@
+{
+  "description": "WordPress.org does not answer for the plugin while Alpine has replaced rsync: the test server's issue still opens, and the check still fails, naming the plugin.",
+  "act": true,
+  "pullRequests": [],
+  "pluginUnanswered": true,
+  "alpine": {
+    "replaced": {
+      "rsync": "3.9.9-r1"
+    }
+  },
+  "expectedIssues": [
+    "The deploy test server's rsync {pinned:rsync} is gone from Alpine; it now has 3.9.9-r1"
+  ],
+  "expectFailure": true,
+  "expectOutputNaming": "example-plugin",
+  "expectFailedParts": [
+    "the plugins Dependabot never proposed"
+  ]
+}

@@ -24,8 +24,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 - **Next:** step 1.4, `bin/deploy`, designed 2026-11-21 (T11) in five parts; 1.4a done (the PHP
   error log found, `log_errors` on), 1.4b done (`bin/site-check`, the page check, #90), 1.4c done
   (`site.json`'s `deploy` section), 1.4d-1 done (`bin/deploy`'s checks before a copy), 1.4d-2
-  done (the copy, #91), 1.4d-3 done (after the copy, and the test against a throwaway server);
-  next is 1.4d-4, the weekly warning for the test server's packages, then 1.4e.
+  done (the copy, #91), 1.4d-3 done (after the copy, and the test against a throwaway server,
+  #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
+  next is 1.4e, the real servers set up with the user and the first deploys.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -347,7 +348,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     a deploy to staging can never land on live), and an address may hold no login
     (`user:password@`). Eight broken examples refused, five planted faults in the rules caught;
     nothing reads the section until 1.4d.
-  - [ ] 1.4d `bin/deploy staging|live [--commit <commit>]`, with its tests: the refusals as
+  - [x] 1.4d `bin/deploy staging|live [--commit <commit>]`, with its tests: the refusals as
     functions on examples in `bin/check`, and a run from start to finish against a throwaway
     server container (sshd and rsync with the same forced-command restriction, a stand-in `gh`),
     proving that one place's key reaches neither the other place nor a shell. Decided with the
@@ -438,12 +439,24 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       (option a; all three under a month old, reported to the user, `AI_SECURITY.md` section 4);
       real `ssh`, `rsync` and `bin/deploy`, stand-ins for GitHub and for `bin/site-check`
       (tested on its own; a real one would need a web server with a certificate in the test).
-    - [ ] 1.4d-4 The weekly warning for the test server's packages (the user, 2026-11-21): Alpine
+    - [x] 1.4d-4 The weekly warning for the test server's packages (the user, 2026-11-21): Alpine
       keeps only each package's newest version, so an exact pin breaks the test server's build
       the day a new one appears; `bin/versions-check` also compares the pinned `openssh-server`
-      and `rsync` with Alpine's index and opens an issue (GitHub emails the owner), so the pin
-      is raised in a session within the week, through the usual age check. With its tests in
-      `tests/tools/versions-check/`.
+      and `rsync` with Alpine's package list (`APKINDEX`, for the pinned image's branch, `main`,
+      x86_64) and opens an issue (GitHub emails the owner). **No 7-day wait here** (the user,
+      2026-11-21): the old version is gone from Alpine's server the day it is replaced, so waiting
+      cannot keep it, and the `dev-site` check fails on every pull request until the pin is
+      raised; apk checks Alpine's signature on every package against the keys in the image pinned
+      by digest. The list is only read, never installed from, so its own signature is not
+      checked; its versions and build times must match strict patterns, and a missing package,
+      an unreadable list or no answer fails the check. Also (the user, 2026-11-21): each part of
+      the check (the theme, waiting updates, unproposed plugins, the test server) runs on its own,
+      so an outage in one no longer hides another's finding for a week; the check still fails at
+      the end, naming the failed parts in plain words (each pinned theme by its name). Tests: 13
+      new situations in `tests/tools/versions-check/` (24 in all; 9 of them check exactly which
+      parts are named as failed), each package listed after a look-alike whose name begins with
+      its own; 12 planted faults caught, among them running a part under `||`, which turns `set -e` off
+      inside it and opened a wrong issue against an unusable pin.
   - [ ] 1.4e The server set up (the user's steps: two keys made on the user's computer, their
     restrictions and folders in hPanel), the first `bin/deploy staging`, then `bin/deploy live`;
     removed: the `deploy-staging` job and the push trigger in `check.yml`, `bin/deploy-staging`,
