@@ -2,11 +2,11 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-21T15:35:18-05:00
-# The pause commit is on the branch chore/pause-2026-11-21 until the user says "push"; then main.
-# last_commit is main's tip before the pause commit, after #89 (1.3c) merged.
-current_branch: chore/pause-2026-11-21
-last_commit: 488f547
+timestamp: 2026-11-21T19:45:00-05:00
+# The pause commit is on the branch chore/pause-2026-11-21-evening until the user says "push";
+# then main. last_commit is main's tip before the pause commit, after #93 (1.4d-4) merged.
+current_branch: chore/pause-2026-11-21-evening
+last_commit: 2f457f3
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
@@ -258,15 +258,28 @@ last_work: >
   before the footer; deployed to staging with #88, not yet to live. Pipeline timing measured: push
   to main passing about 5.5 minutes. Memory gained read-before-editing (the user: context is
   summarized, only the file is reliable) and pause-and-compact-between-steps (usage allowance).
+  Later on 2026-11-21 (after a resume, one compaction): 1.3d done (a new site's starting tests in
+  template-notes.md). Step 1.4 designed (T11) and built in parts, #90 to #93: 1.4a (the per-site
+  PHP log found on the server; log_errors switched on by the user in hPanel for live and staging),
+  1.4b bin/site-check (#90), 1.4c site.json's deploy section, 1.4d-1/2 bin/deploy's checks and copy
+  (#91), 1.4d-3 after the copy (page check, PHP log lines, one deploy at a time) and its test
+  against a throwaway Alpine server with the real ssh and rsync (#92, passed on GitHub too), 1.4d-4
+  the versions check's weekly warning when Alpine replaces a test server package, raised with no
+  7-day wait (the user's choice), and each part of the versions check running on its own, failed
+  parts named in plain words (#93). Found in the PHP logs, recorded as the rebuild plan's 9w:
+  Wordfence "Commands out of sync" errors on live, an Action Scheduler cron error on staging.
 
 next_action: >
-  The template plan's step 1.3d: the starting set of tests for a new site written down (the
-  template notes and the plan: the generic and component tests, and only the site tests its own
-  features need); documentation only. Then 1.4 (bin/deploy, generic, delivering site-packages/'s
-  pinned plugins), 1.5, 1.6, then stage 2. Working approach (the user, 2026-11-21, to save usage):
-  at each step's end Claude says it is a good moment to pause and compact, never mid-step; the
-  user types /compact. Kept waiting, not forgotten: the rebuild plan's 9u, at the first break that
-  suits the user; Dependabot's #56 for the user to review; 9n from about 2026-12-01.
+  The template plan's step 1.4e, mostly the user's steps with Claude guiding: on the server, two
+  keys made on the user's computer with their restrictions, the rsyncd settings and folders
+  (deploy-note, php-log); a first bin/deploy run answered "no"; then the first bin/deploy staging
+  and bin/deploy live; removing GitHub's deploy-staging job and push trigger, bin/deploy-staging,
+  the staging environment's secrets and the old key; ending D33; rewriting the rebuild plan's 9b,
+  item 5 and D14; the handbook wording proposals (only with the user's approval); proving rsync
+  3.1.3's behaviors on the real server. Then 1.5, 1.6, stage 2. Working approach: at each step's
+  end Claude says it is a good moment to compact, if the context is past about half. Kept waiting,
+  not forgotten: the rebuild plan's 9u and 9w; Dependabot's #56 for the user to review; 9n from
+  about 2026-12-01.
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -287,11 +300,13 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 31 checks all passing (2026-11-21, with "The versions check's alerts", eleven situations); bin/test 11 scenario checks (in tests/scenario/<group>/) + 246 browser tests (242 passed, 4 skipped with their reasons, in specs/dev/<group>/) + the final debug-log check, all passing (2026-11-21, locally and on #88/#89); bin/screenshots for before/after looks
+  checks: bin/check 33 checks all passing (2026-11-21 evening; the versions check's alerts in 24 situations, the page check's 25, the deploy's 50 stand-in situations); bin/test 13 scenario checks (with dev-site-check.sh and dev-deploy-server.sh, the deploy's 5 real-server situations and 4 restriction probes; the counts of browser tests below are from before 1.4) (in tests/scenario/<group>/) + 246 browser tests (242 passed, 4 skipped with their reasons, in specs/dev/<group>/) + the final debug-log check, all passing (2026-11-21, locally and on #88/#89); bin/screenshots for before/after looks
   staging_theme: deployed by main's run after each merge; latest 488f547 (#89), which includes the form.css fix (aedde5e); live still has the zip of a1e5271
   dev_site_plugins: Contact Form 7 6.2.5 and Yoast SEO 28.9 (site-packages/composer.lock, #80); live and staging have Yoast 28.8 until the next deploy in the monthly check
   github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
+  php_logs: per site in ~/.logs/error_log_<domain with underscores> on the server; log_errors on for live and staging since 2026-11-21 (the user, hPanel; data/records/settings.md)
+  bin_deploy: on main since #93, not yet run against the real server (1.4e); the server's rsync is 3.1.3
   deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
   dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter, and site-packages/ with a 7-day wait); alerts and security updates on; plugin updates merge themselves once their checks pass (.github/workflows/plugin-updates.yml, T9; "Allow auto-merge" on); tools updates wait for the user, and one is open (2026-11-21, number 56)
@@ -301,7 +316,7 @@ verification:
 
 uncommitted_changes:
   - file: none in this repository
-    why: this file and the template plan's Current position are the pause commit, on chore/pause-2026-11-21 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #89; no other local branches
+    why: this file is the pause commit, on chore/pause-2026-11-21-evening (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #93; no other local branches (the plan's Current position went in with #93)
   - file: data/ (not versioned)
     why: >
       New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
@@ -312,10 +327,9 @@ uncommitted_changes:
     why: see the pause output's git status of ~/.claude.
   - file: the session scratchpad (deleted when the session ends)
     why: >
-      Throwaway: the merge scripts (merge-86.sh to merge-89.sh; a new session writes its own by
-      the rules in memory's github-waits-in-background, with a 20-second wait before watching the
-      checks), run-specs.sh (runs chosen specs as bin/test does), probes and logs. The learning
-      write-up of 2026-11-18 is lost with it unless the user copied it.
+      Throwaway: merge scripts (merge-90.sh to merge-92.sh), backups taken for planted faults
+      (all restored and compared), a downloaded Alpine package list, checksum probes and logs.
+      Nothing needed after the pause.
 
 pending_decisions:
   - >
@@ -333,6 +347,10 @@ pending_decisions:
     Deploying to live in the monthly check: the form.css fix and Yoast 28.9 are on main and
     staging, not live.
   - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
+  - >
+    Left as they are from the review of #93 (the user may ask to fix): the Alpine check reads the
+    x86_64 list only (both computers are x86_64); an Alpine build time in the future would show a
+    negative age in the issue.
   - >
     For the user, not done yet (2026-11-20): in Search Console, URL Inspection, Test live URL, then
     Request indexing for the Book page (and any other page whose search wording changed), so
@@ -353,7 +371,7 @@ pending_decisions:
 
 reference_documents: |
   - docs/planning/template-plan.md: the active plan (since 2026-11-20), the brochure-site
-    template. Current position, Decisions T1-T10, stage 1 and stage 2 steps.
+    template. Current position, Decisions T1-T11, stage 1 and stage 2 steps.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template. Current position
     (9u kept waiting; item 5 is the template plan's step 1.4), Decisions D1-D34, the steps with
     their status and details (D29's story is step 5g), "Earlier positions (archived)" at the end.
@@ -373,5 +391,7 @@ resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     and the entries of steps 1.3 and 1.4; and the rebuild plan's Current position (9u waiting).
-  3. Then next_action: step 1.3d. At its end, say it is a good moment to pause and compact.
+     and the entries of steps 1.4 (with 1.4e and T11) and 1.5; and the rebuild plan's Current
+     position (9u and 9w waiting).
+  3. Then next_action: step 1.4e. At its end, say it is a good moment to compact, if the context
+     is past about half.
