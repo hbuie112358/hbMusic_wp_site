@@ -28,7 +28,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
   1.4e done (2026-11-22: the server set up, staging and live deployed with `bin/deploy`, GitHub's
   staging deploy, key and environment removed, #95; the handbook's H103), so step 1.4 is done;
-  next is 1.5, the records and care pieces.
+  1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); next is 1.5b, the
+  activity log.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -526,9 +527,32 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     site's server is set up the same way.
   - Later, its own part (the user, 2026-11-21): the search checks added to the page check on
     2026-11-15 (H62's title and description limits, one main heading, picture descriptions).
-- [ ] **1.5 The records and care pieces** the handbook expects of every site: a `records/`
+- [~] **1.5 The records and care pieces** the handbook expects of every site: a `records/`
   skeleton, the status sheet (chapter 12), the activity log (Simple History, H94), the routines
-  file. Overlaps the rebuild plan's item 3; done there for this site, generalized here.
+  file. Overlaps the rebuild plan's item 3; done there for this site, generalized here. Split with the
+  user, 2026-11-22, in four parts, each its own pull request, in this order:
+  - [x] 1.5a The records skeleton: `records/README.md` names every record the handbook keeps "in
+    the site's records" (chapter 7; settings, hosting, status sheet, search, exceptions, the
+    expected plugin set, the site sheet, incidents, monthly reports, the customer's decisions,
+    the starter version, takeover and handover), its file, the handbook section and whether it
+    may sit in a public repository. Decided with the user: in a public repository (the user's own
+    sites) a record mapping the site's security or outside accounts, and an exception or
+    incident naming a weakness still open, stays in the private records folder (`data/records/`
+    here); a customer's private repository keeps everything in `records/`. A record is created
+    when there is something to write, not ahead of time. The starter's copy, without this site's
+    section, is noted in `template-notes.md` for 2.4.
+  - [ ] 1.5b The activity log: Simple History pinned in `site-packages/` (Dependabot, `bin/deploy`),
+    checked first under the plugin rules (`AI_SECURITY.md` section 4; no data kept in its own
+    folder, H103); a dev site test that it records a page edit and a plugin switched off, shown
+    failing first; H94's question answered on the dev site (does it log the SEO plugin's
+    fields?); deployed and activated on staging and live; the privacy policy checked for
+    "logins and changes are recorded".
+  - [ ] 1.5c The routines file: `docs/ROUTINES.md` split into what every site does (the monthly
+    check, deploying, the alerts) and this site's own details.
+  - [ ] 1.5d The status sheet: this site's `records/status.md` against chapter 12's 74 items,
+    each done (with how it was checked) or an exception (with its reason), from
+    `docs/SITE_CHECKLIST.md` and what is verified; with the expected plugin set and the
+    exceptions; and a blank sheet for new sites. Likely more than one session.
 - [ ] **1.6 Neutral defaults for the site layer:** a placeholder palette, logo, and header,
   footer and call-to-action wording, so a new site starts from something that works rather than
   from this site's look.

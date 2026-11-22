@@ -149,6 +149,13 @@ template project starts; until then, a list, not a to-do.
   `HBMUSIC_AREAS_SERVED`, both the site's; the dev site's stand-in organization in `bin/dev-site`
   (`DEV_ORGANIZATION_NAME`) is generic.
 
+## A new site's records
+
+A new site's `records/` starts with `README.md` alone (template plan 1.5a): this site's
+`records/README.md` without its last section, "This site". Each record is created when the site
+first has something to write in it. The settings and hosting records start in the private
+records folder only where the site's repository is public.
+
 ## Tests a new site starts with
 
 Decided at template plan 1.3d (2026-11-21, T10): a new site starts with the tests that come with
