@@ -28,8 +28,15 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
   1.4e done (2026-11-22: the server set up, staging and live deployed with `bin/deploy`, GitHub's
   staging deploy, key and environment removed, #95; the handbook's H103), so step 1.4 is done;
-  1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); next is 1.5b, the
-  activity log.
+  1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); 1.5b built and
+  merged (#96), deployed to staging and activated there (3afc5e0, after adding `simple-history`
+  to both places' server settings by rerunning the setup script). **Resume exactly here:** the
+  user runs `bin/deploy live` and activates Simple History in live's admin; then Claude fills
+  live's column of the settings record's Simple History section, adds a line to
+  `docs/ROUTINES.md`'s data-request routine (Simple History answers WordPress's Export Personal
+  Data tool), and marks 1.5b done. Then 1.5c. Worth raising soon: every deploy's change counts
+  equal the files' count for the site's own code (`git archive` dates each file with its
+  commit), so the planned content-only count matters more than first thought.
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
