@@ -97,9 +97,10 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    (for example `2026-12-01-content.xml`). The originals of new photos go into `data/photos/`.
 5. **The data folder's off-computer copy** is brought up to date.
 6. **Deploy `main`** (see "Deploying" below): `bin/deploy staging`, a look at staging, then
-   `bin/deploy live`. This brings the downloaded plugins (Contact Form 7, Yoast SEO) at the
+   `bin/deploy live`. This brings the downloaded plugins (Contact Form 7, Yoast SEO, Simple
+   History) at the
    versions the dev site tested, and any code merged since the last deploy. With nothing new, it
-   says the place already runs that commit; answering `no` then changes nothing. **Never "Update now" for those two plugins:** that installs
+   says the place already runs that commit; answering `no` then changes nothing. **Never "Update now" for those plugins:** that installs
    WordPress.org's newest release, untested here, and the next deploy then refuses to lower it
    until it is looked at with Claude.
 
@@ -118,7 +119,7 @@ Until go-live, steps 1-3 run on staging; afterwards on live.
    [`tools/versions.sh`](https://github.com/hbuie112358/hbMusic_wp_site/blob/main/tools/versions.sh)
    for the theme (`PARENT_THEME_VERSION`, Twenty Twenty-Five).
    For each update waiting on staging:
-   - **Contact Form 7 or Yoast SEO:** left to `bin/deploy`, as above.
+   - **Contact Form 7, Yoast SEO or Simple History:** left to `bin/deploy`, as above.
    - **Twenty Twenty-Five, the same version as `tools/versions.sh`:** tested; update staging, then
      live. **Newer than there:** not tested yet; ask Claude in a session to raise it and run the
      tests first.

@@ -74,7 +74,7 @@ main() {
   expect_picture_fetched_on_save
   expect_no_picture_when_youtube_has_none
   expect_other_frames_untouched
-  expect_empty_debug_log
+  expect_clean_debug_log
   log "PASSED"
 }
 

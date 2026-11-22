@@ -103,7 +103,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   and its messages after sending ("sent" and "sending failed") from
   `config/booking-form-messages.json` (merged into Contact Form 7's own messages; staging and live
   get the same texts typed in by hand, in the form's Messages tab),
-  and Yoast SEO, test pages (`site.json`'s list, their text in `tests/dev-content/`, each with the
+  and Yoast SEO, and Simple History, the activity log (template plan 1.5b; a
+  scenario check, `dev-activity-log.sh`, shows it records a page edit and a plugin switched off
+  and on, with addresses anonymized), test pages (`site.json`'s list, their text in `tests/dev-content/`, each with the
   page template its real page uses) and the components' example page (every component on neutral
   content, outside the menu), a stand-in Yoast organization (a neutral name and a picture
   WordPress itself ships), then the site's own steps in `tests/dev-setup.sh` (here, the Song
@@ -111,13 +113,16 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `DEV_ADMIN_PASSWORD` in `.env`) and a dev Editor (`deveditor`, `DEV_EDITOR_PASSWORD`), the role
   a customer gets. To log in by hand, copy a password without showing it:
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never
-  deployed (and mounted for WP-CLI too), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
+  deployed (and mounted for WP-CLI too), notes each PHP message's origin in the debug log
+  (`dev-error-origin.php`), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
   too.
 - `bin/test`: the tests against the dev site, each in its group's folder (template plan 1.3a:
   `generic/`, `components/`, `plugins/<plugin>/` and `site/`, the site's own; the browser tests'
   shared helpers in `helpers/`), so each group can later go with its own repository: the
-  scenario checks named `tests/scenario/<group>/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, an empty
-  PHP debug log, the `.env` safety stop, every stylesheet of the theme and the Song List labelled
+  scenario checks named `tests/scenario/<group>/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, the
+  PHP debug log's rule (`tests/scenario/debug-log.sh`, template plan 1.5b: any message from the
+  site's own code, and any fatal error, fails; other people's notices, warnings and deprecations
+  are shown, each with its origin), the `.env` safety stop, every stylesheet of the theme and the Song List labelled
   by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
   `config/booking-form-messages.json`, `site.json`, whose test pages the specs that check every
@@ -137,7 +142,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   guide for the admin and the dev Editor (its panel first on the Dashboard, and on the Editor's first screen, headings and accessibility, the
   site's templates, sections and link example, and every editor label it names found in the real
   editor, on a draft page of its own); then, last, a check that the PHP debug
-  log is still empty after everything (`tests/scenario/generic/final-debug-log.sh`). If the site does not
+  log still holds nothing from the site's own code and no error after everything (`tests/scenario/generic/final-debug-log.sh`). If the site does not
   answer, the run fails; it is never skipped.
   Before a commit that touches the site, the theme or a plugin, Claude runs `bin/check` and the
   browser tests of the part changed (their spec files, in the Playwright container as `bin/test`
@@ -229,7 +234,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   commit with the same files, and on live unless staging runs that commit; it reads the place's
   note on the server and shows the commits arriving or taken away. Before asking "yes", it exports
   the commit, builds its downloaded plugins from its `composer.lock` (the pinned Composer
-  container) and checks every file against WordPress.org's checksum file, checks each folder
+  container) and checks every file against WordPress.org's checksum file (a changed or added
+  file refuses; one listed but missing from the download is shown, not refused, as WP-CLI's
+  check on the dev site does, 1.5b), checks each folder
   exists on the server for the key, and refuses to lower a downloaded plugin the host updated
   unless `--allow-lower` names it. After "yes" it copies the downloaded plugins, the site's own
   plugins and the theme, each folder made exactly the commit's, then writes the note, and names
