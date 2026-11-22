@@ -2,11 +2,11 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-21T19:45:00-05:00
-# The pause commit is on the branch chore/pause-2026-11-21-evening until the user says "push";
-# then main. last_commit is main's tip before the pause commit, after #93 (1.4d-4) merged.
-current_branch: chore/pause-2026-11-21-evening
-last_commit: 2f457f3
+timestamp: 2026-11-22T09:35:00-05:00
+# The pause commit is on the branch chore/pause-2026-11-22 until the user says "push"; then main.
+# last_commit is main's tip before the pause commit, after #96 (1.5b) merged.
+current_branch: chore/pause-2026-11-22
+last_commit: 3afc5e0
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
@@ -268,18 +268,29 @@ last_work: >
   7-day wait (the user's choice), and each part of the versions check running on its own, failed
   parts named in plain words (#93). Found in the PHP logs, recorded as the rebuild plan's 9w:
   Wordfence "Commands out of sync" errors on live, an Action Scheduler cron error on staging.
+  2026-11-22 (after a resume): 1.4e done: two deploy keys made by the user with passphrases, the
+  server set up by a script over the user's password login (data/records/server-setup-1.4e.sh),
+  probes from the user's computer, bin/deploy staging and live (91a01ff; Yoast 28.9 and the
+  form.css fix on live); GitHub's staging deploy, bin/deploy-staging, the old key and settings on
+  the server and the staging environment removed (#95); bin/deploy made executable with a bin/check
+  rule. Brevo's "Verify a new IP" alert traced to staging sending from the server's IPv6 address,
+  added to Authorized IPs by the user; the refused email resent. Handbook: H103 and chapter 2's
+  deploy wording (ee49e7b), H94 corrected (8a6d69c), both pushed. 1.5 split in four; 1.5a done
+  (records/README.md); 1.5b built (#96): Simple History 5.36.0 chosen after comparing four
+  activity logs, pinned in site-packages; bin/deploy shows a missing file instead of refusing
+  (WP-CLI's rule); the debug log rule now sorts by origin (own code and fatal errors fail, others'
+  messages shown); dev-activity-log.sh. Staging deployed (3afc5e0) and Simple History activated
+  there, after rerunning the setup script with simple-history added.
 
 next_action: >
-  The template plan's step 1.4e, mostly the user's steps with Claude guiding: on the server, two
-  keys made on the user's computer with their restrictions, the rsyncd settings and folders
-  (deploy-note, php-log); a first bin/deploy run answered "no"; then the first bin/deploy staging
-  and bin/deploy live; removing GitHub's deploy-staging job and push trigger, bin/deploy-staging,
-  the staging environment's secrets and the old key; ending D33; rewriting the rebuild plan's 9b,
-  item 5 and D14; the handbook wording proposals (only with the user's approval); proving rsync
-  3.1.3's behaviors on the real server. Then 1.5, 1.6, stage 2. Working approach: at each step's
-  end Claude says it is a good moment to compact, if the context is past about half. Kept waiting,
-  not forgotten: the rebuild plan's 9u and 9w; Dependabot's #56 for the user to review; 9n from
-  about 2026-12-01.
+  Resume exactly here: the user runs bin/deploy live and activates Simple History in live's admin
+  (Plugins); Claude then fills live's column of the settings record's Simple History section,
+  adds to docs/ROUTINES.md's data-request routine that Simple History answers WordPress's Export
+  Personal Data tool, and marks 1.5b done in the template plan. Then 1.5c (the routines file),
+  1.5d (the status sheet), 1.6, stage 2. Worth raising soon: bin/deploy's change counts always
+  equal the file count for the site's own code (git archive dates each file with its commit), so
+  a content-only count matters. Kept waiting: the rebuild plan's 9u and 9w; Dependabot's #56.
+
 
 verification:
   wordpress_version: 7.1.4 (live, staging, dev site)
@@ -296,30 +307,31 @@ verification:
   staging_checked_2026_11_09: headers identical to the dev site's, xmlrpc.php 403, no Yoast comment, no policy violation of ours on Home, Music and Book logged out or logged in; the server adds a second policy, upgrade-insecure-requests; Music has no video yet, so YouTube is not yet checked on staging
   staging_mail: FluentSMTP connected to Brevo (sender website@howardbuiemusic.com, log off, failed emails kept anyway); a test arrived in the inbox with SPF, DKIM and DMARC passing (2026-11-09); failure alerts by Pushover, proven with a planted failure; the 2026-11-07 mails had gone through Hostinger's relay into spam, failing DMARC; staging's admin email changed to the business Gmail address (confirmed by the user, 2026-11-22)
   dns_mail_records: MX at Hostinger; SPF v=spf1 include:_spf.mail.hostinger.com ~all (unchanged); brevo-code TXT and brevo1/brevo2._domainkey CNAMEs and DMARC v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com, all checked live again on 2026-11-09 on 1.1.1.1 and 8.8.8.8 and at the domain's own name servers (ns1/ns2.dns-parking.com); also two google-site-verification TXT records (the user's two Google accounts) and Hostinger's own hostingermail-a/b/c._domainkey CNAMEs
-  brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds staging's address, blocking off; login, API key and Pushover keys in the user's password notes
+  brevo: account under the user's Gmail address, two-factor login on; domain authenticated (support, 2026-11-09), not branded; one sender, website@howardbuiemusic.com; API key restricted to transactional email, no fixed expiry but expires after 90 days unused; retention 3 months, previews never stored, tracking anonymous; Authorized IPs holds the server's IPv4 and IPv6 addresses (IPv6 added 2026-11-22), blocking on (as the settings record says); login, API key and Pushover keys in the user's password notes
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 33 checks all passing (2026-11-21 evening; the versions check's alerts in 24 situations, the page check's 25, the deploy's 50 stand-in situations); bin/test 13 scenario checks (with dev-site-check.sh and dev-deploy-server.sh, the deploy's 5 real-server situations and 4 restriction probes; the counts of browser tests below are from before 1.4) (in tests/scenario/<group>/) + 246 browser tests (242 passed, 4 skipped with their reasons, in specs/dev/<group>/) + the final debug-log check, all passing (2026-11-21, locally and on #88/#89); bin/screenshots for before/after looks
-  staging_theme: deployed by main's run after each merge; latest 488f547 (#89), which includes the form.css fix (aedde5e); live still has the zip of a1e5271
-  dev_site_plugins: Contact Form 7 6.2.5 and Yoast SEO 28.9 (site-packages/composer.lock, #80); live and staging have Yoast 28.8 until the next deploy in the monthly check
+  checks: bin/check 35 checks all passing (2026-11-22; with "Every script in bin/ can be run" and "The debug log rule on known lines"); bin/test 15 scenario checks (with dev-activity-log.sh) + 246 browser tests (242 passed, 4 skipped with their reasons) + the final debug-log check (other people's messages shown, not failed), all passing locally and on #96 (2026-11-22); bin/screenshots for before/after looks
+  deployed: by bin/deploy from the user's computer only (1.4e); staging runs 3afc5e0 (with Simple History 5.36.0, activated), live runs 91a01ff (Yoast 28.9, the form.css fix); each place's note in its deploy-note folder
+  dev_site_plugins: Contact Form 7 6.2.5, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
   github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
-  github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); deploy-staging after both on main; environment staging for protected branches only; workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
+  github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); no deploy job, no environments, no server keys (since 2026-11-22, #95); workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   php_logs: per site in ~/.logs/error_log_<domain with underscores> on the server; log_errors on for live and staging since 2026-11-21 (the user, hPanel; data/records/settings.md)
-  bin_deploy: on main since #93, not yet run against the real server (1.4e); the server's rsync is 3.1.3
-  deploy_destinations: staging-child-theme, staging-song-list and staging-site-hardening in the server's rsync settings (a backup of that file from 2026-11-09 sits next to it)
+  bin_deploy: used for real since 2026-11-22; the server's rsync is 3.1.3 (a read-only refusal shows only as "connection unexpectedly closed", the reason in the server's rsync log)
+  deploy_destinations: ~/.deploy/rsyncd-hbmusic-staging.conf and -live.conf on the server (the theme, five plugins plus simple-history, deploy-note, read-only php-log), each forced on its own key in authorized_keys (backups authorized_keys.before-1.4e and .before-step-10); the keys hbmusic-staging and hbmusic-live in the user's SSH settings, passphrases in the user's password notes, unlocked with ssh-add; a shell login now needs -o PubkeyAuthentication=no
   uptime: HetrixTools free plan, one account (the user's Hostinger address; two-factor login on (the user, 2026-11-12)), contact list with Pushover, monitor on https://howardbuiemusic.com/ every minute from 4 locations, keyword, certificate and domain expiry warned 15 days ahead; log in at least every 90 days (monthly check, step 7)
   dependabot: weekly version updates (action, Composer, npm for the browser tests and the CSS linter, and site-packages/ with a 7-day wait); alerts and security updates on; plugin updates merge themselves once their checks pass (.github/workflows/plugin-updates.yml, T9; "Allow auto-merge" on); tools updates wait for the user, and one is open (2026-11-21, number 56)
   commit_identity: GitHub noreply address, set in this repository's git config only
-  hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; the only key is restricted to staging's theme and plugin folders
+  hostinger_plan: ends 2028-07-16, auto-renewal off; SSH on, password logins cannot be switched off; two keys, each restricted to rsync with its own place's folders
   not_versioned: data/ holds the song list and its import file, the pages and form import file (data/content/pages-import.xml), the photos (with data/photos/web/howard-buie-logo-696.png and howard-buie-share-1200x675.png, made 2026-11-09 for Yoast) and the screenshots; only on the user's computer, needed at go-live; the user's password notes hold the Turnstile keys; tests/e2e/.auth/ holds the dev admin's saved login (ignored by git)
 
 uncommitted_changes:
   - file: none in this repository
-    why: this file is the pause commit, on chore/pause-2026-11-21-evening (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #93; no other local branches (the plan's Current position went in with #93)
+    why: this file and the plan's Current position are the pause commit, on chore/pause-2026-11-22 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #96; no other local branches
   - file: data/ (not versioned)
     why: >
-      New today: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
+      New 2026-11-22: data/records/server-setup-1.4e.sh and server-cleanup-1.4e.sh, settings.md's
+      Brevo IPv6 line and Simple History section. Earlier: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
       data/exports/ (staging's and live's exports of 2026-11-17, the theme zips live-upload-181eef0
       to live-upload-a1e5271 with their SHA256SUMS), data/photos/web/howard-buie-share.png. Covered
       only by the user's off-computer backup of data/ (D27), which should be brought up to date.
@@ -327,9 +339,9 @@ uncommitted_changes:
     why: see the pause output's git status of ~/.claude.
   - file: the session scratchpad (deleted when the session ends)
     why: >
-      Throwaway: merge scripts (merge-90.sh to merge-92.sh), backups taken for planted faults
-      (all restored and compared), a downloaded Alpine package list, checksum probes and logs.
-      Nothing needed after the pause.
+      Throwaway: backups taken for planted faults (all restored and compared), downloaded plugin
+      zips for comparison, run-spec.sh (runs chosen specs as bin/test does), probe plugins and
+      logs. The two server scripts were copied to data/records/. Nothing else needed.
 
 pending_decisions:
   - >
@@ -390,8 +402,9 @@ reference_documents: |
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
-  2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     and the entries of steps 1.4 (with 1.4e and T11) and 1.5; and the rebuild plan's Current
-     position (9u and 9w waiting).
-  3. Then next_action: step 1.4e. At its end, say it is a good moment to compact, if the context
-     is past about half.
+  2. working_mode is rolling-wave: read the template plan's Current position ("Resume exactly
+     here"), its Decisions table and the entries of step 1.5 (1.5b to 1.5d) and 1.6; and the
+     rebuild plan's Current position (9u and 9w waiting).
+  3. Then next_action: the user's bin/deploy live and Simple History's activation on live, then
+     finishing 1.5b. At a step's end, say it is a good moment to compact, if the context is past
+     about half.
