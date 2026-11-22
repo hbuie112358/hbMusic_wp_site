@@ -1,0 +1,10 @@
+{
+  "description": "staging behind its password: the page check gets the login from .env (a password with a space and a quote, read whole), and the deploy passes.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "expectStatus": 0,
+  "expectPageCheck": "https://staging.example.com\tuser=checker\tpassword=pa ss\"word",
+  "expectOutputNaming": ["every page passed"],
+  "expectOutputLacking": ["pa ss"]
+}

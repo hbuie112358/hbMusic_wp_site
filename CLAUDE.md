@@ -227,9 +227,17 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   exists on the server for the key, and refuses to lower a downloaded plugin the host updated
   unless `--allow-lower` names it. After "yes" it copies the downloaded plugins, the site's own
   plugins and the theme, each folder made exactly the commit's, then writes the note, and names
-  any folder that was empty there (to activate by hand). The page check and the PHP log follow at
-  1.4d-3. The places come from `site.json`'s `deploy` section. Unlike the other scripts it uses programs on the
-  user's computer besides Docker and `jq`: `git`, `gh` (logged in), `rsync`, `ssh` and `curl`;
+  any folder that was empty there (to activate by hand). Then (1.4d-3) the page check
+  (`bin/site-check`; failing, it fails the deploy and names the way back, `--commit` with the
+  commit the place ran before), given a place's password login from `.env`
+  (`<PLACE>_CHECK_USER`, `<PLACE>_CHECK_PASSWORD`, read by exact name), and the PHP log's lines
+  added since before the copy (read through the read-only `php-log` folder; shown, not failing).
+  One deploy of a site at a time on the computer (a `flock` lock in its temporary folder). The
+  places come from `site.json`'s `deploy` section. Its test against a real throwaway server is the
+  scenario check `dev-deploy-server.sh`: an Alpine container (pinned in `tools/versions.sh`) set
+  up like the host, the real `ssh` and `rsync`, and probes that each key opens no shell, cannot
+  write the log or climb out of its folders, and that an unknown key is refused at once. Unlike the other scripts it uses programs on the
+  user's computer besides Docker and `jq`: `git`, `gh` (logged in), `rsync`, `ssh`, `curl` and `flock`;
   `ssh` never asks for a password (`BatchMode`), so a key that does not work stops it.
 - `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan
   1.4b, handbook chapter 2's step 7): every published page of the site at the address, from

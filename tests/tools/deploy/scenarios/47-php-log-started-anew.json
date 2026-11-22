@@ -1,0 +1,9 @@
+{
+  "description": "The PHP log started anew during the deploy (shorter than before): all of it is shown as new.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "logStartsAnew": true,
+  "expectStatus": 0,
+  "expectOutputNaming": ["started anew", "00:00:01 UTC] new"]
+}

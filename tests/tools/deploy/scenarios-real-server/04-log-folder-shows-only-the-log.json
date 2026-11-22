@@ -1,0 +1,9 @@
+{
+  "description": "Another file beside the site's log on the server: the log folder's filter hides it, so the deploy passes.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "phpLogExtraFile": true,
+  "expectStatus": 0,
+  "expectOutputNaming": ["no new lines"]
+}

@@ -7,7 +7,8 @@
 # with the built files afterwards ("changed", "added", "removed"). Nothing goes over the network.
 set -Euo pipefail
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Its own folder, even when reached through a link (the real-server situations' search path).
+HERE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 readonly HERE
 # shellcheck source=tests/tools/deploy/fakes/plugin-files.sh
 source "$HERE/plugin-files.sh"

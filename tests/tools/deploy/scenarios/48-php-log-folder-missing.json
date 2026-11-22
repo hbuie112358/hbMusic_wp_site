@@ -1,0 +1,10 @@
+{
+  "description": "No php-log folder for the key: refused before anything is copied.",
+  "place": "staging",
+  "checks": { "{B}": [["check", "success"], ["dev-site", "success"]] },
+  "notes": { "example-staging": "{A}" },
+  "missingFolders": ["example-staging/php-log"],
+  "expectStatus": 1,
+  "expectOutputNaming": ["php-log"],
+  "expectWrites": []
+}

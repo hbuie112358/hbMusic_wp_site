@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Stand-in for bin/site-check in bin/deploy's tests (tests/tools/deploy/run.sh), copied into the
+# throwaway repository's bin/, where bin/deploy runs it; the real page check has its own tests
+# (tests/tools/site-check/). Records the address and the login it was given (page-checks.txt in
+# FAKE_SERVICES_DIR), and plays what a deploy may cause on the server, as the situation
+# (situation.json there) says: PHP log lines written while the pages are opened
+# (pageCheckAddsLogLines), a log started anew (logStartsAnew), a page that fails
+# (pageCheckFails).
+set -Euo pipefail
+
+readonly SITUATION="$FAKE_SERVICES_DIR/situation.json"
+readonly SERVER="$FAKE_SERVICES_DIR/server"
+
+address="$1"
+case "$address" in
+  https://staging.example.com) ssh_host="example-staging" ;;
+  https://example.com) ssh_host="example-live" ;;
+  *) echo "fake site-check: unknown address $address" >&2; exit 2 ;;
+esac
+printf '%s\tuser=%s\tpassword=%s\n' "$address" "${SITE_CHECK_USER:-}" "${SITE_CHECK_PASSWORD:-}" >>"$FAKE_SERVICES_DIR/page-checks.txt"
+
+log_file="$SERVER/$ssh_host/php-log/error_log_example"
+if jq -e '.logStartsAnew // false' "$SITUATION" >/dev/null; then
+  printf '[01-Jan-2026 00:00:01 UTC] new\n' >"$log_file"
+fi
+jq -r '.pageCheckAddsLogLines // [] | .[]' "$SITUATION" >>"$log_file"
+if jq -e '.pageCheckFails // false' "$SITUATION" >/dev/null; then
+  echo "[site-check] FAILED: $address/about/ answered 500, not 200" >&2
+  exit 1
+fi
+echo "[site-check] all 1 page(s) passed" >&2

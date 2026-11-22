@@ -4,7 +4,8 @@
 #
 #   bin/deploy staging|live [--commit <commit>] [--allow-lower <plugin>]... [--ssh-config <file>]
 #
-# Built in parts (1.4d-1 and 1.4d-2 so far). Before anything is copied, it refuses unless the
+# One deploy of a site at a time on the computer (a lock in its temporary folder). Before anything
+# is copied, it refuses unless the
 # working copy is clean, the commit is on GitHub's main and its required checks passed, either on
 # the commit itself (the weekly run, the button) or on its merged pull request's last commit with
 # exactly the same files (a rebase merge gives the commit a new name, so no check ran on it); where
@@ -21,13 +22,22 @@
 # commit's, compared by content; then the note. A folder that was empty on the server is named,
 # to activate by hand: a copy runs no code and cannot activate anything.
 #
+# After the copy (handbook steps 7 and 8): the page check (bin/site-check), whose failure fails
+# the deploy and names the way back (--commit with the commit the place ran before); then the PHP
+# error log's lines added since before the copy, read through a read-only folder, shown but not
+# failing the deploy, since visitors' requests write there too. A place behind a password gives
+# the page check its login from .env (<PLACE>_CHECK_USER, <PLACE>_CHECK_PASSWORD), read by exact
+# name, the rest of the file never loaded. The host keeps no page cache to clear (site.json's
+# pageCache, "none" the only value so far).
+#
 # The places come from site.json's deploy section; each one's server, account, port and key are in
 # the user's SSH settings under its short name, and its key can reach only its own folders on the
 # server, rsync's daemon mode forced by the key. ssh never asks for a password (BatchMode): the
 # account's password opens a full shell, so a key that does not work stops the deploy instead.
 #
-# Needs git, gh (logged in), rsync, ssh, jq and curl on the user's computer, and Docker. Exit
-# status: 0 done, 1 refused or failed, 2 the command was given wrongly or the settings are wrong.
+# Needs git, gh (logged in), rsync, ssh, jq, curl and flock on the user's computer, and Docker.
+# Exit status: 0 done, 1 refused or failed, 2 the command was given wrongly or the settings are
+# wrong, 130 interrupted.
 set -Euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -50,7 +60,11 @@ readonly NOTE_FILE="deployed-commit"
 # rsync's exit status for a file that does not exist on the server: no note yet, the first deploy.
 readonly RSYNC_FILE_MISSING=23
 readonly SSH_CONNECT_SECONDS=20
-readonly REQUIRED_TOOLS=(git gh rsync ssh jq curl docker)
+readonly REQUIRED_TOOLS=(git gh rsync ssh jq curl docker flock)
+# The server's PHP error log, through a read-only folder holding only this site's log file.
+readonly PHP_LOG_FOLDER="php-log"
+# The secrets file the user keeps on the computer; only the page check's login is read from it.
+readonly SETTINGS_FILE_NAME=".env"
 readonly PLACES=(staging live)
 # Each server folder becomes exactly the commit's: --delete removes files the commit no longer
 # has, --checksum compares by content rather than by size and time, and times are kept so the next
@@ -68,6 +82,12 @@ RELEASE_DOWNLOADED_PLUGINS=()
 # Server folders found empty before the copy: new on the server, to activate by hand.
 NEW_FOLDERS=()
 COPY_STARTED=false
+# The commit the place ran before this deploy, for the way back if the page check fails.
+PREVIOUS_COMMIT=""
+# The page check's login, for a place behind a password; never exported beyond the page check.
+PAGE_CHECK_USER=""
+PAGE_CHECK_PASSWORD=""
+PHP_LOG_NAME=""
 
 PLACE=""
 COMMIT_REQUESTED=""
@@ -440,6 +460,45 @@ report_new_folders() {
   done
 }
 
+# One deploy of this site at a time on this computer: a lock in the temporary folder, outside the
+# repository, held until the script ends.
+acquire_deploy_lock() {
+  local lock_file
+  lock_file="${TMPDIR:-/tmp}/$(site_setting .slug)-deploy.lock" || exit 2
+  exec {DEPLOY_LOCK}>"$lock_file" || refuse "could not open the lock file $lock_file"
+  flock -n "$DEPLOY_LOCK" || refuse "another bin/deploy of this site is running on this computer"
+}
+
+# One value of the settings file by its exact name; the rest of the file is never loaded.
+settings_file_value() {
+  local name="$1" file="$REPO_ROOT/$SETTINGS_FILE_NAME"
+  [[ -f "$file" ]] || return 0
+  grep -m 1 -E "^$name=" "$file" | cut -d= -f2-
+}
+
+# A place behind a password gives the page check its login, <PLACE>_CHECK_USER and
+# <PLACE>_CHECK_PASSWORD from .env; missing, the deploy is refused before anything is copied.
+load_page_check_login() {
+  [[ "$(site_settings_query ".deploy.$PLACE.isBehindPassword // false")" == true ]] || return 0
+  local prefix="${PLACE^^}_CHECK"
+  PAGE_CHECK_USER="$(settings_file_value "${prefix}_USER")"
+  PAGE_CHECK_PASSWORD="$(settings_file_value "${prefix}_PASSWORD")"
+  [[ -n "$PAGE_CHECK_USER" && -n "$PAGE_CHECK_PASSWORD" ]] ||
+    refuse "$PLACE is behind a password: set ${prefix}_USER and ${prefix}_PASSWORD in $SETTINGS_FILE_NAME for the page check"
+}
+
+# The server's PHP log, copied into a file; the folder holds exactly the site's one log file.
+read_php_log() {
+  local target="$1" listing files
+  listing="$(rsync --list-only -e "$(ssh_command)" "$PLACE_SSH_HOST::$PHP_LOG_FOLDER/" 2>"$WORK_DIR/log-errors")" ||
+    refuse "$PLACE_SSH_HOST has no folder $PHP_LOG_FOLDER for this key, or did not answer: $(tail -n 2 "$WORK_DIR/log-errors" | paste -sd ' ')"
+  files="$(awk '$NF != "." && $1 !~ /^d/ { print $NF }' <<<"$listing")"
+  [[ "$(grep -c . <<<"$files")" == 1 ]] || refuse "$PLACE's $PHP_LOG_FOLDER folder should hold exactly the site's log file, not: ${files:-nothing}"
+  PHP_LOG_NAME="$files"
+  rsync -q -e "$(ssh_command)" "$PLACE_SSH_HOST::$PHP_LOG_FOLDER/$PHP_LOG_NAME" "$target" 2>"$WORK_DIR/log-errors" ||
+    refuse "could not read $PLACE's PHP log: $(tail -n 2 "$WORK_DIR/log-errors" | paste -sd ' ')"
+}
+
 # Every check that can refuse, so "yes" is asked only for a deploy that can be carried out.
 prepare_deploy() {
   require_clean_working_copy
@@ -448,7 +507,9 @@ prepare_deploy() {
   require_tested_commit
   require_staging_runs_commit
   read_server_commit "$PLACE"
+  PREVIOUS_COMMIT="$SERVER_COMMIT"
   show_changes "$SERVER_COMMIT"
+  load_page_check_login
   export_release
   load_release_contents
   require_known_allowed_lower
@@ -456,7 +517,61 @@ prepare_deploy() {
   verify_downloaded_plugins
   check_server_folders
   check_server_versions
+  read_php_log "$WORK_DIR/php-log.before"
   show_copy_plan
+}
+
+# The page check (bin/site-check), with the place's login when it has one: exported inside a
+# subshell only, so it never appears on a command line.
+run_page_check() {
+  (
+    [[ -z "$PAGE_CHECK_USER" ]] || export SITE_CHECK_USER="$PAGE_CHECK_USER" SITE_CHECK_PASSWORD="$PAGE_CHECK_PASSWORD"
+    exec "$REPO_ROOT/bin/site-check" "$PLACE_ADDRESS"
+  )
+}
+
+# What the PHP log gained since before the copy, found by position rather than by the lines'
+# times, so a clock difference between this computer and the server hides nothing. Shown, never
+# failing the deploy: visitors' requests write there too. Fails only when the log cannot be read.
+show_new_php_log_lines() {
+  local before="$WORK_DIR/php-log.before" after="$WORK_DIR/php-log.after" before_size new_lines
+  read_php_log_after "$after" || return 1
+  before_size="$(wc -c <"$before")"
+  if (($(wc -c <"$after") >= before_size)); then
+    new_lines="$(tail -c +"$((before_size + 1))" "$after")"
+  else
+    log "the PHP log was started anew during the deploy; all of it is new"
+    new_lines="$(cat "$after")"
+  fi
+  [[ -n "$new_lines" ]] || { log "PHP log: no new lines"; return 0; }
+  log "PHP LOG: $(grep -c . <<<"$new_lines") new line(s) since the deploy started; read them:"
+  local line
+  while IFS= read -r line; do
+    printf '    %s\n' "$line" >&2
+  done <<<"$new_lines"
+}
+
+# The same read as before the copy, but a failure now is reported, not a refusal: the copy is
+# done, so "nothing was copied" would be wrong.
+read_php_log_after() {
+  local target="$1"
+  if ! rsync -q -e "$(ssh_command)" "$PLACE_SSH_HOST::$PHP_LOG_FOLDER/$PHP_LOG_NAME" "$target" 2>"$WORK_DIR/log-errors"; then
+    log "could not read $PLACE's PHP log after the deploy: $(tail -n 2 "$WORK_DIR/log-errors" | paste -sd ' ')"
+    return 1
+  fi
+}
+
+# After the copy and the note: the page check, then the PHP log. A failing page check fails the
+# deploy, naming the way back; the code is on the place either way.
+check_after_copy() {
+  local failures=0
+  run_page_check || failures=1
+  show_new_php_log_lines || failures=1
+  report_new_folders
+  ((failures == 0)) && return 0
+  log "FAILED after the copy: ${DEPLOY_COMMIT:0:7} is on $PLACE, but the page check or the PHP log failed (above)"
+  [[ -z "$PREVIOUS_COMMIT" ]] || log "the way back: bin/deploy $PLACE --commit ${PREVIOUS_COMMIT:0:7}; then fix it in a pull request"
+  exit 1
 }
 
 main() {
@@ -466,12 +581,13 @@ main() {
   WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }
   trap remove_work_dir EXIT
   trap on_interrupt INT TERM
+  acquire_deploy_lock
   prepare_deploy
   confirm
   copy_release
   write_note
-  report_new_folders
-  log "copied ${DEPLOY_COMMIT:0:7} to $PLACE; the page check and the PHP log follow with template plan 1.4d-3"
+  check_after_copy
+  log "done: ${DEPLOY_COMMIT:0:7} is on $PLACE, and every page passed"
 }
 
 main "$@"
