@@ -30,7 +30,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   staging deploy, key and environment removed, #95; the handbook's H103), so step 1.4 is done;
   1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); 1.5b done (#96;
   Simple History on staging and live, activated on both, live at e243788 on 2026-11-23 with
-  Contact Form 7 6.2.6). **Next: 1.5c,** the routines file. Worth raising soon: (1) every
+  Contact Form 7 6.2.6); 1.5c done (the routines split into `docs/ROUTINES.md` and
+  `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23). **Next: 1.5d,** the status sheet. Worth raising
+  soon: (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
   thought; (2) Dependabot's 7-day wait did not hold for Contact Form 7 6.2.6 (published on
@@ -597,8 +599,19 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     - The privacy policy on staging (`data/content/privacy-policy.html`) already says the
       security tools record technical details such as IP addresses; Simple History's failed
       logins (anonymized) fall under it, and only the user has a login.
-  - [ ] 1.5c The routines file: `docs/ROUTINES.md` split into what every site does (the monthly
+  - [x] 1.5c The routines file: `docs/ROUTINES.md` split into what every site does (the monthly
     check, deploying, the alerts) and this site's own details.
+    **Done 2026-11-23** (the user chose two files and the name): `docs/ROUTINES.md` is the same
+    for every site, naming the handbook's toolkit (chapter 3) and linking each site detail to its
+    heading in `docs/SITE_SPECIFIC_ROUTINES.md` (places, deploy keys, host, mail, booking form,
+    uptime monitor, plugins and theme, theme frame, Site Health, expected set, monthly report,
+    staging content refresh, video pictures). `bin/check` fails if a link finds no heading or a
+    heading has no link (`tools/routines.sh`, tested on known examples in
+    `tests/tools/routines/`; five planted faults caught). Three steps the handbook's monthly
+    routine has were missing and were added at the end, so the old step numbers still hold: Site
+    Health (H98), nothing unknown among Administrators, plugins, themes and server keys (chapter
+    6), and the monthly report (chapter 10, customer sites only). A new site's blank copy is
+    described in `template-notes.md`.
   - [ ] 1.5d The status sheet: this site's `records/status.md` against chapter 12's 74 items,
     each done (with how it was checked) or an exception (with its reason), from
     `docs/SITE_CHECKLIST.md` and what is verified; with the expected plugin set and the

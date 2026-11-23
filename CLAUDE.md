@@ -65,8 +65,11 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
-- `docs/ROUTINES.md`: the recurring care of the site (the monthly site check: a booking test and
-  the content export), with what to do when the test fails.
+- `docs/ROUTINES.md`: the recurring care of the site (deploying, the monthly site check, what to
+  do on each alert, visitors' data requests), the same for every DTS site (template plan 1.5c);
+  it links each of this site's details (places, host, mail, uptime monitor, plugins and theme,
+  the expected set) to its heading in `docs/SITE_SPECIFIC_ROUTINES.md`, and `bin/check` fails if
+  a link finds no heading there or a heading there has no link (`tools/routines.sh`).
 
 The old site, as exported:
 - Active theme: the parent `music-lite` 1.5 (unmaintained). A `music-lite-child` theme is
@@ -187,7 +190,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); the
   deploy's checks on known situations (`tests/tools/deploy/`: `bin/deploy` in a throwaway Git
   repository against stand-ins for GitHub, the servers, the Composer build and WordPress.org's
-  checksums, 1.4d-1, 1.4d-2); ShellCheck on `bin/`, the
+  checksums, 1.4d-1, 1.4d-2); the routines' links to their site details, and that check on
+  known examples (`tests/tools/routines/`, 1.5c); ShellCheck on `bin/`, the
   scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
