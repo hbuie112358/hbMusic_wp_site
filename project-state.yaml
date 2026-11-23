@@ -2,12 +2,12 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-23T10:55:00-05:00
-# The pause commit is on the branch docs/sharing-choice, after its two unpushed commits (4a0f8ca,
-# 95351f0), until the user says "push"; then main. last_commit is that branch's tip before the
-# pause commit; main is at 8168d9b, even with origin/main, after #102.
-current_branch: docs/sharing-choice
-last_commit: 95351f0
+timestamp: 2026-11-23T15:55:00-05:00
+# The pause commit is on the branch chore/pause-2026-11-23-afternoon, its only commit, until the
+# user says "push"; then main. last_commit is main's tip before the pause commit, even with
+# origin/main after #108.
+current_branch: chore/pause-2026-11-23-afternoon
+last_commit: 36d6d9a
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
@@ -297,14 +297,31 @@ last_work: >
   deleted as the dev admin left Yoast's deleted-page notice for the guide's axe test), fixed by
   deleting without a user (8168d9b). 9.3: the user kept Home, Book and Songs sharing their own
   photos. 1.6 started (T12): 1.6a done (95351f0, not pushed), the shared tests look-independent.
+  Afternoon of 2026-11-23 (after a resume): #103 (1.6a and the 9.3 record) merged. The project's
+  CLAUDE.md gained "Coding standards by language" (#104; TypeScript strict for production code,
+  test code held to clarity; CSS to css-standards-notes.md; Bash ShellCheck only, a gap); the
+  global CLAUDE.md's resume reads a project's named language standards (the user committed it).
+  The review of the theme's three scripts against TYPESCRIPT_STANDARDS.md found seven items,
+  now step 1.7. 1.6b decided (T13) and done: 1.6b-1 (#105) the call-to-action colors spelled out
+  as custom.callToAction, the video icon, carousel arrow and form color scheme as tokens, the
+  site's facts in includes/site-facts.php, tools/theme-tokens.sh in bin/check, all 24 screenshots
+  identical; 1.6b-2 (#106) starter/ (light palette, contrast table, parts, logo, site facts,
+  pages), tools/site-layer-files.txt and tools/site-layer.sh, seven starter rules in bin/check,
+  .gitignore allowing starter/. 1.6c decided (T14): 1.6c-1 (#107) SITE_DIR names the site's
+  folder, tools/site-theme.sh assembles the starter's theme into starter/themes/ (ignored),
+  bin/test leaves out and names another site's tests; 1.6c-2 (#108) tools/dev-site-guard.sh (one
+  dev site at a time, refused by name), the video code allowing its own player in the policy,
+  four scenario checks fixed with the user's approval; the starter passes 16 scenario checks and
+  166 browser tests, this site 17 and 242. Memory: compacting only past 50% (the user).
 
 next_action: >
-  Resume exactly here: push docs/sharing-choice when the user says so (2 commits plus this pause
-  commit). Then 1.6b, the neutral site layer in starter/ (the plan's 1.6 entry and T12): first
-  give site-cta.css's panel button its own theme.json tokens (this site's values kept, its look
-  unchanged), then the starter's light palette, placeholder SVG logo, header, footer, call to
-  action "Get in touch", style.css and screenshot. Then 1.6c (the weekly proof job), stage 2.
-  Kept waiting: the rebuild plan's 9u and 9w, 9o (the host restore test), Dependabot's #56.
+  Resume exactly here: push chore/pause-2026-11-23-afternoon when the user says so (this pause
+  commit only). Then 1.6c-3 (the plan's 1.6c entry, T12, T14): the starter job in check.yml on
+  the Monday schedule and the "Run workflow" button only (SITE_DIR=starter bin/dev-site and
+  bin/test), then the starter's screenshot.png (1200x900, its Home, shot from its dev site; this
+  site's dev site stopped by name first, docker compose -p hbmusic-dev stop) added to
+  tools/site-layer-files.txt. Then 1.7 (the seven script items), which ends stage 1; then stage
+  2. Kept waiting: the rebuild plan's 9u and 9w, 9o (the host restore test), Dependabot's #56.
 
 
 verification:
@@ -327,8 +344,9 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 39 checks all passing (2026-11-23, with the routines' links and the status sheet); bin/test 17 scenario checks (with dev-editor-presets.sh and dev-accessibility-scan.sh) + 246 browser tests (4 skipped with their reasons) + the final debug-log check, all passing on #102 (2026-11-23); bin/accessibility-scan monthly against live; bin/screenshots for before/after looks
-  deployed: by bin/deploy from the user's computer only (1.4e); staging and live run e366b02 (deployed 2026-11-23, with Contact Form 7 6.2.6, Simple History 5.36.0 activated on both, Site Hardening 0.3.0, the editor presets); later commits change only tools, tests and docs; each place's note in its deploy-note folder
+  checks: bin/check 50 checks all passing (2026-11-23, with the token, site-layer, starter, theme-assembly and dev-site-guard checks); bin/test 17 scenario checks + 242 browser tests passed and 4 skipped (pages with too few videos) + the final debug-log check, all passing locally and on #108 (2026-11-23); the starter (SITE_DIR=starter) 16 scenario checks + 166 browser tests passing locally; bin/accessibility-scan monthly against live; bin/screenshots for before/after looks
+  deployed: by bin/deploy from the user's computer only (1.4e); staging and live run e366b02 (deployed 2026-11-23, with Contact Form 7 6.2.6, Simple History 5.36.0 activated on both, Site Hardening 0.3.0, the editor presets); main's later commits change two things they run, with no visible change (the theme's tokens and site-facts.php, #105; the video code's own policy source, #108, the same policy sources); deploy when convenient; each place's note in its deploy-note folder
+  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time
   dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
   github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); no deploy job, no environments, no server keys (since 2026-11-22, #95); workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
@@ -344,10 +362,10 @@ verification:
 uncommitted_changes:
   - file: none in this repository
     why: >
-      This file and the plan's Current position are the pause commit, on docs/sharing-choice after
-      its 2 unpushed commits (4a0f8ca the 9.3 record and #102's fix in the plan, 95351f0 1.6a); the
-      branch is not on GitHub and waits for the user's "push". main is even with origin/main
-      (8168d9b, after #102); no other local branches.
+      This file and the plan's Current position are the pause commit, the only commit on
+      chore/pause-2026-11-23-afternoon, not on GitHub, waiting for the user's "push". main is even
+      with origin/main (36d6d9a, after #108); no other local branches. starter/themes/ holds the
+      starter's assembled theme, build output ignored by git.
   - file: data/ (not versioned)
     why: >
       New 2026-11-23: data/records/exceptions-private.md (E5), settings.md's Simple History live
@@ -361,11 +379,10 @@ uncommitted_changes:
     why: see the pause output's git status of ~/.claude.
   - file: the session scratchpad (deleted when the session ends)
     why: >
-      Throwaway: backups taken for 1.6a's planted faults (all restored and compared with cmp),
-      stand-in settings and page folders, #102's failed-run log and Playwright traces,
-      run-specs.sh (runs chosen spec files exactly as bin/test's browser_tests does, with
-      SETTINGS_OVERRIDE and CONTENT_OVERRIDE for stand-ins; easily written again from bin/test).
-      Nothing needed after the pause.
+      Throwaway: backups taken for planted faults (all restored and compared with cmp), test and
+      check logs, the contrast scripts (their results are in starter/README.md), run-specs.sh
+      (runs chosen spec files exactly as bin/test's browser_tests does; easily written again from
+      bin/test). Nothing needed after the pause.
 
 pending_decisions:
   - >
@@ -388,6 +405,10 @@ pending_decisions:
     one by one, later: 6.9's check to match E7; 7.3's check to the pairs in use (E8); 3.6 naming
     the generator tag; 7.1's monthly scan of live's pages; the local-staging wording in 2.7 and 3.3.
   - Raising the dev site's WordPress from 7.1.4 to 7.1.5 (live and staging run 7.1.5).
+  - >
+    Deploying main to staging, then live (bin/deploy), when convenient: #105's theme tokens and
+    site-facts.php and #108's video policy source, with no visible change and the same policy
+    sources.
   - >
     The site's type, found by the cold-resume check of 2026-11-23: the rebuild plan's D32
     (2026-11-16) makes it Content by customer, with staging on the host removed after go-live
@@ -453,9 +474,9 @@ resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T12 is 1.6's) and the entries of step 1.6 (1.6a done, 1.6b and 1.6c) and stage 2's 2.1; and
-     the rebuild plan's Current position (9u and 9w waiting).
-  3. Then next_action: the push of docs/sharing-choice when the user says so, then 1.6b, starting
-     with the call-to-action button's own tokens. The user cleared the context at this pause (not
-     a compaction), so everything needed is in these files. At a step's end, say it is a good
-     moment to compact, if the context is past about half.
+     (T12 to T14 are 1.6's) and the entries of step 1.6 (1.6a, 1.6b, 1.6c-1 and 1.6c-2 done,
+     1.6c-3 next) and step 1.7; and the rebuild plan's Current position (9u and 9w waiting).
+  3. Then next_action: the push of chore/pause-2026-11-23-afternoon when the user says so, then
+     1.6c-3. The user compacts after this pause (the context past 50%); the files hold
+     everything needed. At a step's end, say it is a good moment to compact if the user's
+     context is past 50%, never pressing.
