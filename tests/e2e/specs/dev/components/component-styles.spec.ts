@@ -17,13 +17,10 @@ const PAGES_WITH_A_HERO = pagesUsing('site-hero');
 const PAGES_WITH_FEATURES = pagesUsing('site-features');
 const PAGES_WITH_LEAD_AND_FEATURES = pagesUsing('site-lead', 'site-features');
 
-// The red, green and blue of a computed colour, on a 0-255 scale whichever scale the browser uses.
-function rgbChannels(colour: string): [number, number, number] {
-	const channels = (colour.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
-	const scale = Math.max(...channels) <= 1 ? 255 : 1;
-	const [red = 0, green = 0, blue = 0] = channels.map((channel) => channel * scale);
-	return [red, green, blue];
-}
+// The panel's colour token as WordPress names it from theme.json, and how a browser reports no
+// background colour at all.
+const CALL_TO_ACTION_COLOUR_TOKEN = '--wp--custom--color--cta-background';
+const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
 // Opens every page and calls check on each one that has a call to action; none at all fails.
 async function onEveryPageWithCallToAction(page: Page, check: (path: string) => Promise<void>): Promise<void> {
@@ -90,17 +87,26 @@ for (const path of PAGES_WITH_A_HERO) {
 	});
 }
 
-// The call-to-action panel's texture and its even green (a colour mixed in theme.json): green
-// outweighs red and blue, and it is not black, which is what a colour that fails to resolve
-// would leave.
-test('the call-to-action panel is an even, textured green, on every page with one', async ({ page }) => {
+// The call-to-action panel carries the grain and is the colour its theme.json token names
+// (custom.color.ctaBackground), as the browser resolves the token, set apart from the page behind
+// it; whatever colour a site chooses (template plan 1.6a). A token that fails to resolve leaves
+// the panel transparent, which never equals a resolved colour; a missing token leaves the probe
+// transparent too, so it must hold a colour first.
+test("the call-to-action panel is textured, in its token's colour, set apart from the page, on every page with one", async ({ page }) => {
 	await onEveryPageWithCallToAction(page, async (path) => {
 		const panel = page.locator(CALL_TO_ACTION).first();
 		expect(await panel.evaluate((element) => getComputedStyle(element).backgroundImage), `the panel's texture on ${path}`).toContain('grain.png');
-		const colour = await panel.evaluate((element) => getComputedStyle(element).backgroundColor);
-		const [red, green, blue] = rgbChannels(colour);
-		expect(green, `the panel's green in ${colour} on ${path}`).toBeGreaterThan(Math.max(red, blue));
-		expect(green, `the panel's green in ${colour} on ${path}`).toBeGreaterThan(40);
+		const colours = await panel.evaluate((element, token) => {
+			const probe = document.createElement('div');
+			probe.style.backgroundColor = `var(${token})`;
+			document.body.append(probe);
+			const tokenColour = getComputedStyle(probe).backgroundColor;
+			probe.remove();
+			return { panel: getComputedStyle(element).backgroundColor, token: tokenColour, page: getComputedStyle(document.body).backgroundColor };
+		}, CALL_TO_ACTION_COLOUR_TOKEN);
+		expect(colours.token, `${CALL_TO_ACTION_COLOUR_TOKEN} as a colour`).not.toBe(TRANSPARENT);
+		expect(colours.panel, `the panel's colour on ${path}`).toBe(colours.token);
+		expect(colours.panel, `the panel's colour against the page's on ${path}`).not.toBe(colours.page);
 	});
 });
 
@@ -162,8 +168,9 @@ for (const path of PAGES_WITH_FEATURES) {
 	});
 }
 
-// On the green call-to-action panel the page's green button would vanish, so it inverts to black;
-// its edge must stand out from the panel at 3:1 or more (WCAG 2.2, 1.4.11).
+// A button in the page's own colours could vanish into the call-to-action panel, so site-cta.css
+// gives the panel's button others; its edge must stand out from the panel at 3:1 or more
+// (WCAG 2.2, 1.4.11), whatever the colours.
 test('the call-to-action button stands out from its panel, on every page with one', async ({ page }) => {
 	await onEveryPageWithCallToAction(page, async (path) => {
 		const ratio = await page.locator(CALL_TO_ACTION).first().evaluate((panel) => {

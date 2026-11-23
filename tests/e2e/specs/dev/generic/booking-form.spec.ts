@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { WCAG_TAGS } from '../helpers/accessibility';
+import { sitePagesSplitBy } from '../helpers/test-pages';
 
 // Protects the booking form (plan step 5e): a visitor's request reaches the site owner's inbox
 // (Mailpit here) with the visitor as the reply address and without the visitor's name in the
@@ -9,8 +10,14 @@ import { WCAG_TAGS } from '../helpers/accessibility';
 // spam checks send nothing; and its files and Cloudflare's script load only on the page with the form. The site's
 // own configuration runs for real; only Cloudflare is simulated (config/dev-mu-plugins/). The
 // real Turnstile is proven on staging.
-const BOOK_PATH = '/hire-acoustic-guitarist/';
-const PAGE_WITHOUT_FORM = '/about/';
+// The form's page and a page without it, found by the form's shortcode in the site's test pages
+// (any site's, template plan 1.6a), so no page is named here; either one missing fails at once.
+const FORM_SHORTCODE = '[contact-form-7 ';
+const { containing: PAGES_WITH_FORM, notContaining: PAGES_WITHOUT_FORM } = sitePagesSplitBy(FORM_SHORTCODE);
+if (PAGES_WITH_FORM.length === 0 || PAGES_WITHOUT_FORM.length === 0) {
+	throw new Error(`the booking form's tests need a test page with ${FORM_SHORTCODE}…] and one without it`);
+}
+const [BOOK_PATH = '', PAGE_WITHOUT_FORM = ''] = [PAGES_WITH_FORM[0], PAGES_WITHOUT_FORM[0]];
 const TURNSTILE_SCRIPT = /challenges\.cloudflare\.com\/turnstile/;
 const FORM_PLUGIN_FILES = /\/plugins\/contact-form-7\//;
 const PASSING_TOKEN = 'dev-pass';
