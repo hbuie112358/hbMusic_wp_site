@@ -10,13 +10,19 @@ theme) and with booking features, to go live at its current host and move to ano
 
 ## Handbook
 
-- Follows: the DTS Operations Handbook, version 0 (first draft in progress).
+- Follows: the DTS Operations Handbook, version 1 (moved from version 0 by the user, 2026-11-23).
 - Type: Fully managed, Brochure, hosted by the customer (the user's own site).
-- Exceptions:
-  - Hosted on Hostinger, not a DTS standard host: the hosting is prepaid through 2028; the site
-    moves when that plan ends.
-  - Keeps a staging site on the host: the user's practice ground for staging on the host, which
-    Shop sites need.
+- Exceptions (each with its reason and date in `records/exceptions.md`; E5 in the private
+  records folder, `data/records/exceptions-private.md`):
+  - E1 Hosted on Hostinger, not a DTS standard host: the hosting is prepaid through 2028; the
+    site moves when that plan ends.
+  - E2 Keeps a staging site on the host: the user's practice ground for staging on the host,
+    which Shop sites need.
+  - E3 Secrets in the user's password notes until DTS's Bitwarden is set up.
+  - E4 The old admin kept beside the go-live admin until rebuild plan 9n.
+  - E5 A weakness the host does not let the site close (private).
+  - E6 No written agreement on who may change what: the user's own site.
+- Status against the site standard (chapter 12): `records/status.md`.
 
 ## Terms
 

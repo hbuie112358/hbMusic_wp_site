@@ -31,7 +31,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); 1.5b done (#96;
   Simple History on staging and live, activated on both, live at e243788 on 2026-11-23 with
   Contact Form 7 6.2.6); 1.5c done (the routines split into `docs/ROUTINES.md` and
-  `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23). **Next: 1.5d,** the status sheet. Worth raising
+  `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23); 1.5d, the status sheet, split in four, 1.5d-1
+  done (sections 1-4, `records/status.md`, `records/exceptions.md`). **Next: 1.5d-2,** sections
+  5-6 and the expected plugin set. Worth raising
   soon: (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -612,10 +614,29 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     Health (H98), nothing unknown among Administrators, plugins, themes and server keys (chapter
     6), and the monthly report (chapter 10, customer sites only). A new site's blank copy is
     described in `template-notes.md`.
-  - [ ] 1.5d The status sheet: this site's `records/status.md` against chapter 12's 74 items,
+  - [~] 1.5d The status sheet: this site's `records/status.md` against chapter 12's items,
     each done (with how it was checked) or an exception (with its reason), from
     `docs/SITE_CHECKLIST.md` and what is verified; with the expected plugin set and the
-    exceptions; and a blank sheet for new sites. Likely more than one session.
+    exceptions; and a blank sheet for new sites. Counted 2026-11-23: 83 numbers in sections
+    1-14, 2 retired, so 81 to answer (15 of them pointers to other chapters); section 15 (shop)
+    gets one line. Split with the user, 2026-11-23, in four parts; Claude checks everything it
+    can reach (the repository, the tests, the dev site, live and staging from outside) and
+    leaves the user one short list per part (the admin, hPanel, the server over the password
+    login, outside accounts):
+    - [x] 1.5d-1 (2026-11-23) Sections 1-4, the sheet's format (one table per section: item,
+      status, how it was checked, date; `open` allowed only while 1.5d is built) and
+      `records/exceptions.md` (E1-E6; E5 in the private records). Found and fixed on the way:
+      Hostinger's `default.php` placeholder public on live and on staging, and on staging an
+      old `.htaccess` backup and an installer's `llms.txt`, deleted by the user; Hostinger's
+      `.private` folder on staging kept (the user). The project's `CLAUDE.md` moved to handbook
+      version 1 (the user). PHP is 8.4.28 on both, under active support until 2026-12-31, then
+      security fixes until 2028-12-31: moving to 8.5 (staging first) becomes due before then.
+    - [ ] 1.5d-2 Sections 5-6 and `records/plugin-set.md`, the expected set (5.5), which the
+      monthly check's step 12 compares against.
+    - [ ] 1.5d-3 Sections 7-9.
+    - [ ] 1.5d-4 Sections 10-14, the blank sheet for new sites, and a `bin/check` rule: the
+      sheet has every item number of the blank sheet, each `done` or `exception` with its
+      check or reason filled in, and every test file a row names still exists.
 - [ ] **1.6 Neutral defaults for the site layer:** a placeholder palette, logo, and header,
   footer and call-to-action wording, so a new site starts from something that works rather than
   from this site's look.
