@@ -1,0 +1,13 @@
+{
+	"slug": "dts-starter",
+	"devSiteTitle": "DTS Starter (dev)",
+	"theme": "dts-starter",
+	"localPlugins": ["site-hardening", "editing-help"],
+	"testPages": [
+		{ "title": "Home", "address": "home", "pageTemplate": "page-no-title-with-call-to-action", "isFrontPage": true },
+		{ "title": "About", "address": "about", "pageTemplate": "page-with-call-to-action" },
+		{ "title": "Contact", "address": "contact" },
+		{ "title": "Privacy Policy", "address": "privacy-policy", "isPrivacyPolicy": true, "isInMenu": false }
+	],
+	"namesSharedCodeMustNotUse": ["dts-starter"]
+}

@@ -8,6 +8,8 @@
 	     with their own prefixes, so a shared plugin never depends on this site's names. -->
 	<file>themes</file>
 	<file>config/dev-mu-plugins</file>
+	<!-- The starter's site layer (template plan 1.6b), which uses the theme code's prefix. -->
+	<file>starter</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
 

@@ -1,0 +1,16 @@
+/*
+Theme Name:        DTS Starter
+Template:          twentytwentyfive
+Description:       The starting look of a new DTS brochure site: a placeholder palette, logo and wording, each replaced by the site's own.
+Version:           0.1.0
+Requires at least: 7.1
+Requires PHP:      8.4
+Text Domain:       hbmusic
+License:           GPL-2.0-or-later
+License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+*/
+
+/*
+ * The text domain is the shared theme code's (hbmusic) until template plan 2.3 renames that
+ * prefix; a site created from the starter changes the name and description above.
+ */

@@ -74,6 +74,10 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   its slug, theme, plugins, the dev site's test pages and where `bin/deploy` copies to (live and
   staging, by their short names in the user's SSH settings, template plan 1.4c); no secrets. Its fields are explained in
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
+- `starter/`: the starter, the neutral site layer a new site begins from (template plan 1.6,
+  T13), moving to `dts-site-starter` at 2.4: its own `site.json`, `theme/` with only the
+  site-layer files (`tools/site-layer-files.txt`), neutral pages in `dev-content/`, and its
+  `README.md` with the palette's contrast. Never deployed; `bin/check` holds it.
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
@@ -192,7 +196,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   and an accepted one that npm no longer reports also fails; none accepted since 2026-11-20); the theme's component list in `functions.php` matching the files in
   `assets/css/components/`, both ways; every design token the component stylesheets and
   `theme.json` read defined in `theme.json` (`tools/theme-tokens.sh`, and that check on known
-  examples, `tests/tools/theme-tokens/`, template plan 1.6b); a type check of the theme's browser scripts (`assets/js/`) with
+  examples, `tests/tools/theme-tokens/`, template plan 1.6b); the starter (`starter/`) held to
+  the same rules: its `site.json` and pages, its `theme.json` schema and tokens, exactly the
+  site-layer files of `tools/site-layer-files.txt` (`tools/site-layer.sh`, with its examples in
+  `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
   (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in
