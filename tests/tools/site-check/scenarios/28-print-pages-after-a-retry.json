@@ -1,0 +1,8 @@
+{
+  "description": "--print-pages when a page passes only on its second try: it still prints every page checked, not only the one tried again.",
+  "options": ["--deadline", "5", "--retry-every", "1", "--print-pages"],
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "failTimes": 1 } },
+  "expectStatus": 0,
+  "expectStdout": ["https://site.test/", "https://site.test/about/"]
+}

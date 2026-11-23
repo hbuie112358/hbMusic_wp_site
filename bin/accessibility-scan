@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# The accessibility scan (handbook chapter 12, 7.1 and 7.4; template plan 1.5d-3): every published
+# page of the site at the given address, at desktop and phone width, with no axe error at WCAG 2.2
+# AA (the same rules as the dev site's tests) and no image without an alt attribute. Run in the
+# monthly check against live (docs/ROUTINES.md), since the content people edit there is never
+# tested otherwise. Knows nothing of any one site.
+#
+#   bin/accessibility-scan <address>
+#
+# The pages are the ones the page check finds answering (bin/site-check --print-pages), so both
+# tools agree on what a site's pages are, and a site whose pages fail is not scanned. A site behind
+# a site-wide password gets its login from SITE_CHECK_USER and SITE_CHECK_PASSWORD, as the page
+# check does; Playwright reads them from its environment, so they never show on a command line.
+# The scan runs in the pinned Playwright container (tools/versions.sh), which sees only tests/e2e/.
+#
+# Needs Docker, curl and jq. Exit status: 0 every page passed, 1 a page failed the scan or the page
+# check, 2 the command was given wrongly or the settings could not be read.
+set -Euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REPO_ROOT
+# shellcheck source=tools/versions.sh
+source "$REPO_ROOT/tools/versions.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
+
+log() { printf '%s [accessibility-scan] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
+usage_error() {
+  log "$*"
+  log "usage: bin/accessibility-scan <address>"
+  exit 2
+}
+
+read_arguments() {
+  (($# == 1)) || usage_error "one address, the site's root"
+  [[ "$1" != -* ]] || usage_error "unknown option $1"
+}
+
+require_docker() {
+  command -v docker >/dev/null || usage_error "docker is not installed; the scan runs in a container"
+}
+
+# The page check's list, or its exit status: 1 when a page or the list failed, 2 when it was given
+# wrongly; its own log has already said why.
+pages_answering() {
+  "$REPO_ROOT/bin/site-check" --deadline 0 --print-pages "$1"
+}
+
+# npm installs from the lock file with install scripts off, as bin/test does; the cache volume
+# keeps the downloads between runs.
+run_scan() {
+  local pages="$1"
+  docker run --rm --network host -w /e2e \
+    -v "$REPO_ROOT/tests/e2e:/e2e" -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    -e "SCAN_PAGES=$pages" -e SITE_CHECK_USER -e SITE_CHECK_PASSWORD \
+    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error &&
+      npx --no-install playwright test --config=accessibility-scan.config.ts'
+}
+
+main() {
+  local pages status
+  read_arguments "$@"
+  require_docker
+  require_valid_site_settings || exit 2
+  load_site_volume_names || exit 2
+  pages="$(pages_answering "${1%/}")"
+  status=$?
+  ((status == 0)) || { log "FAILED: the page check did not pass, so nothing was scanned"; exit "$status"; }
+  log "scanning $(wc -l <<<"$pages") page(s) at desktop and phone width"
+  run_scan "$pages" || { log "FAILED: accessibility errors, named above by page and width"; exit 1; }
+  log "every page passed: no accessibility error at WCAG 2.2 AA, every image with alt text"
+}
+
+main "$@"
