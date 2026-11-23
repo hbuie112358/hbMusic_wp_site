@@ -661,7 +661,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       `dev-accessibility-scan.sh` (a probe page with an image without alt fails it; a planted
       fault swallowing the failure caught); in the monthly check as step 13 (the report moved to
       14). Live: 12 of 12 passed. E8 added (7.3: no real palette passes "every pair it allows").
-      Open for the user: whether Home, Book and Songs should share the wide photo (9.3).
+      9.3's sharing pictures: Home, Book and Songs keep their own photos (the user, 2026-11-23).
+      A PR #102 run then failed once: the scan check deleted its probe as the dev admin, leaving
+      Yoast's "You just deleted a Page" notice (its icon without alt) for the guide's axe test;
+      fixed by deleting without a user, as `dev-activity-log.sh` already did.
     - Handbook proposals collected (each for the user's approval, later, one by one): 6.9's check
       to match E7; 7.3's check to "the pairs the theme uses and every rendered page" (E8); 3.6 to
       name the generator tag; 7.1's "monthly scan of local staging" to "of live's pages from
