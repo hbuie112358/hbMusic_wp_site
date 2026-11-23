@@ -23,6 +23,8 @@ theme) and with booking features, to go live at its current host and move to ano
   - E5 A weakness the host does not let the site close (private).
   - E6 No written agreement on who may change what: the user's own site.
   - E7 Other people's PHP notices shown, not failed, in the dev site's debug log.
+  - E8 Contrast checked by the color pairs in use, not every pair the palette allows.
+  - E9 No captions or transcript for the videos' brief spoken introductions.
 - Status against the site standard (chapter 12): `records/status.md`.
 
 ## Terms
@@ -268,7 +270,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   settings file in `~/.deploy/` (`rsyncd-hbmusic-<place>.conf`: the theme's and plugins' folders,
   the `deploy-note` folder and the read-only `php-log`), named `hbmusic-staging` and
   `hbmusic-live` in the user's SSH settings.
-- `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>` (template plan
+- `bin/site-check [--deadline <seconds>] [--retry-every <seconds>] [--print-pages] <address>` (template plan
   1.4b, handbook chapter 2's step 7): every published page of the site at the address, from
   WordPress's page list, and the site's root, answers 200 directly, shows the child theme named
   in `site.json` active and ends with `</html>`; failing pages are tried again for up to 2
@@ -278,6 +280,16 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `jq`. Run by
   `bin/deploy` after a copy (1.4d) and, against the dev site, by the scenario check
   `dev-site-check.sh` (which also switches the parent theme on and expects it to fail).
+  `--print-pages` prints the pages checked, once all passed, for `bin/accessibility-scan`.
+- `bin/accessibility-scan <address>` (template plan 1.5d-3; handbook chapter 12, 7.1 and 7.4):
+  every page the page check finds answering at the address, at desktop and phone width, in the
+  pinned Playwright container with its own config (`tests/e2e/accessibility-scan.config.ts`,
+  `tests/e2e/accessibility-scan/`; `bin/test` never runs it): no axe error at WCAG 2.2 AA (the
+  tests' own `WCAG_TAGS`) and no image without alt text. Run against live in the monthly check
+  (`docs/ROUTINES.md`, step 13), since the content edited there is never tested otherwise; staging
+  through `SITE_CHECK_USER` and `SITE_CHECK_PASSWORD`. Its test against the dev site is the
+  scenario check `dev-accessibility-scan.sh` (a published probe page with an image without alt
+  text must fail it).
 - `bin/screenshots previews | baseline | compare` (plan D29): a before/after check of the look with
   the real content, for restyling; local only, never a gate. It shows each real page from
   `data/content/` (listed in its `pages.json`; photos written `{{photo:<file>}}` from
