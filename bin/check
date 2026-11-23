@@ -16,6 +16,8 @@ source "$REPO_ROOT/tools/versions.sh"
 source "$REPO_ROOT/tools/site-settings.sh"
 # shellcheck source=tools/site-packages.sh
 source "$REPO_ROOT/tools/site-packages.sh"
+# shellcheck source=tools/routines.sh
+source "$REPO_ROOT/tools/routines.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
@@ -331,6 +333,23 @@ debug_log_rule() {
   bash "$REPO_ROOT/tests/tools/debug-log/run.sh"
 }
 
+# The routines' two files in step (tools/routines.sh, template plan 1.5c): every link from
+# docs/ROUTINES.md to a site detail finds its heading in docs/SITE_SPECIFIC_ROUTINES.md, and every
+# heading there is linked, so a new site's blank copy cannot leave a detail unfilled unnoticed.
+routines_link_to_site_details() {
+  local differences
+  differences="$(routines_link_differences "$REPO_ROOT/docs/ROUTINES.md" "$REPO_ROOT/docs/SITE_SPECIFIC_ROUTINES.md")"
+  [[ -z "$differences" ]] && return 0
+  log "docs/ROUTINES.md and docs/SITE_SPECIFIC_ROUTINES.md disagree:"
+  printf '%s\n' "$differences" | sed 's/^/    /' >&2
+  return 1
+}
+
+# The check above, tried on known examples (tests/tools/routines/).
+routines_check_refuses_bad_examples() {
+  bash "$REPO_ROOT/tests/tools/routines/run.sh"
+}
+
 # The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
 # redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
 # against a stand-in site; nothing goes over the network.
@@ -600,6 +619,8 @@ run_standards_and_rule_checks() {
   run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
   run_check "The versions check's alerts" versions_check_alerts
   run_check "The debug log rule on known lines" debug_log_rule
+  run_check "The routines link to their site details" routines_link_to_site_details
+  run_check "The routines' link check refuses bad examples" routines_check_refuses_bad_examples
   run_check "The page check on known situations" site_check_situations
   run_check "The deploy's checks on known situations" deploy_situations
 }

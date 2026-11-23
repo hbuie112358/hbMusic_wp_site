@@ -89,7 +89,8 @@ template project starts; until then, a list, not a to-do.
   layer, like the header and footer); the templates `templates/page-with-call-to-action.html` and
   `templates/page-no-title-with-call-to-action.html` (Twenty Twenty-Five 1.5's "Page" and "Page
   No Title" with the part under the content, and the same bottom space) are generic. When the
-  parent theme updates, its two templates are compared with these (`docs/ROUTINES.md`).
+  parent theme updates, its two templates are compared with these (`docs/SITE_SPECIFIC_ROUTINES.md`,
+  "Plugins and theme").
 - `theme.json`'s `customTemplates` and `templateParts` replace the parent's lists instead of
   adding to them: a child theme repeats the parent's entries (without the header's and footer's,
   WordPress renders them as plain `div`s), and compares them when the parent updates.
@@ -155,6 +156,15 @@ A new site's `records/` starts with `README.md` alone (template plan 1.5a): this
 `records/README.md` without its last section, "This site". Each record is created when the site
 first has something to write in it. The settings and hosting records start in the private
 records folder only where the site's repository is public.
+
+## A new site's routines
+
+A new site gets `docs/ROUTINES.md` unchanged (template plan 1.5c) and a blank
+`docs/SITE_SPECIFIC_ROUTINES.md`: this site's file with each heading kept and its text replaced
+by what the heading asks for, filled in as the site is set up (chapter 7's step 6). `bin/check`
+then fails on a heading removed or renamed. When `ROUTINES.md` moves into the starter (2.4), its
+history references to this site's plans (rebuild plan D27, 8j, 1e, 9v) are kept as the reasons
+behind each step, or moved into the handbook if they read as this site's.
 
 ## Tests a new site starts with
 
