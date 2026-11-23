@@ -62,6 +62,9 @@
 	],
 	"settings": {
 		"color": {
+			"custom": false,
+			"customDuotone": false,
+			"customGradient": false,
 			"palette": [
 				{
 					"color": "#000000",
@@ -131,6 +134,14 @@
 		},
 		"layout": {
 			"wideSize": "1100px"
+		},
+		"typography": {
+			"customFontSize": false,
+			"letterSpacing": false,
+			"lineHeight": false
+		},
+		"spacing": {
+			"customSpacingSize": false
 		},
 		"custom": {
 			"color": {
