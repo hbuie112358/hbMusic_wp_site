@@ -2,11 +2,12 @@
 # Current position first (rolling-wave mode); where everything else lives: reference_documents.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-22T09:35:00-05:00
-# The pause commit is on the branch chore/pause-2026-11-22 until the user says "push"; then main.
-# last_commit is main's tip before the pause commit, after #96 (1.5b) merged.
-current_branch: chore/pause-2026-11-22
-last_commit: 3afc5e0
+timestamp: 2026-11-23T10:55:00-05:00
+# The pause commit is on the branch docs/sharing-choice, after its two unpushed commits (4a0f8ca,
+# 95351f0), until the user says "push"; then main. last_commit is that branch's tip before the
+# pause commit; main is at 8168d9b, even with origin/main, after #102.
+current_branch: docs/sharing-choice
+last_commit: 95351f0
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
@@ -281,22 +282,37 @@ last_work: >
   (WP-CLI's rule); the debug log rule now sorts by origin (own code and fatal errors fail, others'
   messages shown); dev-activity-log.sh. Staging deployed (3afc5e0) and Simple History activated
   there, after rerunning the setup script with simple-history added.
+  2026-11-23: Contact Form 7 6.2.6 (#98, Dependabot) and Simple History on live (bin/deploy live,
+  e243788); bin/deploy says "<place> now runs commit: <sha>". Step 1.5 finished: 1.5b recorded
+  (#99); 1.5c the routines split into docs/ROUTINES.md (every site's) and
+  docs/SITE_SPECIFIC_ROUTINES.md (this site's details), bin/check holding their links both ways
+  (#100); 1.5d the status sheet records/status.md, complete (86 items answered, 2 retired, none
+  open), exceptions E1-E11 in records/exceptions.md (E5 private, in data/records/), the expected
+  set records/plugin-set.md; the editor offers only the theme's presets (theme.json switches,
+  dev-editor-presets.sh) and no WordPress version in pages or feeds (Site Hardening 0.3.0),
+  both deployed to staging and live (e366b02, #101); bin/accessibility-scan (axe WCAG 2.2 AA and
+  images without alt, desktop and phone, the pages bin/site-check --print-pages finds) in the
+  monthly check, live 12 of 12 passing; bin/check's status-sheet check (tools/status-sheet.sh,
+  tools/status-sheet-blank.md); #102's first dev-site run failed once (the scan check's probe
+  deleted as the dev admin left Yoast's deleted-page notice for the guide's axe test), fixed by
+  deleting without a user (8168d9b). 9.3: the user kept Home, Book and Songs sharing their own
+  photos. 1.6 started (T12): 1.6a done (95351f0, not pushed), the shared tests look-independent.
 
 next_action: >
-  Resume exactly here: the user runs bin/deploy live and activates Simple History in live's admin
-  (Plugins); Claude then fills live's column of the settings record's Simple History section,
-  adds to docs/ROUTINES.md's data-request routine that Simple History answers WordPress's Export
-  Personal Data tool, and marks 1.5b done in the template plan. Then 1.5c (the routines file),
-  1.5d (the status sheet), 1.6, stage 2. Worth raising soon: bin/deploy's change counts always
-  equal the file count for the site's own code (git archive dates each file with its commit), so
-  a content-only count matters. Kept waiting: the rebuild plan's 9u and 9w; Dependabot's #56.
+  Resume exactly here: push docs/sharing-choice when the user says so (2 commits plus this pause
+  commit). Then 1.6b, the neutral site layer in starter/ (the plan's 1.6 entry and T12): first
+  give site-cta.css's panel button its own theme.json tokens (this site's values kept, its look
+  unchanged), then the starter's light palette, placeholder SVG logo, header, footer, call to
+  action "Get in touch", style.css and screenshot. Then 1.6c (the weekly proof job), stage 2.
+  Kept waiting: the rebuild plan's 9u and 9w, 9o (the host restore test), Dependabot's #56.
 
 
 verification:
-  wordpress_version: 7.1.4 (live, staging, dev site)
-  live_php: 8.4.27
+  wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
+  live_php: 8.4.28 (2026-11-23)
   live_wp_config: mode 600 on live and staging (2026-11-11)
-  staging_php: 8.4.27 (set per website; step 0f corrected)
+  staging_php: 8.4.28 (2026-11-23; set per website; step 0f corrected)
+  status_sheet: records/status.md complete against handbook chapter 12 (version 1), held by bin/check; exceptions E1-E11; expected plugin set in records/plugin-set.md (2026-11-23)
   live_plugins: wordfence 9.1.1 (by hand, 2026-11-11), wordpress-seo 28.8; twentytwentyfive 1.5; UpdraftPlus deleted 2026-11-09 with its old backups and folder (D27, plan 8f); Hostinger's Smart auto-updates set to security updates only for core, themes and plugins on both sites; the rest by hand in the monthly check (8j)
   live_wordfence: two-factor login required for administrators (2026-11-09, tested; recovery codes in the user's password notes), XML-RPC logins disabled, Application Passwords blocked, firewall in Extended Protection (remove before a host move, step 10); visitors' addresses read from REMOTE_ADDR behind Hostinger's CDN (8i); brute-force limits as on staging, read 2026-11-10
   search_console: Domain property under the business Google account, verified 2026-11-09 by a new google-site-verification TXT record; the other owner is the user's other Google account (the older TXT record); baseline in plan 8h
@@ -311,9 +327,9 @@ verification:
   google_cloud: the project made for the Gmail attempt shut down by the user; a different Google account's project was opened by mistake and, as far as known, left unchanged
   staging_2026_11_16: the Privacy Policy rewritten and its slug privacy-policy (the old draft trashed and both trashes emptied by the user); every page's Yoast phrase, title and description set (records/search.md); the Book page at /hire-acoustic-guitarist/, "Main menu" changed to it in the Site Editor; the call-to-action template part's saved copy reset by the user, and Header, Footer and the three page templates found without saved copies; the form's "sent" message typed in its Messages tab; FluentSMTP Delete Logs 60 days; Songs has a new photo (its original kept in data/photos/); theme as of #59 deployed
   local_sites: dev site on 10102 (rebuilt 2026-11-16 with the Book page at /hire-acoustic-guitarist/ and the privacy page chosen in Settings; the dev Editor deveditor, password DEV_EDITOR_PASSWORD in .env; to log in by hand, copy a password with grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy), its Mailpit inbox on 10103; the rest of the 101xx block is free
-  checks: bin/check 35 checks all passing (2026-11-22; with "Every script in bin/ can be run" and "The debug log rule on known lines"); bin/test 15 scenario checks (with dev-activity-log.sh) + 246 browser tests (242 passed, 4 skipped with their reasons) + the final debug-log check (other people's messages shown, not failed), all passing locally and on #96 (2026-11-22); bin/screenshots for before/after looks
-  deployed: by bin/deploy from the user's computer only (1.4e); staging runs 3afc5e0 (with Simple History 5.36.0, activated), live runs 91a01ff (Yoast 28.9, the form.css fix); each place's note in its deploy-note folder
-  dev_site_plugins: Contact Form 7 6.2.5, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
+  checks: bin/check 39 checks all passing (2026-11-23, with the routines' links and the status sheet); bin/test 17 scenario checks (with dev-editor-presets.sh and dev-accessibility-scan.sh) + 246 browser tests (4 skipped with their reasons) + the final debug-log check, all passing on #102 (2026-11-23); bin/accessibility-scan monthly against live; bin/screenshots for before/after looks
+  deployed: by bin/deploy from the user's computer only (1.4e); staging and live run e366b02 (deployed 2026-11-23, with Contact Form 7 6.2.6, Simple History 5.36.0 activated on both, Site Hardening 0.3.0, the editor presets); later commits change only tools, tests and docs; each place's note in its deploy-note folder
+  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
   github_organization: direct-technical-solutions (2026-11-20), holding the handbook; its settings in the handbook's toolkit/github.md; this repository stays on the user's personal account (D17)
   github: the setting Automatically delete head branches on (2026-11-16); required checks check and dev-site on main (strict, also for admins); no deploy job, no environments, no server keys (since 2026-11-22, #95); workflow versions (Mondays 06:41 UTC, bin/versions-check --act); workflows may open pull requests (setting switched on 2026-11-11, default token read-only)
   php_logs: per site in ~/.logs/error_log_<domain with underscores> on the server; log_errors on for live and staging since 2026-11-21 (the user, hPanel; data/records/settings.md)
@@ -327,10 +343,16 @@ verification:
 
 uncommitted_changes:
   - file: none in this repository
-    why: this file and the plan's Current position are the pause commit, on chore/pause-2026-11-22 (1 commit, not pushed; it waits for the user's "push"); main is even with origin/main after #96; no other local branches
+    why: >
+      This file and the plan's Current position are the pause commit, on docs/sharing-choice after
+      its 2 unpushed commits (4a0f8ca the 9.3 record and #102's fix in the plan, 95351f0 1.6a); the
+      branch is not on GitHub and waits for the user's "push". main is even with origin/main
+      (8168d9b, after #102); no other local branches.
   - file: data/ (not versioned)
     why: >
-      New 2026-11-22: data/records/server-setup-1.4e.sh and server-cleanup-1.4e.sh, settings.md's
+      New 2026-11-23: data/records/exceptions-private.md (E5), settings.md's Simple History live
+      column, Wordfence's IP detection, test email and Live Traffic lines. New 2026-11-22:
+      data/records/server-setup-1.4e.sh and server-cleanup-1.4e.sh, settings.md's
       Brevo IPv6 line and Simple History section. Earlier: data/records/ (handover-note.md, settings.md, content-list-2026-11-17.md),
       data/exports/ (staging's and live's exports of 2026-11-17, the theme zips live-upload-181eef0
       to live-upload-a1e5271 with their SHA256SUMS), data/photos/web/howard-buie-share.png. Covered
@@ -339,9 +361,11 @@ uncommitted_changes:
     why: see the pause output's git status of ~/.claude.
   - file: the session scratchpad (deleted when the session ends)
     why: >
-      Throwaway: backups taken for planted faults (all restored and compared), downloaded plugin
-      zips for comparison, run-spec.sh (runs chosen specs as bin/test does), probe plugins and
-      logs. The two server scripts were copied to data/records/. Nothing else needed.
+      Throwaway: backups taken for 1.6a's planted faults (all restored and compared with cmp),
+      stand-in settings and page folders, #102's failed-run log and Playwright traces,
+      run-specs.sh (runs chosen spec files exactly as bin/test's browser_tests does, with
+      SETTINGS_OVERRIDE and CONTENT_OVERRIDE for stand-ins; easily written again from bin/test).
+      Nothing needed after the pause.
 
 pending_decisions:
   - >
@@ -356,9 +380,19 @@ pending_decisions:
     Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to
     review, later.
   - >
-    Deploying to live in the monthly check: the form.css fix and Yoast 28.9 are on main and
-    staging, not live.
-  - Bringing the off-computer backup of data/ up to date (today's records, exports and zips).
+    Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
+    expected senders (a DNS change at Hostinger by the user, with Claude; the template plan's
+    Current position, status sheet 11.2).
+  - >
+    Handbook proposals collected in the template plan (1.5d entries), each for the user's approval
+    one by one, later: 6.9's check to match E7; 7.3's check to the pairs in use (E8); 3.6 naming
+    the generator tag; 7.1's monthly scan of live's pages; the local-staging wording in 2.7 and 3.3.
+  - Raising the dev site's WordPress from 7.1.4 to 7.1.5 (live and staging run 7.1.5).
+  - >
+    The rebuild plan's 9o (the host restore test, recorded as pending in exception E10) and the
+    template plan's two "worth raising" items (a content-only change count in bin/deploy;
+    why Dependabot's 7-day wait did not hold for Contact Form 7 6.2.6).
+  - Bringing the off-computer backup of data/ up to date (the 2026-11-22 and 2026-11-23 records).
   - >
     Left as they are from the review of #93 (the user may ask to fix): the Alpine check reads the
     x86_64 list only (both computers are x86_64); an Alpine build time in the future would show a
@@ -367,7 +401,7 @@ pending_decisions:
     For the user, not done yet (2026-11-20): in Search Console, URL Inspection, Test live URL, then
     Request indexing for the Book page (and any other page whose search wording changed), so
     Google shows the new "book" wording sooner; Google still chooses the snippet it shows.
-  - Whether to look into the Site Hardening check's leftover probe drafts (seen 2026-11-20; none on the dev site at this pause, after its rebuilds and test runs of 2026-11-21).
+  - Whether to fix the Site Hardening check's leftover probe drafts (six "Unfiltered HTML probe" drafts on the dev site, 2026-11-23; harmless, drafts trigger no Yoast notice; dev-site-hardening.sh does not clean up after itself).
   - Optional, from the review of #74: a pasted-code video on a test page (the CSS for pasted players is kept but no longer shown on a test page; live has none). Claude advised leaving it out.
   - >
     Optional tidy-up: keep Search Console in the business Google account only (remove the other
@@ -383,16 +417,19 @@ pending_decisions:
 
 reference_documents: |
   - docs/planning/template-plan.md: the active plan (since 2026-11-20), the brochure-site
-    template. Current position, Decisions T1-T11, stage 1 and stage 2 steps.
+    template. Current position, Decisions T1-T12, stage 1 and stage 2 steps.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template. Current position
     (9u kept waiting; item 5 is the template plan's step 1.4), Decisions D1-D34, the steps with
     their status and details (D29's story is step 5g), "Earlier positions (archived)" at the end.
   - docs/planning/template-notes.md: what a new site sets differently, and what is generic.
   - CLAUDE.md (the project's): what is true of this project, its commands, tests and rules.
   - docs/ENVIRONMENTS.md: the intended differences between the dev site, staging and live.
-  - docs/ROUTINES.md: the monthly site check.
-  - docs/SITE_CHECKLIST.md: this site's checklist, to become its status sheet against the
-    handbook's chapter 12 at step 9 (H16, H99).
+  - docs/ROUTINES.md: every DTS site's recurring care (deploying, the monthly check, alerts,
+    data requests); docs/SITE_SPECIFIC_ROUTINES.md: this site's details it links to.
+  - records/: status.md (the status sheet against handbook chapter 12), exceptions.md (E1-E11),
+    plugin-set.md (the expected set), search.md; README.md explains them.
+  - docs/SITE_CHECKLIST.md: this site's older checklist, which records/status.md was built from
+    (records/README.md).
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without
     the user's approval of that change): the DTS Operations Handbook, version 1; WORKING_DRAFT.md
     holds its open items.
@@ -402,9 +439,10 @@ reference_documents: |
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this project's repository and ~/dev/dts-handbook).
-  2. working_mode is rolling-wave: read the template plan's Current position ("Resume exactly
-     here"), its Decisions table and the entries of step 1.5 (1.5b to 1.5d) and 1.6; and the
-     rebuild plan's Current position (9u and 9w waiting).
-  3. Then next_action: the user's bin/deploy live and Simple History's activation on live, then
-     finishing 1.5b. At a step's end, say it is a good moment to compact, if the context is past
-     about half.
+  2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
+     (T12 is 1.6's) and the entries of step 1.6 (1.6a done, 1.6b and 1.6c) and stage 2's 2.1; and
+     the rebuild plan's Current position (9u and 9w waiting).
+  3. Then next_action: the push of docs/sharing-choice when the user says so, then 1.6b, starting
+     with the call-to-action button's own tokens. The user cleared the context at this pause (not
+     a compaction), so everything needed is in these files. At a step's end, say it is a good
+     moment to compact, if the context is past about half.
