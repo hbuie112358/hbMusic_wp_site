@@ -190,6 +190,8 @@ The privacy policy promises a reply within 30 days, usually within a few days.
    FluentSMTP → Email Logs, searched for the address (failed entries only, kept 60 days).
    Brevo's delivery record is kept there for 3 months; whether it can be deleted earlier, and
    where in Brevo, is still to be found (the handbook's chapter 10, H56, says it is deleted there).
+   On live, Tools → Export Personal Data with the address: Simple History, the activity log,
+   adds what that person did on the site (its own Compliance note); kept 30 days.
 2. **To see it:** reply with what was found.
 3. **To delete it:** delete those emails and log entries, reply that it is done, and note the
    date and the address in `data/deletion-requests.txt` (not versioned, never committed).

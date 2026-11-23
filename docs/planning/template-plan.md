@@ -28,15 +28,16 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   #92), 1.4d-4 done (the weekly warning for the test server's packages, raised with no wait);
   1.4e done (2026-11-22: the server set up, staging and live deployed with `bin/deploy`, GitHub's
   staging deploy, key and environment removed, #95; the handbook's H103), so step 1.4 is done;
-  1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); 1.5b built and
-  merged (#96), deployed to staging and activated there (3afc5e0, after adding `simple-history`
-  to both places' server settings by rerunning the setup script). **Resume exactly here:** the
-  user runs `bin/deploy live` and activates Simple History in live's admin; then Claude fills
-  live's column of the settings record's Simple History section, adds a line to
-  `docs/ROUTINES.md`'s data-request routine (Simple History answers WordPress's Export Personal
-  Data tool), and marks 1.5b done. Then 1.5c. Worth raising soon: every deploy's change counts
-  equal the files' count for the site's own code (`git archive` dates each file with its
-  commit), so the planned content-only count matters more than first thought.
+  1.5 under way (split in four, 2026-11-22): 1.5a done (`records/README.md`); 1.5b done (#96;
+  Simple History on staging and live, activated on both, live at e243788 on 2026-11-23 with
+  Contact Form 7 6.2.6). **Next: 1.5c,** the routines file. Worth raising soon: (1) every
+  deploy's change counts equal the files' count for the site's own code (`git archive` dates
+  each file with its commit), so the planned content-only count matters more than first
+  thought; (2) Dependabot's 7-day wait did not hold for Contact Form 7 6.2.6 (published on
+  WordPress.org 2026-11-23 02:28 GMT, #98 opened 10:17 GMT the same day and merged itself):
+  cause not known yet; hypotheses, each to confirm or rule out: a security update (those skip
+  the wait; the repository's Dependabot alerts would show it), or WPackagist giving Dependabot
+  no usable release time (#98's details against WPackagist's listing would show it).
 - **Then, in order:** 1.5 and 1.6 (stage 1, in this repository), then 2.1 to 2.5 (stage 2, the
   shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -548,13 +549,16 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     here); a customer's private repository keeps everything in `records/`. A record is created
     when there is something to write, not ahead of time. The starter's copy, without this site's
     section, is noted in `template-notes.md` for 2.4.
-  - [~] 1.5b The activity log: Simple History pinned in `site-packages/` (Dependabot, `bin/deploy`),
+  - [x] 1.5b (#96; live 2026-11-23, e243788) The activity log: Simple History pinned in `site-packages/` (Dependabot, `bin/deploy`),
     checked first under the plugin rules (`AI_SECURITY.md` section 4; no data kept in its own
     folder, H103); a dev site test that it records a page edit and a plugin switched off, shown
     failing first; H94's question answered on the dev site (does it log the SEO plugin's
     fields?); deployed and activated on staging and live; the privacy policy checked for
     "logins and changes are recorded".
-    **Built 2026-11-22 (deploying to staging and live still open):**
+    **Built 2026-11-22; deployed to staging (3afc5e0, 2026-11-22) and live (e243788, 2026-11-23),
+    activated by the user on both with the defaults (the settings record, `data/records/`); its
+    Compliance note says it answers WordPress's Export Personal Data tool, now in
+    `docs/ROUTINES.md`'s data-request routine:**
     - Simple History 5.36.0 (since 2010, about 300,000 sites, rated 98%; released in October, past
       the wait) pinned in `site-packages/`. Read before use: its outside calls only for paid
       add-ons and a GitHub readme on request, no telemetry found, data in its own tables, the file
