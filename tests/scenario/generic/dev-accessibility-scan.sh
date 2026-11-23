@@ -18,8 +18,12 @@ readonly PROBE_IMAGE='/wp-includes/images/w-logo-blue.png'
 
 wp_cli() { dev_compose run --rm -T cli wp --user="$DEV_ADMIN_USER" "$@" </dev/null; }
 
+# Deleted without a user: Yoast SEO saves a "You just deleted a Page" notice for the user who
+# deletes a published page and shows it on that user's next admin page, where the dev admin's
+# browser tests would meet it (its icon has no alt text). With no user, it is saved for no one.
 remove_probe_page() {
-  [[ -n "$PROBE_PAGE_ID" ]] && wp_cli post delete "$PROBE_PAGE_ID" --force >/dev/null 2>&1
+  [[ -n "$PROBE_PAGE_ID" ]] &&
+    dev_compose run --rm -T cli wp post delete "$PROBE_PAGE_ID" --force </dev/null >/dev/null 2>&1
   return 0
 }
 
