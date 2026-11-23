@@ -18,6 +18,8 @@ source "$REPO_ROOT/tools/site-settings.sh"
 source "$REPO_ROOT/tools/site-packages.sh"
 # shellcheck source=tools/routines.sh
 source "$REPO_ROOT/tools/routines.sh"
+# shellcheck source=tools/status-sheet.sh
+source "$REPO_ROOT/tools/status-sheet.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
@@ -350,6 +352,26 @@ routines_check_refuses_bad_examples() {
   bash "$REPO_ROOT/tests/tools/routines/run.sh"
 }
 
+# The status sheet held to the site standard (tools/status-sheet.sh, template plan 1.5d-4): every
+# item of the blank answered, done or exception, every recorded exception it links there, and every
+# file it names still in the repository. A new site has no sheet until it starts one (the
+# handbook's chapter 7, step 6), which is said, not failed.
+status_sheet_complete() {
+  local sheet="$REPO_ROOT/records/status.md" problems
+  [[ -f "$sheet" ]] || { log "no records/status.md yet; it is started from tools/status-sheet-blank.md"; return 0; }
+  problems="$(status_sheet_problems "$sheet" "$REPO_ROOT/tools/status-sheet-blank.md" \
+    "$REPO_ROOT/records/exceptions.md" "$REPO_ROOT")"
+  [[ -z "$problems" ]] && return 0
+  log "records/status.md is not complete:"
+  printf '%s\n' "$problems" | sed 's/^/    /' >&2
+  return 1
+}
+
+# The check above, tried on known examples (tests/tools/status-sheet/).
+status_sheet_check_refuses_bad_examples() {
+  bash "$REPO_ROOT/tests/tools/status-sheet/run.sh"
+}
+
 # The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
 # redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
 # against a stand-in site; nothing goes over the network.
@@ -621,6 +643,8 @@ run_standards_and_rule_checks() {
   run_check "The debug log rule on known lines" debug_log_rule
   run_check "The routines link to their site details" routines_link_to_site_details
   run_check "The routines' link check refuses bad examples" routines_check_refuses_bad_examples
+  run_check "The status sheet answers every item" status_sheet_complete
+  run_check "The status sheet's check refuses bad examples" status_sheet_check_refuses_bad_examples
   run_check "The page check on known situations" site_check_situations
   run_check "The deploy's checks on known situations" deploy_situations
 }
