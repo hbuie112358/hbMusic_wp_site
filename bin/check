@@ -22,6 +22,8 @@ source "$REPO_ROOT/tools/routines.sh"
 source "$REPO_ROOT/tools/status-sheet.sh"
 # shellcheck source=tools/theme-tokens.sh
 source "$REPO_ROOT/tools/theme-tokens.sh"
+# shellcheck source=tools/site-layer.sh
+source "$REPO_ROOT/tools/site-layer.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
@@ -98,6 +100,7 @@ in_analysis() {
     -v "$REPO_ROOT/themes:/app/themes:ro" \
     -v "$REPO_ROOT/plugins:/app/plugins:ro" \
     -v "$REPO_ROOT/config/dev-mu-plugins:/app/config/dev-mu-plugins:ro" \
+    -v "$REPO_ROOT/starter:/app/starter:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
 
@@ -439,13 +442,71 @@ playwright_versions_match() {
 # theme.json's schema must describe the WordPress version the site runs (compose.dev.yaml): an
 # older schema hides settings the site has, a newer one offers settings it silently ignores.
 theme_json_schema_matches_wordpress() {
-  local wordpress_version schema_version
+  local theme_json="${1:-$SITE_THEME_DIR/theme.json}" wordpress_version schema_version
   wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.dev.yaml")"
   # [$] matches the literal "$schema" key without looking like a shell variable.
-  schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$SITE_THEME_DIR/theme.json")"
+  schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$theme_json")"
   [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
-  log "${SITE_THEME_DIR#"$REPO_ROOT"/}/theme.json uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
+  log "${theme_json#"$REPO_ROOT"/} uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
   return 1
+}
+
+# The starter (starter/, template plan 1.6b): the site layer a new site begins from. Its own
+# settings and pages, its look's tokens and its files are held to the same rules as this site's,
+# so it never drifts from the theme code it stands on. Its theme is checked against this site's
+# component stylesheets and theme files, which it is assembled with (1.6c) until 2.3 moves them.
+readonly STARTER_DIR="$REPO_ROOT/starter"
+
+starter_site_json_is_valid() {
+  local problems
+  problems="$(site_settings_problems "$STARTER_DIR/site.json")" || {
+    log "starter/site.json is not valid JSON (jq's message is above)"
+    return 1
+  }
+  problems+="$(site_settings_missing_test_pages "$STARTER_DIR/site.json" "$STARTER_DIR/dev-content")"
+  [[ -z "$problems" ]] && return 0
+  log "starter/site.json does not follow the rules in tools/site-settings.jq, or lacks a page's content:"
+  printf '%s\n' "$problems" | sed 's/^/    /' >&2
+  return 1
+}
+
+starter_defines_every_token() {
+  local differences
+  differences="$(theme_token_differences "$SITE_THEME_DIR/assets/css/components" "$STARTER_DIR/theme/theme.json")"
+  [[ -z "$differences" ]] && return 0
+  log "The starter's design tokens are incomplete:"
+  printf '%s\n' "$differences" | sed 's/^/    /' >&2
+  return 1
+}
+
+starter_holds_the_site_layer() {
+  local differences
+  differences="$(site_layer_differences "$REPO_ROOT/tools/site-layer-files.txt" "$STARTER_DIR/theme" "$SITE_THEME_DIR")"
+  [[ -z "$differences" ]] && return 0
+  log "starter/theme/ and tools/site-layer-files.txt disagree:"
+  printf '%s\n' "$differences" | sed 's/^/    /' >&2
+  return 1
+}
+
+# The check above, tried on known examples (tests/tools/site-layer/).
+site_layer_check_refuses_bad_examples() {
+  bash "$REPO_ROOT/tests/tools/site-layer/run.sh"
+}
+
+# The starter names nothing of this site but the shared theme code's prefix (the site's slug),
+# which its PHP and patterns must use until template plan 2.3 renames that prefix.
+starter_names_nothing_of_this_site() {
+  local slug name patterns=()
+  slug="$(site_setting .slug)"
+  while IFS= read -r name; do
+    [[ "$name" == "$slug" ]] || patterns+=(-e "$name")
+  done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
+  ((${#patterns[@]} > 0)) || return 0
+  ! grep -rniF "${patterns[@]}" "$STARTER_DIR"
+}
+
+starter_theme_json_schema_matches_wordpress() {
+  theme_json_schema_matches_wordpress "$STARTER_DIR/theme/theme.json"
 }
 
 # The theme's component stylesheets load by name (plan D29): <PREFIX>_COMPONENT_STYLES and
@@ -675,6 +736,13 @@ run_analysis_and_file_checks() {
   run_check "Component stylesheets match their list" component_styles_match_files
   run_check "The theme defines every design token used" theme_defines_every_token
   run_check "The token check refuses bad examples" theme_token_check_refuses_bad_examples
+  run_check "Starter: site.json follows its rules" starter_site_json_is_valid
+  run_check "Starter: theme.json schema matches WordPress" starter_theme_json_schema_matches_wordpress
+  run_check "Starter: defines every design token used" starter_defines_every_token
+  run_check "Starter: holds exactly the site layer" starter_holds_the_site_layer
+  run_check "The site-layer check refuses bad examples" site_layer_check_refuses_bad_examples
+  run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
+  run_check "Starter: static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
   run_check "Components appear on the example pages" components_shown_on_example_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check

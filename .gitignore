@@ -18,6 +18,7 @@
 !/phpcs.xml.dist
 !/phpstan.neon.dist
 !/site.json
+!/starter/
 !/site-packages/
 !/themes/
 /themes/*

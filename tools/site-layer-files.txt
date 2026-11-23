@@ -1,0 +1,15 @@
+# The site layer: the files of a site's child theme that make it this site rather than another
+# (template plan 1.6b, T13; docs/planning/template-notes.md). A starter or a new site brings its own
+# copy of each, at the same path; every other file of the theme is generic, shared by every site
+# (until template plan 2.3 moves it into the shared components plugin). Read by
+# tools/site-layer.sh; one path per line, relative to the theme's folder.
+#
+# Besides these, a site layer may add pictures under assets/images/ (its logo, named by its own
+# pattern); the theme's generic pictures (the grain) stay. screenshot.png joins this list at 1.6c.
+theme.json
+style.css
+parts/header.html
+parts/footer.html
+parts/call-to-action.html
+patterns/site-logo.php
+includes/site-facts.php

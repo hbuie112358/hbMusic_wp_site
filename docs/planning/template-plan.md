@@ -40,8 +40,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   weekly only), split in three (see its entry): 1.6a done (`95351f0`, not yet pushed: the shared
   tests no longer assume this site's look or names; the components' `hbmusic` prefix stays for
   2.3).
-- **Next: 1.6b-2,** the `starter/` folder (T13). 1.6b-1 done (2026-11-23): this site's code
-  ready for another look, its own look unchanged (all 24 screenshots identical). The
+- **Next: 1.6c,** the starter's proof on a dev site of its own (its entry names two points found
+  at 1.6b-2 to settle there). 1.6b done (2026-11-23): 1.6b-1, this site's code ready for another
+  look, its own look unchanged (all 24 screenshots identical); 1.6b-2, the `starter/` folder,
+  held by seven new `bin/check` rules. The
   project's `CLAUDE.md` now names each language's standard ("Coding standards by language"); the
   review of the theme's three scripts against the strict standards (2026-11-23) became step 1.7.
 - **Worth raising soon:** (1) every
@@ -720,7 +722,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       `bin/check` requiring every token the component stylesheets use to be defined in each
       `theme.json`. Proven by `bin/screenshots` showing no change, the redirect, structured-data
       and policy tests, and the new check failing on a removed token.
-    - [ ] **1.6b-2** The `starter/` folder: `README.md` (with the contrast table, each pair the
+    - [x] **1.6b-2** (done 2026-11-23; the site-layer files listed in
+      `tools/site-layer-files.txt`, checked by `tools/site-layer.sh`; `bin/check` also holds the
+      starter's `site.json` and pages, schema, tokens, PHPCS and PHPStan) The `starter/` folder: `README.md` (with the contrast table, each pair the
       components use, the call-to-action panel's text checked at the grain's brightest speck),
       `site.json` (Home, About, Contact, Privacy Policy; Site Hardening and Editing Help),
       `theme/` holding only the site layer (`theme.json` with the light palette, `style.css`,
@@ -733,7 +737,14 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     (a theme assembled from this theme's generic files and `starter/theme/` into a folder git
     ignores, mounted read-only, standing in for 2.4's starter theme), the generic and component
     tests run on it, as a job in `check.yml` on the Monday schedule and the "Run workflow" button
-    only, never on pull requests; then the starter's `screenshot.png`, shot from that dev site.
+    only, never on pull requests; then the starter's `screenshot.png`, shot from that dev site
+    (added to `tools/site-layer-files.txt` then). Two points found at 1.6b-2, to settle here:
+    the components' example page holds stand-in videos, while the starter's policy allows no
+    YouTube frames (a site without videos needs none), so the policy test there may fail: the
+    likely answer is that the click-to-load videos bring their own sources with them (T5's
+    plugin), not that every site allows YouTube; and the assembled theme's folder name must
+    match `starter/site.json`'s `theme` (`dts-starter`), which `bin/dev-site` checks against
+    `themes/`, so the assembly needs a themes folder of its own or an option for it.
 - [ ] **1.7 The theme's scripts to the strict standards** (the user, 2026-11-23): the review of
   `assets/js/` against `~/.claude/TYPESCRIPT_STANDARDS.md` (production code, strictly) found
   seven items, all taken, done before 2.3 makes the scripts shared code. Their behavior is held
