@@ -11,7 +11,8 @@
 # (pageList, pages, siteRequiresLogin, as fakes/curl reads them); curlMissing (run with every
 # command but curl, and no stand-in); expectStatus; expectOutputNaming;
 # expectNotAsked (addresses that must never be asked for); expectAskedTimes ({address: count});
-# expectAskedAtLeast ({address: count}, where the exact number depends on timing).
+# expectAskedAtLeast ({address: count}, where the exact number depends on timing); expectStdout (the
+# lines printed on standard output, exactly; left out: nothing).
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -69,7 +70,19 @@ run_site_check() {
   mapfile -t login < <(login_environment "$scenario")
   search_path="$(search_path_for "$scenario")" || exit 1
   env -u SITE_CHECK_USER -u SITE_CHECK_PASSWORD PATH="$search_path" FAKE_SITE_DIR="$work/site" "${login[@]}" \
-    bash "$work/repo/bin/site-check" "${options[@]}" "$(jq -r '.address // "https://site.test"' "$scenario")" >"$work/output.txt" 2>&1
+    bash "$work/repo/bin/site-check" "${options[@]}" "$(jq -r '.address // "https://site.test"' "$scenario")" >"$work/stdout.txt" 2>"$work/stderr.txt"
+  local status=$?
+  cat "$work/stderr.txt" "$work/stdout.txt" >"$work/output.txt"
+  return "$status"
+}
+
+# What the run printed on standard output, exactly: the list --print-pages gives, and nothing at
+# all otherwise, since the log goes to standard error and the list may be piped on.
+stdout_problems() {
+  local scenario="$1" work="$2" expected
+  expected="$(jq -r '.expectStdout // [] | .[]' "$scenario")"
+  [[ "$(cat "$work/stdout.txt")" == "$expected" ]] && return 0
+  printf 'standard output was "%s", expected "%s"\n' "$(paste -sd ' ' "$work/stdout.txt")" "$(paste -sd ' ' <<<"$expected")"
 }
 
 # No requests file means nothing was asked for at all.
@@ -84,6 +97,7 @@ outcome_problems() {
   local scenario="$1" work="$2" status="$3" expected naming address count
   expected="$(jq -r '.expectStatus' "$scenario")"
   [[ "$status" == "$expected" ]] || printf 'exit status %s, expected %s\n' "$status" "$expected"
+  stdout_problems "$scenario" "$work"
   while IFS= read -r naming; do
     grep -qF -- "$naming" "$work/output.txt" || printf 'its output does not name %s\n' "$naming"
   done < <(jq -r '.expectOutputNaming // [] | .[]' "$scenario")

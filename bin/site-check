@@ -7,7 +7,11 @@
 # files a few seconds after a deploy. Knows nothing of any one site; bin/deploy runs it after a
 # copy, and bin/test runs it against the dev site.
 #
-#   bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>
+#   bin/site-check [--deadline <seconds>] [--retry-every <seconds>] [--print-pages] <address>
+#
+# --print-pages: once every page passed, the pages checked are printed on standard output, one
+# per line, for a tool that works on the same pages (bin/accessibility-scan); the log is on
+# standard error, and nothing is printed when a page fails.
 #
 # The pages come from WordPress's page list (/wp-json/wp/v2/pages), which answers visitors with
 # published pages only. A list that does not answer, is not a list or is empty fails, never
@@ -39,6 +43,7 @@ readonly WHOLE_NUMBER='^[0-9]+$'
 
 DEADLINE_SECONDS="$DEFAULT_DEADLINE_SECONDS"
 RETRY_SECONDS="$DEFAULT_RETRY_SECONDS"
+PRINT_PAGES=false
 SITE_ADDRESS=""
 THEME_BODY_CLASS=""
 # Each response's body and headers, in a private folder removed however the script ends.
@@ -47,7 +52,7 @@ WORK_DIR=""
 log() { printf '%s [site-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 usage_error() {
   log "$*"
-  log "usage: bin/site-check [--deadline <seconds>] [--retry-every <seconds>] <address>"
+  log "usage: bin/site-check [--deadline <seconds>] [--retry-every <seconds>] [--print-pages] <address>"
   exit 2
 }
 
@@ -67,6 +72,7 @@ read_arguments() {
     case "$1" in
       --deadline) require_whole_number "$1" "${2:-}" && DEADLINE_SECONDS="$2" && shift 2 ;;
       --retry-every) require_whole_number "$1" "${2:-}" && RETRY_SECONDS="$2" && shift 2 ;;
+      --print-pages) PRINT_PAGES=true && shift ;;
       -*) usage_error "unknown option $1" ;;
       *) [[ -z "$SITE_ADDRESS" ]] || usage_error "one address only"; SITE_ADDRESS="${1%/}" && shift ;;
     esac
@@ -244,12 +250,16 @@ main() {
   THEME_BODY_CLASS="wp-child-theme-$(site_setting .theme)" || exit 2
   WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }
   trap remove_work_dir EXIT
-  local pages="$WORK_DIR/pages.txt" count
+  # check_until_deadline narrows its list to the pages still failing, so it gets a copy and the
+  # whole list stays for --print-pages.
+  local pages="$WORK_DIR/pages.txt" pending="$WORK_DIR/pending.txt" count
   read_page_list "$pages" || exit 1
+  cp "$pages" "$pending"
   count="$(wc -l <"$pages")"
   log "checking $count page(s) of $SITE_ADDRESS"
-  check_until_deadline "$pages" || exit 1
+  check_until_deadline "$pending" || exit 1
   log "all $count page(s) passed"
+  [[ "$PRINT_PAGES" == false ]] || cat "$pages"
 }
 
 main "$@"

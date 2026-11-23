@@ -1,0 +1,8 @@
+{
+  "description": "--print-pages: every page passes, so it prints the pages it checked, one per line, and nothing else on standard output.",
+  "options": ["--deadline", "0", "--print-pages"],
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": {},
+  "expectStatus": 0,
+  "expectStdout": ["https://site.test/", "https://site.test/about/"]
+}

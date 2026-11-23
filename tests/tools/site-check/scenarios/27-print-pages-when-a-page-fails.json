@@ -1,0 +1,8 @@
+{
+  "description": "--print-pages with a failing page: it fails and prints no list, so nothing downstream works on a site that does not answer.",
+  "options": ["--deadline", "0", "--print-pages"],
+  "pageList": { "links": ["/", "/about/"], "total": 2 },
+  "pages": { "/about/": { "status": 500 } },
+  "expectStatus": 1,
+  "expectOutputNaming": ["https://site.test/about/", "500"]
+}

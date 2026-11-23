@@ -14,5 +14,12 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["playwright.config.ts", "screenshots.config.ts", "specs/**/*.ts", "screenshots/**/*.ts"]
+  "include": [
+    "playwright.config.ts",
+    "screenshots.config.ts",
+    "accessibility-scan.config.ts",
+    "specs/**/*.ts",
+    "screenshots/**/*.ts",
+    "accessibility-scan/**/*.ts"
+  ]
 }
