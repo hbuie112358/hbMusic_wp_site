@@ -40,17 +40,10 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   weekly only), split in three (see its entry): 1.6a done (`95351f0`, not yet pushed: the shared
   tests no longer assume this site's look or names; the components' `hbmusic` prefix stays for
   2.3).
-- **Next: 1.6b,** the neutral site layer in `starter/` (not created yet). It starts with a fix
-  found while reading for 1.6a: `site-cta.css` gives the panel's button the page's background
-  (`--wp--preset--color--base`) and the panel's text colour (`--wp--custom--color--on-cta`),
-  white on white in a light look; the button gets its own tokens in `theme.json`, with this
-  site's values, so this site's look does not change. Not designed yet, so Claude proposes each
-  to the user at 1.6b's start, as a complete design: which files `starter/` holds (the site
-  layer of template-notes.md: `theme.json`, `parts/`, the logo pattern and image, the page
-  templates, `style.css`, `screenshot.png`), the new tokens' names, the palette's actual
-  colours with their contrast, whether the starter brings a contact page for "Get in touch" to
-  link to, and how 1.6c's dev site takes the starter's layer in place of this site's (through
-  `site.json`, the compose mounts or an option of `bin/dev-site`).
+- **Next: 1.6b-1,** designed and decided (T13, 2026-11-23): this site's code made ready for
+  another look, its own look and behavior unchanged; then 1.6b-2, the `starter/` folder. The
+  project's `CLAUDE.md` now names each language's standard ("Coding standards by language"); the
+  review of the theme's three scripts against the strict standards (2026-11-23) became step 1.7.
 - **Worth raising soon:** (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -61,7 +54,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   no usable release time (#98's details against WPackagist's listing would show it).
 - **Then, in order:** 1.6c (a job in `check.yml` on the Monday schedule and the "Run workflow"
   button only, building the dev site with the starter's layer and running the generic and
-  component tests on it), which ends stage 1; then 2.1 to 2.5 (stage 2, the shared repositories).
+  component tests on it); 1.7 (the theme's scripts to the strict standards), which ends stage 1;
+  then 2.1 to 2.5 (stage 2, the shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
@@ -92,6 +86,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 | T10 | A component's tests find the component themselves, on the site's own test pages, by its class, and run on every page that uses it; the components also bring one neutral page holding every component, each in its own block, built by every dev site outside the menu, as a baseline (changed 2026-11-21 from a page per component, the user: twelve pages more would add back run time the tests had just lost; one page costs a few seconds and keeps what the baseline is for); the generic "every page" tests (accessibility, policy, the frame, PHP notices) keep running on all the site's pages (the user, 2026-11-21). | The user: a component tested only on its own page tests the component, not the component on the page, and what matters is how it behaves on the site's pages, with the site's look, layout and content around it. Proven by this site's history: the click-to-load videos passed on the dev site's stand-in pages and showed a black space above each video on live, caused by WordPress's own video block stylesheet, which the stand-ins did not load (9v, 2026-11-17). The baseline page still matters: the shared plugin's tests must run without any one site (in its own repository), a component no site page uses yet is still tested, and a failure there points at the component. Weighed and set aside: only the component's own page (misses the site's context); `site.json` mapping pages to components (every site fills it in, and a missing entry skips a test silently); keeping this site's page names in the component tests until 2.3 (postpones the hard part). The black-space kind of bug is caught only when the site's test pages use real blocks, not stand-ins, the rule since that bug. |
 | T11 | `bin/deploy staging\|live` (the user, 2026-11-21) follows handbook chapter 2's eight steps from the user's computer, each place through its own key made there and restricted on the server to rsync's daemon mode with that place's folders (no shell, never the other place), named in the user's SSH settings; GitHub's deploy job and key are removed. Its parts: (1) "tested" means the commit's files are exactly those of a commit whose required checks passed: its pull request's last commit with an identical tree, or the commit itself (the weekly run, the button); (2) it shows the commits between the server's note and the new commit and waits for "yes"; (3) live accepts only staging's commit, where the site has staging; (4) it copies the downloaded plugins (built from `site-packages/composer.lock` and checked against WordPress.org's checksums first), then the site's own plugins, then the theme, comparing by content, refuses to lower a plugin's version found on the server, and names a plugin folder new on the server, to activate by hand; (5) the commit into a note folder; (6) the page cache from `site.json` (none here); (7) `bin/site-check`; (8) the PHP error log's new lines, through a read-only folder. Three points the user agreed: the handbook's wording gains the downloaded plugins (proposed at 1.4e, approved before it is written); `bin/deploy` needs `gh` on the host, beside Docker and `jq`; the search checks in the page check are a later part.| The handbook (H8, H9) was decided after this site's GitHub-based staging deploy was built; this site has run on a recorded exception (D33) until `bin/deploy` exists. A rebase merge gives the commit on `main` a new name, so no check ran on it: checked 2026-11-21, `main`'s 488f547 has `check` and `dev-site` skipped, #89's tested 24f7c18 has both passed, and both have the tree `c664229`; only a merged pull request's last commit can therefore be deployed, which a rollback to an earlier pull request still allows. Hostinger installs security updates by itself (8j), so a plugin on the server can be newer than its pin, and a deploy that mirrors the folder would quietly put the older version back. `gh` on the host, rather than in a container with a token passed in, keeps the secret handling out of the script; the user already runs it. |
 | T12 | The neutral defaults (1.6) are built in this repository, in a `starter/` folder that becomes `dts-site-starter`'s site layer at 2.4, with a light placeholder look (white, dark text, one blue accent); their proof runs weekly, never on pull requests (the user, 2026-11-23). | Stage 1 proves each piece here before it moves (T1). Reading the tests first showed that the shared tests assume this site's look and names (the call-to-action panel must be green, the booking page's address is this site's), so a new site would fail them; making them look-independent is most of the work, and a look the opposite of this dark site's catches any test still relying on it. The user did not want minutes added to every pull request; the neutral layer changes rarely, and the weekly run (Mondays, already automatic, GitHub emailing a failure) shows a break within a week. |
+| T13 | 1.6b's design (the user, 2026-11-23): split in two, this site's code first (1.6b-1) and the `starter/` folder second (1.6b-2); the site's facts moved into a site-layer file now, not at 2.3; the light palette as proposed (white `#ffffff`, text `#1b1f24`, paragraphs `#3a4048`, accent `#1d5fc2`, deep accent `#163f7a`, links `#1a55ad`, raised `#f2f4f7`, lines `#dde2e8`, muted `#5b6470`, error `#b42318`), kept as long as every pair in use passes WCAG AA; this site's form settings as the starter's stand-in until 2.4; the starter's screenshot moved to 1.6c. Token names spelled out where a site's designer reads them (`custom.callToAction.…` in `theme.json`, which allows no comments); the short `site-cta` class kept, its stylesheet saying what CTA stands for. | Reading the stylesheets for a light look found more than the planned button fix: the video play triangle and the carousel arrows take the text color (dark on their dark plates in a light look) and `form.css` fixes `color-scheme: dark`; and `functions.php`'s old-address list sends `/contact/` to this site's Book page, which would take a starter's Contact page away. The class is not renamed: it is in the tests, the component list, the example page and any copy of the part saved in the Site Editor on staging or live, which would silently lose its look. Contrast computed with WCAG's formula for each pair the components use; the tightest, muted text on the placeholder, is 4.60. |
 
 ## Steps
 
@@ -713,13 +708,51 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     against its token and the page behind it, not as green; the booking form's page from
     `site.json`, not this site's address; this site's names out of the generic and component
     tests. Proven by this site's tests still passing.
-  - [ ] **1.6b** The neutral site layer in `starter/`: a light palette (white, dark text, one blue
-    accent, every pair in use at least WCAG AA), a placeholder SVG logo, the header and footer, a
-    call to action "Get in touch" to a contact page, `style.css` naming it a starter, its own
-    screenshot.
-  - [ ] **1.6c** The proof: the dev site built with the starter's layer in place of this site's,
-    the generic and component tests run on it, as a job in `check.yml` on the Monday schedule
-    and the "Run workflow" button only, never on pull requests.
+  - [ ] **1.6b** The neutral site layer (T13), in two parts:
+    - [ ] **1.6b-1** This site's code made ready for another look, its own look and behavior
+      unchanged: `theme.json` tokens for what a light look would break (the call-to-action
+      colors as `custom.callToAction.background`, `text`, `buttonBackground` and `buttonText`,
+      replacing `ctaBackground` and `onCta`; `custom.video.playIconColor`;
+      `custom.carousel.buttonColor`; `custom.colorScheme` for `form.css`), each with this site's
+      present value; `site-cta.css` opening with "CTA: call to action"; the site's facts (old
+      addresses, areas served, the organization's type, the policy's outside sources, the link
+      example) out of `functions.php` into the site-layer file `includes/site-facts.php`;
+      `bin/check` requiring every token the component stylesheets use to be defined in each
+      `theme.json`. Proven by `bin/screenshots` showing no change, the redirect, structured-data
+      and policy tests, and the new check failing on a removed token.
+    - [ ] **1.6b-2** The `starter/` folder: `README.md` (with the contrast table, each pair the
+      components use, the call-to-action panel's text checked at the grain's brightest speck),
+      `site.json` (Home, About, Contact, Privacy Policy; Site Hardening and Editing Help),
+      `theme/` holding only the site layer (`theme.json` with the light palette, `style.css`,
+      `parts/` with the call to action "Get in touch" to `/contact/`, the logo pattern and a
+      placeholder SVG, `includes/site-facts.php`), `dev-content/` with neutral text, the Contact
+      page holding the form's shortcode (this site's form settings in `config/` as a stand-in
+      until 2.4). `bin/check`: `starter/theme/` holds exactly the site-layer files, both ways,
+      and `starter/` names nothing of this site except the `hbmusic` prefix until 2.3.
+  - [ ] **1.6c** The proof: the dev site built with the starter's layer in place of this site's
+    (a theme assembled from this theme's generic files and `starter/theme/` into a folder git
+    ignores, mounted read-only, standing in for 2.4's starter theme), the generic and component
+    tests run on it, as a job in `check.yml` on the Monday schedule and the "Run workflow" button
+    only, never on pull requests; then the starter's `screenshot.png`, shot from that dev site.
+- [ ] **1.7 The theme's scripts to the strict standards** (the user, 2026-11-23): the review of
+  `assets/js/` against `~/.claude/TYPESCRIPT_STANDARDS.md` (production code, strictly) found
+  seven items, all taken, done before 2.3 makes the scripts shared code. Their behavior is held
+  by the existing browser tests (one video at a time, the click-to-load videos, the menu).
+  1. ESLint with typescript-eslint's `strict-type-checked` and `stylistic-type-checked` over the
+     scripts in `bin/check`, zero findings; new tools in `tools/js-check/`, pinned with a lock
+     file and vetted first (`~/.claude/AI_SECURITY.md`, section 4).
+  2. ES modules instead of the classic scripts' wrapper and `'use strict'`, loaded with
+     WordPress's `wp_enqueue_script_module` (since 6.5). First checked on the dev site: whether
+     WordPress prints an inline import map that the site's Content-Security-Policy would block.
+  3. `video-pause.js`'s shared changing state (the players, the current player, the focus
+     timer) held by one small class built with its settings.
+  4. `video-pause.js`'s `originOf` catching only the `TypeError` an unreadable address raises.
+  5. The event name `hbmusic:player-added` in one place (one module exporting it, with item 2),
+     not in both `video-pause.js` and `video-facade.js`.
+  6. `video-facade.js`: a facade without its title attribute stays a plain link to YouTube, as
+     one with an invalid video ID does, never a player with an empty title.
+  7. `tools/js-check/tsconfig.json` gains `exactOptionalPropertyTypes` (and
+     `noImplicitOverride`, with item 3's class).
 
 ### Stage 2: the shared repositories (rough)
 
