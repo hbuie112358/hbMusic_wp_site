@@ -12,6 +12,9 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
 # shellcheck source=tools/versions.sh
 source "$REPO_ROOT/tools/versions.sh"
+# Every check is of this repository, the starter's included (its own rules below), whatever site
+# SITE_DIR names for the dev site (template plan 1.6c).
+unset SITE_DIR
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"
 # shellcheck source=tools/site-packages.sh
@@ -463,7 +466,7 @@ starter_site_json_is_valid() {
     log "starter/site.json is not valid JSON (jq's message is above)"
     return 1
   }
-  problems+="$(site_settings_missing_test_pages "$STARTER_DIR/site.json" "$STARTER_DIR/dev-content")"
+  problems+="$(site_settings_missing_test_pages "$STARTER_DIR/site.json" "$STARTER_DIR/tests/dev-content")"
   [[ -z "$problems" ]] && return 0
   log "starter/site.json does not follow the rules in tools/site-settings.jq, or lacks a page's content:"
   printf '%s\n' "$problems" | sed 's/^/    /' >&2
@@ -493,8 +496,15 @@ site_layer_check_refuses_bad_examples() {
   bash "$REPO_ROOT/tests/tools/site-layer/run.sh"
 }
 
+# A site layer's full theme assembled on known examples (tools/site-theme.sh, tests/tools/site-theme/).
+site_theme_assembly_on_examples() {
+  bash "$REPO_ROOT/tests/tools/site-theme/run.sh"
+}
+
 # The starter names nothing of this site but the shared theme code's prefix (the site's slug),
-# which its PHP and patterns must use until template plan 2.3 renames that prefix.
+# which its PHP and patterns must use until template plan 2.3 renames that prefix. Its assembled
+# theme (starter/themes/, build output ignored by git, template plan 1.6c) holds this site's
+# shared theme files and is not the starter's own.
 starter_names_nothing_of_this_site() {
   local slug name patterns=()
   slug="$(site_setting .slug)"
@@ -502,7 +512,7 @@ starter_names_nothing_of_this_site() {
     [[ "$name" == "$slug" ]] || patterns+=(-e "$name")
   done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
   ((${#patterns[@]} > 0)) || return 0
-  ! grep -rniF "${patterns[@]}" "$STARTER_DIR"
+  ! grep -rniF --exclude-dir=themes "${patterns[@]}" "$STARTER_DIR"
 }
 
 starter_theme_json_schema_matches_wordpress() {
@@ -741,6 +751,7 @@ run_analysis_and_file_checks() {
   run_check "Starter: defines every design token used" starter_defines_every_token
   run_check "Starter: holds exactly the site layer" starter_holds_the_site_layer
   run_check "The site-layer check refuses bad examples" site_layer_check_refuses_bad_examples
+  run_check "The theme assembly on known examples" site_theme_assembly_on_examples
   run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
   run_check "Starter: static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
   run_check "Components appear on the example pages" components_shown_on_example_pages

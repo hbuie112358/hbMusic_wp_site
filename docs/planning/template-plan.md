@@ -40,8 +40,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   weekly only), split in three (see its entry): 1.6a done (`95351f0`, not yet pushed: the shared
   tests no longer assume this site's look or names; the components' `hbmusic` prefix stays for
   2.3).
-- **Next: 1.6c,** the starter's proof on a dev site of its own (its entry names two points found
-  at 1.6b-2 to settle there). 1.6b done (2026-11-23): 1.6b-1, this site's code ready for another
+- **Next: 1.6c,** the starter's proof on a dev site of its own, designed and decided (T14) in
+  three parts: 1.6c-1 done (the tools take a site folder, `SITE_DIR`); next 1.6c-2, the starter's
+  dev site run and fixed. 1.6b done (2026-11-23): 1.6b-1, this site's code ready for another
   look, its own look unchanged (all 24 screenshots identical); 1.6b-2, the `starter/` folder,
   held by seven new `bin/check` rules. The
   project's `CLAUDE.md` now names each language's standard ("Coding standards by language"); the
@@ -89,6 +90,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
 | T11 | `bin/deploy staging\|live` (the user, 2026-11-21) follows handbook chapter 2's eight steps from the user's computer, each place through its own key made there and restricted on the server to rsync's daemon mode with that place's folders (no shell, never the other place), named in the user's SSH settings; GitHub's deploy job and key are removed. Its parts: (1) "tested" means the commit's files are exactly those of a commit whose required checks passed: its pull request's last commit with an identical tree, or the commit itself (the weekly run, the button); (2) it shows the commits between the server's note and the new commit and waits for "yes"; (3) live accepts only staging's commit, where the site has staging; (4) it copies the downloaded plugins (built from `site-packages/composer.lock` and checked against WordPress.org's checksums first), then the site's own plugins, then the theme, comparing by content, refuses to lower a plugin's version found on the server, and names a plugin folder new on the server, to activate by hand; (5) the commit into a note folder; (6) the page cache from `site.json` (none here); (7) `bin/site-check`; (8) the PHP error log's new lines, through a read-only folder. Three points the user agreed: the handbook's wording gains the downloaded plugins (proposed at 1.4e, approved before it is written); `bin/deploy` needs `gh` on the host, beside Docker and `jq`; the search checks in the page check are a later part.| The handbook (H8, H9) was decided after this site's GitHub-based staging deploy was built; this site has run on a recorded exception (D33) until `bin/deploy` exists. A rebase merge gives the commit on `main` a new name, so no check ran on it: checked 2026-11-21, `main`'s 488f547 has `check` and `dev-site` skipped, #89's tested 24f7c18 has both passed, and both have the tree `c664229`; only a merged pull request's last commit can therefore be deployed, which a rollback to an earlier pull request still allows. Hostinger installs security updates by itself (8j), so a plugin on the server can be newer than its pin, and a deploy that mirrors the folder would quietly put the older version back. `gh` on the host, rather than in a container with a token passed in, keeps the secret handling out of the script; the user already runs it. |
 | T12 | The neutral defaults (1.6) are built in this repository, in a `starter/` folder that becomes `dts-site-starter`'s site layer at 2.4, with a light placeholder look (white, dark text, one blue accent); their proof runs weekly, never on pull requests (the user, 2026-11-23). | Stage 1 proves each piece here before it moves (T1). Reading the tests first showed that the shared tests assume this site's look and names (the call-to-action panel must be green, the booking page's address is this site's), so a new site would fail them; making them look-independent is most of the work, and a look the opposite of this dark site's catches any test still relying on it. The user did not want minutes added to every pull request; the neutral layer changes rarely, and the weekly run (Mondays, already automatic, GitHub emailing a failure) shows a break within a week. |
 | T13 | 1.6b's design (the user, 2026-11-23): split in two, this site's code first (1.6b-1) and the `starter/` folder second (1.6b-2); the site's facts moved into a site-layer file now, not at 2.3; the light palette as proposed (white `#ffffff`, text `#1b1f24`, paragraphs `#3a4048`, accent `#1d5fc2`, deep accent `#163f7a`, links `#1a55ad`, raised `#f2f4f7`, lines `#dde2e8`, muted `#5b6470`, error `#b42318`), kept as long as every pair in use passes WCAG AA; this site's form settings as the starter's stand-in until 2.4; the starter's screenshot moved to 1.6c. Token names spelled out where a site's designer reads them (`custom.callToAction.…` in `theme.json`, which allows no comments); the short `site-cta` class kept, its stylesheet saying what CTA stands for. | Reading the stylesheets for a light look found more than the planned button fix: the video play triangle and the carousel arrows take the text color (dark on their dark plates in a light look) and `form.css` fixes `color-scheme: dark`; and `functions.php`'s old-address list sends `/contact/` to this site's Book page, which would take a starter's Contact page away. The class is not renamed: it is in the tests, the component list, the example page and any copy of the part saved in the Site Editor on staging or live, which would silently lose its look. Contrast computed with WCAG's formula for each pair the components use; the tightest, muted text on the placeholder, is 4.60. |
+| T14 | 1.6c's design (the user, 2026-11-23): in three parts (the tools take a site folder; the starter's dev site run and fixed; the weekly job and screenshot); the site chosen by a `SITE_DIR` setting, not a flag on each command, since the scenario checks and browser tests inherit it; the starter laid out as a site (`starter/tests/dev-content/`), as `dts-site-starter` will be at 2.4; its assembled theme in `starter/themes/`, ignored by git; the shared video code adding `https://www.youtube-nocookie.com` to the policy itself. | The tools assumed this repository's layout everywhere (`site.json` at the top, `tests/dev-content/`, `themes/`); one setting naming the site's folder changes that in one place. The assembled theme stands in for 2.4's starter theme until 2.3 moves the shared code into its plugin. The video's own address belongs with the code that creates the player: every site using the shared click-to-load videos needs it, and a frame from it cannot run script in the page; `https://www.youtube.com`, for players pasted into content, stays a site's fact. Weighed: every site allowing YouTube in its facts (each site repeating what the shared code needs), or the example page without a playable video (the shared tests no longer proving the video on a neutral page). |
 
 ## Steps
 
@@ -738,13 +740,32 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     ignores, mounted read-only, standing in for 2.4's starter theme), the generic and component
     tests run on it, as a job in `check.yml` on the Monday schedule and the "Run workflow" button
     only, never on pull requests; then the starter's `screenshot.png`, shot from that dev site
-    (added to `tools/site-layer-files.txt` then). Two points found at 1.6b-2, to settle here:
-    the components' example page holds stand-in videos, while the starter's policy allows no
-    YouTube frames (a site without videos needs none), so the policy test there may fail: the
-    likely answer is that the click-to-load videos bring their own sources with them (T5's
-    plugin), not that every site allows YouTube; and the assembled theme's folder name must
-    match `starter/site.json`'s `theme` (`dts-starter`), which `bin/dev-site` checks against
-    `themes/`, so the assembly needs a themes folder of its own or an option for it.
+    (added to `tools/site-layer-files.txt` then). Designed and decided 2026-11-23 (T14), in three
+    parts:
+    - [x] **1.6c-1** (done 2026-11-23) The tools take a site folder, this site's behavior unchanged: `SITE_DIR`
+      (default this repository), read by `tools/site-settings.sh`, names the folder holding
+      `site.json`, `tests/dev-content/`, the optional `tests/dev-setup.sh` and `themes/`; the
+      plugins (`plugins/`) and the form's files (`config/`) stay this repository's.
+      `starter/dev-content/` moves to `starter/tests/dev-content/`. `tools/site-theme.sh` assembles
+      a site layer's full theme (this theme's files, each listed site-layer file replaced by the
+      layer's, the layer's pictures added) into `starter/themes/dts-starter/`, ignored by git and
+      rebuilt on every `bin/dev-site` run. For a site other than this one, `bin/test` leaves out
+      `site/` and the tests of this repository's plugins the site does not list, naming each.
+      `bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another
+      site.
+    - [ ] **1.6c-2** The starter's dev site run locally, with its own database (its slug) and the
+      same port as this site's (only one runs at a time; `bin/dev-site` refuses, naming the other,
+      when the port is taken). **To do here, from 1.6c-1's review (the user, 2026-11-23):**
+      `bin/test` refuses, naming both sites, when the running dev site is not the one it was
+      asked to test; the two sites share `compose.site.yaml` and the port, so a plain `bin/test`
+      after `SITE_DIR=starter bin/dev-site` would run this site's tests against the starter and
+      fail in many confusing ways. The shared video code adds the one address its player uses
+      (`https://www.youtube-nocookie.com`) to the policy itself, `https://www.youtube.com` staying
+      this site's fact; any other failure of the shared tests on the light look reported to the
+      user before it is fixed.
+    - [ ] **1.6c-3** The `starter` job in `check.yml`, on the Monday schedule and the "Run
+      workflow" button only; the starter's `screenshot.png` (1200x900, its Home), then listed in
+      `tools/site-layer-files.txt`.
 - [ ] **1.7 The theme's scripts to the strict standards** (the user, 2026-11-23): the review of
   `assets/js/` against `~/.claude/TYPESCRIPT_STANDARDS.md` (production code, strictly) found
   seven items, all taken, done before 2.3 makes the scripts shared code. Their behavior is held

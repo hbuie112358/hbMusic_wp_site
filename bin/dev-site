@@ -4,7 +4,9 @@
 # plugins, and scripted test content; no real data. The site's facts (its theme, plugins, title
 # and test pages) come from site.json (template plan T7); its own extra steps, if any, from
 # tests/dev-setup.sh. Each run starts from an empty database, so the site is the same every
-# time. Runs alone: no backup needed, so CI can build it too (step 4d).
+# time. Runs alone: no backup needed, so CI can build it too (step 4d). Builds this repository's
+# site, or the site whose folder SITE_DIR names (SITE_DIR=starter bin/dev-site, template plan
+# 1.6c), with its own database.
 set -Eeuo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,7 +19,6 @@ readonly WAIT_INTERVAL_SECONDS=2
 readonly SEO_PLUGIN="wordpress-seo"
 # The booking form's files (config/); a site without them has no booking form on its dev site.
 readonly BOOKING_FORM_FILE="$REPO_ROOT/config/booking-form.txt"
-readonly SITE_DEV_SETUP="$REPO_ROOT/tests/dev-setup.sh"
 # Every setting compose.dev.yaml and this script use; checked right after .env is loaded.
 readonly REQUIRED_SETTINGS=(
   DEV_SITE_PORT DEV_MAIL_UI_PORT DEV_DB_NAME DEV_DB_USER DEV_DB_PASSWORD DEV_DB_ROOT_PASSWORD
@@ -55,6 +56,11 @@ source "$REPO_ROOT/tools/site-settings.sh"
 # site-packages/: the downloaded plugins, pinned with Composer.
 # shellcheck source=tools/site-packages.sh
 source "$REPO_ROOT/tools/site-packages.sh"
+# A site layer's full theme (template plan 1.6c), checked against the site-layer list first.
+# shellcheck source=tools/site-layer.sh
+source "$REPO_ROOT/tools/site-layer.sh"
+# shellcheck source=tools/site-theme.sh
+source "$REPO_ROOT/tools/site-theme.sh"
 
 compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" "$@"; }
 
@@ -84,14 +90,27 @@ load_site_settings() {
     | [.title, .address, (.pageTemplate // ""), (.isFrontPage // false), (.isPrivacyPolicy // false), (if has("isInMenu") then .isInMenu else true end)]
     | map(tostring) | join("\u001f")')
   readonly CHILD_THEME DEV_SITE_TITLE LOCAL_PLUGINS WORDPRESS_ORG_PLUGINS TEST_PAGES
-  refuse_if_any "$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")"
+  assemble_layer_theme
+  refuse_if_any "$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$SITE_THEMES_DIR")"
   refuse_if_any "$(site_settings_missing_local_plugins "$SITE_SETTINGS_FILE" "$REPO_ROOT/plugins")"
   refuse_if_any "$(site_packages_unsupported_plugins "$SITE_PACKAGES_LOCK")"
   refuse_if_any "$(site_packages_download_problems "$SITE_PACKAGES_LOCK")"
-  refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$REPO_ROOT/tests/dev-content")"
+  refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$SITE_DEV_CONTENT_DIR")"
   refuse_if_any "$(test_pages_taking_example_addresses)"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
   write_site_compose_file
+}
+
+# A site with a site layer of its own (the starter's theme/, SITE_DIR=starter) gets its full theme
+# assembled into its themes/ folder from this repository's theme (tools/site-theme.sh, template
+# plan 1.6c), afresh on every build; a site with a full theme of its own needs nothing.
+assemble_layer_theme() {
+  local problems
+  [[ -d "$SITE_LAYER_DIR" ]] || return 0
+  log "Assembling the theme ${CHILD_THEME} from the site layer ${SITE_LAYER_DIR#"$REPO_ROOT"/}/"
+  problems="$(assemble_site_theme "$REPO_ROOT/tools/site-layer-files.txt" "$SITE_LAYER_DIR" \
+    "$REPO_ROOT/themes/$(jq -r '.theme' "$REPO_ROOT/site.json")" "$SITE_THEMES_DIR/$CHILD_THEME")" ||
+    fail "the site layer does not match tools/site-layer-files.txt: $(paste -sd ';' <<<"$problems")"
 }
 
 # Stops the build with the problems found, one per line, if there are any. The checks behind it
@@ -352,7 +371,7 @@ create_test_page() {
   # As the admin: WordPress strips the Music page's video frame from anyone else's content.
   page_id="$(wp_cli --user="$DEV_ADMIN_USER" post create --post_type=page --post_status=publish \
     --post_title="$title" --post_name="$address" --menu_order="$position" --porcelain \
-    --post_content="$(cat "$REPO_ROOT/tests/dev-content/$address.html")")"
+    --post_content="$(cat "$SITE_DEV_CONTENT_DIR/$address.html")")"
   [[ -z "$template" ]] || wp_cli post meta update "$page_id" _wp_page_template "$template" >/dev/null
   [[ "$is_front_page" != true ]] || wp_cli option update page_on_front "$page_id" >/dev/null
   [[ "$is_privacy_policy" != true ]] || wp_cli option update wp_page_for_privacy_policy "$page_id" >/dev/null
@@ -389,10 +408,10 @@ clear_uploads() {
 # The site's own build steps, if it has any: sourced after the rest, so they can use wp_cli, log
 # and fail like the steps above.
 run_site_dev_setup() {
-  [[ -f "$SITE_DEV_SETUP" ]] || return 0
-  log "Running the site's own build steps (tests/dev-setup.sh)"
+  [[ -f "$SITE_DEV_SETUP_FILE" ]] || return 0
+  log "Running the site's own build steps (${SITE_DEV_SETUP_FILE#"$REPO_ROOT"/})"
   # shellcheck source=tests/dev-setup.sh
-  source "$SITE_DEV_SETUP"
+  source "$SITE_DEV_SETUP_FILE"
 }
 
 main() {

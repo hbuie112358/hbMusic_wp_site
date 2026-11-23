@@ -76,8 +76,10 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
 - `starter/`: the starter, the neutral site layer a new site begins from (template plan 1.6,
   T13), moving to `dts-site-starter` at 2.4: its own `site.json`, `theme/` with only the
-  site-layer files (`tools/site-layer-files.txt`), neutral pages in `dev-content/`, and its
-  `README.md` with the palette's contrast. Never deployed; `bin/check` holds it.
+  site-layer files (`tools/site-layer-files.txt`), neutral pages in `tests/dev-content/`, and its
+  `README.md` with the palette's contrast. Never deployed; `bin/check` holds it. Laid out as a
+  site, so the tools work on it with `SITE_DIR=starter` (template plan 1.6c, T14): its full theme
+  is assembled into `starter/themes/` (ignored by git) on each build.
 - `project-state.yaml`: session state for pause and resume, with the open items.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
@@ -108,6 +110,13 @@ with random secrets; never committed). This project's ports are the **101xx** bl
 site on 10102, its Mailpit inbox on 10103, the rest of the block for later needs. The old site's local copy was removed at
 plan step 5a-2; the real old site stays online until go-live, and the export stays in `backups/`,
 `db/` and `wordpress/`.
+
+**Which site:** `bin/dev-site` and `bin/test` work on this repository's site unless `SITE_DIR`
+names another site's folder (template plan 1.6c, T14): `SITE_DIR=starter bin/dev-site` builds the
+starter's dev site (its own database, from its slug; the same port, so one dev site runs at a
+time), and `SITE_DIR=starter bin/test` tests it, leaving out this site's own tests (`site/`) and
+those of this repository's plugins the starter does not list, each named in the output.
+`bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another site.
 
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run),
   from the site's facts in `site.json` (its theme, title, own plugins and test pages) and its
@@ -199,7 +208,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   examples, `tests/tools/theme-tokens/`, template plan 1.6b); the starter (`starter/`) held to
   the same rules: its `site.json` and pages, its `theme.json` schema and tokens, exactly the
   site-layer files of `tools/site-layer-files.txt` (`tools/site-layer.sh`, with its examples in
-  `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; a type check of the theme's browser scripts (`assets/js/`) with
+  `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; the
+  theme assembly on known examples (`tools/site-theme.sh`, `tests/tools/site-theme/`); a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
   (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in

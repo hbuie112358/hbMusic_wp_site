@@ -16,8 +16,10 @@ dev site of its own (1.6c).
 - `theme/`: only the site layer, the files listed in `tools/site-layer-files.txt`, each at the path
   of the file it replaces in a full child theme, plus the logo in `assets/images/`. Everything
   else (the component stylesheets, the scripts, `functions.php`, the page templates) is the shared
-  theme code, which the starter's dev site takes from this repository's theme (1.6c) until
-  template plan 2.3 moves it into the shared components plugin.
+  theme code, which the starter's dev site takes from this repository's theme until template plan
+  2.3 moves it into the shared components plugin: `SITE_DIR=starter bin/dev-site` assembles the
+  full theme into `themes/dts-starter/` (`tools/site-theme.sh`; build output, ignored by git) and
+  builds the starter's dev site, and `SITE_DIR=starter bin/test` tests it.
   - `theme.json`: the palette below and every design token the components read.
   - `style.css`: the theme's name and description, which a new site changes.
   - `parts/`: the header, the footer and the call to action ("Ready to talk?", a button "Get in
@@ -26,7 +28,7 @@ dev site of its own (1.6c).
   - `includes/site-facts.php`: no old addresses, no areas served, the plain schema.org
     Organization, and the Content-Security-Policy's outside sources for the contact form's
     Turnstile check only. A site with videos adds YouTube's players there.
-- `dev-content/`: neutral text for the four pages. The Contact page holds the contact form's
+- `tests/dev-content/`: neutral text for the four pages, where a site keeps its test pages. The Contact page holds the contact form's
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.
 

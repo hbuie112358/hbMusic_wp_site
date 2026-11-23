@@ -3,7 +3,25 @@
 # tools/site-settings.jq and the explanation in tools/site-settings.md. Needs jq. Sourced, never
 # run; the sourcing script defines REPO_ROOT.
 
-readonly SITE_SETTINGS_FILE="$REPO_ROOT/site.json"
+# The site the tools work on (template plan 1.6c, T14): this repository's own, unless SITE_DIR
+# names another site's folder (the starter's, SITE_DIR=starter), laid out the same way: site.json
+# at its top, its test pages' text in tests/dev-content/, its own build steps in
+# tests/dev-setup.sh (optional) and its theme in themes/. A relative SITE_DIR is read from the
+# repository's top, wherever the command is typed. The plugins (plugins/) and the booking form's
+# files (config/) stay this repository's. Never exported by this file: a SITE_DIR the user sets
+# reaches the scenario checks and tests a script starts through the user's own environment, and
+# an unset one leaves every tool, a stand-in copy under test included, on its own repository.
+SITE_DIR="${SITE_DIR:-$REPO_ROOT}"
+[[ "$SITE_DIR" == /* ]] || SITE_DIR="$REPO_ROOT/$SITE_DIR"
+SITE_DIR="${SITE_DIR%/}"
+readonly SITE_DIR
+readonly SITE_SETTINGS_FILE="$SITE_DIR/site.json"
+readonly SITE_THEMES_DIR="$SITE_DIR/themes"
+readonly SITE_DEV_CONTENT_DIR="$SITE_DIR/tests/dev-content"
+readonly SITE_DEV_SETUP_FILE="$SITE_DIR/tests/dev-setup.sh"
+# A site layer of its own (the starter's theme/, template plan 1.6b): the site's full theme is then
+# assembled from it into themes/ by tools/site-theme.sh before each build.
+readonly SITE_LAYER_DIR="$SITE_DIR/theme"
 readonly SITE_SETTINGS_EXPLANATION="$REPO_ROOT/tools/site-settings.md"
 readonly SITE_SETTINGS_RULES_DIR="$REPO_ROOT/tools"
 # Written from site.json (write_site_compose_file); ignored by git, never edited by hand.
@@ -39,11 +57,31 @@ site_setting() {
 # Refuses, with a message, when jq is missing or site.json is missing or breaks its rules, so a
 # script never goes on with a wrong or empty setting.
 require_valid_site_settings() {
-  local problems
+  local problems shown
+  shown="$(site_settings_shown_path)"
   command -v jq >/dev/null || { printf 'jq is not installed; the tools need it to read site.json\n' >&2; return 1; }
-  [[ -f "$SITE_SETTINGS_FILE" ]] || { printf 'site.json is missing; tools/site-settings.md lists its fields\n' >&2; return 1; }
-  problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || { printf 'site.json is not valid JSON\n' >&2; return 1; }
-  [[ -z "$problems" ]] || { printf 'site.json does not follow its rules: %s\n' "$(paste -sd ';' <<<"$problems")" >&2; return 1; }
+  [[ -f "$SITE_SETTINGS_FILE" ]] || { printf '%s is missing; tools/site-settings.md lists its fields\n' "$shown" >&2; return 1; }
+  problems="$(site_settings_problems "$SITE_SETTINGS_FILE")" || { printf '%s is not valid JSON\n' "$shown" >&2; return 1; }
+  [[ -z "$problems" ]] || { printf '%s does not follow its rules: %s\n' "$shown" "$(paste -sd ';' <<<"$problems")" >&2; return 1; }
+}
+
+# The settings file's path as a message shows it: relative to the repository where it is inside it.
+site_settings_shown_path() {
+  printf '%s\n' "${SITE_SETTINGS_FILE#"$REPO_ROOT"/}"
+}
+
+# Whether the tools work on this repository's own site, not another site's folder (SITE_DIR).
+is_this_repository_site() {
+  [[ "$SITE_DIR" == "$REPO_ROOT" ]]
+}
+
+# Refuses, naming the script, when SITE_DIR names another site: for the tools that only ever act
+# on this repository's site (deploying it, its screenshots).
+refuse_other_site() {
+  local script_name="$1"
+  is_this_repository_site && return 0
+  printf '%s works on this repository'"'"'s own site only; SITE_DIR names %s\n' "$script_name" "${SITE_DIR#"$REPO_ROOT"/}" >&2
+  return 1
 }
 
 # The Docker names built from the site's slug (template plan T7): the download caches, and the dev
@@ -92,10 +130,13 @@ site_settings_missing_local_plugins() {
 # whole by bin/dev-site, bin/check and bin/screenshots each time they start, so it follows
 # site.json; replaced in one step, so a reader never sees half a file.
 write_site_compose_file() {
-  local slug theme plugin_slug mounts
+  local slug theme themes_path plugin_slug mounts
   slug="$(site_setting .slug)"
   theme="$(site_setting .theme)"
-  mounts="      - ./themes/$theme:/var/www/html/wp-content/themes/$theme:ro"$'\n'
+  # Relative to the repository, where Compose reads the recipe, when the site is inside it.
+  themes_path="$SITE_THEMES_DIR"
+  [[ "$themes_path" == "$REPO_ROOT"/* ]] && themes_path="./${themes_path#"$REPO_ROOT"/}"
+  mounts="      - $themes_path/$theme:/var/www/html/wp-content/themes/$theme:ro"$'\n'
   while IFS= read -r plugin_slug; do
     mounts+="      - ./plugins/$plugin_slug:/var/www/html/wp-content/plugins/$plugin_slug:ro"$'\n'
   done < <(site_settings_query '.localPlugins[]')

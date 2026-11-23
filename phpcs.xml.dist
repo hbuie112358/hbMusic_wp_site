@@ -12,6 +12,8 @@
 	<file>starter</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
+	<!-- The starter's assembled theme: build output, a copy of themes/ with the starter's layer. -->
+	<exclude-pattern>/starter/themes/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg name="parallel" value="8"/>
