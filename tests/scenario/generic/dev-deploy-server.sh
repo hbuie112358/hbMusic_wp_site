@@ -113,7 +113,9 @@ main() {
   start_server
   write_ssh_settings
   wait_for_server
-  run_capturing env REAL_SERVER_CONTAINER="$CONTAINER" REAL_SERVER_SSH_CONFIG="$WORK/ssh_config" \
+  # Without SITE_DIR: these are the deploy tool's own tests, against stand-in repositories, whatever
+  # site's dev site this run tests (template plan 1.6c-2).
+  run_capturing env -u SITE_DIR REAL_SERVER_CONTAINER="$CONTAINER" REAL_SERVER_SSH_CONFIG="$WORK/ssh_config" \
     bash "$REPO_ROOT/tests/tools/deploy/run.sh" --real-server
   assert_status 0 "bin/deploy's situations against the real server"
   log "bin/deploy's situations against the real server passed"

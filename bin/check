@@ -496,6 +496,12 @@ site_layer_check_refuses_bad_examples() {
   bash "$REPO_ROOT/tests/tools/site-layer/run.sh"
 }
 
+# The guard naming the dev site that holds the port, on known examples with a stand-in for docker
+# (tools/dev-site-guard.sh, tests/tools/dev-site-guard/).
+dev_site_guard_on_examples() {
+  bash "$REPO_ROOT/tests/tools/dev-site-guard/run.sh"
+}
+
 # A site layer's full theme assembled on known examples (tools/site-theme.sh, tests/tools/site-theme/).
 site_theme_assembly_on_examples() {
   bash "$REPO_ROOT/tests/tools/site-theme/run.sh"
@@ -752,6 +758,7 @@ run_analysis_and_file_checks() {
   run_check "Starter: holds exactly the site layer" starter_holds_the_site_layer
   run_check "The site-layer check refuses bad examples" site_layer_check_refuses_bad_examples
   run_check "The theme assembly on known examples" site_theme_assembly_on_examples
+  run_check "The dev-site guard on known examples" dev_site_guard_on_examples
   run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
   run_check "Starter: static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
   run_check "Components appear on the example pages" components_shown_on_example_pages

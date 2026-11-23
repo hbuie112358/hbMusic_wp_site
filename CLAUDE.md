@@ -114,9 +114,14 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 **Which site:** `bin/dev-site` and `bin/test` work on this repository's site unless `SITE_DIR`
 names another site's folder (template plan 1.6c, T14): `SITE_DIR=starter bin/dev-site` builds the
 starter's dev site (its own database, from its slug; the same port, so one dev site runs at a
-time), and `SITE_DIR=starter bin/test` tests it, leaving out this site's own tests (`site/`) and
-those of this repository's plugins the starter does not list, each named in the output.
-`bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another site.
+time), and `SITE_DIR=starter bin/test` tests it, leaving out this site's own tests (`site/`),
+those of this repository's plugins the starter does not list and the screenshots check, each
+named in the output. Both refuse, naming the two sites and the command that stops the other by
+name, when the port is held by another site's dev site (`tools/dev-site-guard.sh`, template plan
+1.6c-2); to switch, `docker compose -p <slug>-dev stop` (its data stays), then `bin/dev-site` with
+the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/deploy` and
+`bin/screenshots` refuse another site. The click-to-load videos allow their own player
+(`https://www.youtube-nocookie.com`) in the security policy; a site's facts add the rest.
 
 - `bin/dev-site`: builds or rebuilds the dev site from nothing (an empty database each run),
   from the site's facts in `site.json` (its theme, title, own plugins and test pages) and its
@@ -209,7 +214,8 @@ those of this repository's plugins the starter does not list, each named in the 
   the same rules: its `site.json` and pages, its `theme.json` schema and tokens, exactly the
   site-layer files of `tools/site-layer-files.txt` (`tools/site-layer.sh`, with its examples in
   `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; the
-  theme assembly on known examples (`tools/site-theme.sh`, `tests/tools/site-theme/`); a type check of the theme's browser scripts (`assets/js/`) with
+  theme assembly on known examples (`tools/site-theme.sh`, `tests/tools/site-theme/`); the dev-site
+  guard on known examples, with a stand-in for docker (`tests/tools/dev-site-guard/`); a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
   (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in

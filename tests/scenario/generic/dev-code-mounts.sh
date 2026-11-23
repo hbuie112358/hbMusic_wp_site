@@ -34,11 +34,22 @@ expect_write_refused() {
   log "user $container_user cannot write into $code_folder"
 }
 
+# Where a folder under wp-content/ comes from on the host: the theme from the site's themes folder
+# (this repository's, or the site SITE_DIR names, template plan 1.6c), the plugins from plugins/.
+host_folder() {
+  local code_folder="$1"
+  case "$code_folder" in
+    themes/*) printf '%s/%s\n' "$SITE_THEMES_DIR" "${code_folder#themes/}" ;;
+    *) printf '%s/%s\n' "$REPO_ROOT" "$code_folder" ;;
+  esac
+}
+
 expect_host_files_private() {
-  local code_folder="$1" foreign writable
-  foreign="$(find "$REPO_ROOT/$code_folder" ! -user "$(id -u)" -print)"
+  local code_folder="$1" host_path foreign writable
+  host_path="$(host_folder "$code_folder")"
+  foreign="$(find "$host_path" ! -user "$(id -u)" -print)"
   [[ -z "$foreign" ]] || fail "files in $code_folder not owned by the user: $foreign"
-  writable="$(find "$REPO_ROOT/$code_folder" -perm -o+w -print)"
+  writable="$(find "$host_path" -perm -o+w -print)"
   [[ -z "$writable" ]] || fail "files in $code_folder writable by others: $writable"
   log "every file in $code_folder belongs to the user, and none is writable by others"
 }

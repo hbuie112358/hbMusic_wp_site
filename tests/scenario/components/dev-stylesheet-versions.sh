@@ -10,6 +10,9 @@
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+# The site's themes folder (SITE_THEMES_DIR).
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 # One block of each kind with component stylesheets in functions.php, and the Song List block.
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.
@@ -31,11 +34,13 @@ foreach ( wp_styles()->registered as $handle => $style ) {
 # The theme's stylesheets registered per block in functions.php, and the Song List's one.
 readonly MINIMUM_STYLESHEETS=10
 
-# Maps a path inside the WordPress container to the repository's copy of the same file.
+# Maps a path inside the WordPress container to the host's copy of the same file: the theme in
+# the site's themes folder (this repository's, or the site SITE_DIR names, template plan 1.6c),
+# the plugins in plugins/.
 repository_copy() {
   local container_path="$1"
   case "$container_path" in
-    */wp-content/themes/*) printf '%s/themes/%s' "$REPO_ROOT" "${container_path#*/wp-content/themes/}" ;;
+    */wp-content/themes/*) printf '%s/%s' "$SITE_THEMES_DIR" "${container_path#*/wp-content/themes/}" ;;
     */wp-content/plugins/*) printf '%s/plugins/%s' "$REPO_ROOT" "${container_path#*/wp-content/plugins/}" ;;
     *) return 1 ;;
   esac

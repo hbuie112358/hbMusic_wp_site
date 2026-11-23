@@ -46,6 +46,27 @@ const HBMUSIC_VIDEO_FACADE_STYLESHEET = 'assets/css/components/video-facade.css'
 const HBMUSIC_VIDEO_FACADE_SCRIPT     = 'assets/js/video-facade.js';
 const HBMUSIC_VIDEO_FACADE_HANDLE     = 'hbmusic-video-facade';
 
+// The origin of the player the facade script builds (its PLAYER_ADDRESS, YouTube's
+// privacy-enhanced player), which the page's Content-Security-Policy must allow as a frame.
+const HBMUSIC_VIDEO_PLAYER_ORIGIN = 'https://www.youtube-nocookie.com';
+
+/**
+ * Allows the click-to-load player's frame in the Site Hardening plugin's Content-Security-Policy
+ * (template plan 1.6c-2, T14): the player is this code's, so its address comes with it, and every
+ * site using these videos gets it without listing it among its own facts. The header is sent
+ * before the page is built, so it cannot depend on whether this page has a video; a frame from
+ * this origin cannot run script in the page. Players pasted into content (youtube.com) stay a
+ * site's own fact (includes/site-facts.php).
+ *
+ * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
+ * @return array<string, list<string>> The sources with the player's frame.
+ */
+function hbmusic_allow_video_player_frame( array $outside_sources ): array {
+	$outside_sources['frame-src'] = array_merge( $outside_sources['frame-src'] ?? array(), array( HBMUSIC_VIDEO_PLAYER_ORIGIN ) );
+	return $outside_sources;
+}
+add_filter( 'sitehardening_csp_sources', 'hbmusic_allow_video_player_frame' );
+
 /**
  * Fetches the pictures of the videos in a saved page or post that do not have one yet.
  *
