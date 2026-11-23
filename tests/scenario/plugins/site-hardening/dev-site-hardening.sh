@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Scenario (dev site): what the Site Hardening plugin refuses or removes outside the admin (plan
 # step 8a, D26): xmlrpc.php is refused (docs/SITE_CHECKLIST.md 4.4), no page points to it with an
-# X-Pingback header, Yoast SEO's version comment is gone, and no response names the PHP version
-# (3.6). Also (handbook 12, 3.1 and 4.10): HSTS only on HTTPS requests, and unfiltered HTML for
+# X-Pingback header, Yoast SEO's version comment is gone, neither the pages nor the feed name
+# WordPress's version, and no response names the PHP version (3.6). Also (handbook 12, 3.1 and 4.10): HSTS only on HTTPS requests, and unfiltered HTML for
 # Administrators only. The headers on every page are
 # checked in tests/e2e/specs/dev/generic/theme.spec.ts, Application Passwords in
 # tests/e2e/specs/dev/plugins/site-hardening/hardening.spec.ts.
@@ -70,6 +70,22 @@ expect_no_version_comment() {
   log "Yoast SEO's tags are there, its version comment is not"
 }
 
+# WordPress names its version in a generator tag in every page's head and a generator line in
+# every feed (handbook 12, 3.6's reason). Each must have loaded, or a missing line proves nothing.
+expect_no_wordpress_version() {
+  local page feed version
+  version="$(dev_compose run --rm -T cli wp core version </dev/null)"
+  page="$(curl -sS --max-time 10 "$(site_url /)")"
+  feed="$(curl -sS --max-time 10 "$(site_url "/?feed=rss2")")"
+  [[ "$page" == *'<head'* && "$page" == *'</html>'* ]] || fail "the home page did not load"
+  [[ "$feed" == *'<rss'* && "$feed" == *'</rss>'* ]] || fail "the feed did not load"
+  ! grep -qi 'name="generator"[^>]*WordPress' <<<"$page" || fail "the home page names WordPress in a generator tag"
+  ! grep -qi '<generator>' <<<"$feed" || fail "the feed carries a generator line"
+  [[ "$page$feed" != *"?v=$version"* && "$page$feed" != *"WordPress $version"* ]] ||
+    fail "the home page or the feed names WordPress $version"
+  log "neither the home page nor the feed names WordPress or its version"
+}
+
 # HSTS (3.1): the dev site is plain HTTP, so the plugin's header list is asked for both kinds of
 # request, and the real page must not carry the header. Whether the send path passes is_ssl()
 # through is seen on staging, which runs over HTTPS (plan, item 3).
@@ -124,6 +140,7 @@ main() {
   expect_xml_rpc_refused GET
   expect_no_pingback_header
   expect_no_version_comment
+  expect_no_wordpress_version
   expect_no_php_version_header
   expect_hsts_only_over_https
   expect_unfiltered_html_for_administrators_only
