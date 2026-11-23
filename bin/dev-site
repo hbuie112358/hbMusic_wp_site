@@ -61,6 +61,9 @@ source "$REPO_ROOT/tools/site-packages.sh"
 source "$REPO_ROOT/tools/site-layer.sh"
 # shellcheck source=tools/site-theme.sh
 source "$REPO_ROOT/tools/site-theme.sh"
+# Which site's dev site holds the port: one runs at a time (template plan 1.6c-2).
+# shellcheck source=tools/dev-site-guard.sh
+source "$REPO_ROOT/tools/dev-site-guard.sh"
 
 compose() { docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" "$@"; }
 
@@ -98,7 +101,6 @@ load_site_settings() {
   refuse_if_any "$(site_settings_missing_test_pages "$SITE_SETTINGS_FILE" "$SITE_DEV_CONTENT_DIR")"
   refuse_if_any "$(test_pages_taking_example_addresses)"
   refuse_if_any "$(site_packages_booking_form_problem "$BOOKING_FORM_FILE" "$SITE_PACKAGES_LOCK")"
-  write_site_compose_file
 }
 
 # A site with a site layer of its own (the starter's theme/, SITE_DIR=starter) gets its full theme
@@ -420,6 +422,10 @@ main() {
   ensure_env_file
   load_env
   require_settings
+  # Before compose.site.yaml is written: it is shared by every site's dev site, so a refused build
+  # must leave it pointing at the one still running.
+  refuse_if_any "$(running_dev_site_problem "$DEV_SITE_PORT" "$(site_setting .slug)-dev")"
+  write_site_compose_file
   compose up -d db mailpit
   # A new container each run: a running one keeps pointing at a mounted folder that git has since
   # removed and recreated (when switching branches), and then shows that folder as empty.

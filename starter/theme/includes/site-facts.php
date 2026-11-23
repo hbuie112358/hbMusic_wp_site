@@ -32,8 +32,8 @@ const HBMUSIC_AREAS_SERVED = array();
  * The outside sources the site's pages need in the Site Hardening plugin's
  * Content-Security-Policy, by directive, each with its reason:
  * - Cloudflare Turnstile's script and its widget frame protect the contact form.
- * A site with videos adds YouTube's players to frame-src (https://www.youtube.com and the
- * privacy-enhanced https://www.youtube-nocookie.com).
+ * The theme's click-to-load videos allow their own player; a site that pastes YouTube's player
+ * code into its pages adds https://www.youtube.com to frame-src.
  */
 const HBMUSIC_OUTSIDE_SOURCES = array(
 	'script-src' => array( 'https://challenges.cloudflare.com' ),

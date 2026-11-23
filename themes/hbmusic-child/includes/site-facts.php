@@ -48,12 +48,13 @@ const HBMUSIC_AREAS_SERVED = array(
  * Content-Security-Policy (plan D26; docs/SITE_CHECKLIST.md 3.2), by directive, each with its
  * reason:
  * - Cloudflare Turnstile's script and its widget frame protect the booking form (plan 5e);
- * - the site's videos always play from YouTube (plan D19): WordPress's embeds use youtube.com,
- *   the privacy-enhanced player youtube-nocookie.com.
+ * - the site's videos always play from YouTube (plan D19): a player pasted into a page's content
+ *   uses youtube.com. (The click-to-load player's youtube-nocookie.com is allowed by the video
+ *   code itself, includes/video-facade.php.)
  */
 const HBMUSIC_OUTSIDE_SOURCES = array(
 	'script-src' => array( 'https://challenges.cloudflare.com' ),
-	'frame-src'  => array( 'https://www.youtube.com', 'https://www.youtube-nocookie.com', 'https://challenges.cloudflare.com' ),
+	'frame-src'  => array( 'https://www.youtube.com', 'https://challenges.cloudflare.com' ),
 );
 
 /**

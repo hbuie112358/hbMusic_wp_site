@@ -13,8 +13,15 @@ readonly REPO_ROOT
 source "$REPO_ROOT/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
 source "$REPO_ROOT/tools/site-settings.sh"
+# shellcheck source=tools/dev-site-guard.sh
+source "$REPO_ROOT/tools/dev-site-guard.sh"
 
 FAILED_TESTS=()
+# Scenario checks that need this repository's own site, relative to tests/scenario/, each with its
+# reason; left out, and named, for another site (template plan 1.6c-2).
+readonly THIS_SITE_ONLY_SCENARIOS=(
+  "generic/dev-screenshots-previews.sh:bin/screenshots shows this repository's site's real content only"
+)
 # The test folders left out for this site (left_out_test_folders), relative to each test group's
 # top (tests/scenario/ and tests/e2e/specs/dev/); set once in main.
 LEFT_OUT_FOLDERS=()
@@ -50,23 +57,42 @@ left_out_test_folders() {
   done
 }
 
+# Stops before any test when the dev site running is another site's (template plan 1.6c-2): its
+# pages and settings would fail this site's tests in many confusing ways. The two share the port
+# and compose.site.yaml, written by the last bin/dev-site.
+refuse_another_running_site() {
+  local problem
+  problem="$(running_dev_site_problem "$DEV_SITE_PORT" "$(site_setting .slug)-dev")"
+  [[ -z "$problem" ]] && return 0
+  log "$problem"
+  log "then build the dev site this run tests: bin/dev-site, with the same SITE_DIR as bin/test"
+  exit 1
+}
+
 # Names every folder left out, so no test is skipped silently.
 log_left_out_folders() {
-  local folder
-  ((${#LEFT_OUT_FOLDERS[@]} > 0)) || return 0
+  local folder entry
+  is_this_repository_site && return 0
   for folder in "${LEFT_OUT_FOLDERS[@]}"; do
     case "$folder" in
       site) log "Left out: site/, this repository's site's own tests, not ${SITE_DIR#"$REPO_ROOT"/}'s" ;;
       *) log "Left out: $folder/, a plugin ${SITE_DIR#"$REPO_ROOT"/} does not list" ;;
     esac
   done
+  for entry in "${THIS_SITE_ONLY_SCENARIOS[@]}"; do
+    log "Left out: tests/scenario/${entry%%:*}, as ${entry#*:}"
+  done
 }
 
 # Whether a scenario check sits in a left-out folder.
 is_left_out_scenario() {
-  local scenario="$1" folder
+  local scenario="$1" folder entry
   for folder in "${LEFT_OUT_FOLDERS[@]}"; do
     [[ "$scenario" == "$REPO_ROOT/tests/scenario/$folder/"* ]] && return 0
+  done
+  is_this_repository_site && return 1
+  for entry in "${THIS_SITE_ONLY_SCENARIOS[@]}"; do
+    [[ "$scenario" == "$REPO_ROOT/tests/scenario/${entry%%:*}" ]] && return 0
   done
   return 1
 }
@@ -145,6 +171,10 @@ run_all_tests() {
 main() {
   load_site_volume_names || exit 1
   load_settings
+  refuse_another_running_site
+  # Written again for the site the guard just found running: bin/check and bin/screenshots write
+  # it for this repository's site, and the scenario checks reach the dev site through it.
+  write_site_compose_file
   mapfile -t LEFT_OUT_FOLDERS < <(left_out_test_folders)
   readonly LEFT_OUT_FOLDERS
   log_left_out_folders

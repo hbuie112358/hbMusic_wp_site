@@ -27,7 +27,8 @@ dev site of its own (1.6c).
   - `patterns/site-logo.php` and `assets/images/site-logo.svg`: a placeholder mark.
   - `includes/site-facts.php`: no old addresses, no areas served, the plain schema.org
     Organization, and the Content-Security-Policy's outside sources for the contact form's
-    Turnstile check only. A site with videos adds YouTube's players there.
+    Turnstile check only. The theme's click-to-load videos allow their own player; a site pasting
+    YouTube's player code into its pages adds https://www.youtube.com there.
 - `tests/dev-content/`: neutral text for the four pages, where a site keeps its test pages. The Contact page holds the contact form's
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.

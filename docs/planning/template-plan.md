@@ -41,8 +41,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   tests no longer assume this site's look or names; the components' `hbmusic` prefix stays for
   2.3).
 - **Next: 1.6c,** the starter's proof on a dev site of its own, designed and decided (T14) in
-  three parts: 1.6c-1 done (the tools take a site folder, `SITE_DIR`); next 1.6c-2, the starter's
-  dev site run and fixed. 1.6b done (2026-11-23): 1.6b-1, this site's code ready for another
+  three parts: 1.6c-1 done (the tools take a site folder, `SITE_DIR`); 1.6c-2 done (the starter's
+  dev site passes every shared test on its light look); next 1.6c-3, the weekly job and the
+  starter's screenshot. 1.6b done (2026-11-23): 1.6b-1, this site's code ready for another
   look, its own look unchanged (all 24 screenshots identical); 1.6b-2, the `starter/` folder,
   held by seven new `bin/check` rules. The
   project's `CLAUDE.md` now names each language's standard ("Coding standards by language"); the
@@ -753,7 +754,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       `site/` and the tests of this repository's plugins the site does not list, naming each.
       `bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another
       site.
-    - [ ] **1.6c-2** The starter's dev site run locally, with its own database (its slug) and the
+    - [x] **1.6c-2** (done 2026-11-23: the starter 16 scenario checks and 166 browser tests
+      passing, this site's unchanged; the guard and `bin/test`'s rewrite of `compose.site.yaml`
+      built; four scenario checks that assumed this site fixed with the user's approval) The starter's dev site run locally, with its own database (its slug) and the
       same port as this site's (only one runs at a time; `bin/dev-site` refuses, naming the other,
       when the port is taken). **To do here, from 1.6c-1's review (the user, 2026-11-23):**
       `bin/test` refuses, naming both sites, when the running dev site is not the one it was
@@ -780,7 +783,11 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
      timer) held by one small class built with its settings.
   4. `video-pause.js`'s `originOf` catching only the `TypeError` an unreadable address raises.
   5. The event name `hbmusic:player-added` in one place (one module exporting it, with item 2),
-     not in both `video-pause.js` and `video-facade.js`.
+     not in both `video-pause.js` and `video-facade.js`. Likewise the player's origin
+     `https://www.youtube-nocookie.com` (found in 1.6c-2's review, the user, 2026-11-23): in
+     `video-facade.php`'s `HBMUSIC_VIDEO_PLAYER_ORIGIN`, for the security policy, and in
+     `video-facade.js`'s `PLAYER_ADDRESS`, tied only by a comment; one home, or a check that the
+     two agree.
   6. `video-facade.js`: a facade without its title attribute stays a plain link to YouTube, as
      one with an invalid video ID does, never a player with an empty title.
   7. `tools/js-check/tsconfig.json` gains `exactOptionalPropertyTypes` (and
