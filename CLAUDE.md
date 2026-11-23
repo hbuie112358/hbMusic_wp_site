@@ -356,6 +356,28 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
   stays on, and its findings are fixed or explained.
 
+## Coding standards by language
+
+The standard for each language this project uses, read at resume (the global `CLAUDE.md`'s
+resume protocol, step 1) and by "Reload rules". Production code means what runs on the site (the
+theme and the plugins); test code means the tests and the tools that check the code.
+
+- **PHP** (the theme, the plugins): the WordPress Coding Standards, as `phpcs.xml.dist` enforces
+  them (see Framework).
+- **TypeScript and the theme's JavaScript:** `~/.claude/TYPESCRIPT_STANDARDS.md`, strictly for
+  production code (the theme's scripts in `assets/js/`, type-checked through
+  `tools/js-check/`). Test code (the browser tests in `tests/e2e/`) is held to clarity instead
+  (the user, 2026-11-23): every failure message names what failed and where; no silent `catch`;
+  no `any`, `!` or `@ts-ignore`; clear names, helpers kept short. Plain `Error`, a cast after an
+  upstream check, and the test runner's output in place of a logger are fine there.
+- **CSS** (the theme, the plugins): `docs/planning/css-standards-notes.md`, read before any CSS
+  or `theme.json` work (observations until a global CSS rule exists), and Stylelint in
+  `bin/check`.
+- **Bash** (`bin/`, `tools/`, the scenario checks): ShellCheck in `bin/check`.
+- **Gaps:** no written standard yet for Bash (ShellCheck only) or for the theme's JavaScript
+  beyond `TYPESCRIPT_STANDARDS.md` and its type check. Each is written when the user chooses,
+  proposed item by item like the CSS notes.
+
 ## Project rules
 
 - **Commit and push are separate decisions of the user.** "commit" means a local commit on a

@@ -419,6 +419,13 @@ pending_decisions:
   - >
     After D29 (the user, 2026-11-11: not now): a global CSS rule proposed item by item from
     docs/planning/css-standards-notes.md.
+  - >
+    Later, for the global files (the user, 2026-11-23): a global standard that production code
+    follows its language's standards strictly and test code follows them as far as is reasonable,
+    held to clarity: every failure message names what failed and where; no silent catch; no
+    escape hatches from the type checker; plain errors, casts after an upstream check and the
+    test runner's output in place of a logger allowed. Proposed item by item for the user's
+    approval; until then the project's CLAUDE.md ("Coding standards by language") holds it here.
   - Decided 2026-11-17, kept for the record: the time report stays as it is (busy gaps over 10 minutes counted 0 lose about 42 minutes in the project so far).
 
 reference_documents: |
