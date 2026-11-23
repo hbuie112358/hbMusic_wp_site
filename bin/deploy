@@ -464,7 +464,7 @@ write_note() {
   printf '%s\ndeployed %s by bin/deploy\n' "$DEPLOY_COMMIT" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$note"
   rsync -q -e "$(ssh_command)" "$note" "$PLACE_SSH_HOST::$NOTE_FOLDER/$NOTE_FILE" 2>"$WORK_DIR/note-errors" ||
     refuse "every folder was copied, but the note could not be written: $(tail -n 2 "$WORK_DIR/note-errors" | paste -sd ' ')"
-  log "$PLACE's note: ${DEPLOY_COMMIT:0:7}"
+  log "$PLACE now runs commit: ${DEPLOY_COMMIT:0:7}"
 }
 
 report_new_folders() {
