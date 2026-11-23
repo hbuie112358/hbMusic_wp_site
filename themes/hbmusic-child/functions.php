@@ -7,42 +7,16 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// The site's own facts (its old addresses, organization, areas served, outside sources and link
+// example) are in their own file, the part a new site replaces (template plan 1.6b).
+require_once __DIR__ . '/includes/site-facts.php';
 require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
 require_once __DIR__ . '/includes/video-facade.php';
-
-/**
- * This site's old page addresses and the pages that replaced them (plan D22): the old site's
- * Video and Audio pages became Music, its Contact page became Book, whose address is
- * /hire-acoustic-guitarist/ (plan 1c). Search engines and old links still point at the old
- * addresses. Book's earlier address on staging, /book/, gets no redirect: it was never live, so
- * nothing outside the site knows it. Also from live's export (plan 9e): the empty "Audio and
- * Video" page and three old video posts, whose videos are on Music now. A site without old
- * addresses leaves this list empty.
- */
-const HBMUSIC_OLD_ADDRESSES = array(
-	'video'           => 'music',
-	'audio'           => 'music',
-	'audio-and-video' => 'music',
-	'video-01'        => 'music',
-	'video-02'        => 'music',
-	'video-03'        => 'music',
-	'contact'         => 'hire-acoustic-guitarist',
-);
 
 /**
  * The heading tags, as WordPress's tag processor names them (upper case).
  */
 const HBMUSIC_HEADING_TAGS = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
-
-/**
- * The towns this site's musician travels to for events (plan D22), named in the page data for
- * search engines. The page text names the same towns.
- */
-const HBMUSIC_AREAS_SERVED = array(
-	'Fayetteville, North Carolina',
-	'Hope Mills, North Carolina',
-	'Southern Pines, North Carolina',
-);
 
 /**
  * The theme's component stylesheets (assets/css/components/, plan D29), listed under the block
@@ -341,24 +315,17 @@ function hbmusic_remove_emoji_support(): void {
 add_action( 'init', 'hbmusic_remove_emoji_support' );
 
 /**
- * Adds the outside sources this site's pages need to the Site Hardening plugin's
- * Content-Security-Policy (plan D26; docs/SITE_CHECKLIST.md 3.2), each with its reason:
- * - Cloudflare Turnstile's script and its widget frame protect the booking form (plan 5e);
- * - the site's videos always play from YouTube (plan D19): WordPress's embeds use youtube.com,
- *   the privacy-enhanced player youtube-nocookie.com.
+ * Adds the outside sources the site's pages need (HBMUSIC_OUTSIDE_SOURCES, each with its reason in
+ * includes/site-facts.php) to the Site Hardening plugin's Content-Security-Policy (plan D26;
+ * docs/SITE_CHECKLIST.md 3.2), keeping the sources other code added before.
  *
  * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
- * @return array<string, list<string>> The sources with this site's.
+ * @return array<string, list<string>> The sources with the site's.
  */
 function hbmusic_add_outside_sources( array $outside_sources ): array {
-	$outside_sources['script-src'] = array_merge(
-		$outside_sources['script-src'] ?? array(),
-		array( 'https://challenges.cloudflare.com' )
-	);
-	$outside_sources['frame-src']  = array_merge(
-		$outside_sources['frame-src'] ?? array(),
-		array( 'https://www.youtube.com', 'https://www.youtube-nocookie.com', 'https://challenges.cloudflare.com' )
-	);
+	foreach ( HBMUSIC_OUTSIDE_SOURCES as $directive => $sources ) {
+		$outside_sources[ $directive ] = array_merge( $outside_sources[ $directive ] ?? array(), $sources );
+	}
 	return $outside_sources;
 }
 add_filter( 'sitehardening_csp_sources', 'hbmusic_add_outside_sources' );
@@ -413,29 +380,47 @@ function hbmusic_redirect_old_address(): void {
 add_action( 'template_redirect', 'hbmusic_redirect_old_address', 1 );
 
 /**
- * Describes the site's organization in Yoast SEO's page data as a musician (schema.org's
- * MusicGroup, which also covers a solo musician) and names the towns served (plan 8h), so search
- * engines read the same facts as the page text. Yoast's Local SEO add-on would do this for a fee.
+ * Describes the site's organization in Yoast SEO's page data with its own types and the towns it
+ * serves (HBMUSIC_ORGANIZATION_TYPES and HBMUSIC_AREAS_SERVED, includes/site-facts.php; plan 8h),
+ * so search engines read the same facts as the page text. Yoast's Local SEO add-on would do this
+ * for a fee.
  *
  * Yoast builds the Organization only when its settings name a company with a logo; this adds to
  * that piece and keeps its name, logo and links. Its type is always "Organization" in Yoast 28.8
- * (src/generators/schema/organization.php), so the pair is written out rather than merged.
+ * (src/generators/schema/organization.php), so the site's list includes it rather than being
+ * merged with it. A site that serves no listed towns gets no empty areaServed.
  *
  * @param array<string, mixed> $organization Yoast's Organization piece.
- * @return array<string, mixed> The piece as a musician, with the areas served.
+ * @return array<string, mixed> The piece with the site's types and areas served.
  */
 function hbmusic_describe_organization( array $organization ): array {
-	$organization['@type']      = array( 'Organization', 'MusicGroup' );
+	$organization['@type'] = HBMUSIC_ORGANIZATION_TYPES;
+	return hbmusic_add_areas_served( $organization, HBMUSIC_AREAS_SERVED );
+}
+add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
+
+/**
+ * Adds the towns served to an organization's page data, each as a schema.org City. The towns come
+ * in as a parameter, not read from the site's list here, so the same code serves a site with none:
+ * its organization is returned unchanged, with no empty areaServed.
+ *
+ * @param array<string, mixed> $organization The organization's piece.
+ * @param string[]             $towns        The towns served, possibly none.
+ * @return array<string, mixed> The piece, with the towns if there are any.
+ */
+function hbmusic_add_areas_served( array $organization, array $towns ): array {
+	if ( array() === $towns ) {
+		return $organization;
+	}
 	$organization['areaServed'] = array_map(
 		static fn ( string $town ): array => array(
 			'@type' => 'City',
 			'name'  => $town,
 		),
-		HBMUSIC_AREAS_SERVED
+		$towns
 	);
 	return $organization;
 }
-add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
 
 /**
  * Decodes an embedded video's title before WordPress escapes it for the player's title attribute,
@@ -675,14 +660,3 @@ function hbmusic_describe_page_templates( mixed $descriptions ): array {
 	);
 }
 add_filter( 'editinghelp_template_descriptions', 'hbmusic_describe_page_templates' );
-
-/**
- * This site's example of good link text, for the Editing Help plugin's guide: a link the site
- * really has, so the guide reads as written for it (the user, 2026-11-14).
- *
- * @return string The example.
- */
-function hbmusic_link_example(): string {
-	return __( 'See the song list', 'hbmusic' );
-}
-add_filter( 'editinghelp_link_example', 'hbmusic_link_example' );

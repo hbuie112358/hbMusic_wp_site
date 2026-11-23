@@ -190,7 +190,9 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   packages (every advisory fails, except any the user accepted in that folder's
   `audit-exceptions.json`, each with its reason and a review-by date after which it fails again,
   and an accepted one that npm no longer reports also fails; none accepted since 2026-11-20); the theme's component list in `functions.php` matching the files in
-  `assets/css/components/`, both ways; a type check of the theme's browser scripts (`assets/js/`) with
+  `assets/css/components/`, both ways; every design token the component stylesheets and
+  `theme.json` read defined in `theme.json` (`tools/theme-tokens.sh`, and that check on known
+  examples, `tests/tools/theme-tokens/`, template plan 1.6b); a type check of the theme's browser scripts (`assets/js/`) with
   the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
   (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in

@@ -145,9 +145,14 @@
 		},
 		"custom": {
 			"color": {
-				"formError": "#ffb3b3",
-				"ctaBackground": "var(--wp--preset--color--accent-2)",
-				"onCta": "#ffffff"
+				"formError": "#ffb3b3"
+			},
+			"colorScheme": "dark",
+			"callToAction": {
+				"background": "var(--wp--preset--color--accent-2)",
+				"text": "#ffffff",
+				"buttonBackground": "var(--wp--preset--color--base)",
+				"buttonText": "var(--wp--custom--call-to-action--text)"
 			},
 			"spacing": {
 				"gutter": "24px",
@@ -190,7 +195,8 @@
 				"playWidth": "68px",
 				"playHeight": "48px",
 				"playIcon": "20px",
-				"playBackground": "rgb(0 0 0 / 75%)"
+				"playBackground": "rgb(0 0 0 / 75%)",
+				"playIconColor": "var(--wp--preset--color--contrast)"
 			},
 			"header": {
 				"logoSize": "56px",
@@ -206,7 +212,8 @@
 				"gap": "16px",
 				"markerSize": "10px",
 				"buttonSize": "44px",
-				"buttonBackground": "rgb(0 0 0 / 60%)"
+				"buttonBackground": "rgb(0 0 0 / 60%)",
+				"buttonColor": "var(--wp--preset--color--contrast)"
 			},
 			"texture": {
 				"stageLight": "rgb(255 236 214 / 10%)",

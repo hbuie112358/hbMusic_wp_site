@@ -23,8 +23,8 @@
 	border: 1px solid var(--wp--preset--color--accent-6);
 	border-radius: var(--wp--custom--radius);
 
-	/* The browser's own parts of the fields (the date picker) follow the dark page. */
-	color-scheme: dark;
+	/* The browser's own parts of the fields (the date picker) follow the page's look, light or dark. */
+	color-scheme: var(--wp--custom--color-scheme);
 }
 
 .wpcf7 textarea {
