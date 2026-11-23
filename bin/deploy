@@ -591,6 +591,8 @@ check_after_copy() {
 
 main() {
   read_arguments "$@"
+  # Only this repository's site has places to deploy to; the starter (SITE_DIR) is never deployed.
+  refuse_other_site "bin/deploy" || exit 2
   require_tools
   load_place_settings
   WORK_DIR="$(mktemp -d)" || { log "could not make a temporary folder"; exit 2; }

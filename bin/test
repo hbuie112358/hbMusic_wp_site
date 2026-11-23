@@ -15,6 +15,9 @@ source "$REPO_ROOT/tools/versions.sh"
 source "$REPO_ROOT/tools/site-settings.sh"
 
 FAILED_TESTS=()
+# The test folders left out for this site (left_out_test_folders), relative to each test group's
+# top (tests/scenario/ and tests/e2e/specs/dev/); set once in main.
+LEFT_OUT_FOLDERS=()
 
 log() { printf '%s [test] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 
@@ -32,23 +35,63 @@ site_answers() {
   return 1
 }
 
+# The tests that belong to another site than the one tested (template plan 1.6c, T14; the rule
+# 2.1 sets for the shared tests): for a site other than this repository's (SITE_DIR), this
+# repository's site's own tests (site/) and the tests of this repository's own plugins the site
+# does not list in localPlugins. One folder per line; nothing for this repository's site.
+left_out_test_folders() {
+  local plugin_dir plugin_slug listed_plugins
+  is_this_repository_site && return 0
+  printf 'site\n'
+  listed_plugins="$(site_settings_query '.localPlugins[]')"
+  for plugin_dir in "$REPO_ROOT"/plugins/*/; do
+    plugin_slug="$(basename "$plugin_dir")"
+    grep -qxF "$plugin_slug" <<<"$listed_plugins" || printf 'plugins/%s\n' "$plugin_slug"
+  done
+}
+
+# Names every folder left out, so no test is skipped silently.
+log_left_out_folders() {
+  local folder
+  ((${#LEFT_OUT_FOLDERS[@]} > 0)) || return 0
+  for folder in "${LEFT_OUT_FOLDERS[@]}"; do
+    case "$folder" in
+      site) log "Left out: site/, this repository's site's own tests, not ${SITE_DIR#"$REPO_ROOT"/}'s" ;;
+      *) log "Left out: $folder/, a plugin ${SITE_DIR#"$REPO_ROOT"/} does not list" ;;
+    esac
+  done
+}
+
+# Whether a scenario check sits in a left-out folder.
+is_left_out_scenario() {
+  local scenario="$1" folder
+  for folder in "${LEFT_OUT_FOLDERS[@]}"; do
+    [[ "$scenario" == "$REPO_ROOT/tests/scenario/$folder/"* ]] && return 0
+  done
+  return 1
+}
+
 # The container sees only tests/e2e/ and, read-only, the booking form's messages, which a test
 # expects the visitor to see, site.json, whose test pages the specs check (template plan 1.2g),
-# and the test pages' files in tests/dev-content/, where the component tests find the pages that
-# use their component (1.3b). Host networking lets it reach the site on localhost, as
+# and the test pages' files (the site's tests/dev-content/), where the component tests find the
+# pages that use their component (1.3b). The folders left out reach Playwright's config as
+# TESTS_LEFT_OUT. Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
 # The admin's and the Editor's logins go by name, so the dev site's generated passwords stay off
 # the command line. They unlock only this throwaway site, whose admin screens the tests use.
 browser_tests() {
+  local tests_left_out
+  tests_left_out="$(IFS=,; printf '%s' "${LEFT_OUT_FOLDERS[*]}")"
   docker run --rm --network host -w /e2e \
     -v "$REPO_ROOT/tests/e2e:/e2e" \
     -v "$REPO_ROOT/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
     -v "$SITE_SETTINGS_FILE:/config/site.json:ro" \
-    -v "$REPO_ROOT/tests/dev-content:/config/dev-content:ro" \
+    -v "$SITE_DEV_CONTENT_DIR:/config/dev-content:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e "DEV_MAIL_URL=http://localhost:${DEV_MAIL_UI_PORT}" \
     -e BOOKING_FORM_MESSAGES=/config/booking-form-messages.json \
     -e SITE_SETTINGS=/config/site.json -e DEV_CONTENT=/config/dev-content \
+    -e "TESTS_LEFT_OUT=$tests_left_out" \
     -e DEV_ADMIN_USER -e DEV_ADMIN_PASSWORD -e DEV_ADMIN_EMAIL \
     -e DEV_EDITOR_USER -e DEV_EDITOR_PASSWORD \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test'
@@ -91,6 +134,7 @@ run_all_tests() {
   # A moved or misnamed folder must fail the run, not leave it passing with no scenario checks.
   run_test "Scenario checks found" scenarios_found "${#scenarios[@]}" || return 0
   for scenario in "${scenarios[@]}"; do
+    is_left_out_scenario "$scenario" && continue
     run_test "Scenario: $(basename "$scenario" .sh)" bash "$scenario"
   done
   run_test "Browser tests (Playwright)" browser_tests
@@ -101,6 +145,9 @@ run_all_tests() {
 main() {
   load_site_volume_names || exit 1
   load_settings
+  mapfile -t LEFT_OUT_FOLDERS < <(left_out_test_folders)
+  readonly LEFT_OUT_FOLDERS
+  log_left_out_folders
   run_all_tests
   report
 }

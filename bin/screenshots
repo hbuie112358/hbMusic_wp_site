@@ -176,6 +176,8 @@ compare_with_baseline() {
 
 main() {
   local command="${1:-}"
+  # The real content it shows (data/content/) is this repository's site's only.
+  refuse_other_site "bin/screenshots" || exit 1
   case "$command" in
     previews | baseline | compare) ;;
     *) fail "usage: bin/screenshots previews | baseline | compare" ;;
