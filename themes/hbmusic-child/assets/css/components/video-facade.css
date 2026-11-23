@@ -64,7 +64,7 @@
 	height: var(--wp--custom--video--play-icon);
 	margin: auto;
 	content: "";
-	background: var(--wp--preset--color--contrast);
+	background: var(--wp--custom--video--play-icon-color);
 	clip-path: polygon(15% 0, 100% 50%, 15% 100%);
 }
 

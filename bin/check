@@ -20,6 +20,8 @@ source "$REPO_ROOT/tools/site-packages.sh"
 source "$REPO_ROOT/tools/routines.sh"
 # shellcheck source=tools/status-sheet.sh
 source "$REPO_ROOT/tools/status-sheet.sh"
+# shellcheck source=tools/theme-tokens.sh
+source "$REPO_ROOT/tools/theme-tokens.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
@@ -467,6 +469,23 @@ component_styles_match_files() {
   return 1
 }
 
+# Every design token the component stylesheets and theme.json read is defined in the site's
+# theme.json (tools/theme-tokens.sh, template plan 1.6b): CSS treats an undefined token as unset and
+# says nothing, so a look missing one would quietly lose a color or a size.
+theme_defines_every_token() {
+  local differences
+  differences="$(theme_token_differences "$SITE_THEME_DIR/assets/css/components" "$SITE_THEME_DIR/theme.json")"
+  [[ -z "$differences" ]] && return 0
+  log "The theme's design tokens are incomplete:"
+  printf '%s\n' "$differences" | sed 's/^/    /' >&2
+  return 1
+}
+
+# The check above, tried on known examples (tests/tools/theme-tokens/).
+theme_token_check_refuses_bad_examples() {
+  bash "$REPO_ROOT/tests/tools/theme-tokens/run.sh"
+}
+
 # Every one of the theme's own components (named site-…) appears on the components' example pages
 # or in the theme's template parts, so the browser tests (accessibility, policy, debug log) see it
 # on neutral content whatever the site's own pages hold (template plan T10). Components named
@@ -654,6 +673,8 @@ run_analysis_and_file_checks() {
   run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "Component stylesheets match their list" component_styles_match_files
+  run_check "The theme defines every design token used" theme_defines_every_token
+  run_check "The token check refuses bad examples" theme_token_check_refuses_bad_examples
   run_check "Components appear on the example pages" components_shown_on_example_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check

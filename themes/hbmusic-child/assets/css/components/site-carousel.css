@@ -96,7 +96,9 @@
 	width: var(--wp--custom--carousel--button-size);
 	height: var(--wp--custom--carousel--button-size);
 	font-size: 1.25rem;
-	color: var(--wp--preset--color--contrast);
+
+	/* Its own token: the disc stays dark over the video in any look, so the arrow must stay light. */
+	color: var(--wp--custom--carousel--button-color);
 	cursor: pointer;
 	background: var(--wp--custom--carousel--button-background);
 	border: 1px solid var(--wp--preset--color--accent-6);

@@ -40,8 +40,8 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   weekly only), split in three (see its entry): 1.6a done (`95351f0`, not yet pushed: the shared
   tests no longer assume this site's look or names; the components' `hbmusic` prefix stays for
   2.3).
-- **Next: 1.6b-1,** designed and decided (T13, 2026-11-23): this site's code made ready for
-  another look, its own look and behavior unchanged; then 1.6b-2, the `starter/` folder. The
+- **Next: 1.6b-2,** the `starter/` folder (T13). 1.6b-1 done (2026-11-23): this site's code
+  ready for another look, its own look unchanged (all 24 screenshots identical). The
   project's `CLAUDE.md` now names each language's standard ("Coding standards by language"); the
   review of the theme's three scripts against the strict standards (2026-11-23) became step 1.7.
 - **Worth raising soon:** (1) every
@@ -709,7 +709,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     `site.json`, not this site's address; this site's names out of the generic and component
     tests. Proven by this site's tests still passing.
   - [ ] **1.6b** The neutral site layer (T13), in two parts:
-    - [ ] **1.6b-1** This site's code made ready for another look, its own look and behavior
+    - [x] **1.6b-1** (done 2026-11-23) This site's code made ready for another look, its own look and behavior
       unchanged: `theme.json` tokens for what a light look would break (the call-to-action
       colors as `custom.callToAction.background`, `text`, `buttonBackground` and `buttonText`,
       replacing `ctaBackground` and `onCta`; `custom.video.playIconColor`;

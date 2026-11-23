@@ -31,7 +31,12 @@ template project starts; until then, a list, not a to-do.
   content, the header, the footer and the panels follow and never repeat, and every design token
   in `settings.custom`), `parts/`, `patterns/site-logo.php`
   and `assets/images/`; the neutral test pages' layouts in `tests/dev-content/` follow them. A new
-  site changes these, not the component stylesheets.
+  site changes these, not the component stylesheets; `bin/check` fails if its `theme.json` lacks a
+  token the components read (template plan 1.6b).
+- The site's facts in the theme's code (template plan 1.6b): `themes/hbmusic-child/includes/site-facts.php`,
+  its old addresses and their redirects, the organization's schema.org types, the areas served,
+  the outside sources its Content-Security-Policy allows and the guide's link example. A new site
+  replaces this file; `functions.php` names no site.
 - The stylesheet handles' prefix `hbmusic-` in `functions.php`, with the PHP prefix.
 - The theme's picture in Appearance → Themes, `themes/hbmusic-child/screenshot.png` (1200x900,
   WordPress's recommended size): this site's Home page, shot from its dev preview

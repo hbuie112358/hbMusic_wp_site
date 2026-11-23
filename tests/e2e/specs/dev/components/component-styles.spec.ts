@@ -19,7 +19,7 @@ const PAGES_WITH_LEAD_AND_FEATURES = pagesUsing('site-lead', 'site-features');
 
 // The panel's colour token as WordPress names it from theme.json, and how a browser reports no
 // background colour at all.
-const CALL_TO_ACTION_COLOUR_TOKEN = '--wp--custom--color--cta-background';
+const CALL_TO_ACTION_COLOUR_TOKEN = '--wp--custom--call-to-action--background';
 const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
 // Opens every page and calls check on each one that has a call to action; none at all fails.
@@ -88,7 +88,7 @@ for (const path of PAGES_WITH_A_HERO) {
 }
 
 // The call-to-action panel carries the grain and is the colour its theme.json token names
-// (custom.color.ctaBackground), as the browser resolves the token, set apart from the page behind
+// (custom.callToAction.background), as the browser resolves the token, set apart from the page behind
 // it; whatever colour a site chooses (template plan 1.6a). A token that fails to resolve leaves
 // the panel transparent, which never equals a resolved colour; a missing token leaves the probe
 // transparent too, so it must hold a colour first.
