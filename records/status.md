@@ -128,3 +128,54 @@ commit `8a6d69c`; when the handbook adds an item, it is added here with its stat
 | 9.4 Old addresses redirected | done | From outside on live: all seven of the old site's addresses (from live's own export, rebuild plan 9e and #65) answer 301 to their new pages (Claude); on every pull request: `tests/e2e/specs/dev/site/redirects.spec.ts` | 2026-11-23 |
 | 9.5 Only live indexed | done | From outside: live's `robots.txt` allows everything and names the sitemap; staging has "discourage search engines" on behind its password (rebuild plan 3g-1; `docs/ENVIRONMENTS.md`) | 2026-11-23 |
 | 9.6 Each page planned for search, checked after | done | `records/search.md`: an entry for every page with its phrase, title, description and links, and the launch baseline (screenshots in `records/launch/yoast_screenshots/`, the reasons for each check not green, the user's acknowledgment), rebuild plan 1c and 9m | 2026-11-17 |
+
+## 10. Privacy and legal
+
+| Item | Status | How it was checked | Date |
+|---|---|---|---|
+| 10.1 The privacy policy (chapter 10) | done | Live's Privacy Policy, from the handbook's model (rebuild plan item 1), naming the booking form, Brevo, Turnstile, the videos and the logs with their retention; linked from every page's footer (`tests/e2e/specs/dev/generic/theme.spec.ts`) | 2026-11-17 |
+| 10.2 Collecting the least (chapter 10) | done | From outside, a first browser visit to live's Home and Book gets no cookie at all, and no page holds an analytics or tracking script (Claude); comments off (4.8); the form asks for a name, an email address, an event date and a message only | 2026-11-23 |
+| 10.3 Forms protected against spam (Turnstile) | done | From outside on live: a scripted submission without Turnstile's answer refused as spam by Contact Form 7 (Claude); the form passes the accessibility scan (7.1); on every pull request: `tests/e2e/specs/dev/generic/booking-form.spec.ts` (a message arrives, refusals) | 2026-11-23 |
+| 10.4 The rights to the site's media (chapter 10) | done | The photos are the user's own (the user); the videos are the user's own performances on the user's YouTube channel, only embedded | 2026-11-23 |
+
+## 11. Email and domain
+
+| Item | Status | How it was checked | Date |
+|---|---|---|---|
+| 11.1 Mail through Brevo and FluentSMTP | done | On live and staging since go-live (rebuild plan 9g); a test from staging through Brevo arrived with SPF, DKIM and DMARC passing (rebuild plan 8); the monthly booking test proves the whole path (`docs/ROUTINES.md`, steps 1-2) | 2026-11-17 |
+| 11.2 SPF, DKIM and DMARC; `p=quarantine` from the fifth week | done | From outside: SPF, Brevo's two DKIM records and DMARC `p=none` with reports to Brevo, all in DNS (Claude); a mail tester scored 9.2/10 (rebuild plan 8m). Four weeks of reports end around mid-December 2026, when the policy is raised to `p=quarantine` (a dated item in the template plan) | 2026-11-23 |
+| 11.3 The domain locked and renewed (chapters 3, 6) | done | From outside (the registry's RDAP): transfer prohibited, expiring 2027-04-16; at Hostinger auto-renewal, privacy protection and two-factor login on (the user, rebuild plan 8m); the uptime monitor warns 15 days before expiry (14.2) | 2026-11-23 |
+| 11.4 DNSSEC where offered; CAA | exception | [E11](exceptions.md#e11): Hostinger's DNS signs nothing, so DNSSEC cannot be switched on (no DNSKEY or DS record, Claude, from outside), and no CAA record is set, on Hostinger's advice (rebuild plan 8m) | 2026-11-23 |
+
+## 12. Backups and recovery
+
+| Item | Status | How it was checked | Date |
+|---|---|---|---|
+| 12.1 Backups away from the server (chapter 4) | exception | [E10](exceptions.md#e10): Hostinger's daily backups (7 daily and 7 weekly copies), and as the copy away from the host a monthly content export into `data/exports/` and the user's off-computer copy of `data/` (rebuild plan D27), not chapter 4's monthly full copy with restic | 2026-11-23 |
+| 12.2 Encrypted (chapter 4) | done | The user's off-computer copy of `data/` is on an encrypted external hard drive, last brought up to date on 2026-11-22 (the user); Hostinger's own backups are in the host's account ([E10](exceptions.md#e10)) | 2026-11-23 |
+| 12.3 Restores tested (chapter 4) | exception | [E10](exceptions.md#e10): the content export's restore proven at go-live (staging's export imported onto live, rebuild plan 9i, after a rehearsal on a throwaway site, 9d); a restore from Hostinger's backups not yet tested (rebuild plan 9o) | 2026-11-17 |
+
+## 13. Deployment and migration
+
+| Item | Status | How it was checked | Date |
+|---|---|---|---|
+| 13.1 Changes checked before live; deployed from the repository (chapter 2) | done | `bin/deploy` only (template plan 1.4e): GitHub's required checks on the commit, staging first, then the same commit to live; tested in `tests/tools/deploy/` and against a throwaway server (`tests/scenario/generic/dev-deploy-server.sh`) | 2026-11-23 |
+| 13.2 `wp search-replace` when content changes address | done | No database was copied between addresses: live got staging's content as a WordPress export (rebuild plan D30), and the two addresses that carried staging's domain were fixed by hand (9c, 9i). From outside, no page of live names staging's address; only each page's permanent ID (its GUID) keeps it, which WordPress says is never changed (Claude) | 2026-11-23 |
+| 13.3 Moving a site (chapter 8) | exception | Does not apply yet: the site has not moved; chapter 8's routine applies at rebuild plan step 10, before the hosting plan ends in 2028 | 2026-11-23 |
+| 13.4 DNS time-to-live lowered first (chapter 8) | exception | Does not apply yet: as 13.3 | 2026-11-23 |
+| 13.5 | retired | | |
+
+## 14. Monitoring
+
+| Item | Status | How it was checked | Date |
+|---|---|---|---|
+| 14.1 Uptime monitoring with alerts (chapters 3, 5) | done | HetrixTools every minute from four locations, alerts by Pushover, proven with a planted failure (rebuild plan 8m); the monthly login (`docs/ROUTINES.md`, step 7) | 2026-11-11 |
+| 14.2 Certificate and domain expiry warned (chapters 3, 5) | done | HetrixTools warns 15 days ahead for live's certificate and domain (rebuild plan 8m) | 2026-11-11 |
+| 14.3 Wordfence scans daily and emails every severity | done | Daily scans, findings of every severity emailed to the user (rebuild plan 8m); a test email (Tools → Diagnostics → Other Tests) arrived in the inbox (the user). The latest scan (live, 2026-11-23) found one issue, "How does Wordfence get IPs" (it recommends the X-Real-IP header behind the CDN); with the setting kept at `REMOTE_ADDR`, the user's own address was detected correctly, as on 2026-11-17, and a header can be faked by a visitor, so the issue was ignored with that reason (the settings record) | 2026-11-23 |
+| 14.4 `bin/deploy` shows the PHP log's new lines | done | Every deploy's output ends with the PHP log's new lines ("PHP log: no new lines" on staging and live, e366b02); tested in `tests/tools/deploy/` | 2026-11-23 |
+| 14.5 Site Health, no critical issue | done | Live, at launch: no critical issue, three known recommendations (rebuild plan 9m); in every monthly check (`docs/ROUTINES.md`, step 11) | 2026-11-17 |
+| 14.6 An activity log, kept 30 days (chapters 3, 10) | done | Simple History on staging and live, 30 days, addresses anonymized (template plan 1.5b); on every pull request: `tests/scenario/plugins/simple-history/dev-activity-log.sh` | 2026-11-23 |
+
+## 15. Shop additions
+
+Does not apply: a brochure site, with no shop (the project's `CLAUDE.md`, "Handbook").

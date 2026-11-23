@@ -72,3 +72,22 @@ performance and misses only those introductions, which carry nothing of substanc
 YouTube Studio or a short transcript under each video were weighed and left out as more work
 than they give (the user). Either can be added at any time, which ends this exception. Since
 2026-11-23.
+
+## E10
+
+**Backups follow rebuild plan D27, not chapter 4's two layers** (chapter 12, 12.1-12.3).
+Hostinger backs up daily (7 daily and 7 weekly copies, so up to about 60 days back); the copy away
+from the host is a monthly content export from live's admin into `data/exports/` (pages, songs,
+menu and form; the code is on GitHub, and no keys or visitors' data are in it), with the user's
+off-computer copy of `data/`. Chapter 4's monthly full copy of the site, encrypted with restic on
+a home drive, needs local staging (H7), which is not built yet. Restores: the export's was proven
+at go-live; one from Hostinger's backups is still to be tested (rebuild plan 9o), which ends that
+part of this exception. Since 2026-11-09.
+
+## E11
+
+**No DNSSEC and no CAA record** (chapter 12, 11.4; H96). Hostinger's name servers sign nothing,
+so DNSSEC cannot work there (entering DS values, as its assistant offered, would have broken the
+domain), and Hostinger's assistant advised against a CAA record, since its certificates and its
+CDN have no fixed authority (rebuild plan 8m). Both are looked at again when the site moves
+(rebuild plan step 10), with wherever its DNS is then. Since 2026-11-11.

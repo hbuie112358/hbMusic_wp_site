@@ -25,7 +25,10 @@ theme) and with booking features, to go live at its current host and move to ano
   - E7 Other people's PHP notices shown, not failed, in the dev site's debug log.
   - E8 Contrast checked by the color pairs in use, not every pair the palette allows.
   - E9 No captions or transcript for the videos' brief spoken introductions.
-- Status against the site standard (chapter 12): `records/status.md`.
+  - E10 Backups by D27 (host backups and monthly content exports), not chapter 4's two layers.
+  - E11 No DNSSEC and no CAA record at Hostinger's DNS.
+- Status against the site standard (chapter 12): `records/status.md`, held complete by
+  `bin/check`; the expected plugin set: `records/plugin-set.md`.
 
 ## Terms
 
@@ -200,7 +203,10 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   deploy's checks on known situations (`tests/tools/deploy/`: `bin/deploy` in a throwaway Git
   repository against stand-ins for GitHub, the servers, the Composer build and WordPress.org's
   checksums, 1.4d-1, 1.4d-2); the routines' links to their site details, and that check on
-  known examples (`tests/tools/routines/`, 1.5c); ShellCheck on `bin/`, the
+  known examples (`tests/tools/routines/`, 1.5c); the status sheet (`records/status.md`) answering
+  every item of the blank (`tools/status-sheet-blank.md`: done or exception, with its check or
+  reason and a date, its recorded exceptions there, every file it names still in the repository),
+  and that check on known examples (`tests/tools/status-sheet/`, 1.5d-4); ShellCheck on `bin/`, the
   scenario checks and the tools' tests; the compose file. Runs every check even
   after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or

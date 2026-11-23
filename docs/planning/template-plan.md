@@ -34,8 +34,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23); 1.5d, the status sheet, split in four, 1.5d-1
   done (sections 1-4, `records/status.md`, `records/exceptions.md`); 1.5d-2 done (sections 5-6,
   `records/plugin-set.md`, its two fixes deployed); 1.5d-3 done (sections 7-9,
-  `bin/accessibility-scan` in the monthly check). **Next: 1.5d-4,** sections 10-14, the blank
-  sheet and its `bin/check` rule. Worth raising
+  `bin/accessibility-scan` in the monthly check); 1.5d-4 done (sections 10-14, the blank sheet,
+  `bin/check` holding the sheet complete), so step 1.5 is done. **Next: 1.6,** neutral defaults
+  for the site layer. Worth raising
   soon: (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -541,7 +542,7 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     site's server is set up the same way.
   - Later, its own part (the user, 2026-11-21): the search checks added to the page check on
     2026-11-15 (H62's title and description limits, one main heading, picture descriptions).
-- [~] **1.5 The records and care pieces** the handbook expects of every site: a `records/`
+- [x] **1.5 The records and care pieces** the handbook expects of every site: a `records/`
   skeleton, the status sheet (chapter 12), the activity log (Simple History, H94), the routines
   file. Overlaps the rebuild plan's item 3; done there for this site, generalized here. Split with the
   user, 2026-11-22, in four parts, each its own pull request, in this order:
@@ -616,12 +617,12 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     Health (H98), nothing unknown among Administrators, plugins, themes and server keys (chapter
     6), and the monthly report (chapter 10, customer sites only). A new site's blank copy is
     described in `template-notes.md`.
-  - [~] 1.5d The status sheet: this site's `records/status.md` against chapter 12's items,
+  - [x] 1.5d (2026-11-23) The status sheet: this site's `records/status.md` against chapter 12's items,
     each done (with how it was checked) or an exception (with its reason), from
     `docs/SITE_CHECKLIST.md` and what is verified; with the expected plugin set and the
-    exceptions; and a blank sheet for new sites. Counted 2026-11-23: 83 numbers in sections
-    1-14, 2 retired, so 81 to answer (15 of them pointers to other chapters); section 15 (shop)
-    gets one line. Split with the user, 2026-11-23, in four parts; Claude checks everything it
+    exceptions; and a blank sheet for new sites. Counted 2026-11-23: 88 numbers in sections
+    1-14 (first miscounted as 83, missing numbers that share a pointer line), 2 retired, so 86 to
+    answer; section 15 (shop) gets one line. Split with the user, 2026-11-23, in four parts; Claude checks everything it
     can reach (the repository, the tests, the dev site, live and staging from outside) and
     leaves the user one short list per part (the admin, hPanel, the server over the password
     login, outside accounts):
@@ -666,9 +667,26 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       name the generator tag; 7.1's "monthly scan of local staging" to "of live's pages from
       outside" (`bin/accessibility-scan`); 2.7 and 3.3's "local staging" where a site keeps staging
       on its host.
-    - [ ] 1.5d-4 Sections 10-14, the blank sheet for new sites, and a `bin/check` rule: the
+    - [x] 1.5d-4 Sections 10-14, the blank sheet for new sites, and a `bin/check` rule: the
       sheet has every item number of the blank sheet, each `done` or `exception` with its
-      check or reason filled in, and every test file a row names still exists.
+      check or reason filled in, and every test file a row names still exists. Built
+      2026-11-23: `tools/status-sheet-blank.md` (made from this sheet's item column, compared
+      with chapter 12's numbers both ways: 88), `tools/status-sheet.sh` (every item once,
+      retired ones kept retired, a check or reason and a date, E-links reaching
+      `exceptions.md`, every repository path or test file named still there), tested in
+      `tests/tools/status-sheet/` (13 examples; a real bug caught there: an empty cell merged
+      into the next, as a tab is whitespace to `read`; three planted faults caught). From
+      outside on live: DNS mail records, no DNSSEC or CAA (E11), the domain locked to
+      2027-04-16, no cookies on a first visit, a scripted spam submission refused, no page
+      naming staging (only GUIDs). E10 (backups by D27). Answered by the user: the photos are
+      the user's own (10.4); the off-computer copy is on an encrypted drive (12.2); Wordfence's
+      test email arrived in the inbox, and its scan's one issue (X-Real-IP recommended behind the
+      CDN) was ignored after the user's address showed correctly with `REMOTE_ADDR` (14.3); live's
+      Live Traffic set to Wordfence's new default, logins and blocked requests only. The sheet: 86
+      items answered, none open; `bin/check` holds it there.
+    - Dated (2026-11-23): DMARC to `p=quarantine` from about 2026-12-15, four weeks after live
+      began sending through Brevo, once Brevo's DMARC reports show only the expected senders
+      (handbook H95; status sheet 11.2). A DNS change at Hostinger, by the user, with Claude.
 - [ ] **1.6 Neutral defaults for the site layer:** a placeholder palette, logo, and header,
   footer and call-to-action wording, so a new site starts from something that works rather than
   from this site's look.
