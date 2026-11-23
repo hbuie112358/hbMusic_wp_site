@@ -29,9 +29,11 @@ repository, GitHub, email or chat. Since 2026-11-23.
 
 ## E4
 
-**Two Administrator logins belong to the user** (chapter 6; chapter 12, 4.1): the admin made at
-go-live, and the old site's admin, kept as the way back until rebuild plan 9n (from about
-2026-12-01), then removed. Since 2026-11-17.
+**The old site's admin and themes are kept until rebuild plan 9n** (chapter 6; chapter 12, 4.1,
+5.1, 5.2): two Administrator logins belong to the user, the admin made at go-live and the old
+site's; and the old theme Music Lite (unmaintained, last released in 2022) and its child stay
+installed, inactive, on live. Together they are the way back to the old site until 9n (from
+about 2026-12-01), when the login and both themes are removed. Since 2026-11-17.
 
 ## E5
 
@@ -41,3 +43,12 @@ See the private records (a weakness the host does not let the site close; chapte
 
 **No written agreement on who may change what** (chapters 9 and 10; chapter 12, 4.9): the user's
 own site, with no customer. Since 2026-11-23.
+
+## E7
+
+**The dev site's debug log may hold other people's notices after the tests** (chapter 12, 6.9:
+"empty after the tests"). Any message from the site's own code and any fatal error fails the
+tests; a notice, warning or deprecation from WordPress or a downloaded plugin is shown, not
+failed, since their code is theirs to fix and the browser tests show whether it breaks anything
+(the user, 2026-11-22, template plan 1.5b, after Simple History 5.36.0's deprecation). A change
+of the handbook's check to match is for the user to decide. Since 2026-11-22.

@@ -32,8 +32,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   Simple History on staging and live, activated on both, live at e243788 on 2026-11-23 with
   Contact Form 7 6.2.6); 1.5c done (the routines split into `docs/ROUTINES.md` and
   `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23); 1.5d, the status sheet, split in four, 1.5d-1
-  done (sections 1-4, `records/status.md`, `records/exceptions.md`). **Next: 1.5d-2,** sections
-  5-6 and the expected plugin set. Worth raising
+  done (sections 1-4, `records/status.md`, `records/exceptions.md`); 1.5d-2 done (sections 5-6,
+  `records/plugin-set.md`, two fixes waiting for the next deploy to live). **Next: 1.5d-3,**
+  sections 7-9. Worth raising
   soon: (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -631,8 +632,20 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
       `.private` folder on staging kept (the user). The project's `CLAUDE.md` moved to handbook
       version 1 (the user). PHP is 8.4.28 on both, under active support until 2026-12-31, then
       security fixes until 2028-12-31: moving to 8.5 (staging first) becomes due before then.
-    - [ ] 1.5d-2 Sections 5-6 and `records/plugin-set.md`, the expected set (5.5), which the
-      monthly check's step 12 compares against.
+    - [x] 1.5d-2 (2026-11-23) Sections 5-6 and `records/plugin-set.md`, the expected set (5.5),
+      which the monthly check's step 12 compares against. Live and staging read by the user with
+      WP-CLI: the same plugins at the same versions, core and the five WordPress.org plugins
+      verifying against their checksums. E4 widened to the old theme Music Lite (unmaintained,
+      kept until 9n), E7 added (6.9, the debug log rule of 1.5b). Two gaps found and fixed, each
+      with a check shown failing first (the user chose both, 2026-11-23): 6.11, the editor
+      offered free colors and sizes (WordPress's merged settings; the child's `theme.json` now
+      switches them off; `tests/scenario/generic/dev-editor-presets.sh`); and WordPress's version
+      in every page's generator tag and the feed, against 3.6's reason (Site Hardening 0.3.0
+      empties `the_generator`; two core stylesheets' `?ver=` kept). Both reach live with the next
+      deploy, after which 6.11 is marked done.
+    - Note (2026-11-23): live and staging run WordPress 7.1.5 (Hostinger's security release),
+      the dev site 7.1.4. The dev site's WordPress is raised to it afterwards, as the routines
+      say for a host's security fix; to do in a session soon, with its tests.
     - [ ] 1.5d-3 Sections 7-9.
     - [ ] 1.5d-4 Sections 10-14, the blank sheet for new sites, and a `bin/check` rule: the
       sheet has every item number of the blank sheet, each `done` or `exception` with its
