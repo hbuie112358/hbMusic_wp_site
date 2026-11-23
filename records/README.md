@@ -37,7 +37,7 @@ The repository is public. Here: `search.md`, and the launch screenshots of the s
 (`launch/yoast_screenshots/`, plan 9m). In the private records folder (`data/records/`, never
 committed): `settings.md` (which also holds the hosting setup), `content-list-2026-11-17.md` (the
 content at go-live), `handover-note.md` (a rehearsal, plan item 1d) and `exceptions-private.md`
-(E5). Here as well: `status.md` and `exceptions.md` (template plan 1.5d, being written section
-by section, from `docs/SITE_CHECKLIST.md` and checks made again). Not yet written: the expected
-plugin set (1.5d-2). There are no monthly reports (the user's own site, with no customer) and no
+(E5). Here as well: `status.md` (every item of the standard, held complete by `bin/check`),
+`exceptions.md` and `plugin-set.md` (template plan 1.5d, from `docs/SITE_CHECKLIST.md` and
+checks made again on 2026-11-23). There are no monthly reports (the user's own site, with no customer) and no
 incidents.

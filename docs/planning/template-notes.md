@@ -157,6 +157,14 @@ A new site's `records/` starts with `README.md` alone (template plan 1.5a): this
 first has something to write in it. The settings and hosting records start in the private
 records folder only where the site's repository is public.
 
+## A new site's status sheet
+
+A new site copies `tools/status-sheet-blank.md` to `records/status.md` when it starts its status
+sheet (chapter 7's step 6, at launch), with `records/exceptions.md` and `records/plugin-set.md`
+beside it; until then `bin/check` says the sheet is not started, and from then on fails on any
+item unanswered (template plan 1.5d-4). Most answers come from the tests (named by their files),
+the rest from checks on live from outside and the user's few admin, hPanel and server checks.
+
 ## A new site's routines
 
 A new site gets `docs/ROUTINES.md` unchanged (template plan 1.5c) and a blank
