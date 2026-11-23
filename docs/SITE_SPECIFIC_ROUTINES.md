@@ -91,7 +91,8 @@ Until the expected plugin set is written (`records/plugin-set.md`, template plan
   daemon mode with its own place's settings, and the backups `authorized_keys.before-1.4e` and
   `.before-step-10` beside it. Read over the user's password login, the way the user opens a
   shell on the server: `ssh -o PubkeyAuthentication=no hbmusic-live cat .ssh/authorized_keys`
-  (the password from the user's password notes).
+  (the password from the user's password notes). Tried by the user on 2026-11-23: the two
+  deploy keys' lines and nothing else.
 
 ## Monthly report
 
