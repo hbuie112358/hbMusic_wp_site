@@ -33,8 +33,9 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
   Contact Form 7 6.2.6); 1.5c done (the routines split into `docs/ROUTINES.md` and
   `docs/SITE_SPECIFIC_ROUTINES.md`, 2026-11-23); 1.5d, the status sheet, split in four, 1.5d-1
   done (sections 1-4, `records/status.md`, `records/exceptions.md`); 1.5d-2 done (sections 5-6,
-  `records/plugin-set.md`, two fixes waiting for the next deploy to live). **Next: 1.5d-3,**
-  sections 7-9. Worth raising
+  `records/plugin-set.md`, its two fixes deployed); 1.5d-3 done (sections 7-9,
+  `bin/accessibility-scan` in the monthly check). **Next: 1.5d-4,** sections 10-14, the blank
+  sheet and its `bin/check` rule. Worth raising
   soon: (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -646,7 +647,25 @@ steps. This project's own remaining work stays in `docs/planning/rebuild-plan.md
     - Note (2026-11-23): live and staging run WordPress 7.1.5 (Hostinger's security release),
       the dev site 7.1.4. The dev site's WordPress is raised to it afterwards, as the routines
       say for a host's security fix; to do in a session soon, with its tests.
-    - [ ] 1.5d-3 Sections 7-9.
+    - [x] 1.5d-3 (2026-11-23) Sections 7-9. 9.2 by the user (Google's Rich Results Test valid,
+      the Schema.org validator 0 errors); 7.4 an exception, E9 (some videos carry brief spoken
+      introductions; captions or transcripts left out, the user). Checked by Claude on live
+      from outside: headings in order, the skip link, images, caching and compression, fonts and
+      outside scripts, the search tags, the old addresses and `robots.txt`. A gap found: the
+      handbook's monthly accessibility scan of the real content (7.1, 7.4) did not exist, so
+      `bin/accessibility-scan` was built (the user's choice): the pages `bin/site-check
+      --print-pages` finds answering (a new option, with three situations, one catching a list
+      shortened by a retry), axe at WCAG 2.2 AA with the tests' own rules and images without alt,
+      at both widths, in the pinned Playwright container with its own config; tested by
+      `dev-accessibility-scan.sh` (a probe page with an image without alt fails it; a planted
+      fault swallowing the failure caught); in the monthly check as step 13 (the report moved to
+      14). Live: 12 of 12 passed. E8 added (7.3: no real palette passes "every pair it allows").
+      Open for the user: whether Home, Book and Songs should share the wide photo (9.3).
+    - Handbook proposals collected (each for the user's approval, later, one by one): 6.9's check
+      to match E7; 7.3's check to "the pairs the theme uses and every rendered page" (E8); 3.6 to
+      name the generator tag; 7.1's "monthly scan of local staging" to "of live's pages from
+      outside" (`bin/accessibility-scan`); 2.7 and 3.3's "local staging" where a site keeps staging
+      on its host.
     - [ ] 1.5d-4 Sections 10-14, the blank sheet for new sites, and a `bin/check` rule: the
       sheet has every item number of the blank sheet, each `done` or `exception` with its
       check or reason filled in, and every test file a row names still exists.

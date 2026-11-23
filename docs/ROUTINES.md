@@ -163,8 +163,14 @@ Steps 1-3 run on live (on a site not yet live, on staging).
     Anything not in the expected set (site details:
     [Expected set](SITE_SPECIFIC_ROUTINES.md#expected-set)) is handled as a possible break-in
     (handbook chapter 5): nothing is deleted, and it is looked at with Claude at once.
-13. **The monthly report (handbook chapter 10, H63-H65):** a customer's site only, by the 10th,
-    after steps 1-12, from the handbook's `customer/monthly-report.md`, saved into
+13. **Accessibility scan (handbook chapter 12, 7.1 and 7.4):** from the project's folder,
+    `bin/accessibility-scan` with live's address (site details:
+    [Places](SITE_SPECIFIC_ROUTINES.md#places)). It scans every published page at desktop and
+    phone width (about a minute). A failure names the page, the width and the problem, such as an
+    image added without alt text: fixed on live in the block editor, or brought to a session with
+    Claude when it is not content.
+14. **The monthly report (handbook chapter 10, H63-H65):** a customer's site only, by the 10th,
+    after steps 1-13, from the handbook's `customer/monthly-report.md`, saved into
     `records/reports/` (site details: [Monthly report](SITE_SPECIFIC_ROUTINES.md#monthly-report)).
 
 **What it protects:**
@@ -189,7 +195,9 @@ Steps 1-3 run on live (on a site not yet live, on staging).
   task, a missing module) before it breaks a page.
 - Step 12 catches a break-in that left a way back in: an extra Administrator, plugin or key is
   what an intruder adds, and only DTS knows what the expected set is.
-- Step 13 is what the customer pays for seeing, and the saved report is the site's uptime record.
+- Step 13 tests the content people edit on live, which the dev site's tests never see: a picture
+  without its description or a heading skipped is caught within the month.
+- Step 14 is what the customer pays for seeing, and the saved report is the site's uptime record.
 
 ## If the test fails
 

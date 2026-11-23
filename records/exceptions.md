@@ -52,3 +52,23 @@ tests; a notice, warning or deprecation from WordPress or a downloaded plugin is
 failed, since their code is theirs to fix and the browser tests show whether it breaks anything
 (the user, 2026-11-22, template plan 1.5b, after Simple History 5.36.0's deprecation). A change
 of the handbook's check to match is for the user to decide. Since 2026-11-22.
+
+## E8
+
+**Contrast is checked by the color pairs the site uses, not every pair its palette allows**
+(chapter 12, 7.3). A palette holds several dark and several light shades meant as backgrounds,
+which never contrast with each other (here 14 of its 36 pairs are below 3:1), so no real palette
+passes the handbook's check as worded. The pairs the theme puts together are tested, and every
+rendered page is checked by axe's contrast rule, on the dev site and monthly on live. A change of
+the handbook's check to match is for the user to decide. Since 2026-11-23.
+
+## E9
+
+**The videos' spoken introductions have no captions or transcript** (chapter 12, 7.4; WCAG 2.2,
+1.2.2, through 7.1). Some of the four videos carry brief talking between songs: greetings, who
+the musician is, the next song's name; the rest is music. YouTube's automatic captions garbled
+the singing and were unpublished (rebuild plan 5f). A deaf or hard-of-hearing visitor sees the
+performance and misses only those introductions, which carry nothing of substance; captions in
+YouTube Studio or a short transcript under each video were weighed and left out as more work
+than they give (the user). Either can be added at any time, which ends this exception. Since
+2026-11-23.
