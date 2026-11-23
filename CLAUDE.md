@@ -19,9 +19,10 @@ theme) and with booking features, to go live at its current host and move to ano
   - E2 Keeps a staging site on the host: the user's practice ground for staging on the host,
     which Shop sites need.
   - E3 Secrets in the user's password notes until DTS's Bitwarden is set up.
-  - E4 The old admin kept beside the go-live admin until rebuild plan 9n.
+  - E4 The old site's admin and themes kept until rebuild plan 9n.
   - E5 A weakness the host does not let the site close (private).
   - E6 No written agreement on who may change what: the user's own site.
+  - E7 Other people's PHP notices shown, not failed, in the dev site's debug log.
 - Status against the site standard (chapter 12): `records/status.md`.
 
 ## Terms
@@ -132,7 +133,7 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   PHP debug log's rule (`tests/scenario/debug-log.sh`, template plan 1.5b: any message from the
   site's own code, and any fatal error, fails; other people's notices, warnings and deprecations
   are shown, each with its origin), the `.env` safety stop, every stylesheet of the theme and the Song List labelled
-  by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects), then the browser tests in `tests/e2e/specs/dev/` in the
+  by a fingerprint of its contents, embedded videos' titles read as written, the theme's patterns matching the structure its CSS expects, the editor offering only the theme's colors and sizes (`dev-editor-presets.sh`, handbook 12, 6.11)), then the browser tests in `tests/e2e/specs/dev/` in the
   official Playwright container (`--network host`, seeing only `tests/e2e/` and, read-only,
   `config/booking-form-messages.json`, `site.json`, whose test pages the specs that check every
   page read, and `tests/dev-content/`, where each component's tests find the pages that use it,
@@ -295,7 +296,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
   `bin/dev-site`.
 - `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,
   `docs/SITE_CHECKLIST.md` 3.2), XML-RPC refused, Application Passwords off, no version
-  comments and no PHP version header (plan D26, 8k), HSTS for a year on HTTPS requests only and
+  comments, no WordPress version in pages and feeds (0.3.0, handbook 12, 3.6) and no PHP version
+  header (plan D26, 8k), HSTS for a year on HTTPS requests only and
   unfiltered HTML for Administrators only (handbook 12, 3.1 and 4.10), in a generic plugin that names nothing of this site, with its own prefix
   `sitehardening` and `phpcs.xml.dist`. It deploys like Song List. The policy's outside sources
   are this site's setting, added in the child theme's `functions.php`, each with its reason.

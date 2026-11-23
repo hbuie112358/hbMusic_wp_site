@@ -80,13 +80,10 @@ them); a persistent object cache and a page cache (declined, rebuild plan 0f and
 
 ## Expected set
 
-Until the expected plugin set is written (`records/plugin-set.md`, template plan 1.5d):
-
-- **Plugins:** those under "Plugins and theme", plus Hostinger's own must-use files in
-  `wp-content/mu-plugins/` (listed one by one in 1.5d); themes: the child theme and Twenty Twenty-Five (and the old ones
-  until rebuild plan 9n).
-- **Administrators:** the user's two-factor admin (and the old admin until 9n). The user's
-  Editor login is the only other account.
+- **Plugins, must-use files, themes and accounts:** `records/plugin-set.md` (template plan
+  1.5d-2). Read with `wp plugin list` and `wp theme list` and the `wp-content/mu-plugins/`
+  folder over the password login (below), or in the admin (Plugins, with its Must-Use tab;
+  Appearance → Themes; Users).
 - **Server SSH keys** (`~/.ssh/authorized_keys`): the two deploy keys, each forced into rsync's
   daemon mode with its own place's settings, and the backups `authorized_keys.before-1.4e` and
   `.before-step-10` beside it. Read over the user's password login, the way the user opens a
