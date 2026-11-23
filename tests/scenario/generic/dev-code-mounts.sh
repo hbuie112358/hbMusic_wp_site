@@ -6,14 +6,20 @@
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+# shellcheck source=tools/site-settings.sh
+source "$REPO_ROOT/tools/site-settings.sh"
 
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
 
 # Each folder under wp-content/ in the container, and under the repository on the host: the child
 # theme and every plugin in plugins/, found rather than listed, so a new plugin cannot be left out
-# (the Editing Help plugin was, until this check found its folders by itself).
+# (the Editing Help plugin was, until this check found its folders by itself). The theme's folder
+# is the one site.json names, read once at the start (a plain assignment, so a failed read stops
+# the check under set -e, which a read inside printf's arguments would not).
+CHILD_THEME="$(site_setting .theme)"
+readonly CHILD_THEME
 code_folders() {
-  printf '%s\n' themes/hbmusic-child
+  printf 'themes/%s\n' "$CHILD_THEME"
   local plugin_folder
   for plugin_folder in "$REPO_ROOT"/plugins/*/; do
     printf 'plugins/%s\n' "$(basename "$plugin_folder")"

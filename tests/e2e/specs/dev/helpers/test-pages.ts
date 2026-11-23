@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { SITE_SETTINGS, type TestPage } from './site-settings';
 
 // The paths of every page bin/dev-site creates, shared by the specs that check every page, and
 // the pages that use a given component, for the component tests (template plan T10).
@@ -13,22 +14,13 @@ import path from 'node:path';
 // accessibility, links) also see each component on neutral content. The scripts name this folder
 // in tools/site-settings.sh (COMPONENT_EXAMPLES_DIR), which the test container cannot read; a
 // difference fails loudly, as a page that is not there or a folder that is not found.
-type TestPage = { title: string; address: string; isFrontPage?: boolean; isInMenu?: boolean };
 type PageSource = { path: string; file: string; isExample: boolean };
 
 const COMPONENT_EXAMPLES_FOLDER = path.join(__dirname, '..', 'components', 'pages');
 const EXAMPLE_PAGE_FILE = /\.html$/;
 
 function siteTestPages(): TestPage[] {
-	const settingsFile = process.env.SITE_SETTINGS;
-	if (!settingsFile) {
-		throw new Error('SITE_SETTINGS is not set; run the tests through bin/test.');
-	}
-	const pages = (JSON.parse(readFileSync(settingsFile, 'utf8')) as { testPages?: TestPage[] }).testPages;
-	if (!Array.isArray(pages) || pages.length === 0) {
-		throw new Error(`${settingsFile} lists no testPages`);
-	}
-	return pages;
+	return SITE_SETTINGS.testPages;
 }
 
 function sitePagePath(page: TestPage): string {
@@ -69,6 +61,19 @@ function pageSources(): PageSource[] {
 		...siteTestPages().map((page) => ({ path: sitePagePath(page), file: path.join(folder, `${page.address}.html`), isExample: false })),
 		...exampleFiles().map((file) => ({ path: examplePagePath(file), file: path.join(COMPONENT_EXAMPLES_FOLDER, file), isExample: true })),
 	];
+}
+
+// The site's own test pages (not the example pages) whose content holds the text, such as a
+// plugin's shortcode, and those whose content does not: so a test of something a page's content
+// brings finds that page, and a page without it, on any site, without naming either. Each list
+// may be empty; the test decides what it needs.
+export function sitePagesSplitBy(text: string): { containing: string[]; notContaining: string[] } {
+	const sources = pageSources().filter((source) => !source.isExample);
+	const holdsText = (source: PageSource) => readFileSync(source.file, 'utf8').includes(text);
+	return {
+		containing: sources.filter(holdsText).map((source) => source.path),
+		notContaining: sources.filter((source) => !holdsText(source)).map((source) => source.path),
+	};
 }
 
 // Whether the page's content has an element with every one of the classes (each a whole class

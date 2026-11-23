@@ -99,7 +99,7 @@ for (const path of PAGES_WITH_HERO_BUTTONS) {
 			expect(outlined?.height, 'the outlined button\'s height').toBe(main?.height);
 		});
 
-		// The user saw "Watch him play" stacked longer than "Book Howard". Whether buttons stack
+		// The user once saw two buttons in a row stacked at different widths. Whether buttons stack
 		// depends on the column, not on one screen width, so the pair is measured at widths where
 		// they sit side by side and where they stack.
 		for (const width of [1280, 900, 600, 390]) {

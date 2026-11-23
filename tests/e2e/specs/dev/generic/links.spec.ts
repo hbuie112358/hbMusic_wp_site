@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { TEST_PATHS } from '../helpers/test-pages';
 
-// Protects every link between the site's own pages (plan 1c, 2026-11-16): renaming the Book page's
-// address once left the call-to-action panel's "Book Howard" button, which comes from the theme,
+// Protects every link between the site's own pages (plan 1c, 2026-11-16): renaming a page's
+// address once left the call-to-action panel's button, which comes from the theme,
 // pointing at an address that no longer existed, and nothing noticed. Each test page's links to
 // this site, from the menu, the content, the call-to-action panel and the footer, must lead to a
 // page that answers, following redirects as a browser would. Links into the admin and to anchors

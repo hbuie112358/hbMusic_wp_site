@@ -2,13 +2,16 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { WCAG_TAGS } from '../helpers/accessibility';
 import { answerOutsideServices, recordCspViolations, recordedCspViolations } from '../helpers/csp-violations';
+import { SITE_SETTINGS } from '../helpers/site-settings';
 import { TEST_PATHS } from '../helpers/test-pages';
 
 // Protects the child theme on the dev site (plan step 4c): every test page loads through the
 // child theme, carries the security headers, causes no Content-Security-Policy violation and
 // has no accessibility errors (docs/SITE_CHECKLIST.md 3.2, 6.7, 7.1).
-// WordPress marks the active child theme on <body> (wp-child-theme-<folder>).
-const CHILD_THEME_BODY_CLASS = /\bwp-child-theme-hbmusic-child\b/;
+// WordPress marks the active child theme on <body> (wp-child-theme-<folder>), the folder that
+// site.json names. Its rules (tools/site-settings.jq) allow only lower-case letters, digits and
+// dashes there, so the name needs no escaping in the pattern.
+const CHILD_THEME_BODY_CLASS = new RegExp(`\\bwp-child-theme-${SITE_SETTINGS.theme}\\b`);
 // The policy's rules that no outside source may loosen (checklist 3.2; the Site Hardening plugin).
 const STRICT_POLICY_RULES = ["default-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'self'"];
 
