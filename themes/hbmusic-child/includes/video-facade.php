@@ -46,8 +46,9 @@ const HBMUSIC_VIDEO_FACADE_STYLESHEET = 'assets/css/components/video-facade.css'
 const HBMUSIC_VIDEO_FACADE_SCRIPT     = 'assets/js/video-facade.js';
 const HBMUSIC_VIDEO_FACADE_HANDLE     = 'hbmusic-video-facade';
 
-// The origin of the player the facade script builds (its PLAYER_ADDRESS, YouTube's
-// privacy-enhanced player), which the page's Content-Security-Policy must allow as a frame.
+// The origin of the player the facade script builds (YouTube's privacy-enhanced player), which
+// the page's Content-Security-Policy must allow as a frame. Its one home (template plan 1.7): each
+// facade carries it to the script (data-player-origin).
 const HBMUSIC_VIDEO_PLAYER_ORIGIN = 'https://www.youtube-nocookie.com';
 
 /**
@@ -233,30 +234,30 @@ function hbmusic_video_facade_html( string $video_id, string $title ): string {
 		$picture['height']
 	);
 	return sprintf(
-		'<a class="video-facade" href="%1$s" data-video-id="%2$s" data-video-title="%3$s" aria-label="%4$s">%5$s<span class="video-facade__play" aria-hidden="true"></span></a>',
+		'<a class="video-facade" href="%1$s" data-video-id="%2$s" data-video-title="%3$s" data-player-origin="%4$s" aria-label="%5$s">%6$s<span class="video-facade__play" aria-hidden="true"></span></a>',
 		esc_url( HBMUSIC_VIDEO_WATCH_ADDRESS . $video_id ),
 		esc_attr( $video_id ),
 		esc_attr( $named ),
+		esc_url( HBMUSIC_VIDEO_PLAYER_ORIGIN ),
 		esc_attr( $label ),
 		$image
 	);
 }
 
 /**
- * Loads the facade's stylesheet and script, and the video script that plays one video at a time.
+ * Loads the facade's stylesheet and script (a module, with the module it shares with the video
+ * script), and the video script that plays one video at a time.
  */
 function hbmusic_enqueue_video_facade(): void {
 	wp_enqueue_style( HBMUSIC_VIDEO_FACADE_HANDLE, get_theme_file_uri( HBMUSIC_VIDEO_FACADE_STYLESHEET ), array(), hbmusic_asset_version( HBMUSIC_VIDEO_FACADE_STYLESHEET ) );
 	wp_style_add_data( HBMUSIC_VIDEO_FACADE_HANDLE, 'path', get_theme_file_path( HBMUSIC_VIDEO_FACADE_STYLESHEET ) );
-	wp_enqueue_script(
+	hbmusic_register_video_shared_module();
+	wp_enqueue_script_module(
 		HBMUSIC_VIDEO_FACADE_HANDLE,
 		get_theme_file_uri( HBMUSIC_VIDEO_FACADE_SCRIPT ),
-		array(),
+		array( HBMUSIC_VIDEO_SHARED_MODULE ),
 		hbmusic_asset_version( HBMUSIC_VIDEO_FACADE_SCRIPT ),
-		array(
-			'strategy'  => 'defer',
-			'in_footer' => true,
-		)
+		HBMUSIC_SCRIPT_MODULE_ARGS
 	);
 	hbmusic_enqueue_video_pause_script();
 }

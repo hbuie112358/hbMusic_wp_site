@@ -50,6 +50,21 @@ const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
 const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
 
 /**
+ * What the two video scripts share (template plan 1.7): a script module both import by this name,
+ * which WordPress's import map turns into the file's versioned address. Named for the shared
+ * components plugin it moves into (template plan 2.3, T5), not for this site: the scripts' import
+ * lines and the type check's settings in tools/ repeat the name, and the tools name no site.
+ */
+const HBMUSIC_VIDEO_SHARED_SCRIPT = 'assets/js/video-shared.js';
+const HBMUSIC_VIDEO_SHARED_MODULE = '@dts-site-components/video-shared';
+
+/**
+ * The theme's scripts load as script modules at the end of the page (template plan 1.7): modules
+ * are strict, run once, and wait for the page to be read, as the deferred classic scripts did.
+ */
+const HBMUSIC_SCRIPT_MODULE_ARGS = array( 'in_footer' => true );
+
+/**
  * The script that closes the open hamburger menu on a tap outside it (plan 9t-5), loaded only
  * where a navigation block is rendered, and its handle.
  */
@@ -601,39 +616,50 @@ function hbmusic_is_youtube_player( string $address ): bool {
 }
 
 /**
- * Loads the video script at the end of the page, deferred, labelled by its contents' fingerprint.
+ * Registers the module the two video scripts share, labelled by its contents' fingerprint. Each
+ * script that imports it registers it first, so it is read only on pages with a video; WordPress
+ * ignores a second registration.
  */
-function hbmusic_enqueue_video_pause_script(): void {
-	wp_enqueue_script(
-		HBMUSIC_VIDEO_PAUSE_HANDLE,
-		get_theme_file_uri( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
+function hbmusic_register_video_shared_module(): void {
+	wp_register_script_module(
+		HBMUSIC_VIDEO_SHARED_MODULE,
+		get_theme_file_uri( HBMUSIC_VIDEO_SHARED_SCRIPT ),
 		array(),
-		hbmusic_asset_version( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
-		array(
-			'strategy'  => 'defer',
-			'in_footer' => true,
-		)
+		hbmusic_asset_version( HBMUSIC_VIDEO_SHARED_SCRIPT ),
+		HBMUSIC_SCRIPT_MODULE_ARGS
 	);
 }
 
 /**
- * Loads the menu's close-on-tap script with the first navigation block on the page, at the end of
- * the page, deferred, labelled by its contents' fingerprint; the block's markup passes unchanged.
- * Scripts placed in the footer can still be queued while the page's blocks are being rendered.
+ * Loads the video script as a module at the end of the page, labelled by its contents' fingerprint.
+ */
+function hbmusic_enqueue_video_pause_script(): void {
+	hbmusic_register_video_shared_module();
+	wp_enqueue_script_module(
+		HBMUSIC_VIDEO_PAUSE_HANDLE,
+		get_theme_file_uri( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
+		array( HBMUSIC_VIDEO_SHARED_MODULE ),
+		hbmusic_asset_version( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
+		HBMUSIC_SCRIPT_MODULE_ARGS
+	);
+}
+
+/**
+ * Loads the menu's close-on-tap script with the first navigation block on the page, as a module at
+ * the end of the page, labelled by its contents' fingerprint; the block's markup passes unchanged.
+ * A block theme draws the page's blocks before printing its head, so a module queued here is
+ * still printed.
  *
  * @param string $block_content The navigation block's markup.
  * @return string The same markup.
  */
 function hbmusic_enqueue_menu_close_script( string $block_content ): string {
-	wp_enqueue_script(
+	wp_enqueue_script_module(
 		HBMUSIC_MENU_CLOSE_HANDLE,
 		get_theme_file_uri( HBMUSIC_MENU_CLOSE_SCRIPT ),
 		array(),
 		hbmusic_asset_version( HBMUSIC_MENU_CLOSE_SCRIPT ),
-		array(
-			'strategy'  => 'defer',
-			'in_footer' => true,
-		)
+		HBMUSIC_SCRIPT_MODULE_ARGS
 	);
 	return $block_content;
 }
