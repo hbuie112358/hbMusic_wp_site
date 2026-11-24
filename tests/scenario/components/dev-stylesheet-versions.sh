@@ -12,7 +12,7 @@ set -Eeuo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # The site's themes folder (SITE_THEMES_DIR).
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
 # One block of each kind with component stylesheets in functions.php, and the Song List block.
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.
@@ -41,7 +41,7 @@ repository_copy() {
   local container_path="$1"
   case "$container_path" in
     */wp-content/themes/*) printf '%s/%s' "$SITE_THEMES_DIR" "${container_path#*/wp-content/themes/}" ;;
-    */wp-content/plugins/*) printf '%s/plugins/%s' "$REPO_ROOT" "${container_path#*/wp-content/plugins/}" ;;
+    */wp-content/plugins/*) printf '%s/plugins/%s' "$PROJECT_DIR" "${container_path#*/wp-content/plugins/}" ;;
     *) return 1 ;;
   esac
 }

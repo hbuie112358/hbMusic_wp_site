@@ -16,9 +16,9 @@
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
-readonly HERE REPO_ROOT
-readonly VALID_SITE_SETTINGS="$REPO_ROOT/tests/tools/site-settings/valid.json"
+TOOLS_DIR="$(cd "$HERE/../../.." && pwd)"
+readonly HERE TOOLS_DIR
+readonly VALID_SITE_SETTINGS="$TOOLS_DIR/tests/tools/site-settings/valid.json"
 TEST_ROOT=""
 
 log() { printf '%s [site-check tests] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
@@ -26,8 +26,8 @@ log() { printf '%s [site-check tests] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 copy_site_check() {
   local root="$1"
   mkdir -p "$root/bin" "$root/tools"
-  cp "$REPO_ROOT/bin/site-check" "$root/bin/"
-  cp "$REPO_ROOT/tools/site-settings.sh" "$REPO_ROOT/tools/site-settings.jq" "$root/tools/"
+  cp "$TOOLS_DIR/bin/site-check" "$root/bin/"
+  cp "$TOOLS_DIR/tools/paths.sh" "$TOOLS_DIR/tools/site-settings.sh" "$TOOLS_DIR/tools/site-settings.jq" "$root/tools/"
   cp "$VALID_SITE_SETTINGS" "$root/site.json"
 }
 

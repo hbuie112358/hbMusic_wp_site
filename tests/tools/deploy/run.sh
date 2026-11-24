@@ -37,9 +37,9 @@
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
-readonly HERE REPO_ROOT
-readonly VALID_SITE_SETTINGS="$REPO_ROOT/tests/tools/site-settings/valid.json"
+TOOLS_DIR="$(cd "$HERE/../../.." && pwd)"
+readonly HERE TOOLS_DIR
+readonly VALID_SITE_SETTINGS="$TOOLS_DIR/tests/tools/site-settings/valid.json"
 readonly DOWNLOADED_PLUGIN="example-download"
 readonly PINNED_VERSION="1.1.0"
 readonly SERVER_FOLDERS=(example-download example-plugin example-child deploy-note php-log)
@@ -60,11 +60,11 @@ make_repository() {
   in_git init -q --bare "$work/origin.git"
   in_git init -q "$work/repo"
   mkdir -p "$work/repo/bin" "$work/repo/tools"
-  cp "$REPO_ROOT/bin/deploy" "$work/repo/bin/"
+  cp "$TOOLS_DIR/bin/deploy" "$work/repo/bin/"
   # The page check, a stand-in here: bin/deploy runs the one beside it.
   cp "$HERE/fakes/site-check" "$work/repo/bin/site-check"
-  cp "$REPO_ROOT/tools/site-settings.sh" "$REPO_ROOT/tools/site-settings.jq" \
-    "$REPO_ROOT/tools/site-packages.sh" "$REPO_ROOT/tools/versions.sh" "$work/repo/tools/"
+  cp "$TOOLS_DIR/tools/paths.sh" "$TOOLS_DIR/tools/site-settings.sh" "$TOOLS_DIR/tools/site-settings.jq" \
+    "$TOOLS_DIR/tools/site-packages.sh" "$TOOLS_DIR/tools/versions.sh" "$work/repo/tools/"
   site_settings_for "$scenario" >"$work/repo/site.json"
   write_site_code "$work/repo"
   in_git -C "$work/repo" add -A && in_git -C "$work/repo" commit -qm "A: the site"

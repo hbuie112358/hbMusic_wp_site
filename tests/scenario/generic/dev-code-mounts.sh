@@ -7,7 +7,7 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
 
@@ -21,7 +21,7 @@ readonly CHILD_THEME
 code_folders() {
   printf 'themes/%s\n' "$CHILD_THEME"
   local plugin_folder
-  for plugin_folder in "$REPO_ROOT"/plugins/*/; do
+  for plugin_folder in "$PROJECT_DIR"/plugins/*/; do
     printf 'plugins/%s\n' "$(basename "$plugin_folder")"
   done
 }
@@ -40,7 +40,7 @@ host_folder() {
   local code_folder="$1"
   case "$code_folder" in
     themes/*) printf '%s/%s\n' "$SITE_THEMES_DIR" "${code_folder#themes/}" ;;
-    *) printf '%s/%s\n' "$REPO_ROOT" "$code_folder" ;;
+    *) printf '%s/%s\n' "$PROJECT_DIR" "$code_folder" ;;
   esac
 }
 

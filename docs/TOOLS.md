@@ -248,7 +248,10 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
   theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
   differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling of
-  `bin/dev-site`.
+  `bin/dev-site`. `tools/paths.sh`: the folders every tool works with (template plan T19): the
+  tools' own (`TOOLS_DIR`) and the site's repository (`PROJECT_DIR`), the latter from Composer's
+  `COMPOSER_RUNTIME_BIN_DIR` once the tools come through Composer; a tool that can tell neither
+  refuses rather than guess.
 - `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,
   `docs/SITE_CHECKLIST.md` 3.2), XML-RPC refused, Application Passwords off, no version
   comments, no WordPress version in pages and feeds (0.3.0, handbook 12, 3.6) and no PHP version

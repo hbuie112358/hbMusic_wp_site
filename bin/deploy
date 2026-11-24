@@ -40,14 +40,16 @@
 # wrong, 130 interrupted.
 set -Euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 # shellcheck source=tools/site-packages.sh
-source "$REPO_ROOT/tools/site-packages.sh"
+source "$TOOLS_DIR/tools/site-packages.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 
 # The jobs of .github/workflows/check.yml that must pass before code reaches a server; the same for
 # every site, since the workflow comes with the tools.
@@ -180,7 +182,7 @@ ssh_command() {
   printf '%s' "$command"
 }
 
-in_repository() { git -C "$REPO_ROOT" "$@"; }
+in_repository() { git -C "$PROJECT_DIR" "$@"; }
 
 # Every change counts, untracked files too: the deploy copies the commit, and a working copy
 # that differs from it suggests the commit is not the one meant.
@@ -486,7 +488,7 @@ acquire_deploy_lock() {
 
 # One value of the settings file by its exact name; the rest of the file is never loaded.
 settings_file_value() {
-  local name="$1" file="$REPO_ROOT/$SETTINGS_FILE_NAME"
+  local name="$1" file="$PROJECT_DIR/$SETTINGS_FILE_NAME"
   [[ -f "$file" ]] || return 0
   grep -m 1 -E "^$name=" "$file" | cut -d= -f2-
 }
@@ -541,7 +543,7 @@ prepare_deploy() {
 run_page_check() {
   (
     [[ -z "$PAGE_CHECK_USER" ]] || export SITE_CHECK_USER="$PAGE_CHECK_USER" SITE_CHECK_PASSWORD="$PAGE_CHECK_PASSWORD"
-    exec "$REPO_ROOT/bin/site-check" "$PLACE_ADDRESS"
+    exec "$TOOLS_DIR/bin/site-check" "$PLACE_ADDRESS"
   )
 }
 

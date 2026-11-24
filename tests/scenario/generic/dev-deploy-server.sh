@@ -12,9 +12,9 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 
-readonly SERVER_DIR="$REPO_ROOT/tests/scenario/generic/deploy-server"
+readonly SERVER_DIR="$TOOLS_DIR/tests/scenario/generic/deploy-server"
 readonly IMAGE_TAG="deploy-test-server:local"
 readonly SSH_PORT_INSIDE=22
 # A probe that hangs (a password question waiting for an answer) fails instead of blocking.
@@ -116,7 +116,7 @@ main() {
   # Without SITE_DIR: these are the deploy tool's own tests, against stand-in repositories, whatever
   # site's dev site this run tests (template plan 1.6c-2).
   run_capturing env -u SITE_DIR REAL_SERVER_CONTAINER="$CONTAINER" REAL_SERVER_SSH_CONFIG="$WORK/ssh_config" \
-    bash "$REPO_ROOT/tests/tools/deploy/run.sh" --real-server
+    bash "$TOOLS_DIR/tests/tools/deploy/run.sh" --real-server
   assert_status 0 "bin/deploy's situations against the real server"
   log "bin/deploy's situations against the real server passed"
   probe_restrictions

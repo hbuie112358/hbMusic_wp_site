@@ -9,7 +9,7 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
 SITE_ADDRESS=""
 PROBE_PAGE_ID=""
@@ -48,14 +48,14 @@ main() {
   load_settings
   SITE_ADDRESS="http://localhost:${DEV_SITE_PORT}"
 
-  run_capturing "$REPO_ROOT/bin/accessibility-scan" "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/accessibility-scan" "$SITE_ADDRESS"
   assert_status 0 "the accessibility scan of the dev site"
   expect_every_test_page_scanned
   log "the scan passed on every test page at both widths"
 
   trap remove_probe_page EXIT
   publish_probe_page
-  run_capturing "$REPO_ROOT/bin/accessibility-scan" "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/accessibility-scan" "$SITE_ADDRESS"
   assert_status 1 "the accessibility scan with the probe page"
   assert_output_names "accessibility-scan-probe-$$" "the accessibility scan with the probe page"
   assert_output_names "image-alt" "the accessibility scan with the probe page"
@@ -63,7 +63,7 @@ main() {
 
   remove_probe_page
   PROBE_PAGE_ID=""
-  run_capturing "$REPO_ROOT/bin/accessibility-scan" "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/accessibility-scan" "$SITE_ADDRESS"
   assert_status 0 "the accessibility scan after the probe page was deleted"
   log "the probe page is gone and the scan passes again"
 }

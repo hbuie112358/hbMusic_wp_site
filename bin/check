@@ -8,30 +8,32 @@
 # the exit status is 1 if any check failed.
 set -Euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 # Every check is of this repository, the starter's included (its own rules below), whatever site
 # SITE_DIR names for the dev site (template plan 1.6c).
 unset SITE_DIR
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 # shellcheck source=tools/site-packages.sh
-source "$REPO_ROOT/tools/site-packages.sh"
+source "$TOOLS_DIR/tools/site-packages.sh"
 # shellcheck source=tools/routines.sh
-source "$REPO_ROOT/tools/routines.sh"
+source "$TOOLS_DIR/tools/routines.sh"
 # shellcheck source=tools/status-sheet.sh
-source "$REPO_ROOT/tools/status-sheet.sh"
+source "$TOOLS_DIR/tools/status-sheet.sh"
 # shellcheck source=tools/theme-tokens.sh
-source "$REPO_ROOT/tools/theme-tokens.sh"
+source "$TOOLS_DIR/tools/theme-tokens.sh"
 # shellcheck source=tools/site-layer.sh
-source "$REPO_ROOT/tools/site-layer.sh"
+source "$TOOLS_DIR/tools/site-layer.sh"
 
 # The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
 # with the field it breaks, which the refusal must name; the wording around it may change. So a
 # check that refuses for the wrong field, or accepts everything after a later edit, fails too.
-readonly SITE_SETTINGS_EXAMPLES_DIR="$REPO_ROOT/tests/tools/site-settings"
+readonly SITE_SETTINGS_EXAMPLES_DIR="$TOOLS_DIR/tests/tools/site-settings"
 readonly SITE_SETTINGS_BAD_EXAMPLES=(
   'missing-field.json|devSiteTitle'
   'unknown-field.json|testPages[0].adress'
@@ -53,7 +55,7 @@ readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
 )
 # The same for bin/dev-site's own refusals (tests/tools/dev-site/), which run before it changes
 # anything: each broken example must be refused naming what it breaks, each good one accepted.
-readonly DEV_SITE_EXAMPLES_DIR="$REPO_ROOT/tests/tools/dev-site"
+readonly DEV_SITE_EXAMPLES_DIR="$TOOLS_DIR/tests/tools/dev-site"
 
 FAILED_CHECKS=()
 # The site's facts the checks need, from site.json (load_check_settings): its theme's folder, the
@@ -73,11 +75,11 @@ log() { printf '%s [check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 # Composer's own steps: composer.json and composer.lock read-only (a check never changes the
 # locked versions; bin/tools-update does that on purpose), vendor/ writable for the install.
 in_composer() {
-  mkdir -p "$REPO_ROOT/vendor"
+  mkdir -p "$PROJECT_DIR/vendor"
   docker run --rm -w /app \
-    -v "$REPO_ROOT/composer.json:/app/composer.json:ro" \
-    -v "$REPO_ROOT/composer.lock:/app/composer.lock:ro" \
-    -v "$REPO_ROOT/vendor:/app/vendor" \
+    -v "$PROJECT_DIR/composer.json:/app/composer.json:ro" \
+    -v "$PROJECT_DIR/composer.lock:/app/composer.lock:ro" \
+    -v "$PROJECT_DIR/vendor:/app/vendor" \
     -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
     "$COMPOSER_IMAGE" "$@"
 }
@@ -97,25 +99,25 @@ in_site_packages() {
 # PHPCS and PHPStan: the tools, their configuration and the project's PHP, all read-only.
 in_analysis() {
   docker run --rm -w /app \
-    -v "$REPO_ROOT/vendor:/app/vendor:ro" \
-    -v "$REPO_ROOT/phpcs.xml.dist:/app/phpcs.xml.dist:ro" \
-    -v "$REPO_ROOT/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
-    -v "$REPO_ROOT/themes:/app/themes:ro" \
-    -v "$REPO_ROOT/plugins:/app/plugins:ro" \
-    -v "$REPO_ROOT/config/dev-mu-plugins:/app/config/dev-mu-plugins:ro" \
-    -v "$REPO_ROOT/starter:/app/starter:ro" \
+    -v "$PROJECT_DIR/vendor:/app/vendor:ro" \
+    -v "$PROJECT_DIR/phpcs.xml.dist:/app/phpcs.xml.dist:ro" \
+    -v "$PROJECT_DIR/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
+    -v "$PROJECT_DIR/themes:/app/themes:ro" \
+    -v "$PROJECT_DIR/plugins:/app/plugins:ro" \
+    -v "$TOOLS_DIR/config/dev-mu-plugins:/app/config/dev-mu-plugins:ro" \
+    -v "$PROJECT_DIR/starter:/app/starter:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
 
 load_check_settings() {
   local slug folder_problems
   # Every check below reads these folders; a missing one would fail them with unrelated errors.
-  folder_problems="$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$REPO_ROOT/themes")$(site_settings_missing_local_plugins "$SITE_SETTINGS_FILE" "$REPO_ROOT/plugins")"
+  folder_problems="$(site_settings_theme_problem "$SITE_SETTINGS_FILE" "$PROJECT_DIR/themes")$(site_settings_missing_local_plugins "$SITE_SETTINGS_FILE" "$PROJECT_DIR/plugins")"
   [[ -z "$folder_problems" ]] || { log "site.json: $(paste -sd ';' <<<"$folder_problems")"; exit 1; }
   slug="$(site_setting .slug)"
   SITE_PHP_PREFIX="${slug^^}"
   SITE_PHP_PREFIX="${SITE_PHP_PREFIX//-/_}"
-  SITE_THEME_DIR="$REPO_ROOT/themes/$(site_setting .theme)"
+  SITE_THEME_DIR="$PROJECT_DIR/themes/$(site_setting .theme)"
   mapfile -t SITE_LOCAL_PLUGINS < <(site_settings_query '.localPlugins[]')
   readonly SITE_PHP_PREFIX SITE_THEME_DIR SITE_LOCAL_PLUGINS
 }
@@ -134,15 +136,15 @@ shared_code_names_nothing_of_this_site() {
 }
 
 plugins_name_nothing_of_this_site() {
-  shared_code_names_nothing_of_this_site "$REPO_ROOT/plugins"
+  shared_code_names_nothing_of_this_site "$PROJECT_DIR/plugins"
 }
 
 # The tools, which every site will share (template plan 1.2g): the scripts, their helpers and
 # checker configurations, the GitHub workflows, and the dev site's shared recipe and settings
 # example. Left out: outside code (the CSS linter's installed packages and lock file).
 tools_name_nothing_of_this_site() {
-  shared_code_names_nothing_of_this_site "$REPO_ROOT/bin" "$REPO_ROOT/tools" "$REPO_ROOT/.github" \
-    "$REPO_ROOT/compose.dev.yaml" "$REPO_ROOT/.env.example"
+  shared_code_names_nothing_of_this_site "$TOOLS_DIR/bin" "$TOOLS_DIR/tools" "$PROJECT_DIR/.github" \
+    "$TOOLS_DIR/compose.dev.yaml" "$TOOLS_DIR/.env.example"
 }
 
 # Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
@@ -153,9 +155,9 @@ tools_name_nothing_of_this_site() {
 # was, until template plan 1.4e).
 scripts_can_be_run() {
   local script missing=0
-  for script in "$REPO_ROOT"/bin/*; do
+  for script in "$TOOLS_DIR"/bin/*; do
     [[ -f "$script" && ! -x "$script" ]] || continue
-    log "${script#"$REPO_ROOT"/} cannot be run by its name: it lacks the permission (chmod +x, committed)"
+    log "${script#"$PROJECT_DIR"/} cannot be run by its name: it lacks the permission (chmod +x, committed)"
     missing=1
   done
   return "$missing"
@@ -163,17 +165,17 @@ scripts_can_be_run() {
 
 plugins_never_updated_from_wordpress_org() {
   local plugin_folder main_file missing=0
-  for plugin_folder in "$REPO_ROOT"/plugins/*/; do
+  for plugin_folder in "$PROJECT_DIR"/plugins/*/; do
     main_file="$plugin_folder$(basename "$plugin_folder").php"
     grep -qE '^ \* Update URI: +false$' "$main_file" 2>/dev/null && continue
-    log "${main_file#"$REPO_ROOT"/} has no \"Update URI: false\" header"
+    log "${main_file#"$PROJECT_DIR"/} has no \"Update URI: false\" header"
     missing=1
   done
   return "$missing"
 }
 
 require_lock_file() {
-  [[ -f "$REPO_ROOT/composer.lock" ]] && return 0
+  [[ -f "$PROJECT_DIR/composer.lock" ]] && return 0
   log "composer.lock is missing; bin/tools-update creates it"
   exit 1
 }
@@ -187,7 +189,7 @@ require_jq() {
 
 # site.json, the site's facts (template plan T7), against the rules in tools/site-settings.jq.
 site_json_is_valid() {
-  local problems shown="${SITE_SETTINGS_FILE#"$REPO_ROOT"/}"
+  local problems shown="${SITE_SETTINGS_FILE#"$PROJECT_DIR"/}"
   [[ -f "$SITE_SETTINGS_FILE" ]] || {
     log "$shown is missing; tools/site-settings.md lists its fields"
     return 1
@@ -334,13 +336,13 @@ expect_acceptance() {
 # 1.3c): which issues it would open for plugin updates left waiting and releases never proposed,
 # against stand-ins for GitHub and WordPress.org; nothing goes over the network.
 versions_check_alerts() {
-  bash "$REPO_ROOT/tests/tools/versions-check/run.sh"
+  bash "$TOOLS_DIR/tests/tools/versions-check/run.sh"
 }
 
 # The debug log rule on sample lines (tests/scenario/debug-log.sh, template plan 1.5b): the site's
 # own code and fatal errors fail, other people's notices, warnings and deprecations are shown.
 debug_log_rule() {
-  bash "$REPO_ROOT/tests/tools/debug-log/run.sh"
+  bash "$TOOLS_DIR/tests/tools/debug-log/run.sh"
 }
 
 # The routines' two files in step (tools/routines.sh, template plan 1.5c): every link from
@@ -348,7 +350,7 @@ debug_log_rule() {
 # heading there is linked, so a new site's blank copy cannot leave a detail unfilled unnoticed.
 routines_link_to_site_details() {
   local differences
-  differences="$(routines_link_differences "$REPO_ROOT/docs/ROUTINES.md" "$REPO_ROOT/docs/SITE_SPECIFIC_ROUTINES.md")"
+  differences="$(routines_link_differences "$PROJECT_DIR/docs/ROUTINES.md" "$PROJECT_DIR/docs/SITE_SPECIFIC_ROUTINES.md")"
   [[ -z "$differences" ]] && return 0
   log "docs/ROUTINES.md and docs/SITE_SPECIFIC_ROUTINES.md disagree:"
   printf '%s\n' "$differences" | sed 's/^/    /' >&2
@@ -357,7 +359,7 @@ routines_link_to_site_details() {
 
 # The check above, tried on known examples (tests/tools/routines/).
 routines_check_refuses_bad_examples() {
-  bash "$REPO_ROOT/tests/tools/routines/run.sh"
+  bash "$TOOLS_DIR/tests/tools/routines/run.sh"
 }
 
 # The status sheet held to the site standard (tools/status-sheet.sh, template plan 1.5d-4): every
@@ -365,10 +367,10 @@ routines_check_refuses_bad_examples() {
 # file it names still in the repository. A new site has no sheet until it starts one (the
 # handbook's chapter 7, step 6), which is said, not failed.
 status_sheet_complete() {
-  local sheet="$REPO_ROOT/records/status.md" problems
+  local sheet="$PROJECT_DIR/records/status.md" problems
   [[ -f "$sheet" ]] || { log "no records/status.md yet; it is started from tools/status-sheet-blank.md"; return 0; }
-  problems="$(status_sheet_problems "$sheet" "$REPO_ROOT/tools/status-sheet-blank.md" \
-    "$REPO_ROOT/records/exceptions.md" "$REPO_ROOT")"
+  problems="$(status_sheet_problems "$sheet" "$TOOLS_DIR/tools/status-sheet-blank.md" \
+    "$PROJECT_DIR/records/exceptions.md" "$PROJECT_DIR")"
   [[ -z "$problems" ]] && return 0
   log "records/status.md is not complete:"
   printf '%s\n' "$problems" | sed 's/^/    /' >&2
@@ -377,37 +379,37 @@ status_sheet_complete() {
 
 # The check above, tried on known examples (tests/tools/status-sheet/).
 status_sheet_check_refuses_bad_examples() {
-  bash "$REPO_ROOT/tests/tools/status-sheet/run.sh"
+  bash "$TOOLS_DIR/tests/tools/status-sheet/run.sh"
 }
 
 # The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
 # redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
 # against a stand-in site; nothing goes over the network.
 site_check_situations() {
-  bash "$REPO_ROOT/tests/tools/site-check/run.sh"
+  bash "$TOOLS_DIR/tests/tools/site-check/run.sh"
 }
 
 # bin/deploy's checks before a copy on known situations (tests/tools/deploy/, template plan
 # 1.4d-1): untested or unpushed commits, an unclean working copy, live before staging, a server
 # not answering, against a throwaway repository and stand-ins for GitHub and the servers.
 deploy_situations() {
-  bash "$REPO_ROOT/tests/tools/deploy/run.sh"
+  bash "$TOOLS_DIR/tests/tools/deploy/run.sh"
 }
 
 shellcheck_scripts() {
   local script scenario_scripts tool_test_scripts scripts=()
   # The scenario checks sit in their groups' folders (template plan 1.3a).
-  mapfile -t scenario_scripts < <(find "$REPO_ROOT/tests/scenario" -name '*.sh' -type f | sort)
+  mapfile -t scenario_scripts < <(find "$TOOLS_DIR/tests/scenario" -name '*.sh' -type f | sort)
   # The tools' tests and their stand-in commands, which have no extension (tests/tools/, 1.3c).
-  mapfile -t tool_test_scripts < <(find "$REPO_ROOT/tests/tools" -type f \( -name '*.sh' -o -path '*/fakes/*' \) | sort)
-  for script in "$REPO_ROOT"/bin/* "${scenario_scripts[@]}" "${tool_test_scripts[@]}"; do
-    scripts+=("/src/${script#"$REPO_ROOT"/}")
+  mapfile -t tool_test_scripts < <(find "$TOOLS_DIR/tests/tools" -type f \( -name '*.sh' -o -path '*/fakes/*' \) | sort)
+  for script in "$TOOLS_DIR"/bin/* "${scenario_scripts[@]}" "${tool_test_scripts[@]}"; do
+    scripts+=("/src/${script#"$TOOLS_DIR"/}")
   done
   # -x follows the scenario checks' `source lib.sh` and bin/dev-site's `source tests/dev-setup.sh`;
   # the project root is the source path.
   docker run --rm -w /src \
-    -v "$REPO_ROOT/bin:/src/bin:ro" -v "$REPO_ROOT/tests:/src/tests:ro" \
-    -v "$REPO_ROOT/tools:/src/tools:ro" \
+    -v "$TOOLS_DIR/bin:/src/bin:ro" -v "$TOOLS_DIR/tests:/src/tests:ro" \
+    -v "$TOOLS_DIR/tools:/src/tools:ro" \
     "$SHELLCHECK_IMAGE" --severity=style -x --source-path=/src "${scripts[@]}"
 }
 
@@ -415,7 +417,7 @@ shellcheck_scripts() {
 # node_modules (ignored by git) from the lock file.
 typescript_check() {
   docker run --rm -w /e2e \
-    -v "$REPO_ROOT/tests/e2e:/e2e" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
 }
@@ -436,7 +438,7 @@ theme_scripts_lint() {
 
 in_js_check() {
   docker run --rm -w /js-check \
-    -v "$REPO_ROOT/tools/js-check:/js-check" \
+    -v "$TOOLS_DIR/tools/js-check:/js-check" \
     -v "$SITE_THEME_DIR/assets/js:/theme-js:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     "$PLAYWRIGHT_IMAGE" sh -c "npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && $1"
@@ -446,7 +448,7 @@ in_js_check() {
 # tests run against browsers the test runner was not built for.
 playwright_versions_match() {
   local package_version
-  package_version="$(sed -nE 's/.*"@playwright\/test": "([^"]+)".*/\1/p' "$REPO_ROOT/tests/e2e/package.json")"
+  package_version="$(sed -nE 's/.*"@playwright\/test": "([^"]+)".*/\1/p' "$TOOLS_DIR/tests/e2e/package.json")"
   [[ "$package_version" == "$PLAYWRIGHT_VERSION" ]] && return 0
   log "tests/e2e/package.json has @playwright/test ${package_version:-(none)}; tools/versions.sh has $PLAYWRIGHT_VERSION"
   return 1
@@ -456,11 +458,11 @@ playwright_versions_match() {
 # older schema hides settings the site has, a newer one offers settings it silently ignores.
 theme_json_schema_matches_wordpress() {
   local theme_json="${1:-$SITE_THEME_DIR/theme.json}" wordpress_version schema_version
-  wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$REPO_ROOT/compose.dev.yaml")"
+  wordpress_version="$(sed -nE 's/.*image: wordpress:([0-9]+\.[0-9]+)(\.[0-9]+)?-.*/\1/p' "$TOOLS_DIR/compose.dev.yaml")"
   # [$] matches the literal "$schema" key without looking like a shell variable.
   schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$theme_json")"
   [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
-  log "${theme_json#"$REPO_ROOT"/} uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
+  log "${theme_json#"$PROJECT_DIR"/} uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
   return 1
 }
 
@@ -468,7 +470,7 @@ theme_json_schema_matches_wordpress() {
 # settings and pages, its look's tokens and its files are held to the same rules as this site's,
 # so it never drifts from the theme code it stands on. Its theme is checked against this site's
 # component stylesheets and theme files, which it is assembled with (1.6c) until 2.3 moves them.
-readonly STARTER_DIR="$REPO_ROOT/starter"
+readonly STARTER_DIR="$PROJECT_DIR/starter"
 
 starter_site_json_is_valid() {
   local problems
@@ -494,7 +496,7 @@ starter_defines_every_token() {
 
 starter_holds_the_site_layer() {
   local differences
-  differences="$(site_layer_differences "$REPO_ROOT/tools/site-layer-files.txt" "$STARTER_DIR/theme" "$SITE_THEME_DIR")"
+  differences="$(site_layer_differences "$TOOLS_DIR/tools/site-layer-files.txt" "$STARTER_DIR/theme" "$SITE_THEME_DIR")"
   [[ -z "$differences" ]] && return 0
   log "starter/theme/ and tools/site-layer-files.txt disagree:"
   printf '%s\n' "$differences" | sed 's/^/    /' >&2
@@ -503,18 +505,18 @@ starter_holds_the_site_layer() {
 
 # The check above, tried on known examples (tests/tools/site-layer/).
 site_layer_check_refuses_bad_examples() {
-  bash "$REPO_ROOT/tests/tools/site-layer/run.sh"
+  bash "$TOOLS_DIR/tests/tools/site-layer/run.sh"
 }
 
 # The guard naming the dev site that holds the port, on known examples with a stand-in for docker
 # (tools/dev-site-guard.sh, tests/tools/dev-site-guard/).
 dev_site_guard_on_examples() {
-  bash "$REPO_ROOT/tests/tools/dev-site-guard/run.sh"
+  bash "$TOOLS_DIR/tests/tools/dev-site-guard/run.sh"
 }
 
 # A site layer's full theme assembled on known examples (tools/site-theme.sh, tests/tools/site-theme/).
 site_theme_assembly_on_examples() {
-  bash "$REPO_ROOT/tests/tools/site-theme/run.sh"
+  bash "$TOOLS_DIR/tests/tools/site-theme/run.sh"
 }
 
 # The starter names nothing of this site but the shared theme code's prefix (the site's slug),
@@ -570,7 +572,7 @@ theme_defines_every_token() {
 
 # The check above, tried on known examples (tests/tools/theme-tokens/).
 theme_token_check_refuses_bad_examples() {
-  bash "$REPO_ROOT/tests/tools/theme-tokens/run.sh"
+  bash "$TOOLS_DIR/tests/tools/theme-tokens/run.sh"
 }
 
 # Every one of the theme's own components (named site-…) appears on the components' example pages
@@ -582,7 +584,7 @@ components_shown_on_example_pages() {
   local theme_dir="$SITE_THEME_DIR" component missing=0
   for component in $(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
     grep -qE "class=\"[^\"]*\\b$component\\b" "$COMPONENT_EXAMPLES_DIR"/*.html "$theme_dir"/parts/*.html && continue
-    log "$component appears on no component example page (${COMPONENT_EXAMPLES_DIR#"$REPO_ROOT"/}/) or template part; add a neutral example"
+    log "$component appears on no component example page (${COMPONENT_EXAMPLES_DIR#"$PROJECT_DIR"/}/) or template part; add a neutral example"
     missing=1
   done
   return "$missing"
@@ -599,7 +601,7 @@ npm_audit() {
   local package_dir="$1" report reported exceptions unaccepted
   report="$(npm_audit_json "$package_dir")" || return 1
   reported="$(jq -r '[.vulnerabilities[].via[] | objects | .url | capture("(?<id>GHSA(-[0-9a-z]{4}){3})").id] | unique | .[]' <<<"$report")"
-  exceptions="$(audit_exceptions "$REPO_ROOT/$package_dir/audit-exceptions.json")" || return 1
+  exceptions="$(audit_exceptions "$TOOLS_DIR/$package_dir/audit-exceptions.json")" || return 1
   unaccepted="$(comm -23 <(sort -u <<<"$reported") <(sort -u <<<"$exceptions") | sed '/^$/d')"
   check_exceptions_still_reported "$reported" "$exceptions" || return 1
   if [[ -n "$unaccepted" ]]; then
@@ -631,8 +633,8 @@ npm_audit_in_container() {
   local package_dir="$1"
   shift
   docker run --rm -w /npm \
-    -v "$REPO_ROOT/$package_dir/package.json:/npm/package.json:ro" \
-    -v "$REPO_ROOT/$package_dir/package-lock.json:/npm/package-lock.json:ro" \
+    -v "$TOOLS_DIR/$package_dir/package.json:/npm/package.json:ro" \
+    -v "$TOOLS_DIR/$package_dir/package-lock.json:/npm/package-lock.json:ro" \
     "$PLAYWRIGHT_IMAGE" npm audit --package-lock-only --audit-level=low "$@"
 }
 
@@ -641,7 +643,7 @@ npm_audit_in_container() {
 audit_exceptions() {
   local file="$1" shown today
   [[ -f "$file" ]] || return 0
-  shown="${file#"$REPO_ROOT"/}"
+  shown="${file#"$PROJECT_DIR"/}"
   today="$(date -u +%F)"
   jq -e 'type == "array" and all(.[]; (.advisory | test("^GHSA(-[0-9a-z]{4}){3}$")) and (.reason | type == "string" and length > 0) and (.reviewBy | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")))' "$file" >/dev/null || {
     log "$shown: each entry needs an advisory (GHSA-…), a reason and a reviewBy date (YYYY-MM-DD)"
@@ -668,9 +670,9 @@ check_exceptions_still_reported() {
 # stylesheets is not an error.
 css_lint() {
   docker run --rm -w /lint \
-    -v "$REPO_ROOT/tools/css-lint:/lint" \
-    -v "$REPO_ROOT/themes:/src/themes:ro" \
-    -v "$REPO_ROOT/plugins:/src/plugins:ro" \
+    -v "$TOOLS_DIR/tools/css-lint:/lint" \
+    -v "$PROJECT_DIR/themes:/src/themes:ro" \
+    -v "$PROJECT_DIR/plugins:/src/plugins:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install stylelint --config /lint/stylelint.config.mjs --allow-empty-input "/src/**/*.css"'
 }
@@ -681,18 +683,18 @@ css_lint() {
 # the container does not see.
 actionlint_workflows() {
   local workflow workflows=()
-  for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
+  for workflow in "$PROJECT_DIR"/.github/workflows/*.yml; do
     workflows+=(".github/workflows/$(basename "$workflow")")
   done
-  docker run --rm -w /repo -v "$REPO_ROOT/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
+  docker run --rm -w /repo -v "$PROJECT_DIR/.github:/repo/.github:ro" "$ACTIONLINT_IMAGE" -color "${workflows[@]}"
 }
 
 # The dev site's recipe as Docker Compose reads it: the shared file and the site's own part, written
 # from site.json first (write_site_compose_file), with the example settings.
 compose_file_is_valid() {
   write_site_compose_file
-  docker compose --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" \
-    --env-file "$REPO_ROOT/.env.example" config --quiet
+  docker compose --project-directory "$PROJECT_DIR" -f "$TOOLS_DIR/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" \
+    --env-file "$TOOLS_DIR/.env.example" config --quiet
 }
 
 run_check() {

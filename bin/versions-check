@@ -26,8 +26,10 @@
 # staging and live through the host's own security updates regardless (8j).
 set -Eeuo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 readonly VERSIONS_FILE="tools/versions.sh"
 readonly API_ROOT="https://api.wordpress.org"
 readonly SECONDS_PER_DAY=86400
@@ -66,7 +68,7 @@ log() { printf '%s [versions-check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
 
 # shellcheck source=tools/site-packages.sh
-source "$REPO_ROOT/tools/site-packages.sh"
+source "$TOOLS_DIR/tools/site-packages.sh"
 
 # The newest version and its date, as "version|last_updated". WordPress.org's last_updated is the
 # item's latest change, never earlier than the release, so the wait can only come out longer.
@@ -79,7 +81,7 @@ newest_release() {
     fail "WordPress.org's answer for $slug has no version: $(head -c 200 <<<"$answer")"
 }
 
-pinned_value() { sed -nE "s/^readonly $1=\"([^\"]*)\"$/\1/p" "$REPO_ROOT/$VERSIONS_FILE"; }
+pinned_value() { sed -nE "s/^readonly $1=\"([^\"]*)\"$/\1/p" "$TOOLS_DIR/$VERSIONS_FILE"; }
 
 pinned_version() {
   local variable="$1" version

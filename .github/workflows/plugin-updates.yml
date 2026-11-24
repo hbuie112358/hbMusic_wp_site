@@ -58,7 +58,7 @@ jobs:
           fi
           gh api "repos/$REPOSITORY/contents/site-packages/composer.lock?ref=$HEAD_SHA" \
             -H "Accept: application/vnd.github.raw" > "$RUNNER_TEMP/head.lock"
-          problems="$(REPO_ROOT="$PWD" bash -c 'source tools/site-packages.sh && site_packages_not_plugins_only site-packages/composer.lock "$1"' _ "$RUNNER_TEMP/head.lock")"
+          problems="$(PROJECT_DIR="$PWD" bash -c 'source tools/site-packages.sh && site_packages_not_plugins_only site-packages/composer.lock "$1"' _ "$RUNNER_TEMP/head.lock")"
           if [ -n "$problems" ]; then
             printf 'Not only WordPress.org plugins changed, so this pull request waits for the user:\n'
             printf '  %s\n' "$problems"

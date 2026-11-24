@@ -7,7 +7,7 @@ set -Eeuo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 # The dev site's database volume, named from site.json's slug as bin/dev-site names it.
 load_site_volume_names || exit 1
 
@@ -15,11 +15,11 @@ load_site_volume_names || exit 1
 attempt_new_env_file() {
   local scratch_env="$1"
   # shellcheck disable=SC2016 # the variables expand in the inner shell, on purpose
-  run_capturing env REPO_ROOT="$REPO_ROOT" ENV_FILE="$scratch_env" DEV_DATABASE_VOLUME="$DEV_DATABASE_VOLUME" bash -c '
+  run_capturing env TOOLS_DIR="$TOOLS_DIR" ENV_FILE="$scratch_env" DEV_DATABASE_VOLUME="$DEV_DATABASE_VOLUME" bash -c '
     set -euo pipefail
     log() { printf "%s\n" "$*" >&2; }
     fail() { log "ERROR: $*"; exit 1; }
-    source "$REPO_ROOT/tools/settings.sh"
+    source "$TOOLS_DIR/tools/settings.sh"
     create_env_file
   '
 }
