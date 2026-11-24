@@ -72,7 +72,14 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `check` passing on GitHub; the step entry has the settings); **2.1c built** (T22,
   2026-11-24): committed in `dts-site-tools` as `7c0225a` on `feat/site-workflows`, pushed,
   deliberately unmerged (a rebase merge would rename the commit 2.1d's first call needs); its
-  proof is that first call. **Next: 2.1d,** this site switched over, the first milestone (T21).
+  proof is that first call. **Now: 2.1d,** this site switched over, the first milestone (T21),
+  in eight parts (its step entry): parts 1-7 done 2026-11-24 (#116 open at `82eed0a`, both
+  checks passed; `main`'s protection requires `check / check` and `check / dev-site`; the
+  starter's tests passed with the installed tools); part 8, the release, step 1 done (tools #3
+  merged, the tools' `main` at `18ef4c0`). **Next: part 8 step 2,** tag `v0.2.0` on `18ef4c0`;
+  then step 3 (this site repinned to `0.2.0`, #116 merged, #97 closed) and step 4 (the user's
+  `bin/deploy staging` showing no change); each step one at a time, stopping after each (the
+  user, 2026-11-24).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
@@ -907,7 +914,16 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   self-check rule holds the two equal), and a new `.env` named `compose.dev.yaml` at the
   repository's top (now written for where the tools are). Found, for the user to decide later:
   the parent theme's pinned version, `PARENT_THEME_VERSION`, is in the tools' `tools/versions.sh`,
-  so raising a site's parent theme takes a tools release. Next: the first call. From 2.1c, T22: the first call of the shared workflows from this site's branch,
+  so raising a site's parent theme takes a tools release. The first call (#116): the
+  personal-account caller works; the check runs are named `check / check` and
+  `check / dev-site` (from the check-runs API); `dev-site` failed in the deploy-server scenario,
+  the deploy tests not clearing `COMPOSER_RUNTIME_BIN_DIR`, so `bin/deploy` worked on this
+  repository: fixed in the tools with `REQUIRED_CHECKS` set to the new names (a commit tested
+  only under the old names is refused), then both checks passed; `main`'s protection set to the
+  new names (the user's yes). The traces' path (`vendor/dts/site-tools/tests/e2e/test-results/`)
+  is unverified until a browser test fails on GitHub. The starter's tests passed (17 scenarios,
+  168 browser tests). Tools #3 merged by rebase, `main` at `18ef4c0`. Remaining: tag `v0.2.0`,
+  repin here to `0.2.0` and merge #116, close #97, the user's staging deploy. From 2.1c, T22: the first call of the shared workflows from this site's branch,
   pinned to the tools branch's commit, confirming the personal-account caller, the check names
   GitHub gives called jobs and the traces' path in `vendor/`; then `bin/deploy`'s
   `REQUIRED_CHECKS` and its test scenarios, and this repository's branch protection, set to those
