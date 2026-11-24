@@ -4,35 +4,32 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T12:14:10-05:00
-current_branch: chore/pause-2026-11-24e
-last_commit: ce4ae46
+timestamp: 2026-11-24T12:40:22-05:00
+current_branch: docs/template-stage2-pace
+last_commit: ba99781
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (seventh session), template plan 2.1b-3a-2 done and merged (#114, ce4ae46; the
-  earlier pause commit went with it as 782d173), found while drafting 3b's composer.json: a
-  site's bin-dir bin/ (T18) leaves vendor/bin/ empty, so the checks now start PHPCS and PHPStan
-  by the packages' own files (PHPCS_ENTRY, PHPSTAN_ENTRY in tools/check-lib.sh). Proven by a
-  scratch install with the bin folder set to bin/ (old path failed, new ones worked). The user
-  asked for plain explanations of where the tools live and of Composer: the tools never go on
-  the website; each site's repository downloads a pinned copy into vendor/, on the user's
-  computer and on GitHub alike.
+  2026-11-24 (eighth session). The user set stage 2's pace (T21, also in the project's
+  CLAUDE.md, Testing): work behind the scenes moves fast, things may break between milestones
+  while nothing is deployed; full checks and the starter's tests only at milestones (2.1d,
+  after 2.2/2.3, 2.4) and before every deploy, which stays strict. Template 2.1b-3b done:
+  dts-site-tools built locally in ~/dev/dts-site-tools (the user approved the folder) from
+  ce4ae46 with composer.json (approved), composer.lock (identical packages and commits to this
+  site's), LICENSE, README, CHANGELOG, check workflow, dependabot.yml; three name leaks fixed
+  in the copy; the self-check's Composer validation given --no-check-all (the user approved,
+  after asking why: --strict failed only on the exact versions T18 requires). Then public in
+  the organization with its settings and protection, check passed on GitHub, v0.1.0 tagged on
+  44362f1. The user wants plain explanations and the reasons when a check is changed.
 
 next_action: >
-  Template plan 2.1b-3b, the dts-site-tools repository (T20): read T18-T20 and the step entry.
-  composer.json was drafted and shown to the user (not yet approved as a file): dts/site-tools,
-  type library, GPL-2.0-or-later, the PHP checkers in require at the exact versions of this
-  repository's composer.lock (phpcsextra 1.5.1 and phpcsutils 1.2.3 pinned too), bin listing
-  the eight site commands (bin/tools-update left out: it is tools-repository work), the lint and
-  analyse scripts dropped, config allow-plugins and platform php 8.4.0 kept for its own lock.
-  Ask the user's yes for it, then propose one at a time the rest (copied unchanged from main's
-  ce4ae46: LICENSE, README.md, CHANGELOG.md naming changes to site.json fields and to what
-  bin/check gives a site's own checks, its check workflow) and each outside step for the user's
-  yes: creating the public repository in the organization, its main and v* tag rulesets,
-  security settings, Dependabot, and the v0.1.0 tag. The handbook's toolkit/github.md settings
-  apply. Explain in plain terms; the user asked for simpler explanations this session.
+  Template plan 2.1c, the reusable workflows (T17, T18): read the step entry and
+  findings/step-2.1b-1-trial.md first. Work in ~/dev/dts-site-tools (outside this project: each
+  change there is part of the approved step; ask before anything new outside it). Open in 2.1c:
+  a personal-account caller confirmed at its first call; Composer given the workflow's read-only
+  token; the pin check and the bin/tools-pin command. Per T21, prove at the milestone (2.1d),
+  not every sub-step. Push this repository's docs branch with the 2.1c work, after asking.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
@@ -44,17 +41,23 @@ verification:
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at ce4ae46, even with origin/main. Unpushed: chore/pause-2026-11-24e (1 commit, this
-      pause: resume-state.yaml and the plan's #114 references, documents only).
-      starter/themes/ and tools/js-check/node_modules/ are build output, ignored by git.
+      main is at ce4ae46, even with origin/main. Unpushed: docs/template-stage2-pace (4 commits
+      with this pause: the last pause f4db0a6, T21 17f00bc, the 2.1b-3b record ba99781, this
+      pause; documents only). chore/pause-2026-11-24e (f4db0a6) is contained in it, to delete
+      once the docs branch is merged. starter/themes/ and tools/js-check/node_modules/ are build
+      output, ignored by git.
+  - file: ~/dev/dts-site-tools (its own repository)
+    why: >
+      Clean; main and tag v0.1.0 (44362f1) pushed to direct-technical-solutions/dts-site-tools.
+      Its vendor/ and node_modules/ from the local self-check are ignored by its git.
   - file: data/ (not versioned)
     why: >
       Unchanged since 2026-11-23; its off-computer backup is still behind from the 2026-11-22 and
       2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
     why: >
-      time-log.csv (updated by this pause) and time-corrections.csv (2026-11-24, +12 min, the
-      wait for Dependabot) uncommitted, as at the last pause; the user commits them on the host.
+      time-log.csv (updated by this pause) and time-corrections.csv uncommitted, as at the last
+      pause; the user commits them on the host.
 
 pending_decisions:
   - >
@@ -62,7 +65,7 @@ pending_decisions:
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
     handbook's WORKING_DRAFT.md, "Open items", not repeated here.
   - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built; toolkit/github.md's answered trap on pinning reusable workflows (T17), proposed at 2.1c.
-  - Approving the drafted composer.json for dts-site-tools (next_action), then pushing chore/pause-2026-11-24e (documents only, 1 commit) with later work; Claude asks first.
+  - Pushing docs/template-stage2-pace (documents only) with the 2.1c work; Claude asks first.
   - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to review, later.
   - >
     Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
@@ -119,4 +122,4 @@ resume_instructions: |
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
      (T17-T20 above all) and the entries of the current step (2.1) and the next (2.2); and the
      rebuild plan's Current position (9u waiting).
-  3. Then next_action: step 2.1b-3b.
+  3. Then next_action: step 2.1c.
