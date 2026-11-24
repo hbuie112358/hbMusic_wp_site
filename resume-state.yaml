@@ -4,23 +4,28 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T08:43:27-05:00
+timestamp: 2026-11-24T08:55:00-05:00
 current_branch: chore/pause-2026-11-24
-last_commit: 4989781
+last_commit: 274a397
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24: stage 1 of the template plan done. #109 (T15, T16) and #110 merged: 1.7-1 (ESLint
-  through tools/js-check), 1.7-2 (the theme's scripts as script modules), this file trimmed to
-  resume only and renamed from project-state.yaml (the global files changed with the user's yes),
-  the project's CLAUDE.md slimmed (the tools' details in docs/TOOLS.md). Deployed by the user to
-  staging and live (4989781). The token changes all done; the user keeps Opus for everything.
+  2026-11-24 (second session): no work on this repository. The global setup changes, so every
+  project upgrades to this project's way of working when a session starts in it (the user's yes;
+  committed by the user on the host): ~/.claude/PROJECT_UPGRADE.md (part A, the state file; part
+  B, the project's CLAUDE.md), the SessionStart hook ~/.claude/hooks/setup-check.sh in
+  settings.json (tested on five cases; silent here), a backup section in the global CLAUDE.md,
+  WORKING_STYLE.md's "Saving the usage allowance" (from this project's memory, which keeps only
+  "Opus here"), pointers in PAUSE_CONVENTION, RESUME_CONVENTION and MULTI_PROJECT_SETUP.
 
 next_action: >
-  Step 2.1 of the template plan, dts-site-tools (T16): the tools moved into their own repository,
-  with the review pass (each tool checked for whether it is still needed as it moves). Read 2.1's
-  entries and agree its parts with the user before building.
+  First check: the session-start hook stayed silent here (this project is up to date); a message
+  "Older project setup found" means a fault to look at. Then step 2.1 of the template plan,
+  dts-site-tools (T16). Its parts were proposed, not yet agreed (the plan's Current position):
+  2.1a the review table of every tool, test and workflow (moves / stays / maybe unneeded, for the
+  user to decide) with the two checks on reusable workflows; 2.1b the repository; 2.1c the
+  reusable workflows; 2.1d this site switched over. Start by agreeing the parts, then 2.1a.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
@@ -32,14 +37,15 @@ verification:
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at 4989781, even with origin/main. Unpushed: chore/pause-2026-11-24 (this commit
-      only). starter/themes/ and tools/js-check/node_modules/ are build output, ignored by git.
+      main is at 4989781, even with origin/main. Unpushed: chore/pause-2026-11-24 (2 commits, the
+      two pauses of 2026-11-24). starter/themes/ and tools/js-check/node_modules/ are build
+      output, ignored by git.
   - file: data/ (not versioned)
     why: >
       Unchanged since 2026-11-23; its off-computer backup is still behind from the 2026-11-22 and
       2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
-    why: see the pause output's git status of ~/.claude.
+    why: clean at this pause (2026-11-24 08:55); the time log updated by this pause is the only change.
 
 pending_decisions:
   - >
