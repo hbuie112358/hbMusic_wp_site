@@ -61,10 +61,15 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   starter's tests passing); **2.1b-2b done** (#112, `39677f0`, 2026-11-24: the Compose mount, the site's own
   browser specs in `tests/browser/` mounted apart, the scenario debug-log fix, the status sheet's
   file lookup, `tests/tools/paths/`); **now: 2.1b-3** the repository, designed 2026-11-24 (T20)
-  in two parts: **2.1b-3a under way** (here: `bin/check` split into the site's checks, the tools'
-  self-check and a site's own extra checks; the dev mu-plugin renamed), then **2.1b-3b** the
-  repository (copy, `composer.json`, `LICENSE`, `README.md`, `CHANGELOG.md`, its `check`
-  workflow, branch and tag rulesets, `v0.1.0`). Then 2.1c the
+  in two parts: **2.1b-3a done** (#113, `f3f4bf0`, 2026-11-24: `bin/check` split into the site's
+  checks, the site's own in `tests/checks/` and the tools' self-check
+  `tests/tools/check-tools.sh`, shared runner `tools/check-lib.sh`; the dev mu-plugin renamed
+  `dev-site-services.php` with its own PHP checker settings in `tools/php-check/`); **next:
+  2.1b-3b** the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
+  `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
+  the changelog also names any change to what `bin/check` provides a site's own checks). Each
+  outside step (the repository in the organization, its rulesets, the tag) proposed to the user
+  first. Then 2.1c the
   reusable workflows (a personal-account caller confirmed at its first call; Composer given the
   workflow's read-only token; the pin check and the `bin/tools-pin` command); 2.1d this site switched over (local
   copies removed, the plugin-dependent tests following `composer.json`, all checks and the
@@ -848,7 +853,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   tools' `specs/dev/site/`; the scenario checks' debug-log rule reading the tested site's
   `site.json`, shown failing on a notice planted in the starter's theme; the status sheet's files
   found in either folder; `tests/tools/paths/`, shown failing on two planted faults)), `[~]` 2.1b-3
-  the repository (T20, 2026-11-24: `[~]` 2.1b-3a here, `bin/check` split into site checks, the
+  the repository (T20, 2026-11-24: `[x]` 2.1b-3a here (#113, `f3f4bf0`), `bin/check` split into site checks, the
   tools' self-check and a site's own extra checks, the mu-plugin renamed (every earlier check
   still run, compared by name; three planted faults, one per part, each failing in its part; the
   self-check passing on a copy of the tools alone, which found `bin/dev-site` telling ShellCheck
