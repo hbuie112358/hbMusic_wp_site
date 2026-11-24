@@ -50,7 +50,13 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   parts (1.7-1 ESLint in `bin/check` with `tools/js-check/`'s own packages; 1.7-2 the scripts as
   script modules, the video script's state in a class, one home for what the two video scripts
   share and for the player's origin, a facade without a title or a secure origin staying a link).
-- **Next: 2.1,** `dts-site-tools` (T16).
+- **Next: 2.1,** `dts-site-tools` (T16). Its parts proposed 2026-11-24, not yet agreed with the
+  user: 2.1a a review table of every tool in `bin/` and `tools/`, the shared tests and the
+  workflows (moves, stays with the site, or perhaps no longer needed, each for the user to decide),
+  with the two checks on reusable workflows; 2.1b the repository (layout, license, changelog, its
+  own checks, the first tag, how a site fetches it through Composer); 2.1c the reusable workflows;
+  2.1d this site switched over (local copies removed, the plugin-dependent tests following
+  `composer.json`, all checks and the starter's tests passing, a deploy showing no change).
 - **Worth raising soon:** (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
