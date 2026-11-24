@@ -67,8 +67,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `dev-site-services.php` with its own PHP checker settings in `tools/php-check/`); **2.1b-3a-2
   done** (#114, `ce4ae46`; found while drafting 3b's `composer.json`, 2026-11-24: the checks start PHPCS and
   PHPStan by their packages' own files, `PHPCS_ENTRY` and `PHPSTAN_ENTRY` in
-  `tools/check-lib.sh`, since a site's `bin-dir: bin` leaves `vendor/bin/` empty); **next:
-  2.1b-3b** the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
+  `tools/check-lib.sh`, since a site's `bin-dir: bin` leaves `vendor/bin/` empty); **2.1b-3b
+  done** (2026-11-24: `dts-site-tools` public in the organization, `v0.1.0` on `44362f1`, its
+  `check` passing on GitHub; the step entry has the settings); **next: 2.1c.** 2.1b-3b was
+  the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
   the changelog also names any change to what `bin/check` provides a site's own checks;
   `composer.json` approved by the user 2026-11-24; the pace set by T21: proof at milestones,
@@ -866,9 +868,18 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   to follow the site's `tests/dev-setup.sh`, now the site's ShellCheck's); `[x]` 2.1b-3a-2 (#114, `ce4ae46`) the
   PHP checkers started by their packages' own files, not `vendor/bin/` (a scratch install with
   the bin folder set to `bin/` left no `vendor/bin/`; the old path failed there, the new ones
-  worked); `[ ]` 2.1b-3b the
-  repository, its checks, settings and `v0.1.0` (T21: the three name leaks fixed in the copy; the
-  name check widened to the tests and `docs/TOOLS.md` before 2.5)); `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
+  worked); `[x]` 2.1b-3b the
+  repository, its checks, settings and `v0.1.0` (2026-11-24: `direct-technical-solutions/dts-site-tools`
+  public, rebase merges only, branches deleted after merge; secret scanning with push protection,
+  Dependabot alerts and security updates; `main` protected with `check` required, up to date,
+  administrators included, linear, no force-push or deletion; the ruleset "release tags never
+  move" on `v*`, no bypass; `check` passed on GitHub, then `v0.1.0` tagged on `44362f1`. T21: the three name leaks fixed in the copy; the
+  name check widened to the tests and `docs/TOOLS.md` before 2.5; first commit `44362f1` made
+  locally 2026-11-24, self-check 28 of 29 then the 29th passing after the change below; four
+  files differ from `ce4ae46` on purpose, expected at 2.1d's file-by-file comparison:
+  `tests/e2e/package.json` and its lock file's package name, `docs/TOOLS.md`'s deploy example,
+  `tests/tools/dev-site-guard/run.sh`'s example names, and `tests/tools/check-tools.sh`'s Composer
+  validation with `--no-check-all`, since `--strict` failed on the exact versions T18 requires)); `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
   switched over (found in 2.1b-2b: `.env`'s `COMPOSE_FILE`, written from `.env.example`, names
   `compose.dev.yaml` relative to the site's repository, so hand-typed `docker compose` commands
   need its new place there; found in 2.1b-3a-2: Composer reads `allow-plugins` only from the
