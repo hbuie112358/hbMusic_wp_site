@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Tests the site-layer check (tools/site-layer.sh, template plan 1.6b) on known examples, run by
-# bin/check every time: a layer and a theme that agree with the list pass, and each broken one is
-# refused, naming the file that is wrong. The examples are written fresh into a temporary folder,
-# so nothing depends on this site's theme. Needs bash, find, grep, sed, sort and comm.
+# Tests the site-layer check (tools/site-layer.sh, template plan 1.6b) on known examples, run by the
+# tools' self-check every time: a layer and a theme that agree with the list pass, and each broken
+# one is refused, naming the file that is wrong. The examples are written fresh into a temporary
+# folder, so nothing depends on this site's theme. Needs bash, find, grep, sed, sort and comm.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Tests the debug log rule (tests/scenario/debug-log.sh, template plan 1.5b) on sample lines, run
-# by bin/check every time: which lines fail and which are only shown. The site is a neutral one
-# (an example theme and plugin), so nothing depends on this site's names. Needs bash and jq.
+# Tests the debug log rule (tests/scenario/debug-log.sh, template plan 1.5b) on sample lines, run by
+# the tools' self-check every time: which lines fail and which are only shown. The site is a neutral
+# one (an example theme and plugin), so nothing depends on this site's names. Needs bash and jq.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -5,11 +5,11 @@
 	<description>The project's PHP follows the WordPress Coding Standards (plan step 3d).</description>
 
 	<!-- The project's own PHP. Plugins are checked by their own rulesets (plugins/*/phpcs.xml.dist),
-	     with their own prefixes, so a shared plugin never depends on this site's names. -->
+	     with their own prefixes, so a shared plugin never depends on this site's names; the tools'
+	     dev-site must-use plugins by the tools' self-check (tools/php-check/). -->
 	<file>themes</file>
-	<file>config/dev-mu-plugins</file>
-	<!-- The starter's site layer (template plan 1.6b), which uses the theme code's prefix. -->
-	<file>starter</file>
+	<!-- The starter's site layer (template plan 1.6b), which uses the theme code's prefix, is checked
+	     with these rules by its own check (tests/checks/starter.sh), naming the folder. -->
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<!-- The starter's assembled theme: build output, a copy of themes/ with the starter's layer. -->

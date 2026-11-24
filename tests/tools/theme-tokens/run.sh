@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Tests the design-token check (tools/theme-tokens.sh, template plan 1.6b) on known examples, run by
-# bin/check every time: a look defining every token its components use passes, and each broken one
-# is refused, naming the token or file that is wrong. The examples are written fresh into a
-# temporary folder, so nothing depends on this site's look. Needs bash, grep, sed, sort, comm and jq.
+# the tools' self-check every time: a look defining every token its components use passes, and each
+# broken one is refused, naming the token or file that is wrong. The examples are written fresh into
+# a temporary folder, so nothing depends on this site's look. Needs bash, grep, sed, sort, comm and
+# jq.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

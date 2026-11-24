@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Tests the status sheet's check (tools/status-sheet.sh, template plan 1.5d-4) on known examples,
-# run by bin/check every time: a complete sheet passes, and each broken copy of it is refused,
-# naming the item and what is wrong. The blank, the sheet, the exceptions record and the files a
-# row names are written fresh into a temporary folder, so nothing depends on this site's sheet.
-# The folder holds a stand-in site and, apart from it, a stand-in for the tools (template plan
-# T19), with the files the complete sheet names split between them: a sheet names the site's files
-# and the tools' (bin/check, the shared tests), so each must be found in either.
-# Needs bash, awk, grep and sort.
+# run by the tools' self-check every time: a complete sheet passes, and each broken copy of it is
+# refused, naming the item and what is wrong. The blank, the sheet, the exceptions record and the
+# files a row names are written fresh into a temporary folder, so nothing depends on this site's
+# sheet. The folder holds a stand-in site and, apart from it, a stand-in for the tools (template
+# plan T19), with the files the complete sheet names split between them: a sheet names the site's
+# files and the tools' (bin/check, the shared tests), so each must be found in either. Needs bash,
+# awk, grep and sort.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

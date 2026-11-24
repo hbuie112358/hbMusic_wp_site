@@ -414,7 +414,8 @@ clear_uploads() {
 run_site_dev_setup() {
   [[ -f "$SITE_DEV_SETUP_FILE" ]] || return 0
   log "Running the site's own build steps (${SITE_DEV_SETUP_FILE#"$PROJECT_DIR"/})"
-  # shellcheck source=tests/dev-setup.sh
+  # The site's file, not the tools': the site's own ShellCheck check (bin/check) reads it.
+  # shellcheck source=/dev/null
   source "$SITE_DEV_SETUP_FILE"
 }
 
