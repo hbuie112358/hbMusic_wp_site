@@ -6,8 +6,6 @@
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
-# shellcheck source=tools/site-settings.sh
-source "$TOOLS_DIR/tools/site-settings.sh"
 
 readonly WP_CONTENT_IN_CONTAINER="/var/www/html/wp-content"
 

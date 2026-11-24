@@ -6,8 +6,6 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
-# shellcheck source=tools/site-settings.sh
-source "$TOOLS_DIR/tools/site-settings.sh"
 # The dev site's database volume, named from site.json's slug as bin/dev-site names it.
 load_site_volume_names || exit 1
 

@@ -10,6 +10,11 @@ TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 readonly TOOLS_DIR
 # shellcheck source=tools/paths.sh
 source "$TOOLS_DIR/tools/paths.sh"
+# The site tested (SITE_DIR, from the user's environment as bin/test received it) and its
+# site.json, by the same rule as every tool (template plan T19): the debug log's own-code places
+# are the tested site's, so a notice from the starter's theme fails as this site's would.
+# shellcheck source=tools/site-settings.sh
+source "$TOOLS_DIR/tools/site-settings.sh"
 SCENARIO_NAME="$(basename "${BASH_SOURCE[1]:-scenario}" .sh)"
 readonly SCENARIO_NAME
 
@@ -56,7 +61,7 @@ source "$TOOLS_DIR/tests/scenario/debug-log.sh"
 expect_clean_debug_log() {
   local entries verdicts shown failing
   entries="$(dev_compose exec -T wordpress sh -c "[ -f '$DEBUG_LOG' ] && cat '$DEBUG_LOG' || true")"
-  verdicts="$(debug_log_verdicts "$entries" "$(own_code_places "$PROJECT_DIR/site.json")")"
+  verdicts="$(debug_log_verdicts "$entries" "$(own_code_places "$SITE_SETTINGS_FILE")")"
   shown="$(sed -n 's/^shown\t//p' <<<"$verdicts")"
   failing="$(sed -n 's/^fail\t//p' <<<"$verdicts")"
   [[ -z "$shown" ]] || log "other people's code wrote to the debug log (shown, not failed):

@@ -20,6 +20,10 @@ readonly SITE_SETTINGS_FILE="$SITE_DIR/site.json"
 readonly SITE_THEMES_DIR="$SITE_DIR/themes"
 readonly SITE_DEV_CONTENT_DIR="$SITE_DIR/tests/dev-content"
 readonly SITE_DEV_SETUP_FILE="$SITE_DIR/tests/dev-setup.sh"
+# The site's own browser specs (template plan T19), optional: mounted by bin/test and bin/check's
+# type check into the tools' tests/e2e/specs/dev/site/, where they run with the shared specs.
+readonly SITE_BROWSER_SPECS_DIR="$SITE_DIR/tests/browser"
+readonly SITE_BROWSER_SPECS_MOUNT_POINT="/e2e/specs/dev/site"
 # A site layer of its own (the starter's theme/, template plan 1.6b): the site's full theme is then
 # assembled from it into themes/ by tools/site-theme.sh before each build.
 readonly SITE_LAYER_DIR="$SITE_DIR/theme"
@@ -76,6 +80,13 @@ is_this_repository_site() {
   [[ "$SITE_DIR" == "$PROJECT_DIR" ]]
 }
 
+# The Docker options mounting the site's own browser specs, one per line; nothing for a site
+# without them.
+site_browser_specs_mount_options() {
+  [[ -d "$SITE_BROWSER_SPECS_DIR" ]] || return 0
+  printf '%s\n' -v "$SITE_BROWSER_SPECS_DIR:$SITE_BROWSER_SPECS_MOUNT_POINT:ro"
+}
+
 # Refuses, naming the script, when SITE_DIR names another site: for the tools that only ever act
 # on this repository's site (deploying it, its screenshots).
 refuse_other_site() {
@@ -124,20 +135,31 @@ site_settings_missing_local_plugins() {
   done < <(jq -r '.localPlugins[]' "$settings_file")
 }
 
+# A folder as compose.site.yaml names it: relative to the site's repository, where Compose reads
+# the recipe, when the folder is inside it (the file then names no home folder); absolute
+# otherwise, as the tools' own folder is once they are installed apart (template plan T19).
+compose_mount_source() {
+  local folder="$1"
+  if [[ "$folder" == "$PROJECT_DIR"/* ]]; then
+    printf './%s\n' "${folder#"$PROJECT_DIR"/}"
+    return 0
+  fi
+  printf '%s\n' "$folder"
+}
+
 # Writes compose.site.yaml, the dev site's own part of its recipe, from site.json (template plan
 # 1.2f): the project's name ("<slug>-dev", which also names the database volume) and the folders
-# mounted read-only, the theme and each of the site's own plugins, for the site and for WP-CLI.
-# compose.dev.yaml holds the rest, the same for every site; Docker Compose merges the two. Written
-# whole by bin/dev-site, bin/check and bin/screenshots each time they start, so it follows
-# site.json; replaced in one step, so a reader never sees half a file.
+# mounted read-only, the theme, each of the site's own plugins and the tools' dev-only must-use
+# plugins (template plan T19), for the site and for WP-CLI. compose.dev.yaml holds the rest, the
+# same for every site; Docker Compose merges the two. Written whole by bin/dev-site, bin/check and
+# bin/screenshots each time they start, so it follows site.json; replaced in one step, so a
+# reader never sees half a file.
 write_site_compose_file() {
-  local slug theme themes_path plugin_slug mounts
+  local slug theme plugin_slug mounts
   slug="$(site_setting .slug)"
   theme="$(site_setting .theme)"
-  # Relative to the repository, where Compose reads the recipe, when the site is inside it.
-  themes_path="$SITE_THEMES_DIR"
-  [[ "$themes_path" == "$PROJECT_DIR"/* ]] && themes_path="./${themes_path#"$PROJECT_DIR"/}"
-  mounts="      - $themes_path/$theme:/var/www/html/wp-content/themes/$theme:ro"$'\n'
+  mounts="      - $(compose_mount_source "$SITE_THEMES_DIR/$theme"):/var/www/html/wp-content/themes/$theme:ro"$'\n'
+  mounts+="      - $(compose_mount_source "$TOOLS_DIR/config/dev-mu-plugins"):/var/www/html/wp-content/mu-plugins:ro"$'\n'
   while IFS= read -r plugin_slug; do
     mounts+="      - ./plugins/$plugin_slug:/var/www/html/wp-content/plugins/$plugin_slug:ro"$'\n'
   done < <(site_settings_query '.localPlugins[]')

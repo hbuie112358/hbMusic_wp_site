@@ -201,7 +201,8 @@ its pieces and writes few of its own.
   components with the site's own look around them.
 - **Plugin tests** (with each plugin; `plugins/<plugin>/`): for the plugins the site uses: Site
   Hardening and Editing Help on every site (handbook chapter 3), Song List only where it is used.
-- **Site tests** (`site/`): none at the start. One is written only for code or settings the site
+- **Site tests** (browser specs in the site's own `tests/browser/`, which the tools mount beside
+  the shared specs, template plan T19): none at the start. One is written only for code or settings the site
   adds itself: an old-address list (a moved site; this site's `redirects.spec.ts` is the model), an
   addition to the page data (`organization.spec.ts`), its own build steps in `tests/dev-setup.sh`.
   A site test checks facts, never the pages' wording, and is shown failing on a planted fault
