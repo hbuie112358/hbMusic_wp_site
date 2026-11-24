@@ -9,30 +9,28 @@
  * focus as it always does. Taps inside the open menu, the close button included, are WordPress's.
  *
  * "pointerdown" rather than "click": Safari sends no click for a tap on plain text. Without this
- * script the menu still closes with its button, Escape, or a tap on a link or button.
+ * script the menu still closes with its button, Escape, or a tap on a link or button. A script
+ * module (template plan 1.7): strict and run once, after the page is read.
  */
-( () => {
-	'use strict';
 
-	const OPEN_PANEL_SELECTOR = '.wp-block-navigation__responsive-container.is-menu-open';
-	const CLOSE_BUTTON_SELECTOR = '.wp-block-navigation__responsive-container-close';
+const OPEN_PANEL_SELECTOR = '.wp-block-navigation__responsive-container.is-menu-open';
+const CLOSE_BUTTON_SELECTOR = '.wp-block-navigation__responsive-container-close';
 
-	/**
-	 * Presses the open menu's close button when a press lands outside the menu.
-	 *
-	 * @param {PointerEvent} event The press.
-	 */
-	function closeMenuOnPressOutside( event ) {
-		const panel = document.querySelector( OPEN_PANEL_SELECTOR );
-		const pressed = event.target;
-		if ( ! panel || ! ( pressed instanceof Node ) || panel.contains( pressed ) ) {
-			return;
-		}
-		const closeButton = panel.querySelector( CLOSE_BUTTON_SELECTOR );
-		if ( closeButton instanceof HTMLElement ) {
-			closeButton.click();
-		}
+/**
+ * Presses the open menu's close button when a press lands outside the menu.
+ *
+ * @param {PointerEvent} event The press.
+ */
+function closeMenuOnPressOutside( event ) {
+	const panel = document.querySelector( OPEN_PANEL_SELECTOR );
+	const pressed = event.target;
+	if ( ! panel || ! ( pressed instanceof Node ) || panel.contains( pressed ) ) {
+		return;
 	}
+	const closeButton = panel.querySelector( CLOSE_BUTTON_SELECTOR );
+	if ( closeButton instanceof HTMLElement ) {
+		closeButton.click();
+	}
+}
 
-	document.addEventListener( 'pointerdown', closeMenuOnPressOutside );
-} )();
+document.addEventListener( 'pointerdown', closeMenuOnPressOutside );

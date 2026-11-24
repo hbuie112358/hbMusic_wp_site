@@ -5,8 +5,9 @@ import { pagesUsing } from '../helpers/test-pages';
 // handbook 12, 8.5): a page with videos loads nothing from YouTube until the visitor plays one, each
 // video showing its picture from the site itself and a play button named after the video; playing
 // it, by click or Enter, puts YouTube's privacy-enhanced player in its place, set to play and ready
-// for the video script's commands, holding the keyboard focus after Enter; without JavaScript the picture is a
-// link to the video on YouTube. Replaces the earlier check that every player was lazy-loaded.
+// for the video script's commands, holding the keyboard focus after Enter; without JavaScript, or
+// for a video without a title or a secure player origin, the picture is a link to the video on
+// YouTube. Replaces the earlier check that every player was lazy-loaded.
 // Checked on every page with a YouTube video (template plan T10), playing its first one.
 const PAGES_WITH_VIDEOS = pagesUsing('wp-block-embed-youtube');
 const FACADE = 'main a.video-facade';
@@ -120,6 +121,31 @@ for (const path of PAGES_WITH_VIDEOS) {
 				expect(address.searchParams.get('enablejsapi'), 'ready for the video script\'s commands').toBe('1');
 				// The keyboard focus follows into the player only when played with the keyboard.
 				expect(await player.evaluate((frame) => frame === document.activeElement), 'the keyboard focus in the player').toBe(way === 'Enter');
+			});
+		}
+
+		// A facade the script cannot turn into a named, secure player stays the link it is without
+		// JavaScript (template plan 1.7): never a player without a name for screen readers, never one
+		// from an origin that is not https. Both cases are made by changing the first facade's
+		// attributes in the page, since the theme always writes them.
+		for (const [what, attribute, value] of [
+			['without its title', 'data-video-title', null],
+			['with a player origin that is not https', 'data-player-origin', 'http://www.youtube-nocookie.com'],
+		] as const) {
+			test(`a video ${what} stays a link to the video on YouTube`, async ({ page }) => {
+				await page.route(/^https:\/\/www\.youtube\.com\/watch/, (route) => route.fulfill({ contentType: 'text/html', body: '<title>YouTube</title>' }));
+				await page.route(PLAYER_ADDRESS, (route) => route.fulfill({ contentType: 'text/html', body: STAND_IN_PLAYER }));
+				await page.goto(path);
+				const video = await firstVideo(page);
+				await video.facade.evaluate((facade, [name, setTo]) => {
+					if (setTo === null) {
+						facade.removeAttribute(name);
+					} else {
+						facade.setAttribute(name, setTo);
+					}
+				}, [attribute, value] as const);
+				await video.facade.click();
+				await expect(page, 'the page opened').toHaveURL(`https://www.youtube.com/watch?v=${video.id}`);
 			});
 		}
 

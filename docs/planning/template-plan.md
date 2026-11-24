@@ -46,9 +46,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   weekly job, the starter's tests run before committing any change to what it shares (the
   project's `CLAUDE.md`, Testing), no starter screenshot. Stage 2 trimmed (T16, 2026-11-24):
   the destination written down; `bin/detach` and a prebuilt test server left out.
-- **Next: 1.7,** the theme's three scripts to the strict standards (seven items, found by the
-  review of 2026-11-23 against `TYPESCRIPT_STANDARDS.md`, the project's `CLAUDE.md` naming each
-  language's standard); it ends stage 1.
+  1.7 done (2026-11-24), so stage 1 is done: the theme's scripts to the strict standards, in two
+  parts (1.7-1 ESLint in `bin/check` with `tools/js-check/`'s own packages; 1.7-2 the scripts as
+  script modules, the video script's state in a class, one home for what the two video scripts
+  share and for the player's origin, a facade without a title or a secure origin staying a link).
+- **Next: 2.1,** `dts-site-tools` (T16).
 - **Worth raising soon:** (1) every
   deploy's change counts equal the files' count for the site's own code (`git archive` dates
   each file with its commit), so the planned content-only count matters more than first
@@ -57,8 +59,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   cause not known yet; hypotheses, each to confirm or rule out: a security update (those skip
   the wait; the repository's Dependabot alerts would show it), or WPackagist giving Dependabot
   no usable release time (#98's details against WPackagist's listing would show it).
-- **Then, in order:** 1.7 (the theme's scripts to the strict standards), which ends stage 1;
-  then 2.1 to 2.5 (stage 2, the shared repositories).
+- **Then, in order:** 2.2 to 2.5 (stage 2, the shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
@@ -773,7 +774,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       `screenshot.png` (1200x900, its Home), then listed in `tools/site-layer-files.txt`. Instead:
       the starter's tests run before committing any change to what it shares (the project's
       `CLAUDE.md`, Testing); a new site makes its own picture (`template-notes.md`).
-- [ ] **1.7 The theme's scripts to the strict standards** (the user, 2026-11-23): the review of
+- [x] **1.7 The theme's scripts to the strict standards** (done 2026-11-24, 1.7-1 and 1.7-2) (the user, 2026-11-23): the review of
   `assets/js/` against `~/.claude/TYPESCRIPT_STANDARDS.md` (production code, strictly) found
   seven items, all taken, done before 2.3 makes the scripts shared code. Their behavior is held
   by the existing browser tests (one video at a time, the click-to-load videos, the menu).
@@ -796,6 +797,20 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
      one with an invalid video ID does, never a player with an empty title.
   7. `tools/js-check/tsconfig.json` gains `exactOptionalPropertyTypes` (and
      `noImplicitOverride`, with item 3's class).
+
+  Done in two parts (the user, 2026-11-24). **1.7-1** (items 1 and 7): ESLint 10 with the two
+  configurations, ESLint's own rules for the bans they leave out (`==`, `var`, `let` never
+  reassigned, `console`; a planted `==` passed without them), and WordPress's JavaScript layout
+  through `@stylistic/eslint-plugin` (`@wordpress/eslint-plugin` left for `@wordpress/scripts`
+  with the first block or React work, `template-notes.md`); `tools/js-check/` has its own packages
+  and TypeScript 6.0.3, since typescript-eslint supports TypeScript only up to 6.0. **1.7-2**
+  (items 2 to 6): the scripts are script modules, printed at the end of the page (WordPress's
+  inline import map is allowed by the policy's `'unsafe-inline'` for scripts); what the two video
+  scripts share is the module `@dts-site-components/video-shared` (named for the components plugin
+  of 2.3, since the type check's settings in `tools/` repeat it and the tools name no site); the
+  player's origin has its one home in PHP, carried to the script by each facade's
+  `data-player-origin`; a facade without a title or with an origin that is not https stays a
+  link, a new browser test shown failing on both.
 
 ### Stage 2: the shared repositories (rough)
 

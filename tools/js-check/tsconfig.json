@@ -7,6 +7,11 @@
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    // The scripts are script modules (template plan 1.7); WordPress's import map gives the
+    // browser each shared module's address by its name, and these paths give the compiler the same.
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "paths": { "@dts-site-components/video-shared": ["/theme-js/video-shared.js"] },
     "allowJs": true,
     "checkJs": true,
     "strict": true,
