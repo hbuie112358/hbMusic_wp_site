@@ -177,6 +177,12 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   the result. A change to this site's own files only (its site layer, its `tests/browser/` specs, its
   content) does not need it. *Why:* the pull-request checks test this site alone; the starter
   has no scheduled run, and both of its earlier breaks (1.6a, 1.6c-2) passed every check here.
+- **During the template's stage 2, the proof waits for milestones** (template plan T21, the user,
+  2026-11-24): the starter's tests and the full checks run at the milestones (this site switched
+  to the shared tools, 2.1d; after 2.2 and 2.3; the starter, 2.4) and before every deploy, which
+  stays strict; in between, Claude runs only what a change touches, or nothing for documents and
+  copies. This replaces the rule above until stage 2 is done. *Why:* nothing reaches the website
+  without `bin/deploy`, and the user wants the work behind the scenes finished quickly.
 - **Tests share one dev site and run in parallel,** so each test is placed by what it changes:
   a test that only looks runs freely; a test that changes only its own uniquely named data (a
   song with a unique title, a booking request with a unique word) removes it afterwards and runs
