@@ -65,7 +65,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   checks, the site's own in `tests/checks/` and the tools' self-check
   `tests/tools/check-tools.sh`, shared runner `tools/check-lib.sh`; the dev mu-plugin renamed
   `dev-site-services.php` with its own PHP checker settings in `tools/php-check/`); **2.1b-3a-2
-  done** (found while drafting 3b's `composer.json`, 2026-11-24: the checks start PHPCS and
+  done** (#114, `ce4ae46`; found while drafting 3b's `composer.json`, 2026-11-24: the checks start PHPCS and
   PHPStan by their packages' own files, `PHPCS_ENTRY` and `PHPSTAN_ENTRY` in
   `tools/check-lib.sh`, since a site's `bin-dir: bin` leaves `vendor/bin/` empty); **next:
   2.1b-3b** the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -860,7 +860,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   tools' self-check and a site's own extra checks, the mu-plugin renamed (every earlier check
   still run, compared by name; three planted faults, one per part, each failing in its part; the
   self-check passing on a copy of the tools alone, which found `bin/dev-site` telling ShellCheck
-  to follow the site's `tests/dev-setup.sh`, now the site's ShellCheck's); `[x]` 2.1b-3a-2 the
+  to follow the site's `tests/dev-setup.sh`, now the site's ShellCheck's); `[x]` 2.1b-3a-2 (#114, `ce4ae46`) the
   PHP checkers started by their packages' own files, not `vendor/bin/` (a scratch install with
   the bin folder set to `bin/` left no `vendor/bin/`; the old path failed there, the new ones
   worked); `[ ]` 2.1b-3b the

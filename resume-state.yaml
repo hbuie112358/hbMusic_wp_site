@@ -4,38 +4,39 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T11:45:08-05:00
-current_branch: chore/pause-2026-11-24d
-last_commit: f3f4bf0
+timestamp: 2026-11-24T12:14:10-05:00
+current_branch: chore/pause-2026-11-24e
+last_commit: ce4ae46
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (sixth session), template plan 2.1b-3 designed (T20) and 2.1b-3a done and merged
-  (#113, f3f4bf0; the earlier pause commit went with it as b92f859): bin/check split into the
-  site's checks, the site's own checks in tests/checks/ (components.sh until 2.3, starter.sh
-  until 2.4) and the tools' self-check tests/tools/check-tools.sh (needs no site; run by
-  bin/check only while TOOLS_DIR equals PROJECT_DIR), shared runner tools/check-lib.sh; the dev
-  mu-plugin renamed dev-site-services.php (prefix devsite) with its own PHP checker settings in
-  tools/php-check/. Changed from T17 by the user: "the tools name nothing of this site" stays a
-  site check, so no list of site names is kept in the public tools repository. Proven: every
-  earlier check still run (compared by name); one planted fault per part failing in its part;
-  the self-check passing on a copy of the tools alone (which found bin/dev-site's ShellCheck
-  directive naming the site's dev-setup.sh, fixed).
+  2026-11-24 (seventh session), template plan 2.1b-3a-2 done and merged (#114, ce4ae46; the
+  earlier pause commit went with it as 782d173), found while drafting 3b's composer.json: a
+  site's bin-dir bin/ (T18) leaves vendor/bin/ empty, so the checks now start PHPCS and PHPStan
+  by the packages' own files (PHPCS_ENTRY, PHPSTAN_ENTRY in tools/check-lib.sh). Proven by a
+  scratch install with the bin folder set to bin/ (old path failed, new ones worked). The user
+  asked for plain explanations of where the tools live and of Composer: the tools never go on
+  the website; each site's repository downloads a pinned copy into vendor/, on the user's
+  computer and on GitHub alike.
 
 next_action: >
-  Template plan 2.1b-3b, the dts-site-tools repository (T20): read T18-T20 and the step entry,
-  then propose, one at a time, the repository's files (copied unchanged from main's f3f4bf0 or
-  later, plus composer.json as dts/site-tools with bin entries and the PHP checkers at exact
-  versions, LICENSE GPL-2.0-or-later, README.md, CHANGELOG.md naming changes to site.json fields
-  and to what bin/check gives a site's own checks, its check workflow) and each outside step for
-  the user's yes: creating the public repository in the organization, its main and v* tag
-  rulesets, security settings, Dependabot, and the v0.1.0 tag. The handbook's toolkit/github.md
-  settings apply.
+  Template plan 2.1b-3b, the dts-site-tools repository (T20): read T18-T20 and the step entry.
+  composer.json was drafted and shown to the user (not yet approved as a file): dts/site-tools,
+  type library, GPL-2.0-or-later, the PHP checkers in require at the exact versions of this
+  repository's composer.lock (phpcsextra 1.5.1 and phpcsutils 1.2.3 pinned too), bin listing
+  the eight site commands (bin/tools-update left out: it is tools-repository work), the lint and
+  analyse scripts dropped, config allow-plugins and platform php 8.4.0 kept for its own lock.
+  Ask the user's yes for it, then propose one at a time the rest (copied unchanged from main's
+  ce4ae46: LICENSE, README.md, CHANGELOG.md naming changes to site.json fields and to what
+  bin/check gives a site's own checks, its check workflow) and each outside step for the user's
+  yes: creating the public repository in the organization, its main and v* tag rulesets,
+  security settings, Dependabot, and the v0.1.0 tag. The handbook's toolkit/github.md settings
+  apply. Explain in plain terms; the user asked for simpler explanations this session.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: bin/check all passing on 2.1b-3a's branch (2026-11-24, 111 s, the self-check included); the self-check alone on a copy of the tools passing (26 checks); #113's check and dev-site jobs passed on GitHub; the starter (SITE_DIR=starter) all steps passed, 168 browser tests (2026-11-24)
+  checks: bin/check all passing on 2.1b-3a-2's branch (2026-11-24, 106 s, the self-check included); #114's check and dev-site jobs passed on GitHub; the starter (SITE_DIR=starter) all steps passed, 168 browser tests (2026-11-24, with 2.1b-3a-2)
   deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); #111 and #112 change only the tools, nothing to deploy for visitors. bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
   local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, restarted after the starter's run 2026-11-24); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time. The self-check's own download caches are the Docker volumes site-tools_composer_cache and site-tools_npm_cache
   dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
@@ -43,8 +44,8 @@ verification:
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at f3f4bf0, even with origin/main. Unpushed: chore/pause-2026-11-24d (1 commit, this
-      pause: resume-state.yaml and the plan's #113 references, documents only).
+      main is at ce4ae46, even with origin/main. Unpushed: chore/pause-2026-11-24e (1 commit, this
+      pause: resume-state.yaml and the plan's #114 references, documents only).
       starter/themes/ and tools/js-check/node_modules/ are build output, ignored by git.
   - file: data/ (not versioned)
     why: >
@@ -53,7 +54,7 @@ uncommitted_changes:
   - file: ~/.claude (the user commits it on the host)
     why: >
       time-log.csv (updated by this pause) and time-corrections.csv (2026-11-24, +12 min, the
-      wait for Dependabot) uncommitted; the user commits them on the host.
+      wait for Dependabot) uncommitted, as at the last pause; the user commits them on the host.
 
 pending_decisions:
   - >
@@ -61,7 +62,7 @@ pending_decisions:
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
     handbook's WORKING_DRAFT.md, "Open items", not repeated here.
   - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built; toolkit/github.md's answered trap on pinning reusable workflows (T17), proposed at 2.1c.
-  - Pushing chore/pause-2026-11-24d (documents only, 1 commit) with 2.1b-3b's work; Claude asks first.
+  - Approving the drafted composer.json for dts-site-tools (next_action), then pushing chore/pause-2026-11-24e (documents only, 1 commit) with later work; Claude asks first.
   - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to review, later.
   - >
     Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
