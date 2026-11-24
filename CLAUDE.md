@@ -360,6 +360,16 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   plugin that has real logic to test; the Song List has almost none. **Accessibility checks**
   (axe) run in the dev browser tests since step 4c.
 - A new test is shown to fail on a planted fault before it counts as working.
+- **The starter is tested with every change to what it shares** (template plan T15, the user,
+  2026-11-24): before committing a change to the theme's generic files (anything outside the
+  site layer, `tools/site-layer-files.txt`), the shared tests (`generic/`, `components/`,
+  `helpers/`, the plugins' tests), the tools (`bin/`, `tools/`) or a plugin the starter lists,
+  Claude also runs the starter's tests: this site's dev site stopped by name
+  (`docker compose -p hbmusic-dev stop`), `SITE_DIR=starter bin/dev-site`, `SITE_DIR=starter
+  bin/test`, then the starter's stopped and this site's started again. The review gate reports
+  the result. A change to this site's own files only (its site layer, its `site/` tests, its
+  content) does not need it. *Why:* the pull-request checks test this site alone; the starter
+  has no scheduled run, and both of its earlier breaks (1.6a, 1.6c-2) passed every check here.
 - **Tests share one dev site and run in parallel,** so each test is placed by what it changes:
   a test that only looks runs freely; a test that changes only its own uniquely named data (a
   song with a unique title, a booking request with a unique word) removes it afterwards and runs

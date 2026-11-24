@@ -5,7 +5,9 @@
 # tools/site-layer.sh; one path per line, relative to the theme's folder.
 #
 # Besides these, a site layer may add pictures under assets/images/ (its logo, named by its own
-# pattern); the theme's generic pictures (the grain) stay. screenshot.png joins this list at 1.6c.
+# pattern); the theme's generic pictures (the grain) stay. The theme's screenshot.png is not
+# listed: a site makes its own once its pages exist, and the starter carries none (template plan
+# T15).
 theme.json
 style.css
 parts/header.html

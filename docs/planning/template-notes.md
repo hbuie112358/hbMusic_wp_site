@@ -40,7 +40,9 @@ template project starts; until then, a list, not a to-do.
 - The stylesheet handles' prefix `hbmusic-` in `functions.php`, with the PHP prefix.
 - The theme's picture in Appearance → Themes, `themes/hbmusic-child/screenshot.png` (1200x900,
   WordPress's recommended size): this site's Home page, shot from its dev preview
-  (`bin/screenshots previews`, `/preview-home/`) with the site's real name in the header.
+  (`bin/screenshots previews`, `/preview-home/`) with the site's real name in the header. A new
+  site makes its own the same way, from its own Home page once its pages exist; the starter
+  carries none (template plan T15).
 - The theme's header in `themes/hbmusic-child/style.css`: its name ("Howard Buie Music") and
   description; the parent, text domain, versions and licence stay.
 
