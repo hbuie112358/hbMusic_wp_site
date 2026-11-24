@@ -36,7 +36,7 @@ run_update() {
     "$COMPOSER_IMAGE" composer update --no-interaction --no-progress
 }
 
-# One npm package's lock file (tests/e2e, tools/css-lint): only the lock file is written, in a
+# One npm package's lock file (tests/e2e, tools/css-lint, tools/js-check): only the lock file is written, in a
 # temporary folder holding copies of package.json and package-lock.json; node_modules is
 # installed by bin/check and bin/test. Only releases at least NPM_COOLDOWN_DAYS old are used,
 # transitive ones included, the same wait Dependabot keeps (hijacked releases are usually pulled
@@ -65,7 +65,9 @@ main() {
   update_npm_lock tests/e2e
   log "Updating the CSS linter's packages within the limits in tools/css-lint/package.json"
   update_npm_lock tools/css-lint
-  log "Done. Next: bin/check, then review 'git diff composer.lock tests/e2e/package-lock.json tools/css-lint/package-lock.json' and commit."
+  log "Updating the scripts' checker's packages within the limits in tools/js-check/package.json"
+  update_npm_lock tools/js-check
+  log "Done. Next: bin/check, then review 'git diff composer.lock tests/e2e/package-lock.json tools/css-lint/package-lock.json tools/js-check/package-lock.json' and commit."
 }
 
 main "$@"

@@ -215,8 +215,10 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   site-layer files of `tools/site-layer-files.txt` (`tools/site-layer.sh`, with its examples in
   `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; the
   theme assembly on known examples (`tools/site-theme.sh`, `tests/tools/site-theme/`); the dev-site
-  guard on known examples, with a stand-in for docker (`tests/tools/dev-site-guard/`); a type check of the theme's browser scripts (`assets/js/`) with
-  the TypeScript compiler the browser tests install (`tools/js-check/`); and every `site-…` component shown on the components' example page
+  guard on known examples, with a stand-in for docker (`tests/tools/dev-site-guard/`); a type check and ESLint of the theme's browser scripts (`assets/js/`), with
+  `tools/js-check/`'s own packages (template plan 1.7: typescript-eslint's strict rules and
+  WordPress's JavaScript layout, zero findings; its TypeScript 6, which typescript-eslint supports),
+  and an npm audit of them; and every `site-…` component shown on the components' example page
   (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
   outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in
   `tools/site-settings.jq` (a missing or unknown field, or a wrong kind of value, fails and is
@@ -330,7 +332,8 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   are answered locally; a page that does not answer 200 fails. Whether a change looks right is
   the user's call.
 - `bin/tools-update`: the deliberate way to update the tools, `composer.lock`,
-  `tests/e2e/package-lock.json` and `tools/css-lint/package-lock.json` (npm only from releases
+  `tests/e2e/package-lock.json`, `tools/css-lint/package-lock.json` and
+  `tools/js-check/package-lock.json` (npm only from releases
   at least 7 days old, install scripts off); then `bin/check`, review the lock files' diff,
   commit.
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
@@ -400,8 +403,8 @@ theme and the plugins); test code means the tests and the tools that check the c
 - **PHP** (the theme, the plugins): the WordPress Coding Standards, as `phpcs.xml.dist` enforces
   them (see Framework).
 - **TypeScript and the theme's JavaScript:** `~/.claude/TYPESCRIPT_STANDARDS.md`, strictly for
-  production code (the theme's scripts in `assets/js/`, type-checked through
-  `tools/js-check/`). Test code (the browser tests in `tests/e2e/`) is held to clarity instead
+  production code (the theme's scripts in `assets/js/`, type-checked and linted
+  with ESLint through `tools/js-check/`). Test code (the browser tests in `tests/e2e/`) is held to clarity instead
   (the user, 2026-11-23): every failure message names what failed and where; no silent `catch`;
   no `any`, `!` or `@ts-ignore`; clear names, helpers kept short. Plain `Error`, a cast after an
   upstream check, and the test runner's output in place of a logger are fine there.
@@ -410,7 +413,7 @@ theme and the plugins); test code means the tests and the tools that check the c
   `bin/check`.
 - **Bash** (`bin/`, `tools/`, the scenario checks): ShellCheck in `bin/check`.
 - **Gaps:** no written standard yet for Bash (ShellCheck only) or for the theme's JavaScript
-  beyond `TYPESCRIPT_STANDARDS.md` and its type check. Each is written when the user chooses,
+  beyond `TYPESCRIPT_STANDARDS.md`, its type check and ESLint. Each is written when the user chooses,
   proposed item by item like the CSS notes.
 
 ## Project rules

@@ -1,0 +1,11 @@
+{
+	"name": "theme-js-check",
+	"private": true,
+	"description": "Checks the theme's browser scripts: the type check and ESLint (template plan 1.7). Run by bin/check in a container; never deployed.",
+	"devDependencies": {
+		"@stylistic/eslint-plugin": "6.0.1",
+		"eslint": "10.15.0",
+		"typescript": "6.0.3",
+		"typescript-eslint": "8.73.0"
+	}
+}

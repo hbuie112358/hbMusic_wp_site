@@ -206,6 +206,11 @@ its pieces and writes few of its own.
 
 ## To build in
 
+- **WordPress's own JavaScript checks, with the first block or React work** (the user,
+  2026-11-24): `@wordpress/scripts`, WordPress's build tool, brings `@wordpress/eslint-plugin`
+  configured; it then replaces the WordPress layout rules in `tools/js-check/eslint.config.mjs`.
+  Not added for the theme's three small scripts: it brings rules and packages for React, tests
+  and builds.
 - `~/.claude/CLIENT_DATA.md` (not implemented yet): the template includes its settings block, so
   every customer project starts with it.
 - The frame in the code (plan 1e, 2026-11-16; settled 2026-11-17): the frame (header, footer,

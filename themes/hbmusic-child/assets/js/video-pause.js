@@ -104,11 +104,13 @@
 	 *
 	 * @param {IntersectionObserverEntry[]} entries What the carousel shows of its players.
 	 */
-	const pauseMovedOut = ( entries ) => entries
-		.filter( ( entry ) => entry.intersectionRatio < VISIBLE_SHARE )
-		.map( ( entry ) => entry.target )
-		.filter( isFrame )
-		.forEach( pause );
+	const pauseMovedOut = ( entries ) => {
+		entries
+			.filter( ( entry ) => entry.intersectionRatio < VISIBLE_SHARE )
+			.map( ( entry ) => entry.target )
+			.filter( isFrame )
+			.forEach( pause );
+	};
 
 	// One observer per carousel, measuring against the carousel itself, not the window: moving to
 	// another slide changes what the carousel shows, scrolling the page does not.
@@ -143,6 +145,8 @@
 	// A video the visitor just started (video-facade.js) is the one playing: every other is paused at
 	// once, without waiting to see the focus move.
 	document.addEventListener( PLAYER_ADDED_EVENT, ( event ) => {
+		// A CustomEvent's detail is typed any; read as unknown, it is narrowed below before use.
+		/** @type {unknown} */
 		const player = event instanceof CustomEvent ? event.detail : null;
 		if ( ! ( player instanceof HTMLIFrameElement ) || ! player.matches( PLAYER_SELECTOR ) ) {
 			return;
