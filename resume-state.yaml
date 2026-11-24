@@ -4,47 +4,36 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T08:00:05-05:00
-current_branch: chore/resume-state
-last_commit: 9aa6d88
+timestamp: 2026-11-24T08:43:27-05:00
+current_branch: chore/pause-2026-11-24
+last_commit: 4989781
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (no pause yet; this file trimmed mid-session): #109 merged (the pause of 2026-11-23
-  and the plan's T15 and T16). T15: no weekly starter job and no starter picture; before
-  committing a change to anything the starter shares, Claude runs the starter's tests (the
-  project's CLAUDE.md, Testing). T16: the template's destination written down and stage 2 trimmed
-  step by step with the user (bin/detach and a prebuilt test server left out; Song List moves in
-  2.2 with the other plugins; the second site's repository public for now). Step 1.7 done, so
-  stage 1 is done, on the branch feat/theme-scripts-eslint, not pushed: 1.7-1 (3433827, ESLint
-  with tools/js-check's own packages) and 1.7-2 (85243ae, the scripts as script modules, one home
-  for what the video scripts share and for the player's origin). Then the token use: this file
-  trimmed to resume only, its history and the sites' facts moved to docs/session-history.md.
+  2026-11-24: stage 1 of the template plan done. #109 (T15, T16) and #110 merged: 1.7-1 (ESLint
+  through tools/js-check), 1.7-2 (the theme's scripts as script modules), this file trimmed to
+  resume only and renamed from project-state.yaml (the global files changed with the user's yes),
+  the project's CLAUDE.md slimmed (the tools' details in docs/TOOLS.md). Deployed by the user to
+  staging and live (4989781). The token changes all done; the user keeps Opus for everything.
 
 next_action: >
-  Resume exactly here, in this order (the user, 2026-11-24). A, the token changes: (1) done:
-  this file trimmed and renamed from project-state.yaml, the six global files changed with the
-  user's yes (the user commits them on the host); (2) the compacting habit, compact at each step's end (the user to decide,
-  then Claude's memory note fresh-session-per-plan-step.md); (3) the project's CLAUDE.md slimmed,
-  the Commands section's tool details moved to docs/TOOLS.md (the user to decide). Nothing about
-  how Claude codes changes (the user: the resume re-reads and the review files stay). B, then:
-  push feat/theme-scripts-eslint (1.7-1, 1.7-2); deploy main to staging, check on a phone, then
-  live (the user's call); then step 2.1, dts-site-tools.
+  Step 2.1 of the template plan, dts-site-tools (T16): the tools moved into their own repository,
+  with the review pass (each tool checked for whether it is still needed as it moves). Read 2.1's
+  entries and agree its parts with the user before building.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: bin/check all passing on main and on feat/theme-scripts-eslint (2026-11-24, with ESLint and the scripts' checker's audit); bin/test 17 scenario checks + 242 browser tests passed and 4 skipped (pages with too few videos) on #108; 1.7's changed parts 116 passed and 4 skipped; the starter (SITE_DIR=starter) 16 scenario checks + 168 browser tests (2026-11-24)
-  deployed: by bin/deploy from the user's computer only; staging and live run e366b02 (2026-11-23); main's later commits change no visible thing (#105, #108), feat/theme-scripts-eslint changes how the scripts load (modules), to check on staging first
+  checks: bin/check all passing on main (2026-11-24, with ESLint and the scripts' checker's audit); #110's check and dev-site jobs passed on GitHub; 1.7's changed parts 116 browser tests passed and 4 skipped (pages with too few videos); the starter (SITE_DIR=starter) 16 scenario checks + 168 browser tests (2026-11-24)
+  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user). bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
   local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, rebuilt 2026-11-24); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time
   dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
 
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at 9aa6d88, even with origin/main. Unpushed: feat/theme-scripts-eslint (2 commits,
-      3433827 and 85243ae, step 1.7) and chore/resume-state (this commit). starter/themes/ and
-      tools/js-check/node_modules/ are build output, ignored by git.
+      main is at 4989781, even with origin/main. Unpushed: chore/pause-2026-11-24 (this commit
+      only). starter/themes/ and tools/js-check/node_modules/ are build output, ignored by git.
   - file: data/ (not versioned)
     why: >
       Unchanged since 2026-11-23; its off-computer backup is still behind from the 2026-11-22 and
@@ -53,7 +42,6 @@ uncommitted_changes:
     why: see the pause output's git status of ~/.claude.
 
 pending_decisions:
-  - The compacting habit; the project's CLAUDE.md slimmed (next_action, A).
   - >
     The handbook's follow-ups for the user (the lawyer, the accountant, the payment service, the
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
@@ -68,9 +56,6 @@ pending_decisions:
     one by one, later: 6.9's check to match E7; 7.3's check to the pairs in use (E8); 3.6 naming
     the generator tag; 7.1's monthly scan of live's pages; the local-staging wording in 2.7 and 3.3.
   - Raising the dev site's WordPress from 7.1.4 to 7.1.5 (live and staging run 7.1.5).
-  - >
-    Deploying main to staging, then live (bin/deploy), when convenient: #105 and #108 change
-    nothing visible; 1.7, once merged, changes how the scripts load, checked on staging first.
   - >
     The site's type, found by the cold-resume check of 2026-11-23: the rebuild plan's D32
     (2026-11-16) makes it Content by customer, with staging on the host removed after go-live
@@ -118,4 +103,4 @@ resume_instructions: |
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
      and the entries of the next step (2.1) and the one after (2.2); and the rebuild plan's
      Current position (9u and 9w waiting).
-  3. Then next_action, in its order: A, the token changes; B, the push, the deploy, step 2.1.
+  3. Then next_action: step 2.1.
