@@ -11,6 +11,10 @@
 # the command. Without Composer's variable, the tools must be the site's own (this repository
 # until the tools move, and the tools' tests' stand-in copies), which a site.json beside them
 # shows; anywhere else the script refuses rather than guess a site to change.
+#
+# Not caught here: a COMPOSER_RUNTIME_BIN_DIR left over in a shell started from another project's
+# Composer run names that project's bin/, a real folder, so a tool started from that shell works on
+# the other project. Tested with the tools apart in tests/tools/paths/.
 
 # Prints the site's repository, or a message on stderr and fails when it cannot be told.
 project_dir_of_tools() {

@@ -11,8 +11,6 @@ set -Eeuo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # shellcheck source=tools/versions.sh
 source "$TOOLS_DIR/tools/versions.sh"
-# shellcheck source=tools/site-settings.sh
-source "$TOOLS_DIR/tools/site-settings.sh"
 
 SITE_ADDRESS=""
 CHILD_THEME=""

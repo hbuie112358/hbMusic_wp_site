@@ -8,8 +8,6 @@
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
-# shellcheck source=tools/site-settings.sh
-source "$TOOLS_DIR/tools/site-settings.sh"
 
 SITE_ADDRESS=""
 PROBE_PAGE_ID=""

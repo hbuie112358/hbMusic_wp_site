@@ -58,10 +58,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   command raises it in the review of Dependabot's pull request (T18, option A). **Now: 2.1b-2,**
   `REPO_ROOT` split into three (T19): **2.1b-2a done** (#111, `de724ce`, 2026-11-24:
   `tools/paths.sh` and the rename, behavior unchanged; `bin/check`, the full `bin/test` and the
-  starter's tests passing); **next: 2.1b-2b** the Compose mount, the site's own browser specs mounted apart, the
-  scenario debug-log fix, the status sheet's file lookup, the new tools test; **2.1b-3** the
-  repository
-  (layout, `CHANGELOG.md`, its own checks, branch protection, the first tag). Then 2.1c the
+  starter's tests passing); **2.1b-2b done** (2026-11-24: the Compose mount, the site's own
+  browser specs in `tests/browser/` mounted apart, the scenario debug-log fix, the status sheet's
+  file lookup, `tests/tools/paths/`); **next: 2.1b-3** the repository (layout, `CHANGELOG.md`,
+  its own checks, branch protection, the first tag). Then 2.1c the
   reusable workflows (a personal-account caller confirmed at its first call; Composer given the
   workflow's read-only token; the pin check and the `bin/tools-pin` command); 2.1d this site switched over (local
   copies removed, the plugin-dependent tests following `composer.json`, all checks and the
@@ -837,10 +837,17 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 - [~] **2.1 `dts-site-tools`**: created in the organization, released by Git tags and pinned
   through Composer (T8), with the reusable workflows; this site switched to it. Four parts (T17):
   `[x]` 2.1a the review (2026-11-24, `findings/step-2.1a-tools-review.md`); `[~]` 2.1b the
-  repository (T18): `[x]` 2.1b-1 the trial (2026-11-24, `findings/step-2.1b-1-trial.md`), `[ ]`
-  2.1b-2 `REPO_ROOT` split (T19: `[x]` 2.1b-2a the rename (#111, `de724ce`), `[ ]` 2.1b-2b the layout fixes and
-  the test), `[ ]` 2.1b-3 the repository; `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
-  switched over. (T16: `bin/detach`
+  repository (T18): `[x]` 2.1b-1 the trial (2026-11-24, `findings/step-2.1b-1-trial.md`), `[x]`
+  2.1b-2 `REPO_ROOT` split (T19: `[x]` 2.1b-2a the rename (#111, `de724ce`), `[x]` 2.1b-2b the layout fixes and
+  the test (2026-11-24: the dev-only mu-plugins mounted from the tools' folder through
+  `compose.site.yaml`; the site's browser specs in its own `tests/browser/`, mounted into the
+  tools' `specs/dev/site/`; the scenario checks' debug-log rule reading the tested site's
+  `site.json`, shown failing on a notice planted in the starter's theme; the status sheet's files
+  found in either folder; `tests/tools/paths/`, shown failing on two planted faults)), `[ ]` 2.1b-3
+  the repository; `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
+  switched over (found in 2.1b-2b: `.env`'s `COMPOSE_FILE`, written from `.env.example`, names
+  `compose.dev.yaml` relative to the site's repository, so hand-typed `docker compose` commands
+  need its new place there). (T16: `bin/detach`
   and its release check are built at the first real handover, not here; T6, 2026-11-21, had kept
   them so detaching is real.) As each tool moves, Claude checks whether it is still needed
   outside this one repository (for example `bin/check`'s seven starter rules, the versions check's

@@ -172,7 +172,7 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   Claude also runs the starter's tests: this site's dev site stopped by name
   (`docker compose -p hbmusic-dev stop`), `SITE_DIR=starter bin/dev-site`, `SITE_DIR=starter
   bin/test`, then the starter's stopped and this site's started again. The review gate reports
-  the result. A change to this site's own files only (its site layer, its `site/` tests, its
+  the result. A change to this site's own files only (its site layer, its `tests/browser/` specs, its
   content) does not need it. *Why:* the pull-request checks test this site alone; the starter
   has no scheduled run, and both of its earlier breaks (1.6a, 1.6c-2) passed every check here.
 - **Tests share one dev site and run in parallel,** so each test is placed by what it changes:

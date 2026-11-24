@@ -10,9 +10,6 @@
 set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
-# The site's themes folder (SITE_THEMES_DIR).
-# shellcheck source=tools/site-settings.sh
-source "$TOOLS_DIR/tools/site-settings.sh"
 
 # One block of each kind with component stylesheets in functions.php, and the Song List block.
 # In single quotes on purpose: PHP's variables are for WP-CLI, not this shell.

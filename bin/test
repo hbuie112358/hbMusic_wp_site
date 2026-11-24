@@ -45,13 +45,13 @@ site_answers() {
 }
 
 # The tests that belong to another site than the one tested (template plan 1.6c, T14; the rule
-# 2.1 sets for the shared tests): for a site other than this repository's (SITE_DIR), this
-# repository's site's own tests (site/) and the tests of this repository's own plugins the site
-# does not list in localPlugins. One folder per line; nothing for this repository's site.
+# 2.1 sets for the shared tests): for a site other than this repository's (SITE_DIR), the tests of
+# this repository's own plugins the site does not list in localPlugins. One folder per line;
+# nothing for this repository's site. A site's own browser specs need no entry: they come from
+# the site tested (SITE_BROWSER_SPECS_DIR, template plan T19).
 left_out_test_folders() {
   local plugin_dir plugin_slug listed_plugins
   is_this_repository_site && return 0
-  printf 'site\n'
   listed_plugins="$(site_settings_query '.localPlugins[]')"
   for plugin_dir in "$PROJECT_DIR"/plugins/*/; do
     plugin_slug="$(basename "$plugin_dir")"
@@ -71,15 +71,15 @@ refuse_another_running_site() {
   exit 1
 }
 
-# Names every folder left out, so no test is skipped silently.
+# Names every folder left out, and a site without browser specs of its own, so no test is skipped
+# silently.
 log_left_out_folders() {
   local folder entry
+  [[ -d "$SITE_BROWSER_SPECS_DIR" ]] ||
+    log "No browser specs of the site's own: no ${SITE_BROWSER_SPECS_DIR#"$PROJECT_DIR"/}/"
   is_this_repository_site && return 0
   for folder in "${LEFT_OUT_FOLDERS[@]}"; do
-    case "$folder" in
-      site) log "Left out: site/, this repository's site's own tests, not ${SITE_DIR#"$PROJECT_DIR"/}'s" ;;
-      *) log "Left out: $folder/, a plugin ${SITE_DIR#"$PROJECT_DIR"/} does not list" ;;
-    esac
+    log "Left out: $folder/, a plugin ${SITE_DIR#"$PROJECT_DIR"/} does not list"
   done
   for entry in "${THIS_SITE_ONLY_SCENARIOS[@]}"; do
     log "Left out: tests/scenario/${entry%%:*}, as ${entry#*:}"
@@ -99,19 +99,21 @@ is_left_out_scenario() {
   return 1
 }
 
-# The container sees only tests/e2e/ and, read-only, the booking form's messages, which a test
-# expects the visitor to see, site.json, whose test pages the specs check (template plan 1.2g),
-# and the test pages' files (the site's tests/dev-content/), where the component tests find the
-# pages that use their component (1.3b). The folders left out reach Playwright's config as
-# TESTS_LEFT_OUT. Host networking lets it reach the site on localhost, as
+# The container sees only tests/e2e/ and, read-only, the site's own browser specs (its
+# tests/browser/, inside tests/e2e/ at specs/dev/site/, template plan T19), the booking form's
+# messages, which a test expects the visitor to see, site.json, whose test pages the specs check
+# (template plan 1.2g), and the test pages' files (the site's tests/dev-content/), where the
+# component tests find the pages that use their component (1.3b). The folders left out reach
+# Playwright's config as TESTS_LEFT_OUT. Host networking lets it reach the site on localhost, as
 # rootless Docker publishes the port in the network the container then shares.
 # The admin's and the Editor's logins go by name, so the dev site's generated passwords stay off
 # the command line. They unlock only this throwaway site, whose admin screens the tests use.
 browser_tests() {
-  local tests_left_out
+  local tests_left_out site_specs_mount
   tests_left_out="$(IFS=,; printf '%s' "${LEFT_OUT_FOLDERS[*]}")"
+  mapfile -t site_specs_mount < <(site_browser_specs_mount_options)
   docker run --rm --network host -w /e2e \
-    -v "$TOOLS_DIR/tests/e2e:/e2e" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" "${site_specs_mount[@]}" \
     -v "$PROJECT_DIR/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
     -v "$SITE_SETTINGS_FILE:/config/site.json:ro" \
     -v "$SITE_DEV_CONTENT_DIR:/config/dev-content:ro" \

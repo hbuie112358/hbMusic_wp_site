@@ -370,7 +370,7 @@ status_sheet_complete() {
   local sheet="$PROJECT_DIR/records/status.md" problems
   [[ -f "$sheet" ]] || { log "no records/status.md yet; it is started from tools/status-sheet-blank.md"; return 0; }
   problems="$(status_sheet_problems "$sheet" "$TOOLS_DIR/tools/status-sheet-blank.md" \
-    "$PROJECT_DIR/records/exceptions.md" "$PROJECT_DIR")"
+    "$PROJECT_DIR/records/exceptions.md" "$PROJECT_DIR" "$TOOLS_DIR")"
   [[ -z "$problems" ]] && return 0
   log "records/status.md is not complete:"
   printf '%s\n' "$problems" | sed 's/^/    /' >&2
@@ -413,11 +413,14 @@ shellcheck_scripts() {
     "$SHELLCHECK_IMAGE" --severity=style -x --source-path=/src "${scripts[@]}"
 }
 
-# Type-checks the browser tests. The container sees only tests/e2e/, where npm installs
-# node_modules (ignored by git) from the lock file.
+# Type-checks the browser tests, the site's own among them, mounted where bin/test mounts them
+# (template plan T19). The container sees only tests/e2e/, where npm installs node_modules
+# (ignored by git) from the lock file, and the site's specs, read-only.
 typescript_check() {
+  local site_specs_mount
+  mapfile -t site_specs_mount < <(site_browser_specs_mount_options)
   docker run --rm -w /e2e \
-    -v "$TOOLS_DIR/tests/e2e:/e2e" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" "${site_specs_mount[@]}" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
 }
@@ -512,6 +515,12 @@ site_layer_check_refuses_bad_examples() {
 # (tools/dev-site-guard.sh, tests/tools/dev-site-guard/).
 dev_site_guard_on_examples() {
   bash "$TOOLS_DIR/tests/tools/dev-site-guard/run.sh"
+}
+
+# How the tools find the site they work on, with the tools apart from a stand-in site as Composer
+# installs them (tools/paths.sh, tests/tools/paths/, template plan T19).
+site_found_with_tools_apart() {
+  bash "$TOOLS_DIR/tests/tools/paths/run.sh"
 }
 
 # A site layer's full theme assembled on known examples (tools/site-theme.sh, tests/tools/site-theme/).
@@ -772,6 +781,7 @@ run_analysis_and_file_checks() {
   run_check "The site-layer check refuses bad examples" site_layer_check_refuses_bad_examples
   run_check "The theme assembly on known examples" site_theme_assembly_on_examples
   run_check "The dev-site guard on known examples" dev_site_guard_on_examples
+  run_check "The tools find the site with the tools apart" site_found_with_tools_apart
   run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
   run_check "Starter: static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
   run_check "Components appear on the example pages" components_shown_on_example_pages

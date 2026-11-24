@@ -8,8 +8,8 @@
 # complete when every item of the blank is there once and nothing else is; an item the blank marks
 # retired stays "retired", every other one is "done" or "exception" with its check or reason and
 # a date; an exception's link to a recorded exception ([E4](exceptions.md#e4)) finds its heading;
-# and every file of the repository a row names still exists, so a renamed or deleted test cannot
-# leave the sheet pointing at nothing.
+# and every file a row names still exists, in the repository or the tools' folder, so a renamed or
+# deleted test cannot leave the sheet pointing at nothing.
 
 readonly STATUS_SHEET_ROW='^\| [0-9]+\.[0-9]+[ |]'
 readonly STATUS_SHEET_DATE='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
@@ -64,22 +64,37 @@ status_sheet_exception_problems() {
   done < <(grep -oE '\[E[0-9]+\]\(exceptions\.md#e[0-9]+\)' <<<"$check" | grep -oE '#e[0-9]+' | tr -d '#e')
 }
 
-# Every path or test file in backticks must exist; a path may hold a * standing for one folder.
+# Whether a path, which may hold a * standing for one folder, exists in either folder.
+status_sheet_path_exists() {
+  local name="$1" project_root="$2" tools_root="$3"
+  compgen -G "$project_root/$name" >/dev/null || compgen -G "$tools_root/$name" >/dev/null
+}
+
+# Whether a test file named alone is under either folder's tests/.
+status_sheet_test_exists() {
+  local name="$1" project_root="$2" tools_root="$3"
+  [[ -n "$(find "$project_root/tests" "$tools_root/tests" -name "$name" -print -quit 2>/dev/null)" ]]
+}
+
+# Every path or test file in backticks must exist, in the site's repository or in the tools' folder
+# (template plan T19): the sheet names both, and the two are apart once the tools are installed.
 status_sheet_file_problems() {
-  local item="$1" check="$2" repo_root="$3" name
+  local item="$1" check="$2" project_root="$3" tools_root="$4" name
   while IFS= read -r name; do
     if [[ "$name" =~ $STATUS_SHEET_PATH_PREFIX ]]; then
-      compgen -G "$repo_root/$name" >/dev/null || printf '%s: names %s, which does not exist\n' "$item" "$name"
+      status_sheet_path_exists "$name" "$project_root" "$tools_root" ||
+        printf '%s: names %s, which does not exist\n' "$item" "$name"
     elif [[ "$name" =~ $STATUS_SHEET_TEST_NAME ]]; then
-      [[ -n "$(find "$repo_root/tests" -name "$name" -print -quit 2>/dev/null)" ]] ||
+      status_sheet_test_exists "$name" "$project_root" "$tools_root" ||
         printf '%s: names %s, found nowhere under tests/\n' "$item" "$name"
     fi
   done < <(grep -oE '`[^`]+`' <<<"$check" | tr -d '`')
 }
 
-# Prints one line per problem, nothing when the sheet is complete.
+# Prints one line per problem, nothing when the sheet is complete. The files rows name are looked
+# for in the site's repository (fourth argument) and the tools' folder (fifth).
 status_sheet_problems() {
-  local sheet="$1" blank="$2" exceptions="$3" repo_root="$4" retired item status check date
+  local sheet="$1" blank="$2" exceptions="$3" project_root="$4" tools_root="$5" retired item status check date
   [[ -f "$sheet" ]] || { printf 'missing file: %s\n' "${sheet##*/}"; return 0; }
   [[ -f "$blank" ]] || { printf 'missing file: %s\n' "${blank##*/}"; return 0; }
   status_sheet_item_problems "$sheet" "$blank"
@@ -88,6 +103,6 @@ status_sheet_problems() {
     status_sheet_row_problem "$item" "$status" "$check" "$date" \
       "$(grep -qxF -- "$item" <<<"$retired" && echo true || echo false)"
     status_sheet_exception_problems "$item" "$check" "$exceptions"
-    status_sheet_file_problems "$item" "$check" "$repo_root"
+    status_sheet_file_problems "$item" "$check" "$project_root" "$tools_root"
   done < <(status_sheet_rows "$sheet")
 }

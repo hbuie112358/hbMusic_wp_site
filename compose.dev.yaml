@@ -2,9 +2,9 @@
 # and testing the new theme and plugins (plan step 4b). It runs alone, also in CI, and never holds
 # real data. Never used in production.
 # Settings come from .env (the DEV_ names; bin/dev-site creates or completes it). The site's own
-# part, its name and the folders it mounts (its theme and its own plugins), is compose.site.yaml,
-# written from site.json by bin/dev-site, bin/check and bin/screenshots (template plan 1.2f); this
-# file is the same for every site.
+# part, its name and the folders it mounts (its theme, its own plugins and the tools' dev-only
+# must-use plugins), is compose.site.yaml, written from site.json by bin/dev-site, bin/check and
+# bin/screenshots (template plan 1.2f); this file is the same for every site.
 
 x-wordpress-env: &wordpress-env
   WORDPRESS_DB_HOST: db
@@ -51,10 +51,12 @@ services:
     # The site's theme and its own plugins are mounted read-only by compose.site.yaml: WordPress
     # can never write into the user's files, and files the user creates on the host stay the
     # user's (the permission check of 3c).
+    # The dev-only must-use plugins (mail to Mailpit, a stand-in for Cloudflare, never deployed) are
+    # the tools' own files, so compose.site.yaml mounts them from the tools' folder: Compose reads
+    # a relative path here from the site's repository, where they are not once the tools have
+    # their own (template plan T19).
     volumes:
       - wp_html:/var/www/html
-      # Dev-only services: mail to Mailpit and a stand-in for Cloudflare. Never deployed.
-      - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
   # Catches the site's mail, so none ever leaves this computer. Bound to this computer only.
   mailpit:
@@ -77,11 +79,11 @@ services:
     environment:
       <<: *wordpress-env
       WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
+    # The dev-only must-use plugins too, mounted by compose.site.yaml as for the site: WP-CLI saving
+    # a page fetches its videos' pictures (the theme, plan 9v), which must be answered here too,
+    # never by the real YouTube.
     volumes:
       - wp_html:/var/www/html
-      # The dev-only services, as for the site: WP-CLI saving a page fetches its videos' pictures
-      # (the theme, plan 9v), which must be answered here too, never by the real YouTube.
-      - ./config/dev-mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
 volumes:
   db_data:

@@ -23,8 +23,8 @@ plan step 5a-2; the real old site stays online until go-live, and the export sta
 **Which site:** `bin/dev-site` and `bin/test` work on this repository's site unless `SITE_DIR`
 names another site's folder (template plan 1.6c, T14): `SITE_DIR=starter bin/dev-site` builds the
 starter's dev site (its own database, from its slug; the same port, so one dev site runs at a
-time), and `SITE_DIR=starter bin/test` tests it, leaving out this site's own tests (`site/`),
-those of this repository's plugins the starter does not list and the screenshots check, each
+time), and `SITE_DIR=starter bin/test` tests it, with the starter's own browser specs (none so
+far) instead of this site's, leaving out those of this repository's plugins the starter does not list and the screenshots check, each
 named in the output. Both refuse, naming the two sites and the command that stops the other by
 name, when the port is held by another site's dev site (`tools/dev-site-guard.sh`, template plan
 1.6c-2); to switch, `docker compose -p <slug>-dev stop` (its data stays), then `bin/dev-site` with
@@ -59,8 +59,10 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   (`dev-error-origin.php`), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
   too.
 - `bin/test`: the tests against the dev site, each in its group's folder (template plan 1.3a:
-  `generic/`, `components/`, `plugins/<plugin>/` and `site/`, the site's own; the browser tests'
-  shared helpers in `helpers/`), so each group can later go with its own repository: the
+  `generic/`, `components/` and `plugins/<plugin>/`; the browser tests' shared helpers in
+  `helpers/`), so each group can later go with its own repository, and the site's own browser
+  specs in its `tests/browser/`, mounted read-only into `tests/e2e/specs/dev/site/` (template plan
+  T19; a site without that folder has none, which `bin/test` says): the
   scenario checks named `tests/scenario/<group>/dev-*.sh` (bash, sharing `lib.sh`: read-only theme and plugin mounts, the
   PHP debug log's rule (`tests/scenario/debug-log.sh`, template plan 1.5b: any message from the
   site's own code, and any fatal error, fails; other people's notices, warnings and deprecations
@@ -95,7 +97,8 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   exit status 1 if any failed.
 - Dev site: http://localhost:10102 (admin `/wp-admin`); mail inbox: http://localhost:10103.
 - The dev site's recipe is two files (template plan 1.2f): `compose.dev.yaml`, the same for every
-  site, and `compose.site.yaml`, the site's own name and mounts, written from `site.json` by
+  site, and `compose.site.yaml`, the site's own name and mounts (its theme, its own plugins and
+  the tools' dev-only must-use plugins, by their place on this computer), written from `site.json` by
   `bin/dev-site`, `bin/check` and `bin/screenshots` (ignored by git; never edited). `.env`'s
   `COMPOSE_FILE` names both, so the commands below, typed in the repository's folder, use them.
   After changing `site.json`, run `bin/dev-site` before typing them, so the written file follows.
@@ -251,7 +254,9 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   `bin/dev-site`. `tools/paths.sh`: the folders every tool works with (template plan T19): the
   tools' own (`TOOLS_DIR`) and the site's repository (`PROJECT_DIR`), the latter from Composer's
   `COMPOSER_RUNTIME_BIN_DIR` once the tools come through Composer; a tool that can tell neither
-  refuses rather than guess.
+  refuses rather than guess. `bin/check` tests it with the tools apart from a stand-in site
+  (`tests/tools/paths/`); what no check catches is that variable left over in a shell from another
+  project's Composer run, which points the tools at that project.
 - `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,
   `docs/SITE_CHECKLIST.md` 3.2), XML-RPC refused, Application Passwords off, no version
   comments, no WordPress version in pages and feeds (0.3.0, handbook 12, 3.6) and no PHP version
