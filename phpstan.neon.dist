@@ -5,7 +5,7 @@ includes:
 
 parameters:
     level: max
-    # The site runs PHP 8.4 (compose.dev.yaml), whatever PHP the tools container has.
+    # The site runs PHP 8.4 (the tools' compose.dev.yaml), whatever PHP the tools container has.
     phpVersion: 80400
     paths:
         - themes

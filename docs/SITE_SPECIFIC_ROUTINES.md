@@ -61,7 +61,8 @@ is "Howard Buie Music". Staging has no monitor: its site-wide password would fai
   SEO, Simple History; and the site's own plugins (Song List, Site Hardening, Editing Help) and
   child theme.
 - **Updated by hand, staging first:** WordPress, Twenty Twenty-Five (tested by the dev site when
-  it matches `PARENT_THEME_VERSION` in `tools/versions.sh`), Wordfence, FluentSMTP.
+  it matches `PARENT_THEME_VERSION` in the tools' `tools/versions.sh`, in `dts-site-tools`),
+  Wordfence, FluentSMTP.
 - **When Twenty Twenty-Five is raised:** Claude compares its `templates/page.html` and
   `templates/page-no-title.html` with the child theme's two "with call to action" templates
   (rebuild plan D29), which add only the call-to-action part and the same bottom space, and its

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7ef60f2f7f0cd6baf6961ce06e779c1",
+    "content-hash": "a1a20ffbb34401211a98637ce688e4e4",
     "packages": [],
     "packages-dev": [
         {
@@ -101,7 +101,55 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-05-06T08:26:05+00:00"
+            "time": "2026-05-06T08:26:05+00:00",
+            "published-time": "2026-05-06T12:56:03+00:00"
+        },
+        {
+            "name": "dts/site-tools",
+            "version": "dev-feat/site-workflows",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/direct-technical-solutions/dts-site-tools.git",
+                "reference": "d01ba998b5b5f32607f2d2f13a66726c3e001ee9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/d01ba998b5b5f32607f2d2f13a66726c3e001ee9",
+                "reference": "d01ba998b5b5f32607f2d2f13a66726c3e001ee9",
+                "shasum": ""
+            },
+            "require": {
+                "dealerdirect/phpcodesniffer-composer-installer": "1.2.1",
+                "php-stubs/wordpress-stubs": "7.1.2",
+                "phpcsstandards/phpcsextra": "1.5.1",
+                "phpcsstandards/phpcsutils": "1.2.3",
+                "phpstan/phpstan": "2.3.5",
+                "squizlabs/php_codesniffer": "3.13.6",
+                "szepeviktor/phpstan-wordpress": "2.0.4",
+                "wp-coding-standards/wpcs": "3.4.1"
+            },
+            "bin": [
+                "bin/accessibility-scan",
+                "bin/check",
+                "bin/deploy",
+                "bin/dev-site",
+                "bin/screenshots",
+                "bin/site-check",
+                "bin/test",
+                "bin/tools-pin",
+                "bin/versions-check"
+            ],
+            "type": "library",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "The tools that check, test and deploy a DTS WordPress site: run on the developer's computer and in CI, never installed on the website.",
+            "homepage": "https://github.com/direct-technical-solutions/dts-site-tools",
+            "support": {
+                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/feat/site-workflows",
+                "issues": "https://github.com/direct-technical-solutions/dts-site-tools/issues"
+            },
+            "time": "2026-11-24T19:51:50+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -153,7 +201,8 @@
                 "issues": "https://github.com/php-stubs/wordpress-stubs/issues",
                 "source": "https://github.com/php-stubs/wordpress-stubs/tree/v7.1.2"
             },
-            "time": "2026-10-06T06:59:21+00:00"
+            "time": "2026-10-06T06:59:21+00:00",
+            "published-time": "2026-10-06T07:32:21+00:00"
         },
         {
             "name": "phpcsstandards/phpcsextra",
@@ -235,7 +284,8 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-07-27T11:13:17+00:00"
+            "time": "2026-07-27T11:13:17+00:00",
+            "published-time": "2026-07-27T11:19:59+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -328,7 +378,8 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-07-27T10:28:41+00:00"
+            "time": "2026-07-27T10:28:41+00:00",
+            "published-time": "2026-07-27T10:36:31+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -392,7 +443,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-03T12:14:22+00:00"
+            "time": "2026-11-03T12:14:22+00:00",
+            "published-time": "2026-11-03T12:14:36+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -471,7 +523,8 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2026-08-06T00:17:32+00:00"
+            "time": "2026-08-06T00:17:32+00:00",
+            "published-time": "2026-08-06T01:05:02+00:00"
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
@@ -534,7 +587,8 @@
                 "issues": "https://github.com/szepeviktor/phpstan-wordpress/issues",
                 "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v2.0.4"
             },
-            "time": "2026-05-22T16:22:09+00:00"
+            "time": "2026-05-22T16:22:09+00:00",
+            "published-time": "2026-08-28T06:48:49+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -600,12 +654,15 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-07-27T11:53:23+00:00"
+            "time": "2026-07-27T11:53:23+00:00",
+            "published-time": "2026-07-27T11:55:52+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "dts/site-tools": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},
@@ -613,5 +670,5 @@
     "platform-overrides": {
         "php": "8.4.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

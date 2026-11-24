@@ -1,12 +1,16 @@
-# Dependabot proposes updates of the pinned tools as pull requests (plan step 3f follow-up).
-# It never merges: each pull request runs the `check` workflow and waits for the user's decision.
-# Not covered, updated by hand: the container images in tools/versions.sh and compose.dev.yaml, and
-# Playwright, whose package must match its image (bin/tools-update; bin/check compares them).
+# Dependabot proposes updates as pull requests: the tools (dts-site-tools, through composer.json)
+# wait for the user's review; the site's WordPress.org plugins merge themselves once their checks
+# pass (plugin-updates.yml, template plan T9).
+# Not here: the tools' own packages, images and actions are updated in dts-site-tools; the site's
+# workflows call its shared ones by commit, which bin/tools-pin raises, so Dependabot has no
+# actions to update here (it would raise that commit apart from composer.lock, template plan T18).
 version: 2
 
 updates:
-  # The checkout action, pinned by commit in .github/workflows/check.yml.
-  - package-ecosystem: "github-actions"
+  # The tools (composer.json, composer.lock), at the release composer.json names; the PHP checkers
+  # come with them at the versions the tools require, so only the tools themselves are proposed.
+  # A tools update fails bin/check's pin check until bin/tools-pin has run on its branch (T18).
+  - package-ecosystem: "composer"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -17,33 +21,8 @@ updates:
     # is only proposed once it has survived that. Security updates are not held back by this.
     cooldown:
       default-days: 7
-    commit-message:
-      prefix: "ci"
-      include: "scope"
-
-  # The code-quality tools (composer.json, composer.lock); development only, never deployed.
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:00"
-      timezone: "America/New_York"
-    cooldown:
-      default-days: 7
-    # One pull request for all the tools, so they are tried together as bin/check runs them.
-    groups:
-      code-quality-tools:
-        patterns:
-          - "*"
-    ignore:
-      # WPCS 3.x requires PHP_CodeSniffer 3.x.
-      - dependency-name: "squizlabs/php_codesniffer"
-        update-types: ["version-update:semver-major"]
-      # The stubs describe the WordPress version the site runs (7.1); they move with WordPress,
-      # deliberately, not on their own.
-      - dependency-name: "php-stubs/wordpress-stubs"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    allow:
+      - dependency-name: "dts/site-tools"
     commit-message:
       prefix: "build"
       include: "scope"
@@ -68,73 +47,6 @@ updates:
       site-plugins:
         patterns:
           - "wpackagist-plugin/*"
-    commit-message:
-      prefix: "build"
-      include: "scope"
-
-  # The browser tests' packages (tests/e2e/package.json and its lock file).
-  - package-ecosystem: "npm"
-    directory: "/tests/e2e"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:00"
-      timezone: "America/New_York"
-    cooldown:
-      default-days: 7
-    groups:
-      browser-test-tools:
-        patterns:
-          - "*"
-    ignore:
-      # Must equal the Playwright image in tools/versions.sh; both move together by hand.
-      - dependency-name: "@playwright/test"
-    commit-message:
-      prefix: "build"
-      include: "scope"
-
-  # The CSS linter (tools/css-lint/package.json and its lock file, plan D29).
-  - package-ecosystem: "npm"
-    directory: "/tools/css-lint"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:00"
-      timezone: "America/New_York"
-    cooldown:
-      default-days: 7
-    # Stylelint, its standard configuration and the formatting plugin are released in step and
-    # must agree on Stylelint's major version, so they are tried together.
-    groups:
-      css-lint-tools:
-        patterns:
-          - "*"
-    commit-message:
-      prefix: "build"
-      include: "scope"
-
-  # The theme scripts' checker (tools/js-check/package.json and its lock file, template plan 1.7):
-  # ESLint, typescript-eslint, the layout plugin and the TypeScript typescript-eslint supports.
-  - package-ecosystem: "npm"
-    directory: "/tools/js-check"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:00"
-      timezone: "America/New_York"
-    cooldown:
-      default-days: 7
-    # ESLint and its plugins must agree on ESLint's major version, and typescript-eslint on
-    # TypeScript's, so they are tried together.
-    groups:
-      js-check-tools:
-        patterns:
-          - "*"
-    ignore:
-      # TypeScript is held to the versions typescript-eslint supports (its peer range, below 6.1
-      # in 8.73); raised by hand when typescript-eslint supports a newer one.
-      - dependency-name: "typescript"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
     commit-message:
       prefix: "build"
       include: "scope"

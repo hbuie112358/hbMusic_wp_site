@@ -50,6 +50,14 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 
 ## Where things are
 
+- **The tools** (`dts-site-tools`, template plan 2.1d): installed by Composer from
+  `composer.lock` into `vendor/dts/site-tools/`, their commands into `bin/` (both ignored by
+  git; the install command is in the tools' `README.md`, and runs after a fresh clone and after
+  each change to `composer.lock`). Paths such as `tools/…`, `tests/e2e/`, `tests/scenario/`,
+  `compose.dev.yaml` and `docs/TOOLS.md` in this file and the site's documents name files
+  there. A change to them is made in `~/dev/dts-site-tools` (its own repository), never in
+  `vendor/`. The site's own tests and checks stay here: `tests/browser/`, `tests/checks/`,
+  `tests/dev-content/`, `tests/dev-setup.sh`.
 - `backups/`: the original host export, the site archive (`.tar.gz`) and the database dump
   (`.sql.gz`). Read-only (`chmod a-w`); never changed, moved or unpacked in place.
 - `db/`: the database dump unpacked to plain `.sql` (WordPress 7.1.4, table prefix `wp_`).
@@ -126,19 +134,21 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   runs it locally only for a change that reaches across the site (the user, 2026-11-17: a small
   code change took about 15 minutes from ready to live, the full tests running three times).
 - `bin/check`: every static check, in pinned containers; every check runs even after a failure.
-  Its parts: the site's checks, the site's own in `tests/checks/`, and the tools' self-check
-  (`tests/tools/check-tools.sh`, also run alone; template plan T20).
+  Its parts: the site's checks, the site's own in `tests/checks/`, and that the site's workflows
+  call the installed tools (`bin/tools-pin`). The tools' own self-check runs in their repository.
   The review gate starts with it.
-- `compose.dev.yaml` and `compose.site.yaml` (written from `site.json`; never edited) are the dev
-  site's recipe; after changing `site.json`, run `bin/dev-site` before typing compose commands.
+- The tools' `compose.dev.yaml` and `compose.site.yaml` (written from `site.json`; never edited)
+  are the dev site's recipe, which `.env`'s `COMPOSE_FILE` names; after changing `site.json`, run `bin/dev-site` before typing compose commands.
   `docker compose stop` / `start` keep everything; `docker compose run --rm cli wp <command>` is
   WP-CLI; `docker compose down -v` deletes the dev site's data, and Claude runs it only when the
   user asks.
 - GitHub runs `bin/check` and the dev site's tests on every pull request, weekly and by the button;
-  a merge deploys nothing.
+  a merge deploys nothing. The site's three workflows only call the tools' shared ones, pinned to
+  the commit `composer.lock` installs; `bin/tools-pin` writes them, never edited by hand.
 - `site-packages/`: the downloaded plugins, pinned by Composer; Dependabot's WordPress.org plugin
   updates merge themselves (T9); updates to `composer/installers` and to the tools wait for the
-  user's review.
+  user's review. A tools update (Dependabot raising `dts/site-tools` in `composer.json`) fails
+  `bin/check` until `bin/tools-pin` has run on its branch and its files are committed there.
 - `bin/versions-check`: the weekly alerts for the parent theme, waiting plugin updates and the
   deploy test server's packages.
 - `bin/deploy staging|live`: run by the user, the only way code reaches staging and live.
@@ -146,9 +156,10 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 - `bin/accessibility-scan <address>`: axe and alt text on every page; monthly against live.
 - `bin/screenshots previews | baseline | compare`: before/after pictures of the real content, local
   only, never a gate; whether a change looks right is the user's call.
-- `bin/tools-update`: the deliberate way to update the tools' lock files; then `bin/check`,
-  review the lock files' diff, commit.
-- `tools/versions.sh`: the one place for the images and downloads the scripts use.
+- `bin/tools-pin`: writes the site's three workflows for the tools release `composer.lock`
+  installs; run after each tools update.
+- The tools' `tools/versions.sh`: the one place for the images and downloads the scripts use,
+  the parent theme's pinned version included, so raising it takes a tools release.
 - `plugins/site-hardening/`: the security headers and other hardening; the policy's outside
   sources are this site's facts (`includes/site-facts.php`), each with its reason.
 
@@ -160,7 +171,7 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   `.env` safety stop, the read-only theme and plugin mounts, and `bin/screenshots`'s previews
   (with a neutral fixture in `tests/scenario/fixtures/screenshots/`). Plain bash: the bats
   framework would need the Docker socket in its container.
-- **Browser tests** (`tests/e2e/`, Playwright): the new theme on the dev site, with axe
+- **Browser tests** (the tools' `tests/e2e/` and this site's `tests/browser/`, Playwright): the new theme on the dev site, with axe
   (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
   reports, and the Song List's page and admin form, which log in with the dev admin.
 - **PHPUnit** (unit and integration against a separate test database) arrives with the first

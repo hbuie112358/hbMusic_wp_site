@@ -72,7 +72,7 @@ store. Never in mail, chat or the repository.**
 **2.2 `DISALLOW_FILE_EDIT` set to `true`.**
 - Why: a stolen admin login cannot then edit PHP from the dashboard.
 - Check: Appearance → Theme File Editor and Plugins → Plugin File Editor are absent.
-- Kind: WordPress · Status: done: set on the dev site (`compose.dev.yaml`), and on staging and
+- Kind: WordPress · Status: done: set on the dev site (the tools' `compose.dev.yaml`), and on staging and
   live since 2026-11-11 (`wp config set`; both report `true`, and live refuses
   `theme-editor.php`). On live the line first landed inside a comment the old site had left
   open (`/*define( 'WP_ENVIRONMENT_TYPE', 'local' );`), so it had no effect until those two old
@@ -547,7 +547,7 @@ visitors' location requires.**
 `mail()`.**
 - Why: server mail is often lost as spam.
 - Check: a test message arrives and passes SPF and DKIM.
-- Kind: WordPress · Status: partly: the dev site sends to Mailpit (`config/dev-mu-plugins/`); the mail
+- Kind: WordPress · Status: partly: the dev site sends to Mailpit (the tools' `config/dev-mu-plugins/`); the mail
   service, Brevo through FluentSMTP, on staging since 2026-11-09 with SPF, DKIM and DMARC
   passing (plan step 8, D24); live at step 9.
 

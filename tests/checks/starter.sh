@@ -34,7 +34,7 @@ starter_site_json_is_valid() {
   }
   problems+="$(site_settings_missing_test_pages "$STARTER_DIR/site.json" "$STARTER_DIR/tests/dev-content")"
   [[ -z "$problems" ]] && return 0
-  log "starter/site.json does not follow the rules in tools/site-settings.jq, or lacks a page's content:"
+  log "starter/site.json does not follow the rules in the tools' tools/site-settings.jq, or lacks a page's content:"
   printf '%s\n' "$problems" | sed 's/^/    /' >&2
   return 1
 }
@@ -56,7 +56,7 @@ starter_holds_the_site_layer() {
   local differences
   differences="$(site_layer_differences "$TOOLS_DIR/tools/site-layer-files.txt" "$STARTER_DIR/theme" "$SITE_THEME_DIR")"
   [[ -z "$differences" ]] && return 0
-  log "starter/theme/ and tools/site-layer-files.txt disagree:"
+  log "starter/theme/ and the tools' tools/site-layer-files.txt disagree:"
   printf '%s\n' "$differences" | sed 's/^/    /' >&2
   return 1
 }

@@ -885,7 +885,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `tests/e2e/package.json` and its lock file's package name, `docs/TOOLS.md`'s deploy example,
   `tests/tools/dev-site-guard/run.sh`'s example names, and `tests/tools/check-tools.sh`'s Composer
   validation with `--no-check-all`, since `--strict` failed on the exact versions T18 requires)); `[~]` 2.1c the reusable workflows, called pinned by commit (T22, 2026-11-24: built
-  in `dts-site-tools` on branch `feat/site-workflows`, not yet committed: the three `site-*.yml`
+  in `dts-site-tools` on branch `feat/site-workflows`, committed as `7c0225a` and pushed, unmerged until 2.1d's first call proves it: the three `site-*.yml`
   workflows, `tools/site-workflows/` with `bin/tools-pin` and `tools/tools-pin.sh`, `bin/check`'s
   pin check for sites that install the tools, the README's install command, `docs/TOOLS.md`, the
   changelog; the self-check 29 of 29 passing with its three new checks (the pin's 14 examples,
@@ -893,8 +893,21 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   callers), each shown failing on a planted fault; actionlint works offline and passed a
   misspelled input in a caller calling by GitHub address, so the self-check lints the callers
   rewritten to call by local path in a copy with a `.git` folder, which caught it; found: the existing `in_composer_of` mounts no
-  `bin/`, so the install command mounts the site's `bin/` itself); `[ ]` 2.1d this site
-  switched over (from 2.1c, T22: the first call of the shared workflows from this site's branch,
+  `bin/`, so the install command mounts the site's `bin/` itself); `[~]` 2.1d this site
+  switched over (the approach agreed 2026-11-24, eight parts: install, remove the copies,
+  callers and Dependabot, `.env` and local checks, the first call, the real check names, the
+  milestone proof, the release; the plugin-dependent tests left to 2.4, the user. Done so far,
+  branch `feat/use-site-tools`: the site requires `dts/site-tools` at `dev-feat/site-workflows`,
+  the lock recording the commit (a `#commit` pin failed `composer validate --strict`); the local
+  copies removed after comparing them with the tools (only the expected differences); the
+  callers written by `bin/tools-pin`; `dependabot.yml` down to the tools and the plugins;
+  `.env`'s `COMPOSE_FILE` pointed at the tools; `bin/check` 39 of 39 and the dev site built from
+  the installed tools. Found and fixed in the tools as `d01ba99` on `feat/site-workflows`:
+  `bin/tools-pin` was missing from the tools' `composer.json` `bin`, so never installed (a new
+  self-check rule holds the two equal), and a new `.env` named `compose.dev.yaml` at the
+  repository's top (now written for where the tools are). Found, for the user to decide later:
+  the parent theme's pinned version, `PARENT_THEME_VERSION`, is in the tools' `tools/versions.sh`,
+  so raising a site's parent theme takes a tools release. Next: the first call. From 2.1c, T22: the first call of the shared workflows from this site's branch,
   pinned to the tools branch's commit, confirming the personal-account caller, the check names
   GitHub gives called jobs and the traces' path in `vendor/`; then `bin/deploy`'s
   `REQUIRED_CHECKS` and its test scenarios, and this repository's branch protection, set to those
@@ -924,7 +937,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   plugin at its listed version; then each plugin's move is small. Checked by Composer's lock file,
   which records each release's exact commit (DTS's plugins have no published fingerprints like
   WordPress.org's). This site's `plugins/` folder leaves the repository; its checks and tests pass
-  as before, and a deploy shows no change in the plugins' files.
+  as before, and a deploy shows no change in the plugins' files. The status sheet's evidence
+  naming the plugins' tests (`tests/scenario/plugins/…`, now in the tools) is reworded here, once
+  those tests have their final home (left from 2.1d, the user, 2026-11-24).
 - [ ] **2.3 The generic theme code** in the components plugin chosen at 1.1 (T5, T16: the one
   home for DTS's shared theme code, which Twenty Twenty-Five cannot hold); this site switched over.
   Installed like 2.2's plugins, nothing new built for it. This site's child theme shrinks to its

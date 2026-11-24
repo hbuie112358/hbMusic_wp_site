@@ -1,27 +1,25 @@
 {
-    "name": "hbmusic/site-tools",
-    "description": "Development tools for the site's code: coding standards and static analysis (plan step 3d). Never deployed.",
+    "name": "hbmusic/site",
+    "description": "The site's tools (dts-site-tools: checks, tests, deploy), pinned to one release; they run on the developer's computer and in CI and are never deployed. The site's plugins are in site-packages/.",
     "type": "project",
     "license": "proprietary",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/direct-technical-solutions/dts-site-tools"
+        }
+    ],
     "require-dev": {
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.2.1",
-        "php-stubs/wordpress-stubs": "^7.1.2",
-        "phpstan/phpstan": "^2.3.4",
-        "squizlabs/php_codesniffer": "^3.13.5",
-        "szepeviktor/phpstan-wordpress": "^2.0.4",
-        "wp-coding-standards/wpcs": "^3.4.1"
+        "dts/site-tools": "dev-feat/site-workflows"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
+        "bin-dir": "bin",
         "platform": {
             "php": "8.4.0"
         },
         "sort-packages": true
-    },
-    "scripts": {
-        "lint": "phpcs",
-        "analyse": "phpstan analyse --no-progress --memory-limit=1G"
     }
 }

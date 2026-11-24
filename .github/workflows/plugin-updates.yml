@@ -1,22 +1,18 @@
-# Lets Dependabot's weekly plugin update merge itself once its checks pass (template plan T9): only
-# a pull request opened by Dependabot into main that changes nothing but site-packages/, and in its
-# lock file nothing but WordPress.org plugins, whose files the dev site checks against
-# WordPress.org's checksums. Anything else (composer/installers, which runs code as Composer
-# installs; any tool) waits for the user's review. It
-# switches on GitHub's auto-merge, by rebase as the project merges; the required checks (check,
-# dev-site) still decide, and the merge changes nothing on staging or live, which get a tested
-# version only when the user deploys. A pull request that fails, or falls behind main, stays open,
-# and the weekly versions check opens an issue about it after a few days (versions.yml).
+# Written by dts-site-tools' bin/tools-pin from its tools/site-workflows/plugin-updates.yml;
+# bin/check fails when this file differs from what bin/tools-pin writes, so it is changed in the
+# tools, never here.
 #
-# Nothing from the pull request runs here: the checkout is main's own code (the base commit), and
-# the pull request's lock file is fetched as data only.
+# Lets Dependabot's weekly plugin update merge itself once its checks pass, through the tools'
+# shared rule (site-plugin-updates.yml), pinned to the commit of the tools release composer.lock
+# installs: only WordPress.org plugins in site-packages/ may merge themselves; anything else,
+# the tools' own releases included, waits for the user's review.
 name: plugin-updates
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-# Nothing by default; the one job asks for what switching on auto-merge needs.
+# Nothing by default; the one job gets what switching on auto-merge needs.
 permissions: {}
 
 concurrency:
@@ -25,48 +21,9 @@ concurrency:
 
 jobs:
   auto-merge:
-    # Dependabot's own pull requests into main only; Dependabot's workflows get a read-only token
-    # unless the permissions below raise it.
-    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    # The called workflow acts only on Dependabot's pull requests into main, and skips the rest.
     permissions:
       contents: write
       pull-requests: write
-    env:
-      GH_TOKEN: ${{ github.token }}
-      PR_URL: ${{ github.event.pull_request.html_url }}
-    steps:
-      # main's own code, for the shared rule (tools/site-packages.sh); pinned by commit like the others.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          persist-credentials: false
-
-      - name: Change only WordPress.org plugins in site-packages/?
-        id: scope
-        env:
-          REPOSITORY: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          outside="$(gh pr view "$PR_URL" --json files --jq '.files[].path' | grep -v '^site-packages/' || true)"
-          if [ -n "$outside" ]; then
-            printf 'Changes outside site-packages/, so this pull request waits for the user:\n'
-            printf '  %s\n' "$outside"
-            echo "plugins-only=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          gh api "repos/$REPOSITORY/contents/site-packages/composer.lock?ref=$HEAD_SHA" \
-            -H "Accept: application/vnd.github.raw" > "$RUNNER_TEMP/head.lock"
-          problems="$(PROJECT_DIR="$PWD" bash -c 'source tools/site-packages.sh && site_packages_not_plugins_only site-packages/composer.lock "$1"' _ "$RUNNER_TEMP/head.lock")"
-          if [ -n "$problems" ]; then
-            printf 'Not only WordPress.org plugins changed, so this pull request waits for the user:\n'
-            printf '  %s\n' "$problems"
-            echo "plugins-only=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "plugins-only=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Switch on auto-merge (by rebase, once the required checks pass)
-        if: steps.scope.outputs.plugins-only == 'true'
-        run: gh pr merge --auto --rebase "$PR_URL"
+    # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-plugin-updates.yml@d01ba998b5b5f32607f2d2f13a66726c3e001ee9 # dev-feat/site-workflows
