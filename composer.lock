@@ -110,12 +110,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/direct-technical-solutions/dts-site-tools.git",
-                "reference": "d01ba998b5b5f32607f2d2f13a66726c3e001ee9"
+                "reference": "4fc7b84bbbf00984ac069b357d28366e6729310e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/d01ba998b5b5f32607f2d2f13a66726c3e001ee9",
-                "reference": "d01ba998b5b5f32607f2d2f13a66726c3e001ee9",
+                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/4fc7b84bbbf00984ac069b357d28366e6729310e",
+                "reference": "4fc7b84bbbf00984ac069b357d28366e6729310e",
                 "shasum": ""
             },
             "require": {
@@ -149,7 +149,7 @@
                 "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/feat/site-workflows",
                 "issues": "https://github.com/direct-technical-solutions/dts-site-tools/issues"
             },
-            "time": "2026-11-24T19:51:50+00:00"
+            "time": "2026-11-24T20:18:00+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
