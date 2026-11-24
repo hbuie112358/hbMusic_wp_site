@@ -56,8 +56,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   (`findings/step-2.1b-1-trial.md`): Composer and the reusable workflow behave as the design
   needs; Dependabot raises the tools' Composer pin but never the workflow's commit, so a tools
   command raises it in the review of Dependabot's pull request (T18, option A). **Now: 2.1b-2,**
-  `REPO_ROOT` split into three (T19): **2.1b-2a** `tools/paths.sh` and the rename, behavior
-  unchanged; **2.1b-2b** the Compose mount, the site's own browser specs mounted apart, the
+  `REPO_ROOT` split into three (T19): **2.1b-2a done** (#111, `de724ce`, 2026-11-24:
+  `tools/paths.sh` and the rename, behavior unchanged; `bin/check`, the full `bin/test` and the
+  starter's tests passing); **next: 2.1b-2b** the Compose mount, the site's own browser specs mounted apart, the
   scenario debug-log fix, the status sheet's file lookup, the new tools test; **2.1b-3** the
   repository
   (layout, `CHANGELOG.md`, its own checks, branch protection, the first tag). Then 2.1c the
@@ -837,7 +838,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   through Composer (T8), with the reusable workflows; this site switched to it. Four parts (T17):
   `[x]` 2.1a the review (2026-11-24, `findings/step-2.1a-tools-review.md`); `[~]` 2.1b the
   repository (T18): `[x]` 2.1b-1 the trial (2026-11-24, `findings/step-2.1b-1-trial.md`), `[ ]`
-  2.1b-2 `REPO_ROOT` split (T19: `[~]` 2.1b-2a the rename, `[ ]` 2.1b-2b the layout fixes and
+  2.1b-2 `REPO_ROOT` split (T19: `[x]` 2.1b-2a the rename (#111, `de724ce`), `[ ]` 2.1b-2b the layout fixes and
   the test), `[ ]` 2.1b-3 the repository; `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
   switched over. (T16: `bin/detach`
   and its release check are built at the first real handover, not here; T6, 2026-11-21, had kept
