@@ -80,7 +80,9 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   `README.md` with the palette's contrast. Never deployed; `bin/check` holds it. Laid out as a
   site, so the tools work on it with `SITE_DIR=starter` (template plan 1.6c, T14): its full theme
   is assembled into `starter/themes/` (ignored by git) on each build.
-- `project-state.yaml`: session state for pause and resume, with the open items.
+- `resume-state.yaml`: only what resume needs to get back to where the last pause left off,
+  with the open items; each pause replaces it, never appends. Past sessions and the sites' facts
+  once kept there: `docs/session-history.md`, not read at resume.
 - `docs/ENVIRONMENTS.md`: the intended differences between the dev site, staging and live, each
   with its reason and where it is tested; a new difference is added there when it is introduced.
 - `docs/ROUTINES.md`: the recurring care of the site (deploying, the monthly site check, what to

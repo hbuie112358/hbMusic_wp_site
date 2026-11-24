@@ -236,7 +236,7 @@ new findings added as steps.
   first gets the version staging runs. Live's text names the old service area until go-live
   (D22). The page generator's Music links are old; only the dev previews use it (D30).
 - **Open decisions waiting on the user:** the new host (step 10). Smaller, optional items that
-  stop nothing are in `project-state.yaml`, `pending_decisions`.
+  stop nothing are in `resume-state.yaml`, `pending_decisions`.
 - **Future, not needed for go-live (D19):** the clip request and setlist plugins (5b to 5d), a
   song search after go-live, the template project (D21) when a second site has a date.
   Before the next site (the user, 2026-11-16): a full evaluation of SEO plugins for the
@@ -261,7 +261,7 @@ new findings added as steps.
 | D3 | Git versions an allow-list only (see `.gitignore`). | The export holds credentials, database dumps and host account identifiers. |
 | D4 | The export's local leftovers (open item 1) are not carried to the new host. | They are local development files, not part of the site. |
 | D5 | Commits use the GitHub noreply address, set for this repository only. | Keeps the personal email address out of the history. |
-| D6 | The site's domain may appear in notes and plans (`CLAUDE.md`, the plan, `project-state.yaml`). | The domain is public; leaving it out protects nothing. Secrets, dumps, host account numbers and server paths stay out of the repository. |
+| D6 | The site's domain may appear in notes and plans (`CLAUDE.md`, the plan, `resume-state.yaml`, named `project-state.yaml` until 2026-11-24). | The domain is public; leaving it out protects nothing. Secrets, dumps, host account numbers and server paths stay out of the repository. |
 | D7 | Theme code never hardcodes the domain; it asks WordPress (`home_url()`, `get_theme_file_uri()` and similar). | The same theme then runs unchanged locally, on staging and live; a hardcoded domain breaks on every move. Server settings that name the domain live on the server, not in the repository. |
 | D8 | Song clips go out only on request, approved with one click by the user (not sent automatically, not published). Fully automatic sending is a possible later change, needing an email confirmation step, limits per address and per day, and spam protection. | The user sees every request (which songs a prospective client wants), bots and forged addresses cannot make the site send mail to strangers, and clips are not handed to unknown people, which keeps the licensing question small. |
 | D9 | Each song stores its release year and one of two genres, Rock/Pop or Country. Decades (1970s, 1980s, ...) are worked out from the year where shown. | The user plays rock/pop and country; two genres keep tagging easy. The era dial (5d) weights songs by distance from a chosen year, which needs the year, not only the decade. The old site already grouped its videos by decade. |

@@ -1,0 +1,121 @@
+# Only what is needed to resume where the last pause left off (~/.claude/PAUSE_CONVENTION.md,
+# RESUME_CONVENTION.md). Not a project overview or handoff: that is handoff.md. Each pause
+# replaces the last session's entries; it never appends. Past sessions and the sites' facts as
+# once recorded here: docs/session-history.md, which resume does not read.
+project: hbMusic_wp_site
+project_state_version: 1
+timestamp: 2026-11-24T08:00:05-05:00
+current_branch: chore/resume-state
+last_commit: 9aa6d88
+working_mode: rolling-wave
+active_plan: docs/planning/template-plan.md
+
+last_work: >
+  2026-11-24 (no pause yet; this file trimmed mid-session): #109 merged (the pause of 2026-11-23
+  and the plan's T15 and T16). T15: no weekly starter job and no starter picture; before
+  committing a change to anything the starter shares, Claude runs the starter's tests (the
+  project's CLAUDE.md, Testing). T16: the template's destination written down and stage 2 trimmed
+  step by step with the user (bin/detach and a prebuilt test server left out; Song List moves in
+  2.2 with the other plugins; the second site's repository public for now). Step 1.7 done, so
+  stage 1 is done, on the branch feat/theme-scripts-eslint, not pushed: 1.7-1 (3433827, ESLint
+  with tools/js-check's own packages) and 1.7-2 (85243ae, the scripts as script modules, one home
+  for what the video scripts share and for the player's origin). Then the token use: this file
+  trimmed to resume only, its history and the sites' facts moved to docs/session-history.md.
+
+next_action: >
+  Resume exactly here, in this order (the user, 2026-11-24). A, the token changes: (1) done:
+  this file trimmed and renamed from project-state.yaml, the six global files changed with the
+  user's yes (the user commits them on the host); (2) the compacting habit, compact at each step's end (the user to decide,
+  then Claude's memory note fresh-session-per-plan-step.md); (3) the project's CLAUDE.md slimmed,
+  the Commands section's tool details moved to docs/TOOLS.md (the user to decide). Nothing about
+  how Claude codes changes (the user: the resume re-reads and the review files stay). B, then:
+  push feat/theme-scripts-eslint (1.7-1, 1.7-2); deploy main to staging, check on a phone, then
+  live (the user's call); then step 2.1, dts-site-tools.
+
+verification:
+  wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
+  checks: bin/check all passing on main and on feat/theme-scripts-eslint (2026-11-24, with ESLint and the scripts' checker's audit); bin/test 17 scenario checks + 242 browser tests passed and 4 skipped (pages with too few videos) on #108; 1.7's changed parts 116 passed and 4 skipped; the starter (SITE_DIR=starter) 16 scenario checks + 168 browser tests (2026-11-24)
+  deployed: by bin/deploy from the user's computer only; staging and live run e366b02 (2026-11-23); main's later commits change no visible thing (#105, #108), feat/theme-scripts-eslint changes how the scripts load (modules), to check on staging first
+  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, rebuilt 2026-11-24); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time
+  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
+
+uncommitted_changes:
+  - file: none in this repository besides this commit's files
+    why: >
+      main is at 9aa6d88, even with origin/main. Unpushed: feat/theme-scripts-eslint (2 commits,
+      3433827 and 85243ae, step 1.7) and chore/resume-state (this commit). starter/themes/ and
+      tools/js-check/node_modules/ are build output, ignored by git.
+  - file: data/ (not versioned)
+    why: >
+      Unchanged since 2026-11-23; its off-computer backup is still behind from the 2026-11-22 and
+      2026-11-23 records (D27).
+  - file: ~/.claude (the user commits it on the host)
+    why: see the pause output's git status of ~/.claude.
+
+pending_decisions:
+  - The compacting habit; the project's CLAUDE.md slimmed (next_action, A).
+  - >
+    The handbook's follow-ups for the user (the lawyer, the accountant, the payment service, the
+    continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
+    handbook's WORKING_DRAFT.md, "Open items", not repeated here.
+  - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built.
+  - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to review, later.
+  - >
+    Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
+    expected senders (a DNS change at Hostinger by the user, with Claude; status sheet 11.2).
+  - >
+    Handbook proposals collected in the template plan (1.5d entries), each for the user's approval
+    one by one, later: 6.9's check to match E7; 7.3's check to the pairs in use (E8); 3.6 naming
+    the generator tag; 7.1's monthly scan of live's pages; the local-staging wording in 2.7 and 3.3.
+  - Raising the dev site's WordPress from 7.1.4 to 7.1.5 (live and staging run 7.1.5).
+  - >
+    Deploying main to staging, then live (bin/deploy), when convenient: #105 and #108 change
+    nothing visible; 1.7, once merged, changes how the scripts load, checked on staging first.
+  - >
+    The site's type, found by the cold-resume check of 2026-11-23: the rebuild plan's D32
+    (2026-11-16) makes it Content by customer, with staging on the host removed after go-live
+    (9r); the project's CLAUDE.md still says Fully managed, and its exception E2 keeps staging on
+    the host. For the user to decide which holds; the status sheet and E2 follow it.
+  - >
+    The rebuild plan's 9o (the host restore test, pending in exception E10) and the template
+    plan's two "worth raising" items (a content-only change count in bin/deploy; why Dependabot's
+    7-day wait did not hold for Contact Form 7 6.2.6).
+  - Bringing the off-computer backup of data/ up to date (the 2026-11-22 and 2026-11-23 records).
+  - >
+    Left as they are from the review of #93 (the user may ask to fix): the Alpine check reads the
+    x86_64 list only; an Alpine build time in the future would show a negative age in the issue.
+  - >
+    For the user (2026-11-20): in Search Console, URL Inspection, Test live URL, then Request
+    indexing for the Book page (and any other page whose search wording changed).
+  - Whether to fix the Site Hardening check's leftover probe drafts on the dev site (harmless; dev-site-hardening.sh does not clean up after itself).
+  - Optional, from the review of #74: a pasted-code video on a test page. Claude advised leaving it out.
+  - Optional tidy-up: keep Search Console in the business Google account only, then remove the older google-site-verification TXT record.
+  - Testimonials, left out for now; the user may check Facebook for some.
+  - Step 3i, evaluating a behaviour-scanning service, whenever the user chooses (Claude would skip it).
+  - The new host (step 10, before the Hostinger plan ends in 2028).
+  - Optional, in the admin: Yoast's Other profiles with the Facebook page (sameAs).
+  - After D29 (the user, 2026-11-11, not now): a global CSS rule proposed item by item from docs/planning/css-standards-notes.md.
+  - >
+    Later, for the global files (the user, 2026-11-23): a global standard that production code
+    follows its language's standards strictly and test code as far as is reasonable, held to
+    clarity; proposed item by item; until then the project's CLAUDE.md ("Coding standards by
+    language") holds it here.
+
+reference_documents: |
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T16, the steps.
+  - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
+  - docs/planning/template-notes.md: what a new site sets differently, and what is generic.
+  - CLAUDE.md (the project's): what is true of this project, its commands, tests and rules.
+  - records/: the status sheet, exceptions, the expected plugin set, search.
+  - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without
+    the user's approval of that change): the DTS Operations Handbook, version 1.
+  - docs/session-history.md: past sessions and the sites' facts once kept here; not read at resume.
+  - data/ (not versioned): the site's real content, photos, exports and private records.
+
+resume_instructions: |
+  1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
+     (this repository and ~/dev/dts-handbook).
+  2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
+     and the entries of the next step (2.1) and the one after (2.2); and the rebuild plan's
+     Current position (9u and 9w waiting).
+  3. Then next_action, in its order: A, the token changes; B, the push, the deploy, step 2.1.
