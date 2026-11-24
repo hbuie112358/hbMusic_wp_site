@@ -69,9 +69,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   PHPStan by their packages' own files, `PHPCS_ENTRY` and `PHPSTAN_ENTRY` in
   `tools/check-lib.sh`, since a site's `bin-dir: bin` leaves `vendor/bin/` empty); **2.1b-3b
   done** (2026-11-24: `dts-site-tools` public in the organization, `v0.1.0` on `44362f1`, its
-  `check` passing on GitHub; the step entry has the settings); **now: 2.1c** (T22), built in
-  `dts-site-tools` on `feat/site-workflows`, self-check passing, waiting for the review gate and
-  the user's "commit"; its first real call is in 2.1d. 2.1b-3b was
+  `check` passing on GitHub; the step entry has the settings); **2.1c built** (T22,
+  2026-11-24): committed in `dts-site-tools` as `7c0225a` on `feat/site-workflows`, pushed,
+  deliberately unmerged (a rebase merge would rename the commit 2.1d's first call needs); its
+  proof is that first call. **Next: 2.1d,** this site switched over, the first milestone (T21).
+  2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
   the changelog also names any change to what `bin/check` provides a site's own checks;

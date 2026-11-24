@@ -4,69 +4,74 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T12:40:22-05:00
-current_branch: docs/template-stage2-pace
-last_commit: ba99781
+timestamp: 2026-11-24T14:45:00-05:00
+current_branch: chore/pause-2026-11-24f
+last_commit: 6299d76
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (eighth session). The user set stage 2's pace (T21, also in the project's
-  CLAUDE.md, Testing): work behind the scenes moves fast, things may break between milestones
-  while nothing is deployed; full checks and the starter's tests only at milestones (2.1d,
-  after 2.2/2.3, 2.4) and before every deploy, which stays strict. Template 2.1b-3b done:
-  dts-site-tools built locally in ~/dev/dts-site-tools (the user approved the folder) from
-  ce4ae46 with composer.json (approved), composer.lock (identical packages and commits to this
-  site's), LICENSE, README, CHANGELOG, check workflow, dependabot.yml; three name leaks fixed
-  in the copy; the self-check's Composer validation given --no-check-all (the user approved,
-  after asking why: --strict failed only on the exact versions T18 requires). Then public in
-  the organization with its settings and protection, check passed on GitHub, v0.1.0 tagged on
-  44362f1. The user wants plain explanations and the reasons when a check is changed.
+  2026-11-24 (ninth session). Template 2.1c built (T22, the user's choices: generated callers
+  held by a "must match" rule; proof at 2.1d's first call, no throwaway repository). In
+  dts-site-tools, commit 7c0225a on feat/site-workflows, pushed, deliberately unmerged: the shared
+  workflows site-check.yml (check, dev-site), site-versions.yml, site-plugin-updates.yml, each
+  installing the tools from the site's composer.lock first (Composer given the run's read-only
+  token; --no-plugins --no-scripts in the merging job); caller templates in tools/site-workflows/;
+  bin/tools-pin and tools/tools-pin.sh; bin/check's pin check for sites that install the tools;
+  the README's install command (it mounts the site's bin/, which in_composer_of does not); the
+  self-check 29 of 29 with three new checks, each shown failing on a planted fault (actionlint
+  checks callers rewritten to local paths, since it passed a misspelled input by GitHub address).
+  Also an estimate for the user: about 25-40 active hours to a usable starter (through 2.4).
+  Docs branch merged as #115 (6299d76); the user prefers plain, short explanations.
 
 next_action: >
-  Template plan 2.1c, the reusable workflows (T17, T18): read the step entry and
-  findings/step-2.1b-1-trial.md first. Work in ~/dev/dts-site-tools (outside this project: each
-  change there is part of the approved step; ask before anything new outside it). Open in 2.1c:
-  a personal-account caller confirmed at its first call; Composer given the workflow's read-only
-  token; the pin check and the bin/tools-pin command. Per T21, prove at the milestone (2.1d),
-  not every sub-step. Push this repository's docs branch with the 2.1c work, after asking.
+  Template plan 2.1d, this site switched over (the first milestone, T21): read the 2.1d entry in
+  the plan (its notes from 2.1b-2b, 2.1b-3a-2 and 2.1c) and T18-T22 first, then propose the
+  approach before changing anything. Its first call of the shared workflows, pinned to
+  dts-site-tools' 7c0225a, confirms the personal-account caller, the check names GitHub gives
+  called jobs (expected "check / check", "check / dev-site", unverified) and the traces' path;
+  then bin/deploy's REQUIRED_CHECKS with its ~30 test scenarios and this repository's branch
+  protection (outside change, ask first) set to those names; file-by-file comparison with the
+  tools; full checks and the starter's tests; then merge feat/site-workflows and tag v0.2.0
+  (each outside step proposed first).
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: bin/check all passing on 2.1b-3a-2's branch (2026-11-24, 106 s, the self-check included); #114's check and dev-site jobs passed on GitHub; the starter (SITE_DIR=starter) all steps passed, 168 browser tests (2026-11-24, with 2.1b-3a-2)
-  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); #111 and #112 change only the tools, nothing to deploy for visitors. bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
-  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, restarted after the starter's run 2026-11-24); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time. The self-check's own download caches are the Docker volumes site-tools_composer_cache and site-tools_npm_cache
+  checks: "#115 (documents only): check and dev-site passed on GitHub 2026-11-24. dts-site-tools feat/site-workflows: self-check 29 of 29 locally (2026-11-24), not run on GitHub (no pull request opened there yet). This site's bin/check last run in full on 2.1b-3a-2's branch (2026-11-24)."
+  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); nothing since changes what visitors get. bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
+  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, checked at this pause); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time. The self-check's download caches are the Docker volumes site-tools_composer_cache and site-tools_npm_cache
   dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
 
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at ce4ae46, even with origin/main. Unpushed: docs/template-stage2-pace (4 commits
-      with this pause: the last pause f4db0a6, T21 17f00bc, the 2.1b-3b record ba99781, this
-      pause; documents only). chore/pause-2026-11-24e (f4db0a6) is contained in it, to delete
-      once the docs branch is merged. starter/themes/ and tools/js-check/node_modules/ are build
-      output, ignored by git.
+      main is at 6299d76, even with origin/main. Unpushed: chore/pause-2026-11-24f (1 commit with
+      this pause: the plan's Current position and this file; documents only), to push with the
+      2.1d work.
   - file: ~/dev/dts-site-tools (its own repository)
     why: >
-      Clean; main and tag v0.1.0 (44362f1) pushed to direct-technical-solutions/dts-site-tools.
-      Its vendor/ and node_modules/ from the local self-check are ignored by its git.
+      Clean. main at 44362f1 (v0.1.0) even with origin. feat/site-workflows (1 commit, 7c0225a)
+      pushed and unmerged on purpose until 2.1d proves it; no pull request opened there yet.
   - file: data/ (not versioned)
     why: >
       Unchanged since 2026-11-23; its off-computer backup is still behind from the 2026-11-22 and
       2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
     why: >
-      time-log.csv (updated by this pause) and time-corrections.csv uncommitted, as at the last
-      pause; the user commits them on the host.
+      time-log.csv (updated by this pause) and time-corrections.csv uncommitted; the user commits
+      them on the host.
 
 pending_decisions:
   - >
     The handbook's follow-ups for the user (the lawyer, the accountant, the payment service, the
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
     handbook's WORKING_DRAFT.md, "Open items", not repeated here.
-  - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built; toolkit/github.md's answered trap on pinning reusable workflows (T17), proposed at 2.1c.
-  - Pushing docs/template-stage2-pace (documents only) with the 2.1c work; Claude asks first.
-  - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to review, later.
+  - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built; toolkit/github.md's answered trap on pinning reusable workflows (T17), its wording proposed now that 2.1c's design stands.
+  - >
+    Dependabot's tools updates, waiting for the user's review: #56 (@stylistic/stylelint-plugin
+    6.0.0 to 6.0.1) and #97 (phpstan/phpstan 2.3.5 to 2.3.6, code-quality-tools group). #97 is
+    affected by 2.1d: the PHP checkers' versions move to dts-site-tools' exact requirements, so
+    the update belongs there; to look at before or during 2.1d.
   - >
     Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
     expected senders (a DNS change at Hostinger by the user, with Claude; status sheet 11.2).
@@ -106,11 +111,13 @@ pending_decisions:
     language") holds it here.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T19, the steps.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T22, the steps.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - docs/planning/template-notes.md: what a new site sets differently, and what is generic.
+  - docs/planning/findings/: step-2.1a-tools-review.md, step-2.1b-1-trial.md.
   - CLAUDE.md (the project's): what is true of this project, its commands, tests and rules.
   - records/: the status sheet, exceptions, the expected plugin set, search.
+  - ~/dev/dts-site-tools: the tools' repository (feat/site-workflows holds 2.1c).
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without
     the user's approval of that change): the DTS Operations Handbook, version 1.
   - docs/session-history.md: past sessions and the sites' facts once kept here; not read at resume.
@@ -118,8 +125,8 @@ reference_documents: |
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
-     (this repository and ~/dev/dts-handbook).
+     (this repository, ~/dev/dts-site-tools and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T17-T20 above all) and the entries of the current step (2.1) and the next (2.2); and the
-     rebuild plan's Current position (9u waiting).
-  3. Then next_action: step 2.1c.
+     (T17-T22 above all) and the entries of the current step (2.1, its 2.1d part) and the next
+     (2.2); and the rebuild plan's Current position (9u waiting).
+  3. Then next_action: step 2.1d.
