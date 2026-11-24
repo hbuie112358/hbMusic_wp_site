@@ -293,9 +293,9 @@ run_dependency_checks() {
 # then the rules for shared code, site.json and the records.
 run_standards_and_rule_checks() {
   local plugin_slug
-  run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
+  run_check "WordPress Coding Standards (PHPCS)" in_analysis php "$PHPCS_ENTRY"
   for plugin_slug in "${SITE_LOCAL_PLUGINS[@]}"; do
-    run_check "WordPress Coding Standards ($plugin_slug plugin)" in_analysis php vendor/bin/phpcs \
+    run_check "WordPress Coding Standards ($plugin_slug plugin)" in_analysis php "$PHPCS_ENTRY" \
       --standard="plugins/$plugin_slug/phpcs.xml.dist" --basepath="plugins/$plugin_slug" "plugins/$plugin_slug"
   done
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
@@ -307,7 +307,7 @@ run_standards_and_rule_checks() {
 }
 
 run_analysis_and_file_checks() {
-  run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+  run_check "Static analysis (PHPStan)" in_analysis php "$PHPSTAN_ENTRY" analyse --no-progress --memory-limit=1G
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check

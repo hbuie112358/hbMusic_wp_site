@@ -4,9 +4,16 @@
 # checks both run on packages they both use (Composer, npm). Sourced, never run; the sourcing
 # script defines TOOLS_DIR, CHECK_LOG_NAME (the name its log lines carry) and, before using the
 # containers, COMPOSER_CACHE_VOLUME and NPM_CACHE_VOLUME, and sources tools/versions.sh. A site's own checks
-# (tests/checks/*.sh) may use run_check and log.
+# (tests/checks/*.sh) may use run_check, log, PHPCS_ENTRY and PHPSTAN_ENTRY.
 
 FAILED_CHECKS=()
+
+# The PHP checkers are started by their packages' own files, relative to the folder holding
+# vendor/, never by Composer's launchers in vendor/bin/: a site installs the tools with its
+# bin-dir set to bin/ (template plan T18), which puts every package's launchers there and leaves
+# vendor/bin/ empty. The packages' own files stay in vendor/ whatever the bin-dir.
+readonly PHPCS_ENTRY="vendor/squizlabs/php_codesniffer/bin/phpcs"
+readonly PHPSTAN_ENTRY="vendor/phpstan/phpstan/phpstan"
 
 log() { printf '%s [%s] %s\n' "$(date +%H:%M:%S)" "${CHECK_LOG_NAME:-check}" "$*" >&2; }
 
