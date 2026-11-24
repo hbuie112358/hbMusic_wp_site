@@ -124,18 +124,19 @@ Steps 1-3 run on live (on a site not yet live, on staging).
 
    **Has the dev site tested it?** The versions the dev site's tests ran are in
    [`site-packages/composer.json`](../site-packages/composer.json) for the downloaded plugins and
-   in [`tools/versions.sh`](../tools/versions.sh) for the parent theme (`PARENT_THEME_VERSION`).
+   in the tools' `tools/versions.sh` (in `dts-site-tools`) for the parent theme
+   (`PARENT_THEME_VERSION`).
    For each update waiting on staging:
    - **A plugin `bin/deploy` delivers:** left to `bin/deploy`, as above.
-   - **The parent theme, the same version as `tools/versions.sh`:** tested; update staging, then
-     live. **Newer than there:** not tested yet; ask Claude in a session to raise it and run the
-     tests first.
+   - **The parent theme, the same version as the tools' `tools/versions.sh`:** tested; update
+     staging, then live. **Newer than there:** not tested yet; ask Claude in a session to raise it
+     in the tools and run the tests first (a tools release, which the site then installs).
    - **Not in those files** (WordPress, and the plugins the dev site does not run): staging is the
      test, as above.
 
    A security fix the host installs by itself does not wait for the dev site: closing a hole comes
-   first, and the version in `site-packages/composer.json` (a plugin) or `tools/versions.sh` (the
-   theme) is raised to it afterwards.
+   first, and the version in `site-packages/composer.json` (a plugin) or the tools'
+   `tools/versions.sh` (the theme) is raised to it afterwards.
 7. **Log into HetrixTools** (the uptime monitor, site details:
    [Uptime monitor](SITE_SPECIFIC_ROUTINES.md#uptime-monitor)) and glance at the monitor: up, and
    the certificate and domain dates moving on after each renewal. A free account not logged into

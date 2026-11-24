@@ -10,10 +10,10 @@ dev site of its own (1.6c).
 
 ## What is here
 
-- `site.json`: the starter's site facts, in the same form as every site's (`tools/site-settings.md`):
+- `site.json`: the starter's site facts, in the same form as every site's (the tools' `tools/site-settings.md`):
   four test pages (Home, About, Contact, Privacy Policy) and the site's own plugins, Site
   Hardening and Editing Help. No `deploy` section: the starter is never deployed.
-- `theme/`: only the site layer, the files listed in `tools/site-layer-files.txt`, each at the path
+- `theme/`: only the site layer, the files listed in the tools' `tools/site-layer-files.txt`, each at the path
   of the file it replaces in a full child theme, plus the logo in `assets/images/`. Everything
   else (the component stylesheets, the scripts, `functions.php`, the page templates) is the shared
   theme code, which the starter's dev site takes from this repository's theme until template plan

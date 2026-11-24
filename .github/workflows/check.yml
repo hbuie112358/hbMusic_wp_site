@@ -1,9 +1,10 @@
-# Runs on each pull request, weekly and by its button: bin/check (every static check, plan step
-# 3f), and the dev site's tests (plan step 4d): the dev site is built here from the repository
-# alone and tested with bin/test. main is protected: its pull requests must pass both checks and
-# be up to date with main first ("strict"), so the merged code is the code just tested. A merge
-# deploys nothing: the user deploys with bin/deploy from the user's own computer (template plan
-# 1.4, T11), which accepts only a commit whose checks passed here.
+# Written by dts-site-tools' bin/tools-pin from its tools/site-workflows/check.yml; bin/check fails
+# when this file differs from what bin/tools-pin writes, so it is changed in the tools, never here.
+#
+# Runs on each pull request, weekly and by its button: the tools' shared checks (site-check.yml),
+# pinned to the commit of the tools release composer.lock installs. Its two jobs, the static checks
+# and the dev site's tests, are the checks main's protection requires, and those bin/deploy accepts
+# a commit by. A merge deploys nothing: the user deploys with bin/deploy.
 name: check
 
 on:
@@ -27,43 +28,5 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          # The checks never push; the token is not kept on the runner.
-          persist-credentials: false
-
-      - name: Static checks (bin/check)
-        run: bin/check
-
-  dev-site:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      # The same pinned checkout as above, the token again not kept.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      # No backup and no secrets needed: bin/dev-site creates a fresh .env with new random
-      # secrets on this machine, which never leaves it.
-      - name: Build the dev site (bin/dev-site)
-        run: bin/dev-site
-
-      - name: Test the dev site (bin/test)
-        run: bin/test
-
-      # Playwright keeps a trace of each failed browser test (what the browser saw, step by step);
-      # kept for a week so a failure here can be understood. The traces hold only the dev site's
-      # test pages, never .env.
-      - name: Keep the traces of failed browser tests
-        if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: playwright-traces
-          path: tests/e2e/test-results/
-          retention-days: 7
-          if-no-files-found: ignore
+    # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-check.yml@d01ba998b5b5f32607f2d2f13a66726c3e001ee9 # dev-feat/site-workflows

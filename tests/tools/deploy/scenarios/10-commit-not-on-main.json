@@ -1,8 +1,0 @@
-{
-  "description": "A commit only in the local repository, never pushed: refused, naming it.",
-  "place": "staging",
-  "options": ["--commit", "{C}"],
-  "checks": { "{C}": [["check", "success"], ["dev-site", "success"]] },
-  "expectStatus": 1,
-  "expectOutputNaming": ["{C7}"]
-}

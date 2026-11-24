@@ -1,8 +1,11 @@
-# Weekly: compares the dev site's pinned parent theme with WordPress.org (bin/versions-check,
-# plan 8j) and watches Dependabot's plugin updates (template plan T9): an issue for a newer theme,
-# for a plugin update still waiting after a few days, for a plugin release Dependabot never
-# proposed, and for a package of bin/deploy's test server that Alpine replaced (template plan
-# 1.4d-4). GitHub emails the owner about new issues. It changes no code.
+# Written by dts-site-tools' bin/tools-pin from its tools/site-workflows/versions.yml; bin/check
+# fails when this file differs from what bin/tools-pin writes, so it is changed in the tools, never
+# here.
+#
+# Weekly: the tools' versions check (site-versions.yml), pinned to the commit of the tools release
+# composer.lock installs. It compares the dev site's parent theme with WordPress.org and watches
+# Dependabot's plugin updates, opening an issue for what needs the user (GitHub emails the owner).
+# It changes no code.
 name: versions
 
 on:
@@ -31,16 +34,8 @@ concurrency:
 
 jobs:
   versions:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      # Pinned by commit, like check.yml. Nothing is pushed, so the token is not kept.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Compare the theme with WordPress.org, watch the plugin updates and the test server's Alpine packages; open issues for what needs the user (bin/versions-check --act)
-        run: bin/versions-check --act
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PINS_COOLDOWN_DAYS: ${{ inputs.cooldown-days || '7' }}
+    # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-versions.yml@d01ba998b5b5f32607f2d2f13a66726c3e001ee9 # dev-feat/site-workflows
+    with:
+      # The weekly run has no inputs, so it takes the usual wait.
+      cooldown-days: ${{ inputs.cooldown-days || '7' }}

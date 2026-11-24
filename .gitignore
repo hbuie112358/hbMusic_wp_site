@@ -6,11 +6,9 @@
 !/resume-state.yaml
 !/docs/
 !/records/
-!/compose.dev.yaml
-!/.env.example
-!/bin/
+# bin/ (the tools' commands, written by Composer) and vendor/ (the tools) stay ignored: the site
+# installs dts-site-tools from composer.lock and keeps no copy of it (template plan T16, T18).
 !/config/
-!/tools/
 !/tests/
 !/.github/
 !/composer.json
@@ -40,8 +38,6 @@
 *.log
 wp-config.php
 .env
-# The browser tests' saved dev-admin login (its session cookies), written by admin.setup.ts.
-tests/e2e/.auth/
 
 # Dependencies and build output are installed from lock files, never versioned.
 node_modules/
