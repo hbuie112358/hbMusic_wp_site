@@ -17,12 +17,14 @@
 # check, 2 the command was given wrongly or the settings could not be read.
 set -Euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
 log() { printf '%s [accessibility-scan] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 usage_error() {
@@ -43,7 +45,7 @@ require_docker() {
 # The page check's list, or its exit status: 1 when a page or the list failed, 2 when it was given
 # wrongly; its own log has already said why.
 pages_answering() {
-  "$REPO_ROOT/bin/site-check" --deadline 0 --print-pages "$1"
+  "$TOOLS_DIR/bin/site-check" --deadline 0 --print-pages "$1"
 }
 
 # npm installs from the lock file with install scripts off, as bin/test does; the cache volume
@@ -51,7 +53,7 @@ pages_answering() {
 run_scan() {
   local pages="$1"
   docker run --rm --network host -w /e2e \
-    -v "$REPO_ROOT/tests/e2e:/e2e" -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" -v "$NPM_CACHE_VOLUME:/root/.npm" \
     -e "SCAN_PAGES=$pages" -e SITE_CHECK_USER -e SITE_CHECK_PASSWORD \
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error &&
       npx --no-install playwright test --config=accessibility-scan.config.ts'

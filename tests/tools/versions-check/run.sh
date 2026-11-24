@@ -13,8 +13,8 @@
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
-readonly HERE REPO_ROOT
+TOOLS_DIR="$(cd "$HERE/../../.." && pwd)"
+readonly HERE TOOLS_DIR
 # Every situation's folder, removed when the run ends, also when it is interrupted.
 TEST_ROOT=""
 # The script's pins at their pinned versions, as JSON (pinned_versions), read once in main.
@@ -37,9 +37,11 @@ log() { printf '%s [versions-check tests] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 copy_versions_check() {
   local root="$1"
   mkdir -p "$root/bin" "$root/tools" "$root/site-packages"
-  cp "$REPO_ROOT/bin/versions-check" "$root/bin/"
-  cp "$REPO_ROOT/tools/versions.sh" "$REPO_ROOT/tools/site-packages.sh" "$root/tools/"
+  cp "$TOOLS_DIR/bin/versions-check" "$root/bin/"
+  cp "$TOOLS_DIR/tools/paths.sh" "$TOOLS_DIR/tools/versions.sh" "$TOOLS_DIR/tools/site-packages.sh" "$root/tools/"
   cp "$HERE/composer.lock" "$root/site-packages/"
+  # The tools beside a site.json are that site's own (tools/paths.sh); the check reads none of it.
+  cp "$TOOLS_DIR/tests/tools/site-settings/valid.json" "$root/site.json"
 }
 
 # The situation's brokenPin: that variable in the copied tools/versions.sh made unusable.
@@ -76,12 +78,12 @@ pinned_versions() {
 
 # The entries of one of bin/versions-check's lists (readonly NAME=( ... ), one quoted entry a line).
 listed_in_versions_check() {
-  sed -nE "/^readonly $1=\($/,/^\)$/s/^  \"([^\"]*)\"$/\1/p" "$REPO_ROOT/bin/versions-check"
+  sed -nE "/^readonly $1=\($/,/^\)$/s/^  \"([^\"]*)\"$/\1/p" "$TOOLS_DIR/bin/versions-check"
 }
 
 pinned_in_versions_file() {
   local version
-  version="$(sed -nE "s/^readonly $1=\"([^\"]*)\"$/\1/p" "$REPO_ROOT/tools/versions.sh")"
+  version="$(sed -nE "s/^readonly $1=\"([^\"]*)\"$/\1/p" "$TOOLS_DIR/tools/versions.sh")"
   [[ -n "$version" ]] || { log "tools/versions.sh pins no $1, which bin/versions-check names"; exit 1; }
   printf '%s' "$version"
 }
@@ -98,7 +100,7 @@ test_server_pins() {
 
 alpine_branch() {
   local branch
-  branch="$(sed -nE 's/^readonly DEPLOY_TEST_SERVER_BASE_IMAGE="alpine:([0-9]+\.[0-9]+)\..*$/v\1/p' "$REPO_ROOT/tools/versions.sh")"
+  branch="$(sed -nE 's/^readonly DEPLOY_TEST_SERVER_BASE_IMAGE="alpine:([0-9]+\.[0-9]+)\..*$/v\1/p' "$TOOLS_DIR/tools/versions.sh")"
   [[ -n "$branch" ]] || { log "tools/versions.sh pins no Alpine image as DEPLOY_TEST_SERVER_BASE_IMAGE"; exit 1; }
   printf '%s' "$branch"
 }
@@ -193,7 +195,7 @@ failed_parts_problem() {
 
 failed_parts_introduction() {
   local introduction
-  introduction="$(sed -nE 's/^readonly FAILED_PARTS_INTRODUCTION="(.+)"$/\1/p' "$REPO_ROOT/bin/versions-check")"
+  introduction="$(sed -nE 's/^readonly FAILED_PARTS_INTRODUCTION="(.+)"$/\1/p' "$TOOLS_DIR/bin/versions-check")"
   [[ -n "$introduction" ]] || { log "bin/versions-check has no FAILED_PARTS_INTRODUCTION"; exit 1; }
   printf '%s' "$introduction"
 }

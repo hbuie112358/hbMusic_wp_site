@@ -6,8 +6,10 @@
 # Docker socket to reach the stack, which gives that container full control of the user's
 # Docker. Revisit if that trade-off changes.
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 SCENARIO_NAME="$(basename "${BASH_SOURCE[1]:-scenario}" .sh)"
 readonly SCENARIO_NAME
 
@@ -18,13 +20,13 @@ fail() { log "FAILED: $*"; exit 1; }
 # message shows what the command itself printed.
 # The recipe's site part, compose.site.yaml, is written from site.json by bin/dev-site, which the
 # scenario checks run after.
-dev_compose() { docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$REPO_ROOT/compose.site.yaml" "$@"; }
+dev_compose() { docker compose --progress quiet --project-directory "$PROJECT_DIR" -f "$TOOLS_DIR/compose.dev.yaml" -f "$PROJECT_DIR/compose.site.yaml" "$@"; }
 
 load_settings() {
-  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/dev-site first"
+  [[ -f "$PROJECT_DIR/.env" ]] || fail "no .env; run bin/dev-site first"
   set -a
   # shellcheck source=/dev/null
-  source "$REPO_ROOT/.env"
+  source "$PROJECT_DIR/.env"
   set +a
 }
 
@@ -47,14 +49,14 @@ assert_status() {
 # (docs/SITE_CHECKLIST.md 6.9).
 readonly DEBUG_LOG="/var/www/html/wp-content/debug.log"
 # shellcheck source=tests/scenario/debug-log.sh
-source "$REPO_ROOT/tests/scenario/debug-log.sh"
+source "$TOOLS_DIR/tests/scenario/debug-log.sh"
 
 # The debug log holds nothing from the site's own code and no fatal error; other people's notices,
 # warnings and deprecations are shown (the rule in tests/scenario/debug-log.sh, template plan 1.5b).
 expect_clean_debug_log() {
   local entries verdicts shown failing
   entries="$(dev_compose exec -T wordpress sh -c "[ -f '$DEBUG_LOG' ] && cat '$DEBUG_LOG' || true")"
-  verdicts="$(debug_log_verdicts "$entries" "$(own_code_places "$REPO_ROOT/site.json")")"
+  verdicts="$(debug_log_verdicts "$entries" "$(own_code_places "$PROJECT_DIR/site.json")")"
   shown="$(sed -n 's/^shown\t//p' <<<"$verdicts")"
   failing="$(sed -n 's/^fail\t//p' <<<"$verdicts")"
   [[ -z "$shown" ]] || log "other people's code wrote to the debug log (shown, not failed):

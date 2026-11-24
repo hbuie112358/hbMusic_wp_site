@@ -7,14 +7,16 @@
 # failure; the exit status is 1 if any failed.
 set -Euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 # shellcheck source=tools/dev-site-guard.sh
-source "$REPO_ROOT/tools/dev-site-guard.sh"
+source "$TOOLS_DIR/tools/dev-site-guard.sh"
 
 FAILED_TESTS=()
 # Scenario checks that need this repository's own site, relative to tests/scenario/, each with its
@@ -29,10 +31,10 @@ LEFT_OUT_FOLDERS=()
 log() { printf '%s [test] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 
 load_settings() {
-  [[ -f "$REPO_ROOT/.env" ]] || { log "no .env; run bin/dev-site first"; exit 1; }
+  [[ -f "$PROJECT_DIR/.env" ]] || { log "no .env; run bin/dev-site first"; exit 1; }
   set -a
   # shellcheck source=/dev/null
-  source "$REPO_ROOT/.env"
+  source "$PROJECT_DIR/.env"
   set +a
 }
 
@@ -51,7 +53,7 @@ left_out_test_folders() {
   is_this_repository_site && return 0
   printf 'site\n'
   listed_plugins="$(site_settings_query '.localPlugins[]')"
-  for plugin_dir in "$REPO_ROOT"/plugins/*/; do
+  for plugin_dir in "$PROJECT_DIR"/plugins/*/; do
     plugin_slug="$(basename "$plugin_dir")"
     grep -qxF "$plugin_slug" <<<"$listed_plugins" || printf 'plugins/%s\n' "$plugin_slug"
   done
@@ -75,8 +77,8 @@ log_left_out_folders() {
   is_this_repository_site && return 0
   for folder in "${LEFT_OUT_FOLDERS[@]}"; do
     case "$folder" in
-      site) log "Left out: site/, this repository's site's own tests, not ${SITE_DIR#"$REPO_ROOT"/}'s" ;;
-      *) log "Left out: $folder/, a plugin ${SITE_DIR#"$REPO_ROOT"/} does not list" ;;
+      site) log "Left out: site/, this repository's site's own tests, not ${SITE_DIR#"$PROJECT_DIR"/}'s" ;;
+      *) log "Left out: $folder/, a plugin ${SITE_DIR#"$PROJECT_DIR"/} does not list" ;;
     esac
   done
   for entry in "${THIS_SITE_ONLY_SCENARIOS[@]}"; do
@@ -88,11 +90,11 @@ log_left_out_folders() {
 is_left_out_scenario() {
   local scenario="$1" folder entry
   for folder in "${LEFT_OUT_FOLDERS[@]}"; do
-    [[ "$scenario" == "$REPO_ROOT/tests/scenario/$folder/"* ]] && return 0
+    [[ "$scenario" == "$TOOLS_DIR/tests/scenario/$folder/"* ]] && return 0
   done
   is_this_repository_site && return 1
   for entry in "${THIS_SITE_ONLY_SCENARIOS[@]}"; do
-    [[ "$scenario" == "$REPO_ROOT/tests/scenario/${entry%%:*}" ]] && return 0
+    [[ "$scenario" == "$TOOLS_DIR/tests/scenario/${entry%%:*}" ]] && return 0
   done
   return 1
 }
@@ -109,8 +111,8 @@ browser_tests() {
   local tests_left_out
   tests_left_out="$(IFS=,; printf '%s' "${LEFT_OUT_FOLDERS[*]}")"
   docker run --rm --network host -w /e2e \
-    -v "$REPO_ROOT/tests/e2e:/e2e" \
-    -v "$REPO_ROOT/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" \
+    -v "$PROJECT_DIR/config/booking-form-messages.json:/config/booking-form-messages.json:ro" \
     -v "$SITE_SETTINGS_FILE:/config/site.json:ro" \
     -v "$SITE_DEV_CONTENT_DIR:/config/dev-content:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
@@ -156,7 +158,7 @@ run_all_tests() {
   local scenario scenarios
   # Searched in every group's folder (template plan 1.3a), so a group without scenario checks
   # needs no folder; run in the order of their names, as before they were sorted into groups.
-  mapfile -t scenarios < <(find "$REPO_ROOT/tests/scenario" -name 'dev-*.sh' -type f -printf '%f\t%p\n' | sort | cut -f2)
+  mapfile -t scenarios < <(find "$TOOLS_DIR/tests/scenario" -name 'dev-*.sh' -type f -printf '%f\t%p\n' | sort | cut -f2)
   # A moved or misnamed folder must fail the run, not leave it passing with no scenario checks.
   run_test "Scenario checks found" scenarios_found "${#scenarios[@]}" || return 0
   for scenario in "${scenarios[@]}"; do
@@ -165,7 +167,7 @@ run_all_tests() {
   done
   run_test "Browser tests (Playwright)" browser_tests
   # Last, so it sees what every test before it caused.
-  run_test "Debug log clean after all tests" bash "$REPO_ROOT/tests/scenario/generic/final-debug-log.sh"
+  run_test "Debug log clean after all tests" bash "$TOOLS_DIR/tests/scenario/generic/final-debug-log.sh"
 }
 
 main() {

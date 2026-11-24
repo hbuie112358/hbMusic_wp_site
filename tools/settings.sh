@@ -3,7 +3,7 @@
 # secrets, new settings are appended, and every setting the script needs is checked. Sourced,
 # never run.
 #
-# The sourcing script defines REPO_ROOT, ENV_FILE, REQUIRED_SETTINGS (an array), log and fail, and
+# The sourcing script defines TOOLS_DIR (tools/paths.sh), ENV_FILE, REQUIRED_SETTINGS (an array), log and fail, and
 # DEV_DATABASE_VOLUME, the dev site's database volume (load_site_volume_names in
 # tools/site-settings.sh). The dev site's database keeps the passwords it was first started
 # with, so a new .env is refused while that database exists.
@@ -34,7 +34,7 @@ create_env_file() {
   local line
   (
     umask 077
-    while IFS= read -r line; do expand_setting_line "$line"; done <"$REPO_ROOT/.env.example" >"$ENV_FILE"
+    while IFS= read -r line; do expand_setting_line "$line"; done <"$TOOLS_DIR/.env.example" >"$ENV_FILE"
   )
 }
 
@@ -48,7 +48,7 @@ add_missing_settings() {
     grep -q "^${name}=" "$ENV_FILE" && continue
     log "Adding the new setting $name to .env"
     expand_setting_line "$line" >>"$ENV_FILE"
-  done <"$REPO_ROOT/.env.example"
+  done <"$TOOLS_DIR/.env.example"
 }
 
 ensure_env_file() {

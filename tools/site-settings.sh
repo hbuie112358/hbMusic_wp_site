@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # Reading and checking site.json, the site's facts (template plan T7), against the rules in
 # tools/site-settings.jq and the explanation in tools/site-settings.md. Needs jq. Sourced, never
-# run; the sourcing script defines REPO_ROOT.
+# run; the sourcing script defines TOOLS_DIR and PROJECT_DIR (tools/paths.sh).
 
 # The site the tools work on (template plan 1.6c, T14): this repository's own, unless SITE_DIR
 # names another site's folder (the starter's, SITE_DIR=starter), laid out the same way: site.json
 # at its top, its test pages' text in tests/dev-content/, its own build steps in
 # tests/dev-setup.sh (optional) and its theme in themes/. A relative SITE_DIR is read from the
-# repository's top, wherever the command is typed. The plugins (plugins/) and the booking form's
-# files (config/) stay this repository's. Never exported by this file: a SITE_DIR the user sets
-# reaches the scenario checks and tests a script starts through the user's own environment, and
-# an unset one leaves every tool, a stand-in copy under test included, on its own repository.
-SITE_DIR="${SITE_DIR:-$REPO_ROOT}"
-[[ "$SITE_DIR" == /* ]] || SITE_DIR="$REPO_ROOT/$SITE_DIR"
+# site's repository (PROJECT_DIR), wherever the command is typed. The plugins (plugins/) and the
+# booking form's files (config/) stay the repository's. Never exported by this file: a SITE_DIR
+# the user sets reaches the scenario checks and tests a script starts through the user's own
+# environment, and an unset one leaves every tool, a stand-in copy under test included, on its
+# own repository.
+SITE_DIR="${SITE_DIR:-$PROJECT_DIR}"
+[[ "$SITE_DIR" == /* ]] || SITE_DIR="$PROJECT_DIR/$SITE_DIR"
 SITE_DIR="${SITE_DIR%/}"
 readonly SITE_DIR
 readonly SITE_SETTINGS_FILE="$SITE_DIR/site.json"
@@ -22,16 +23,16 @@ readonly SITE_DEV_SETUP_FILE="$SITE_DIR/tests/dev-setup.sh"
 # A site layer of its own (the starter's theme/, template plan 1.6b): the site's full theme is then
 # assembled from it into themes/ by tools/site-theme.sh before each build.
 readonly SITE_LAYER_DIR="$SITE_DIR/theme"
-readonly SITE_SETTINGS_EXPLANATION="$REPO_ROOT/tools/site-settings.md"
-readonly SITE_SETTINGS_RULES_DIR="$REPO_ROOT/tools"
+readonly SITE_SETTINGS_EXPLANATION="$TOOLS_DIR/tools/site-settings.md"
+readonly SITE_SETTINGS_RULES_DIR="$TOOLS_DIR/tools"
 # Written from site.json (write_site_compose_file); ignored by git, never edited by hand.
-readonly SITE_COMPOSE_FILE="$REPO_ROOT/compose.site.yaml"
+readonly SITE_COMPOSE_FILE="$PROJECT_DIR/compose.site.yaml"
 # The components' example pages (template plan T10): neutral content showing each component,
 # which travels with the component tests; bin/dev-site builds one page per file, at the file's
 # name, outside the menu, and bin/check looks there for every component. The browser tests find
 # the same folder from their own (tests/e2e/specs/dev/helpers/test-pages.ts), as the test
 # container cannot read this file.
-readonly COMPONENT_EXAMPLES_DIR="$REPO_ROOT/tests/e2e/specs/dev/components/pages"
+readonly COMPONENT_EXAMPLES_DIR="$TOOLS_DIR/tests/e2e/specs/dev/components/pages"
 
 # The rules as a jq module, followed by a program using them.
 site_settings_jq() {
@@ -67,12 +68,12 @@ require_valid_site_settings() {
 
 # The settings file's path as a message shows it: relative to the repository where it is inside it.
 site_settings_shown_path() {
-  printf '%s\n' "${SITE_SETTINGS_FILE#"$REPO_ROOT"/}"
+  printf '%s\n' "${SITE_SETTINGS_FILE#"$PROJECT_DIR"/}"
 }
 
 # Whether the tools work on this repository's own site, not another site's folder (SITE_DIR).
 is_this_repository_site() {
-  [[ "$SITE_DIR" == "$REPO_ROOT" ]]
+  [[ "$SITE_DIR" == "$PROJECT_DIR" ]]
 }
 
 # Refuses, naming the script, when SITE_DIR names another site: for the tools that only ever act
@@ -80,7 +81,7 @@ is_this_repository_site() {
 refuse_other_site() {
   local script_name="$1"
   is_this_repository_site && return 0
-  printf '%s works on this repository'"'"'s own site only; SITE_DIR names %s\n' "$script_name" "${SITE_DIR#"$REPO_ROOT"/}" >&2
+  printf '%s works on this repository'"'"'s own site only; SITE_DIR names %s\n' "$script_name" "${SITE_DIR#"$PROJECT_DIR"/}" >&2
   return 1
 }
 
@@ -119,7 +120,7 @@ site_settings_missing_test_pages() {
 site_settings_missing_local_plugins() {
   local settings_file="$1" plugins_dir="$2" plugin_slug
   while IFS= read -r plugin_slug; do
-    [[ -d "$plugins_dir/$plugin_slug" ]] || printf '%s: listed in localPlugins, but no folder %s/%s\n' "$plugin_slug" "${plugins_dir#"$REPO_ROOT"/}" "$plugin_slug"
+    [[ -d "$plugins_dir/$plugin_slug" ]] || printf '%s: listed in localPlugins, but no folder %s/%s\n' "$plugin_slug" "${plugins_dir#"$PROJECT_DIR"/}" "$plugin_slug"
   done < <(jq -r '.localPlugins[]' "$settings_file")
 }
 
@@ -135,7 +136,7 @@ write_site_compose_file() {
   theme="$(site_setting .theme)"
   # Relative to the repository, where Compose reads the recipe, when the site is inside it.
   themes_path="$SITE_THEMES_DIR"
-  [[ "$themes_path" == "$REPO_ROOT"/* ]] && themes_path="./${themes_path#"$REPO_ROOT"/}"
+  [[ "$themes_path" == "$PROJECT_DIR"/* ]] && themes_path="./${themes_path#"$PROJECT_DIR"/}"
   mounts="      - $themes_path/$theme:/var/www/html/wp-content/themes/$theme:ro"$'\n'
   while IFS= read -r plugin_slug; do
     mounts+="      - ./plugins/$plugin_slug:/var/www/html/wp-content/plugins/$plugin_slug:ro"$'\n'
@@ -154,7 +155,7 @@ site_settings_theme_problem() {
   local settings_file="$1" themes_dir="$2" theme
   theme="$(jq -r '.theme' "$settings_file")"
   [[ -d "$themes_dir/$theme" ]] && return 0
-  printf 'theme: "%s" names no folder in %s\n' "$theme" "${themes_dir#"$REPO_ROOT"/}"
+  printf 'theme: "%s" names no folder in %s\n' "$theme" "${themes_dir#"$PROJECT_DIR"/}"
 }
 
 site_settings_field_names() {

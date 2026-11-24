@@ -21,16 +21,18 @@
 # baseline/ holds the "before" set, latest/ the newest screenshots, differences/ what changed.
 set -Eeuo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readonly REPO_ROOT
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly TOOLS_DIR
+# shellcheck source=tools/paths.sh
+source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
-readonly CONTENT_DIR="${SCREENSHOTS_CONTENT_DIR:-$REPO_ROOT/data/content}"
-readonly PHOTOS_DIR="${SCREENSHOTS_PHOTOS_DIR:-$REPO_ROOT/data/photos/web}"
-readonly OUTPUT_DIR="${SCREENSHOTS_OUTPUT_DIR:-$REPO_ROOT/screenshots}"
+readonly CONTENT_DIR="${SCREENSHOTS_CONTENT_DIR:-$PROJECT_DIR/data/content}"
+readonly PHOTOS_DIR="${SCREENSHOTS_PHOTOS_DIR:-$PROJECT_DIR/data/photos/web}"
+readonly OUTPUT_DIR="${SCREENSHOTS_OUTPUT_DIR:-$PROJECT_DIR/screenshots}"
 # A slug or a photo's file name: letters, digits, dots, dashes and underscores only, so neither can
 # reach outside its folder or into a command.
 readonly SAFE_NAME='^[A-Za-z0-9][A-Za-z0-9._-]*$'
@@ -40,10 +42,10 @@ log() { printf '%s [screenshots] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
 
 load_settings() {
-  [[ -f "$REPO_ROOT/.env" ]] || fail "no .env; run bin/dev-site first"
+  [[ -f "$PROJECT_DIR/.env" ]] || fail "no .env; run bin/dev-site first"
   set -a
   # shellcheck source=/dev/null
-  source "$REPO_ROOT/.env"
+  source "$PROJECT_DIR/.env"
   set +a
   curl -fsS -o /dev/null --max-time 10 "http://localhost:${DEV_SITE_PORT}/" ||
     fail "nothing answers on port ${DEV_SITE_PORT}; start the dev site with bin/dev-site"
@@ -53,7 +55,7 @@ load_settings() {
 # would otherwise read the caller's input, and inside the loop over the pages it swallowed the rest
 # of the list, so only the first page got a preview.
 wp_cli() {
-  docker compose --progress quiet --project-directory "$REPO_ROOT" -f "$REPO_ROOT/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" \
+  docker compose --progress quiet --project-directory "$PROJECT_DIR" -f "$TOOLS_DIR/compose.dev.yaml" -f "$SITE_COMPOSE_FILE" \
     run --rm -T -v "$PHOTOS_DIR:/photos:ro" cli wp "$@" </dev/null
 }
 
@@ -131,7 +133,7 @@ list_preview_addresses() {
 # Every address to shoot, as a JSON list: the stand-in pages, then the previews.
 page_paths() {
   local paths=() file slug
-  for file in "$REPO_ROOT"/tests/dev-content/*.html; do
+  for file in "$PROJECT_DIR"/tests/dev-content/*.html; do
     slug="$(basename "$file" .html)"
     [[ "$slug" == "home" ]] && paths+=("/") || paths+=("/$slug/")
   done
@@ -145,7 +147,7 @@ page_paths() {
 run_playwright() {
   mkdir -p "$OUTPUT_DIR"
   docker run --rm --network host -w /e2e \
-    -v "$REPO_ROOT/tests/e2e:/e2e" -v "$OUTPUT_DIR:/screenshots" -v "$NPM_CACHE_VOLUME:/root/.npm" \
+    -v "$TOOLS_DIR/tests/e2e:/e2e" -v "$OUTPUT_DIR:/screenshots" -v "$NPM_CACHE_VOLUME:/root/.npm" \
     -e "DEV_BASE_URL=http://localhost:${DEV_SITE_PORT}" -e SCREENSHOTS_DIR=/screenshots \
     -e "SCREENSHOT_PATHS=$(page_paths)" \
     "$PLAYWRIGHT_IMAGE" sh -c "npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install playwright test --config=screenshots.config.ts $*"

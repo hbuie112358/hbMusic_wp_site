@@ -8,7 +8,7 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
-readonly FIXTURE_DIR="$REPO_ROOT/tests/scenario/fixtures/screenshots"
+readonly FIXTURE_DIR="$TOOLS_DIR/tests/scenario/fixtures/screenshots"
 readonly PREVIEW_SLUG="preview-screenshots-fixture"
 readonly SECOND_PREVIEW_SLUG="preview-screenshots-fixture-two"
 readonly PHOTO_TITLE="screenshots preview photo fixture-photo.png"
@@ -17,7 +17,7 @@ UNSAFE_DIR=""
 wp_cli() { dev_compose run --rm -T cli wp "$@" </dev/null; }
 
 previews() {
-  SCREENSHOTS_CONTENT_DIR="$1" SCREENSHOTS_PHOTOS_DIR="$FIXTURE_DIR" "$REPO_ROOT/bin/screenshots" previews
+  SCREENSHOTS_CONTENT_DIR="$1" SCREENSHOTS_PHOTOS_DIR="$FIXTURE_DIR" "$TOOLS_DIR/bin/screenshots" previews
 }
 
 remove_fixture_content() {

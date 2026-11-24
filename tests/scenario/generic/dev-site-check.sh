@@ -10,9 +10,9 @@ set -Eeuo pipefail
 # shellcheck source=tests/scenario/lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 # shellcheck source=tools/versions.sh
-source "$REPO_ROOT/tools/versions.sh"
+source "$TOOLS_DIR/tools/versions.sh"
 # shellcheck source=tools/site-settings.sh
-source "$REPO_ROOT/tools/site-settings.sh"
+source "$TOOLS_DIR/tools/site-settings.sh"
 
 SITE_ADDRESS=""
 CHILD_THEME=""
@@ -39,20 +39,20 @@ main() {
   SITE_ADDRESS="http://localhost:${DEV_SITE_PORT}"
   CHILD_THEME="$(site_setting .theme)"
 
-  run_capturing "$REPO_ROOT/bin/site-check" --deadline 0 "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/site-check" --deadline 0 "$SITE_ADDRESS"
   assert_status 0 "the page check on the dev site"
   expect_every_test_page_checked
   log "the page check passed on every test page"
 
   trap restore_child_theme EXIT
   wp_cli theme activate "$PARENT_THEME_SLUG" >/dev/null
-  run_capturing "$REPO_ROOT/bin/site-check" --deadline 0 "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/site-check" --deadline 0 "$SITE_ADDRESS"
   assert_status 1 "the page check with the parent theme active"
   assert_output_names "wp-child-theme-$CHILD_THEME" "the page check with the parent theme active"
   log "with the parent theme active, the page check failed, naming the child theme"
 
   restore_child_theme
-  run_capturing "$REPO_ROOT/bin/site-check" --deadline 0 "$SITE_ADDRESS"
+  run_capturing "$TOOLS_DIR/bin/site-check" --deadline 0 "$SITE_ADDRESS"
   assert_status 0 "the page check after the child theme was switched back on"
   log "the child theme is active again and the page check passes"
 }
