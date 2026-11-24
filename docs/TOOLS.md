@@ -56,7 +56,7 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   a customer gets. To log in by hand, copy a password without showing it:
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`. `config/dev-mu-plugins/`, on the dev site only and never
   deployed (and mounted for WP-CLI too), notes each PHP message's origin in the debug log
-  (`dev-error-origin.php`), sends mail to Mailpit and answers for Cloudflare, for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
+  (`dev-error-origin.php`), and sends mail to Mailpit and answers for Cloudflare (`dev-site-services.php`), for YouTube's oEmbed service (so the stand-in videos are real video blocks, loading WordPress's same styles as live) and for YouTube's image server (a test picture). Needs no backup, so CI can build it
   too.
 - `bin/test`: the tests against the dev site, each in its group's folder (template plan 1.3a:
   `generic/`, `components/` and `plugins/<plugin>/`; the browser tests' shared helpers in
@@ -106,50 +106,65 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
 - `docker compose run --rm cli wp <command>`: WP-CLI against the dev site.
 - `docker compose down -v` deletes the dev site's database and files (the
   volumes); Claude runs it only when the user asks. `bin/dev-site` rebuilds them.
-- `bin/check`: every code check, in pinned containers (only Docker and `jq` on the host; it
-  stops at once if `jq` is missing):
-  Composer install from `composer.lock`, validation and security audit; PHPCS with the
-  WordPress Coding Standards (`phpcs.xml.dist`); PHPStan at level max with the WordPress 7.1
-  stubs (`phpstan.neon.dist`), both over `themes/` and `plugins/` (each plugin with its own PHPCS
-  ruleset), and checks that the plugins and the tools (`bin/`, `tools/`, the workflows, the shared
-  compose file and settings example)
-  name nothing of this site (`site.json`'s `namesSharedCodeMustNotUse`) and that each plugin declares
-  `Update URI: false`; every script in `bin/` executable; `theme.json`'s schema matching
-  the pinned WordPress; Stylelint over every CSS file in `themes/` and `plugins/` (its standard
-  rules plus WordPress's formatting, `tools/css-lint/`, plan D29), with an npm audit of its
-  packages (every advisory fails, except any the user accepted in that folder's
-  `audit-exceptions.json`, each with its reason and a review-by date after which it fails again,
-  and an accepted one that npm no longer reports also fails; none accepted since 2026-11-20); the theme's component list in `functions.php` matching the files in
-  `assets/css/components/`, both ways; every design token the component stylesheets and
-  `theme.json` read defined in `theme.json` (`tools/theme-tokens.sh`, and that check on known
-  examples, `tests/tools/theme-tokens/`, template plan 1.6b); the starter (`starter/`) held to
-  the same rules: its `site.json` and pages, its `theme.json` schema and tokens, exactly the
-  site-layer files of `tools/site-layer-files.txt` (`tools/site-layer.sh`, with its examples in
-  `tests/tools/site-layer/`), none of this site's names but the prefix, PHPCS and PHPStan; the
-  theme assembly on known examples (`tools/site-theme.sh`, `tests/tools/site-theme/`); the dev-site
-  guard on known examples, with a stand-in for docker (`tests/tools/dev-site-guard/`); a type check and ESLint of the theme's browser scripts (`assets/js/`), with
-  `tools/js-check/`'s own packages (template plan 1.7: typescript-eslint's strict rules and
-  WordPress's JavaScript layout, zero findings; its TypeScript 6, which typescript-eslint supports),
-  and an npm audit of them; and every `site-…` component shown on the components' example page
-  (`tests/e2e/specs/dev/components/pages/`, built by `bin/dev-site` at `/component-examples/`,
-  outside the menu, template plan T10) or in a template part (so the browser tests see it); `site.json` following the rules in
-  `tools/site-settings.jq` (a missing or unknown field, or a wrong kind of value, fails and is
-  named), every field explained in `tools/site-settings.md` and nothing else, and those checks
-  refusing the broken examples in `tests/tools/site-settings/`; the versions check's alerts on
-  known situations (`tests/tools/versions-check/`: the real script against stand-ins for GitHub
-  and WordPress.org, which issues it would open, template plan 1.3c); the page check on known
-  situations (`tests/tools/site-check/`: `bin/site-check` against a stand-in site, 1.4b); the
-  deploy's checks on known situations (`tests/tools/deploy/`: `bin/deploy` in a throwaway Git
-  repository against stand-ins for GitHub, the servers, the Composer build and WordPress.org's
-  checksums, 1.4d-1, 1.4d-2); the routines' links to their site details, and that check on
-  known examples (`tests/tools/routines/`, 1.5c); the status sheet (`records/status.md`) answering
-  every item of the blank (`tools/status-sheet-blank.md`: done or exception, with its check or
-  reason and a date, its recorded exceptions there, every file it names still in the repository),
-  and that check on known examples (`tests/tools/status-sheet/`, 1.5d-4); ShellCheck on `bin/`, the
-  scenario checks and the tools' tests; the compose file. Runs every check even
-  after a failure; exit status 1 if any failed. The review gate starts with it. The tool
+- `bin/check`: every check of the site's code, in pinned containers (only Docker and `jq` on the
+  host; it stops at once if `jq` is missing), in three parts (template plan T20). Runs every check
+  even after a failure; exit status 1 if any failed. The review gate starts with it. The tool
   containers see only the files their step needs, never `.env`, `db/`, `backups/` or
   `wordpress/`; `composer.lock` is read-only to them.
+  - **The site's checks:** Composer install from `composer.lock`, validation and security audit;
+    the site's downloaded plugins (`site-packages/`: lock file, audit, downloads only from
+    `downloads.wordpress.org`); PHPCS with the WordPress Coding Standards (`phpcs.xml.dist`) and
+    PHPStan at level max with the WordPress 7.1 stubs (`phpstan.neon.dist`), both over `themes/`
+    and `plugins/` (each plugin with its own PHPCS ruleset); the plugins and the tools (`bin/`,
+    `tools/`, the workflows, the shared compose file, settings example and dev-only must-use
+    plugins) naming nothing of this site (`site.json`'s `namesSharedCodeMustNotUse`; each site
+    checks the tools it uses, so no list of sites' names is kept with the tools), and each plugin
+    declaring `Update URI: false`; `site.json` following the rules in `tools/site-settings.jq` (a
+    missing or unknown field, or a wrong kind of value, fails and is named); the routines' links to
+    their site details (1.5c); the status sheet (`records/status.md`) answering every item of the
+    blank (`tools/status-sheet-blank.md`: done or exception, with its check or reason and a date,
+    its recorded exceptions there, every file it names in the site's repository or the tools',
+    1.5d-4); `theme.json`'s schema matching the pinned WordPress; the browser tests' types, the
+    site's own specs (`tests/browser/`) included; a type check and ESLint of the theme's browser
+    scripts (`assets/js/`), with `tools/js-check/`'s own packages (template plan 1.7:
+    typescript-eslint's strict rules and WordPress's JavaScript layout, zero findings; its
+    TypeScript 6, which typescript-eslint supports); Stylelint over every CSS file in `themes/`
+    and `plugins/` (its standard rules plus WordPress's formatting, `tools/css-lint/`, plan D29);
+    npm audits of the tools' three packages (every advisory fails, except any the user accepted in
+    that folder's `audit-exceptions.json`, each with its reason and a review-by date after which it
+    fails again, and an accepted one that npm no longer reports also fails; none accepted since
+    2026-11-20); ShellCheck on the site's own scripts (`tests/dev-setup.sh`, `tests/checks/`);
+    actionlint on the workflows; the compose file.
+  - **The site's own checks:** every `tests/checks/*.sh`, loaded in name order; each calls
+    `run_check` for its checks and may use what `bin/check` has loaded (`tools/check-lib.sh`,
+    the `site.json` readers, `SITE_THEME_DIR`, `SITE_PHP_PREFIX`). Here: `components.sh` (until
+    template plan 2.3: the component list in `functions.php` matching the files in
+    `assets/css/components/` both ways; every design token the component stylesheets and
+    `theme.json` read defined in `theme.json`, `tools/theme-tokens.sh`; every `site-…` component
+    shown on the components' example page, `tests/e2e/specs/dev/components/pages/`, built by
+    `bin/dev-site` at `/component-examples/` outside the menu, T10, or in a template part) and
+    `starter.sh` (until 2.4: the starter's `site.json` and pages, its `theme.json` schema and
+    tokens, exactly the site-layer files of `tools/site-layer-files.txt`, none of this site's
+    names but the prefix, PHPCS and PHPStan).
+  - **The tools' self-check** (`tests/tools/check-tools.sh`), run by `bin/check` only while the
+    tools are the site's own (this repository until template plan 2.1d), and by the tools' own
+    repository; it needs no site. The tools' Composer install, validation and audit and the npm
+    audits; PHPCS and PHPStan of the dev-only must-use plugins (`tools/php-check/`, prefix
+    `devsite`); every script in `bin/` executable; every `site.json` field explained in
+    `tools/site-settings.md` and nothing else, and the `site.json` checks refusing the broken
+    examples in `tests/tools/site-settings/`; `bin/dev-site`'s refusals on known examples
+    (`tests/tools/dev-site/`); the Playwright image matching `@playwright/test`; each tool's
+    tests on known situations, against stand-ins, nothing over the network: the versions check's
+    alerts (`tests/tools/versions-check/`, 1.3c), the debug log rule (`tests/tools/debug-log/`),
+    the routines' and status sheet's checks (`tests/tools/routines/`, `tests/tools/status-sheet/`),
+    the page check (`tests/tools/site-check/`, 1.4b), the deploy's checks (`tests/tools/deploy/`:
+    `bin/deploy` in a throwaway Git repository against stand-ins for GitHub, the servers, the
+    Composer build and WordPress.org's checksums, 1.4d-1, 1.4d-2), the design-token and
+    site-layer checks and the theme assembly (`tests/tools/theme-tokens/`, `site-layer/`,
+    `site-theme/`, 1.6b, 1.6c), the dev-site guard with a stand-in for docker
+    (`tests/tools/dev-site-guard/`) and the tools apart from a stand-in site (`tests/tools/paths/`,
+    T19); the browser tests' types without a site's specs; ShellCheck on `bin/`, the scenario
+    checks and the tools' tests.
 - GitHub runs `bin/check` and the dev site's tests on every pull request, weekly and by the "Run
   workflow" button (`.github/workflows/check.yml`); a pull request merges only when both pass and
   it is up to date with `main`. A merge deploys nothing: the user deploys with `bin/deploy`
@@ -249,12 +264,12 @@ the other site's `SITE_DIR`. `bin/check` always checks this repository; `bin/dep
   at least 7 days old, install scripts off); then `bin/check`, review the lock files' diff,
   commit.
 - `tools/versions.sh`: the one place for the images and downloads these scripts use (the parent
-  theme with its SHA-256); `bin/check` fails if the Playwright image and `@playwright/test`
+  theme with its SHA-256); the self-check fails if the Playwright image and `@playwright/test`
   differ. npm installs run with `--ignore-scripts`. `tools/settings.sh`: the `.env` handling of
   `bin/dev-site`. `tools/paths.sh`: the folders every tool works with (template plan T19): the
   tools' own (`TOOLS_DIR`) and the site's repository (`PROJECT_DIR`), the latter from Composer's
   `COMPOSER_RUNTIME_BIN_DIR` once the tools come through Composer; a tool that can tell neither
-  refuses rather than guess. `bin/check` tests it with the tools apart from a stand-in site
+  refuses rather than guess. The self-check tests it with the tools apart from a stand-in site
   (`tests/tools/paths/`); what no check catches is that variable left over in a shell from another
   project's Composer run, which points the tools at that project.
 - `plugins/site-hardening/`: the security headers (Content-Security-Policy and the others,

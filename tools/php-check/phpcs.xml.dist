@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="dev-site"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../vendor/squizlabs/php_codesniffer/phpcs.xsd">
+	<description>The tools' own PHP, the dev site's must-use plugins, follows the WordPress Coding Standards (template plan T20).</description>
+
+	<!-- Run by the tools' self-check (tests/tools/check-tools.sh) from the tools' folder, never by a
+	     site's bin/check: the plugins belong to the tools and carry the tools' prefix, not a site's. -->
+	<file>../../config/dev-mu-plugins</file>
+
+	<arg name="extensions" value="php"/>
+	<!-- s: show the sniff behind each message, so a finding can be looked up; p: progress. -->
+	<arg value="sp"/>
+
+	<!-- WordPress = Core + Docs + Extra, including the security sniffs. -->
+	<rule ref="WordPress"/>
+
+	<config name="minimum_wp_version" value="7.1"/>
+
+	<!-- Every global function, constant and hook carries the dev site's prefix, so nothing clashes
+	     with WordPress, a site's theme or a plugin. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="devsite"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Tests how the tools find the site they work on (tools/paths.sh and tools/site-settings.sh,
-# template plan T19), run by bin/check every time, with the tools apart from a stand-in site, as
-# they are once a site installs them through Composer (T18). Copies of the real files go into a
-# temporary tools folder with no site.json, beside a stand-in site; a small script there sources
-# them as every tool does and prints the folders they work out. The command is always started from
-# an unrelated folder holding its own starter/, so a tool that read the current folder would show.
+# template plan T19), run by the tools' self-check every time, with the tools apart from a stand-in
+# site, as they are once a site installs them through Composer (T18). Copies of the real files go
+# into a temporary tools folder with no site.json, beside a stand-in site; a small script there
+# sources them as every tool does and prints the folders they work out. The command is always
+# started from an unrelated folder holding its own starter/, so a tool that read the current folder
+# would show.
 #
 # The one risk no code here can catch: COMPOSER_RUNTIME_BIN_DIR is Composer's, exported to whatever
 # a Composer run starts. A shell started from another project's Composer run (composer exec,

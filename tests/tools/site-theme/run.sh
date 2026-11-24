@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Tests the theme assembly (tools/site-theme.sh, template plan 1.6c) on known examples, run by
-# bin/check every time: the full theme holds the shared files, the layer's version of each listed
-# file and the layer's pictures; a stale file from an earlier build is gone; and a layer that does
-# not match the list is refused with the earlier build left as it was. The examples are written
+# Tests the theme assembly (tools/site-theme.sh, template plan 1.6c) on known examples, run by the
+# tools' self-check every time: the full theme holds the shared files, the layer's version of each
+# listed file and the layer's pictures; a stale file from an earlier build is gone; and a layer that
+# does not match the list is refused with the earlier build left as it was. The examples are written
 # fresh into a temporary folder. Needs bash, cp, find, grep, sed, sort and comm.
 set -Euo pipefail
 

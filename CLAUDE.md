@@ -126,6 +126,8 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   runs it locally only for a change that reaches across the site (the user, 2026-11-17: a small
   code change took about 15 minutes from ready to live, the full tests running three times).
 - `bin/check`: every static check, in pinned containers; every check runs even after a failure.
+  Its parts: the site's checks, the site's own in `tests/checks/`, and the tools' self-check
+  (`tests/tools/check-tools.sh`, also run alone; template plan T20).
   The review gate starts with it.
 - `compose.dev.yaml` and `compose.site.yaml` (written from `site.json`; never edited) are the dev
   site's recipe; after changing `site.json`, run `bin/dev-site` before typing compose commands.

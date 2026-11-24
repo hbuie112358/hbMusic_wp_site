@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Tests the versions check's alerts (bin/versions-check, template plan 1.3c): for each situation in
-# scenarios/, which issues it would open, run by bin/check every time. The real script runs,
-# copied with the files it reads into a folder of its own whose lock file holds one neutral plugin
-# (composer.lock here), so nothing depends on the site's own plugins. GitHub, WordPress.org and
-# Alpine's package list (1.4d-4) are stand-ins (fakes/), answering from files written for each
+# scenarios/, which issues it would open, run by the tools' self-check every time. The real script
+# runs, copied with the files it reads into a folder of its own whose lock file holds one neutral
+# plugin (composer.lock here), so nothing depends on the site's own plugins. GitHub, WordPress.org
+# and Alpine's package list (1.4d-4) are stand-ins (fakes/), answering from files written for each
 # situation, with its dates counted back from now: the script itself is not changed for the test.
 # Needs bash, jq and tar.
 #

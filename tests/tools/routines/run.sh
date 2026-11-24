@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Tests the routines' link check (tools/routines.sh, template plan 1.5c) on known examples, run by
-# bin/check every time: two files that agree pass, and each broken pair is refused, naming the
-# anchor or file that is wrong. The examples are written fresh into a temporary folder, so
-# nothing depends on this site's routines. Needs bash, grep, sed and sort.
+# the tools' self-check every time: two files that agree pass, and each broken pair is refused,
+# naming the anchor or file that is wrong. The examples are written fresh into a temporary folder,
+# so nothing depends on this site's routines. Needs bash, grep, sed and sort.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

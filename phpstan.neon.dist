@@ -10,4 +10,4 @@ parameters:
     paths:
         - themes
         - plugins
-        - config/dev-mu-plugins
+    # The tools' dev-site must-use plugins are analysed by the tools' self-check (tools/php-check/).

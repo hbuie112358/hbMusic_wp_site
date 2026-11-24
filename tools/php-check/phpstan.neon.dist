@@ -1,0 +1,13 @@
+# Static analysis of the tools' own PHP, the dev site's must-use plugins (template plan T20), at
+# the strictest level. Run by the tools' self-check (tests/tools/check-tools.sh), never by a site's
+# bin/check. Paths are relative to this file.
+includes:
+    # WordPress-aware rules and the WordPress 7.1 function signatures (php-stubs/wordpress-stubs).
+    - ../../vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: max
+    # The dev site runs PHP 8.4 (compose.dev.yaml), whatever PHP the tools container has.
+    phpVersion: 80400
+    paths:
+        - ../../config/dev-mu-plugins

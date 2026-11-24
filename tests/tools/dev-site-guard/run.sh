@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Tests the dev-site guard (tools/dev-site-guard.sh, template plan 1.6c-2) on known examples, run by
-# bin/check every time, with a stand-in for docker that answers what the example sets: a free port
-# and the expected site's own dev site pass; another site's dev site is refused, naming both sites
-# and the command to stop the other by name. Needs bash, sed, sort and paste.
+# the tools' self-check every time, with a stand-in for docker that answers what the example sets: a
+# free port and the expected site's own dev site pass; another site's dev site is refused, naming
+# both sites and the command to stop the other by name. Needs bash, sed, sort and paste.
 set -Euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

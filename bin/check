@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# Runs every check the project's code must pass (plan step 3d): installing the tools at the
-# versions in composer.lock, Composer's own validation and its security audit, the WordPress
-# Coding Standards (PHPCS), static analysis (PHPStan), the CSS (Stylelint, D29), ShellCheck on
-# the scripts, the compose file, and site.json with its explanation (template plan T7). The tools
-# run in pinned containers; only Docker and jq are needed on the host (jq reads the npm audits'
-# reports and site.json). Every check runs even after a failure, so one run shows everything;
-# the exit status is 1 if any check failed.
+# Runs every check the site's code must pass (plan step 3d, template plan T20): installing the PHP
+# checkers at the versions in composer.lock, Composer's own validation and its security audit, the
+# site's downloaded plugins, the WordPress Coding Standards (PHPCS), static analysis (PHPStan), the
+# CSS (Stylelint, D29), the theme's scripts, the browser tests' types, ShellCheck on the site's own
+# scripts, the workflows, the compose file, site.json (T7), the routines and the status sheet; then
+# the site's own checks (tests/checks/*.sh), and, while the tools are the site's own, the tools'
+# self-check (tests/tools/check-tools.sh). The tools run in pinned containers; only Docker and jq
+# are needed on the host (jq reads the npm audits' reports and site.json). Every check runs even
+# after a failure, so one run shows everything; the exit status is 1 if any check failed.
 set -Euo pipefail
 
 TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,8 +16,11 @@ readonly TOOLS_DIR
 source "$TOOLS_DIR/tools/paths.sh"
 # shellcheck source=tools/versions.sh
 source "$TOOLS_DIR/tools/versions.sh"
-# Every check is of this repository, the starter's included (its own rules below), whatever site
-# SITE_DIR names for the dev site (template plan 1.6c).
+readonly CHECK_LOG_NAME="check"
+# shellcheck source=tools/check-lib.sh
+source "$TOOLS_DIR/tools/check-lib.sh"
+# Every check is of this repository, the starter's included (tests/checks/starter.sh), whatever
+# site SITE_DIR names for the dev site (template plan 1.6c).
 unset SITE_DIR
 # shellcheck source=tools/site-settings.sh
 source "$TOOLS_DIR/tools/site-settings.sh"
@@ -25,39 +30,11 @@ source "$TOOLS_DIR/tools/site-packages.sh"
 source "$TOOLS_DIR/tools/routines.sh"
 # shellcheck source=tools/status-sheet.sh
 source "$TOOLS_DIR/tools/status-sheet.sh"
-# shellcheck source=tools/theme-tokens.sh
-source "$TOOLS_DIR/tools/theme-tokens.sh"
-# shellcheck source=tools/site-layer.sh
-source "$TOOLS_DIR/tools/site-layer.sh"
 
-# The broken examples the site.json checks must keep refusing (tests/tools/site-settings/), each
-# with the field it breaks, which the refusal must name; the wording around it may change. So a
-# check that refuses for the wrong field, or accepts everything after a later edit, fails too.
-readonly SITE_SETTINGS_EXAMPLES_DIR="$TOOLS_DIR/tests/tools/site-settings"
-readonly SITE_SETTINGS_BAD_EXAMPLES=(
-  'missing-field.json|devSiteTitle'
-  'unknown-field.json|testPages[0].adress'
-  'wrong-type.json|testPages[0].isInMenu'
-  'bad-slug.json|slug'
-  'bad-local-plugin.json|localPlugins[0]'
-  'deploy-missing-live.json|deploy.live'
-  'deploy-http-address.json|deploy.live.address'
-  'deploy-address-with-path.json|deploy.staging.address'
-  'deploy-unknown-page-cache.json|deploy.pageCache'
-  'deploy-bad-ssh-host.json|deploy.live.sshHost'
-  'deploy-login-in-address.json|deploy.live.address'
-  'deploy-same-ssh-host.json|deploy.staging.sshHost'
-  'deploy-same-address.json|deploy.staging.address'
-)
-readonly SITE_SETTINGS_BAD_EXPLANATIONS=(
-  'explanation-missing-field.md|theme'
-  'explanation-stale-field.md|logoFile'
-)
-# The same for bin/dev-site's own refusals (tests/tools/dev-site/), which run before it changes
-# anything: each broken example must be refused naming what it breaks, each good one accepted.
-readonly DEV_SITE_EXAMPLES_DIR="$TOOLS_DIR/tests/tools/dev-site"
+# A site's own checks (template plan T20): each file is loaded in name order after the checks
+# below and calls run_check for each of its checks.
+readonly SITE_OWN_CHECKS_DIR="$PROJECT_DIR/tests/checks"
 
-FAILED_CHECKS=()
 # The site's facts the checks need, from site.json (load_check_settings): its theme's folder, the
 # prefix of the theme's PHP names (the slug in capitals with dashes as underscores, the theme's
 # convention: a slug "my-site" gives MY_SITE_), and its own plugins.
@@ -65,24 +42,10 @@ SITE_THEME_DIR=""
 SITE_PHP_PREFIX=""
 SITE_LOCAL_PLUGINS=()
 
-log() { printf '%s [check] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
-
 # The tools are third-party code, so each container sees only the files its step needs: never
 # .env (local secrets), db/ or backups/ (the live site's data) or wordpress/. The container runs
 # as its root, which rootless Docker maps to the user's own account, so vendor/ on the host
 # belongs to the user.
-
-# Composer's own steps: composer.json and composer.lock read-only (a check never changes the
-# locked versions; bin/tools-update does that on purpose), vendor/ writable for the install.
-in_composer() {
-  mkdir -p "$PROJECT_DIR/vendor"
-  docker run --rm -w /app \
-    -v "$PROJECT_DIR/composer.json:/app/composer.json:ro" \
-    -v "$PROJECT_DIR/composer.lock:/app/composer.lock:ro" \
-    -v "$PROJECT_DIR/vendor:/app/vendor" \
-    -v "$COMPOSER_CACHE_VOLUME:/tmp/composer-cache" -e COMPOSER_CACHE_DIR=/tmp/composer-cache \
-    "$COMPOSER_IMAGE" "$@"
-}
 
 # The site's downloaded plugins (site-packages/, template plan T8), all read-only: the lock file
 # must match composer.json, and no installed version may have a known advisory. Exact versions
@@ -96,7 +59,7 @@ in_site_packages() {
     "$COMPOSER_IMAGE" "$@"
 }
 
-# PHPCS and PHPStan: the tools, their configuration and the project's PHP, all read-only.
+# PHPCS and PHPStan: the checkers, their settings and the site's PHP, all read-only.
 in_analysis() {
   docker run --rm -w /app \
     -v "$PROJECT_DIR/vendor:/app/vendor:ro" \
@@ -104,8 +67,6 @@ in_analysis() {
     -v "$PROJECT_DIR/phpstan.neon.dist:/app/phpstan.neon.dist:ro" \
     -v "$PROJECT_DIR/themes:/app/themes:ro" \
     -v "$PROJECT_DIR/plugins:/app/plugins:ro" \
-    -v "$TOOLS_DIR/config/dev-mu-plugins:/app/config/dev-mu-plugins:ro" \
-    -v "$PROJECT_DIR/starter:/app/starter:ro" \
     "$COMPOSER_IMAGE" "$@"
 }
 
@@ -139,30 +100,19 @@ plugins_name_nothing_of_this_site() {
   shared_code_names_nothing_of_this_site "$PROJECT_DIR/plugins"
 }
 
-# The tools, which every site will share (template plan 1.2g): the scripts, their helpers and
-# checker configurations, the GitHub workflows, and the dev site's shared recipe and settings
-# example. Left out: outside code (the CSS linter's installed packages and lock file).
+# The tools, which every site shares (template plan 1.2g): the scripts, their helpers and checker
+# configurations, the GitHub workflows, the dev site's shared recipe, settings example and must-use
+# plugins. Left out: outside code (the CSS linter's installed packages and lock file). Each site
+# checks the tools it uses against its own names, so no list of sites' names is kept in the
+# tools' public repository (template plan T20).
 tools_name_nothing_of_this_site() {
   shared_code_names_nothing_of_this_site "$TOOLS_DIR/bin" "$TOOLS_DIR/tools" "$PROJECT_DIR/.github" \
-    "$TOOLS_DIR/compose.dev.yaml" "$TOOLS_DIR/.env.example"
+    "$TOOLS_DIR/compose.dev.yaml" "$TOOLS_DIR/.env.example" "$TOOLS_DIR/config/dev-mu-plugins"
 }
 
 # Every plugin's main file (plugins/<name>/<name>.php) declares "Update URI: false", or WordPress
 # would offer a WordPress.org plugin of the same name as an update and replace the site's code
 # with a stranger's (plan step 8b).
-# Every script in bin/ can be started by its name, as the documentation shows it. A script
-# committed without that permission still passes its tests, which start it with bash (bin/deploy
-# was, until template plan 1.4e).
-scripts_can_be_run() {
-  local script missing=0
-  for script in "$TOOLS_DIR"/bin/*; do
-    [[ -f "$script" && ! -x "$script" ]] || continue
-    log "${script#"$PROJECT_DIR"/} cannot be run by its name: it lacks the permission (chmod +x, committed)"
-    missing=1
-  done
-  return "$missing"
-}
-
 plugins_never_updated_from_wordpress_org() {
   local plugin_folder main_file missing=0
   for plugin_folder in "$PROJECT_DIR"/plugins/*/; do
@@ -177,13 +127,6 @@ plugins_never_updated_from_wordpress_org() {
 require_lock_file() {
   [[ -f "$PROJECT_DIR/composer.lock" ]] && return 0
   log "composer.lock is missing; bin/tools-update creates it"
-  exit 1
-}
-
-# Without jq, the npm audits and the site.json checks would fail with an unrelated-looking error.
-require_jq() {
-  command -v jq >/dev/null && return 0
-  log "jq is not installed; bin/check needs it on this computer (for example: sudo apt install jq)"
   exit 1
 }
 
@@ -204,63 +147,6 @@ site_json_is_valid() {
   return 1
 }
 
-# Every field is explained in tools/site-settings.md, and nothing else is.
-site_json_fields_explained() {
-  local differences
-  differences="$(site_settings_explanation_differences "$SITE_SETTINGS_EXPLANATION")"
-  [[ -z "$differences" ]] && return 0
-  log "tools/site-settings.md and tools/site-settings.jq disagree:"
-  printf '%s\n' "$differences" | sed 's/^/    /' >&2
-  return 1
-}
-
-# The two checks above, tried on known examples: the valid one accepted, text that is not JSON
-# refused, and each broken one refused with the problem it was made to show.
-site_json_checks_refuse_bad_examples() {
-  local failed=0 example
-  expect_settings_accepted "valid.json" || failed=1
-  expect_settings_not_json "not-json.json" || failed=1
-  for example in "${SITE_SETTINGS_BAD_EXAMPLES[@]}"; do
-    expect_settings_problem "${example%%|*}" "${example#*|}" || failed=1
-  done
-  for example in "${SITE_SETTINGS_BAD_EXPLANATIONS[@]}"; do
-    expect_explanation_difference "${example%%|*}" "${example#*|}" || failed=1
-  done
-  return "$failed"
-}
-
-expect_settings_accepted() {
-  local example="$1" problems
-  problems="$(site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example")" && [[ -z "$problems" ]] && return 0
-  log "the valid example $example was refused: $problems"
-  return 1
-}
-
-expect_settings_not_json() {
-  local example="$1"
-  site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example" >/dev/null 2>&1 || return 0
-  log "$example is not JSON, but was read as JSON"
-  return 1
-}
-
-# A problem line starts with the field it is about, then a colon; the rest is wording.
-expect_settings_problem() {
-  local example="$1" broken_field="$2" problems
-  problems="$(site_settings_problems "$SITE_SETTINGS_EXAMPLES_DIR/$example" 2>&1)"
-  cut -d: -f1 <<<"$problems" | grep -qxF -- "$broken_field" && return 0
-  log "$example should be refused naming $broken_field; reported: ${problems:-(nothing)}"
-  return 1
-}
-
-# A difference line ends with the field it is about, after a colon.
-expect_explanation_difference() {
-  local example="$1" broken_field="$2" differences
-  differences="$(site_settings_explanation_differences "$SITE_SETTINGS_EXAMPLES_DIR/$example")"
-  awk -F': ' '{ print $NF }' <<<"$differences" | grep -qxF -- "$broken_field" && return 0
-  log "$example should show a difference naming $broken_field; reported: ${differences:-(nothing)}"
-  return 1
-}
-
 # Every WordPress.org plugin in site-packages/composer.lock downloads from WordPress.org's own
 # server; the lock file's addresses come from WPackagist, a third party (template plan T8).
 site_packages_downloads_from_wordpress_org() {
@@ -270,79 +156,6 @@ site_packages_downloads_from_wordpress_org() {
   log "site-packages/composer.lock downloads from outside WordPress.org:"
   printf '%s\n' "$problems" | sed 's/^/    /' >&2
   return 1
-}
-
-# bin/dev-site's refusals, and the site packages' rules, tried on known examples
-# (tests/tools/dev-site/): an update that changes more than WordPress.org plugins (it may not merge
-# itself), a download from outside WordPress.org, a theme with no folder,
-# a test page without its content file, a plugin it cannot install, and the booking form without its plugin are each
-# refused, naming what is wrong; the good examples are accepted.
-dev_site_refusals_refuse_bad_examples() {
-  local failed=0
-  site_folder_refusals_refuse_bad_examples || failed=1
-  site_package_refusals_refuse_bad_examples || failed=1
-  return "$failed"
-}
-
-# site.json's folders and pages: the theme, the site's own plugins and the test pages' content.
-site_folder_refusals_refuse_bad_examples() {
-  local examples="$DEV_SITE_EXAMPLES_DIR" valid="$SITE_SETTINGS_EXAMPLES_DIR/valid.json" failed=0
-  expect_refusal "missing-theme.json" "theme" \
-    "$(site_settings_theme_problem "$examples/missing-theme.json" "$examples/themes")" || failed=1
-  expect_refusal "missing-local-plugin.json" "no-such-plugin" \
-    "$(site_settings_missing_local_plugins "$examples/missing-local-plugin.json" "$examples/plugins")" || failed=1
-  expect_refusal "missing-test-page.json" "no-such-page" \
-    "$(site_settings_missing_test_pages "$examples/missing-test-page.json" "$examples/dev-content")" || failed=1
-  expect_acceptance "the valid example's folders and pages" \
-    "$(site_settings_theme_problem "$valid" "$examples/themes")$(site_settings_missing_local_plugins "$valid" "$examples/plugins")$(site_settings_missing_test_pages "$valid" "$examples/dev-content")" || failed=1
-  return "$failed"
-}
-
-# site-packages/'s lock file: what may merge itself, where downloads come from, what can be installed.
-site_package_refusals_refuse_bad_examples() {
-  local examples="$DEV_SITE_EXAMPLES_DIR" good="$DEV_SITE_EXAMPLES_DIR/lock-with-form-plugin.json" failed=0
-  expect_refusal "lock-plugin-and-tool-update.json" "composer/installers" \
-    "$(site_packages_not_plugins_only "$good" "$examples/lock-plugin-and-tool-update.json")" || failed=1
-  # Dependabot's own Composer drops bookkeeping such as "published-time" (seen on #80): not a change.
-  expect_acceptance "lock-plugin-update.json" \
-    "$(site_packages_not_plugins_only "$good" "$examples/lock-plugin-update.json")" || failed=1
-  expect_refusal "lock-with-foreign-download.json" "wpackagist-plugin/example-plugin" \
-    "$(site_packages_download_problems "$examples/lock-with-foreign-download.json")" || failed=1
-  expect_refusal "lock-with-other-plugin.json" "example-vendor/other-plugin" \
-    "$(site_packages_unsupported_plugins "$examples/lock-with-other-plugin.json")" || failed=1
-  expect_refusal "lock-without-form-plugin.json" "$FORM_PLUGIN_PACKAGE" \
-    "$(site_packages_booking_form_problem "$examples/booking-form.txt" "$examples/lock-without-form-plugin.json")" || failed=1
-  expect_acceptance "lock-with-form-plugin.json" \
-    "$(site_packages_unsupported_plugins "$good")$(site_packages_booking_form_problem "$examples/booking-form.txt" "$good")$(site_packages_download_problems "$good")" || failed=1
-  return "$failed"
-}
-
-# A refusal line starts with what it is about, then a colon.
-expect_refusal() {
-  local example="$1" expected="$2" problems="$3"
-  cut -d: -f1 <<<"$problems" | grep -qxF -- "$expected" && return 0
-  log "$example should be refused naming $expected; reported: ${problems:-(nothing)}"
-  return 1
-}
-
-expect_acceptance() {
-  local example="$1" problems="$2"
-  [[ -z "$problems" ]] && return 0
-  log "$example should be accepted; reported: $problems"
-  return 1
-}
-
-# The versions check's alerts on known situations (tests/tools/versions-check/, template plan
-# 1.3c): which issues it would open for plugin updates left waiting and releases never proposed,
-# against stand-ins for GitHub and WordPress.org; nothing goes over the network.
-versions_check_alerts() {
-  bash "$TOOLS_DIR/tests/tools/versions-check/run.sh"
-}
-
-# The debug log rule on sample lines (tests/scenario/debug-log.sh, template plan 1.5b): the site's
-# own code and fatal errors fail, other people's notices, warnings and deprecations are shown.
-debug_log_rule() {
-  bash "$TOOLS_DIR/tests/tools/debug-log/run.sh"
 }
 
 # The routines' two files in step (tools/routines.sh, template plan 1.5c): every link from
@@ -355,11 +168,6 @@ routines_link_to_site_details() {
   log "docs/ROUTINES.md and docs/SITE_SPECIFIC_ROUTINES.md disagree:"
   printf '%s\n' "$differences" | sed 's/^/    /' >&2
   return 1
-}
-
-# The check above, tried on known examples (tests/tools/routines/).
-routines_check_refuses_bad_examples() {
-  bash "$TOOLS_DIR/tests/tools/routines/run.sh"
 }
 
 # The status sheet held to the site standard (tools/status-sheet.sh, template plan 1.5d-4): every
@@ -377,52 +185,26 @@ status_sheet_complete() {
   return 1
 }
 
-# The check above, tried on known examples (tests/tools/status-sheet/).
-status_sheet_check_refuses_bad_examples() {
-  bash "$TOOLS_DIR/tests/tools/status-sheet/run.sh"
-}
-
-# The page check on known situations (tests/tools/site-check/, template plan 1.4b): broken,
-# redirected, cut-off and foreign pages, an unusable page list, retries, and the staging login,
-# against a stand-in site; nothing goes over the network.
-site_check_situations() {
-  bash "$TOOLS_DIR/tests/tools/site-check/run.sh"
-}
-
-# bin/deploy's checks before a copy on known situations (tests/tools/deploy/, template plan
-# 1.4d-1): untested or unpushed commits, an unclean working copy, live before staging, a server
-# not answering, against a throwaway repository and stand-ins for GitHub and the servers.
-deploy_situations() {
-  bash "$TOOLS_DIR/tests/tools/deploy/run.sh"
-}
-
-shellcheck_scripts() {
-  local script scenario_scripts tool_test_scripts scripts=()
-  # The scenario checks sit in their groups' folders (template plan 1.3a).
-  mapfile -t scenario_scripts < <(find "$TOOLS_DIR/tests/scenario" -name '*.sh' -type f | sort)
-  # The tools' tests and their stand-in commands, which have no extension (tests/tools/, 1.3c).
-  mapfile -t tool_test_scripts < <(find "$TOOLS_DIR/tests/tools" -type f \( -name '*.sh' -o -path '*/fakes/*' \) | sort)
-  for script in "$TOOLS_DIR"/bin/* "${scenario_scripts[@]}" "${tool_test_scripts[@]}"; do
-    scripts+=("/src/${script#"$TOOLS_DIR"/}")
+# The site's own shell scripts: its build steps for the dev site (tests/dev-setup.sh) and its own
+# checks (tests/checks/). The tools' scripts are the tools' self-check's. -x follows a check's
+# `source` of the tools' libraries, mounted where the tools keep them.
+shellcheck_site_scripts() {
+  local script scripts=()
+  for script in "$PROJECT_DIR/tests/dev-setup.sh" "$SITE_OWN_CHECKS_DIR"/*.sh; do
+    [[ -f "$script" ]] && scripts+=("/src/${script#"$PROJECT_DIR"/}")
   done
-  # -x follows the scenario checks' `source lib.sh` and bin/dev-site's `source tests/dev-setup.sh`;
-  # the project root is the source path.
+  ((${#scripts[@]} > 0)) || return 0
   docker run --rm -w /src \
-    -v "$TOOLS_DIR/bin:/src/bin:ro" -v "$TOOLS_DIR/tests:/src/tests:ro" \
-    -v "$TOOLS_DIR/tools:/src/tools:ro" \
+    -v "$PROJECT_DIR/tests:/src/tests:ro" -v "$TOOLS_DIR/tools:/src/tools:ro" \
     "$SHELLCHECK_IMAGE" --severity=style -x --source-path=/src "${scripts[@]}"
 }
 
 # Type-checks the browser tests, the site's own among them, mounted where bin/test mounts them
-# (template plan T19). The container sees only tests/e2e/, where npm installs node_modules
-# (ignored by git) from the lock file, and the site's specs, read-only.
+# (template plan T19).
 typescript_check() {
   local site_specs_mount
   mapfile -t site_specs_mount < <(site_browser_specs_mount_options)
-  docker run --rm -w /e2e \
-    -v "$TOOLS_DIR/tests/e2e:/e2e" "${site_specs_mount[@]}" \
-    -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
+  typescript_check_with "${site_specs_mount[@]}"
 }
 
 # Type-checks the theme's browser scripts (plan D29), then lints them with ESLint (template plan
@@ -447,16 +229,6 @@ in_js_check() {
     "$PLAYWRIGHT_IMAGE" sh -c "npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && $1"
 }
 
-# The Playwright image and the @playwright/test package must be the same version, or the
-# tests run against browsers the test runner was not built for.
-playwright_versions_match() {
-  local package_version
-  package_version="$(sed -nE 's/.*"@playwright\/test": "([^"]+)".*/\1/p' "$TOOLS_DIR/tests/e2e/package.json")"
-  [[ "$package_version" == "$PLAYWRIGHT_VERSION" ]] && return 0
-  log "tests/e2e/package.json has @playwright/test ${package_version:-(none)}; tools/versions.sh has $PLAYWRIGHT_VERSION"
-  return 1
-}
-
 # theme.json's schema must describe the WordPress version the site runs (compose.dev.yaml): an
 # older schema hides settings the site has, a newer one offers settings it silently ignores.
 theme_json_schema_matches_wordpress() {
@@ -466,210 +238,6 @@ theme_json_schema_matches_wordpress() {
   schema_version="$(sed -nE 's#.*"[$]schema": "https://schemas\.wp\.org/wp/([0-9]+\.[0-9]+)/theme\.json".*#\1#p' "$theme_json")"
   [[ -n "$wordpress_version" && "$schema_version" == "$wordpress_version" ]] && return 0
   log "${theme_json#"$PROJECT_DIR"/} uses the ${schema_version:-(no recognised)} schema; compose.dev.yaml runs WordPress ${wordpress_version:-(not found)}"
-  return 1
-}
-
-# The starter (starter/, template plan 1.6b): the site layer a new site begins from. Its own
-# settings and pages, its look's tokens and its files are held to the same rules as this site's,
-# so it never drifts from the theme code it stands on. Its theme is checked against this site's
-# component stylesheets and theme files, which it is assembled with (1.6c) until 2.3 moves them.
-readonly STARTER_DIR="$PROJECT_DIR/starter"
-
-starter_site_json_is_valid() {
-  local problems
-  problems="$(site_settings_problems "$STARTER_DIR/site.json")" || {
-    log "starter/site.json is not valid JSON (jq's message is above)"
-    return 1
-  }
-  problems+="$(site_settings_missing_test_pages "$STARTER_DIR/site.json" "$STARTER_DIR/tests/dev-content")"
-  [[ -z "$problems" ]] && return 0
-  log "starter/site.json does not follow the rules in tools/site-settings.jq, or lacks a page's content:"
-  printf '%s\n' "$problems" | sed 's/^/    /' >&2
-  return 1
-}
-
-starter_defines_every_token() {
-  local differences
-  differences="$(theme_token_differences "$SITE_THEME_DIR/assets/css/components" "$STARTER_DIR/theme/theme.json")"
-  [[ -z "$differences" ]] && return 0
-  log "The starter's design tokens are incomplete:"
-  printf '%s\n' "$differences" | sed 's/^/    /' >&2
-  return 1
-}
-
-starter_holds_the_site_layer() {
-  local differences
-  differences="$(site_layer_differences "$TOOLS_DIR/tools/site-layer-files.txt" "$STARTER_DIR/theme" "$SITE_THEME_DIR")"
-  [[ -z "$differences" ]] && return 0
-  log "starter/theme/ and tools/site-layer-files.txt disagree:"
-  printf '%s\n' "$differences" | sed 's/^/    /' >&2
-  return 1
-}
-
-# The check above, tried on known examples (tests/tools/site-layer/).
-site_layer_check_refuses_bad_examples() {
-  bash "$TOOLS_DIR/tests/tools/site-layer/run.sh"
-}
-
-# The guard naming the dev site that holds the port, on known examples with a stand-in for docker
-# (tools/dev-site-guard.sh, tests/tools/dev-site-guard/).
-dev_site_guard_on_examples() {
-  bash "$TOOLS_DIR/tests/tools/dev-site-guard/run.sh"
-}
-
-# How the tools find the site they work on, with the tools apart from a stand-in site as Composer
-# installs them (tools/paths.sh, tests/tools/paths/, template plan T19).
-site_found_with_tools_apart() {
-  bash "$TOOLS_DIR/tests/tools/paths/run.sh"
-}
-
-# A site layer's full theme assembled on known examples (tools/site-theme.sh, tests/tools/site-theme/).
-site_theme_assembly_on_examples() {
-  bash "$TOOLS_DIR/tests/tools/site-theme/run.sh"
-}
-
-# The starter names nothing of this site but the shared theme code's prefix (the site's slug),
-# which its PHP and patterns must use until template plan 2.3 renames that prefix. Its assembled
-# theme (starter/themes/, build output ignored by git, template plan 1.6c) holds this site's
-# shared theme files and is not the starter's own.
-starter_names_nothing_of_this_site() {
-  local slug name patterns=()
-  slug="$(site_setting .slug)"
-  while IFS= read -r name; do
-    [[ "$name" == "$slug" ]] || patterns+=(-e "$name")
-  done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
-  ((${#patterns[@]} > 0)) || return 0
-  ! grep -rniF --exclude-dir=themes "${patterns[@]}" "$STARTER_DIR"
-}
-
-starter_theme_json_schema_matches_wordpress() {
-  theme_json_schema_matches_wordpress "$STARTER_DIR/theme/theme.json"
-}
-
-# The theme's component stylesheets load by name (plan D29): <PREFIX>_COMPONENT_STYLES and
-# <PREFIX>_FORM_STYLESHEET in functions.php name them (the prefix: SITE_PHP_PREFIX), and WordPress silently loads nothing for a
-# name without a file. So the names and the files in assets/css/components/ must match, both ways.
-component_styles_match_files() {
-  local theme_dir="$SITE_THEME_DIR" listed on_disk
-  # The block components, the form's stylesheet (loaded by page) and the video facade's (loaded
-  # with a page's videos, includes/video-facade.php).
-  listed="$(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'[a-z0-9-]+'" | tr -d "'"
-    sed -nE "s#^const ${SITE_PHP_PREFIX}_(FORM|VIDEO_FACADE)_STYLESHEET *= 'assets/css/components/([a-z0-9-]+)\.css';#\2#p" "$theme_dir/functions.php" "$theme_dir/includes/video-facade.php")"
-  on_disk="$(find "$theme_dir/assets/css/components" -maxdepth 1 -name '*.css' -printf '%f\n' | sed 's/\.css$//')"
-  if [[ -z "$listed" ]]; then
-    log "functions.php lists no component stylesheets; the list or this check's pattern changed"
-    return 1
-  fi
-  local difference
-  difference="$(diff <(sort -u <<<"$listed") <(sort -u <<<"$on_disk"))" && return 0
-  log "Component names (<) and files in assets/css/components/ (>) differ:"
-  log "$difference"
-  return 1
-}
-
-# Every design token the component stylesheets and theme.json read is defined in the site's
-# theme.json (tools/theme-tokens.sh, template plan 1.6b): CSS treats an undefined token as unset and
-# says nothing, so a look missing one would quietly lose a color or a size.
-theme_defines_every_token() {
-  local differences
-  differences="$(theme_token_differences "$SITE_THEME_DIR/assets/css/components" "$SITE_THEME_DIR/theme.json")"
-  [[ -z "$differences" ]] && return 0
-  log "The theme's design tokens are incomplete:"
-  printf '%s\n' "$differences" | sed 's/^/    /' >&2
-  return 1
-}
-
-# The check above, tried on known examples (tests/tools/theme-tokens/).
-theme_token_check_refuses_bad_examples() {
-  bash "$TOOLS_DIR/tests/tools/theme-tokens/run.sh"
-}
-
-# Every one of the theme's own components (named site-…) appears on the components' example pages
-# or in the theme's template parts, so the browser tests (accessibility, policy, debug log) see it
-# on neutral content whatever the site's own pages hold (template plan T10). Components named
-# after a WordPress block (buttons) are seen wherever that block is. A class counts by its prefix,
-# so site-media covers site-media-placeholder and site-hero covers site-hero__photo.
-components_shown_on_example_pages() {
-  local theme_dir="$SITE_THEME_DIR" component missing=0
-  for component in $(sed -n "/^const ${SITE_PHP_PREFIX}_COMPONENT_STYLES/,/^);/p" "$theme_dir/functions.php" | grep -oE "'site-[a-z0-9-]+'" | tr -d "'"); do
-    grep -qE "class=\"[^\"]*\\b$component\\b" "$COMPONENT_EXAMPLES_DIR"/*.html "$theme_dir"/parts/*.html && continue
-    log "$component appears on no component example page (${COMPONENT_EXAMPLES_DIR#"$PROJECT_DIR"/}/) or template part; add a neutral example"
-    missing=1
-  done
-  return "$missing"
-}
-
-# Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint,
-# tools/js-check); the container sees only the two files.
-# Every advisory npm knows for a package folder's locked packages fails the check, except those
-# accepted in the folder's audit-exceptions.json: each names one advisory, with its reason and a
-# review-by date, after which it fails again. An exception whose advisory npm no longer reports
-# also fails, so the file holds only what is still accepted. An accepted risk is decided by the
-# user, never added to make a check pass.
-npm_audit() {
-  local package_dir="$1" report reported exceptions unaccepted
-  report="$(npm_audit_json "$package_dir")" || return 1
-  reported="$(jq -r '[.vulnerabilities[].via[] | objects | .url | capture("(?<id>GHSA(-[0-9a-z]{4}){3})").id] | unique | .[]' <<<"$report")"
-  exceptions="$(audit_exceptions "$TOOLS_DIR/$package_dir/audit-exceptions.json")" || return 1
-  unaccepted="$(comm -23 <(sort -u <<<"$reported") <(sort -u <<<"$exceptions") | sed '/^$/d')"
-  check_exceptions_still_reported "$reported" "$exceptions" || return 1
-  if [[ -n "$unaccepted" ]]; then
-    log "advisories not accepted in $package_dir/audit-exceptions.json: $(tr '\n' ' ' <<<"$unaccepted")"
-    npm_audit_text "$package_dir"
-    return 1
-  fi
-  [[ -z "$exceptions" ]] || log "accepted until their review date: $(tr '\n' ' ' <<<"$exceptions")"
-}
-
-# npm's audit of the folder's lock file, as JSON. npm exits non-zero when it finds advisories, so
-# success is judged by the JSON being a report, not by npm's status.
-npm_audit_json() {
-  local package_dir="$1" report
-  report="$(npm_audit_in_container "$package_dir" --json)" || true
-  jq -e '.vulnerabilities | type == "object"' >/dev/null 2>&1 <<<"$report" || {
-    log "npm audit gave no report for $package_dir"
-    return 1
-  }
-  printf '%s' "$report"
-}
-
-# npm's own readable report, shown when an advisory is not accepted.
-npm_audit_text() {
-  npm_audit_in_container "$1" || true
-}
-
-npm_audit_in_container() {
-  local package_dir="$1"
-  shift
-  docker run --rm -w /npm \
-    -v "$TOOLS_DIR/$package_dir/package.json:/npm/package.json:ro" \
-    -v "$TOOLS_DIR/$package_dir/package-lock.json:/npm/package-lock.json:ro" \
-    "$PLAYWRIGHT_IMAGE" npm audit --package-lock-only --audit-level=low "$@"
-}
-
-# The accepted advisories' IDs, one per line; none when the file does not exist. Fails on an entry
-# without an ID, a reason or a valid review date, and on one past its review date.
-audit_exceptions() {
-  local file="$1" shown today
-  [[ -f "$file" ]] || return 0
-  shown="${file#"$PROJECT_DIR"/}"
-  today="$(date -u +%F)"
-  jq -e 'type == "array" and all(.[]; (.advisory | test("^GHSA(-[0-9a-z]{4}){3}$")) and (.reason | type == "string" and length > 0) and (.reviewBy | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")))' "$file" >/dev/null || {
-    log "$shown: each entry needs an advisory (GHSA-…), a reason and a reviewBy date (YYYY-MM-DD)"
-    return 1
-  }
-  jq -e --arg today "$today" 'all(.[]; .reviewBy >= $today)' "$file" >/dev/null || {
-    log "$shown: past its review date: $(jq -r --arg today "$today" '[.[] | select(.reviewBy < $today) | "\(.advisory) (\(.reviewBy))"] | join(", ")' "$file")"
-    return 1
-  }
-  jq -r '.[].advisory' "$file"
-}
-
-check_exceptions_still_reported() {
-  local reported="$1" exceptions="$2" stale
-  stale="$(comm -13 <(sort -u <<<"$reported") <(sort -u <<<"$exceptions") | sed '/^$/d')"
-  [[ -z "$stale" ]] && return 0
-  log "accepted but no longer reported by npm, remove from audit-exceptions.json: $(tr '\n' ' ' <<<"$stale")"
   return 1
 }
 
@@ -706,42 +274,23 @@ compose_file_is_valid() {
     --env-file "$TOOLS_DIR/.env.example" config --quiet
 }
 
-run_check() {
-  local name="$1"
-  shift
-  log "--- $name"
-  if "$@"; then
-    log "PASS  $name"
-    return
-  fi
-  log "FAIL  $name"
-  FAILED_CHECKS+=("$name")
-}
-
-report() {
-  if ((${#FAILED_CHECKS[@]} == 0)); then
-    log "All checks passed."
-    return 0
-  fi
-  log "${#FAILED_CHECKS[@]} check(s) failed: ${FAILED_CHECKS[*]}"
-  return 1
-}
-
-# The checks in the order they have always run, in three groups of neighbors, each a plain list.
+# The site's checks, in three groups of neighbors, each a plain list.
 run_dependency_checks() {
-  run_check "Install tools (composer.lock)" in_composer composer install --no-interaction --no-progress
-  run_check "Composer validation" in_composer composer validate --strict --no-check-publish
-  run_check "Composer security audit" in_composer composer audit --no-interaction
+  run_check "Install the PHP checkers (composer.lock)" in_composer_of "$PROJECT_DIR" composer install --no-interaction --no-progress
+  run_check "Composer validation" in_composer_of "$PROJECT_DIR" composer validate --strict --no-check-publish
+  run_check "Composer security audit" in_composer_of "$PROJECT_DIR" composer audit --no-interaction
   run_check "Site packages: lock file matches composer.json" in_site_packages composer validate --strict --no-check-all --no-check-publish
   run_check "Site packages: security audit" in_site_packages composer audit --locked --no-interaction
   run_check "Site packages: downloads come from WordPress.org" site_packages_downloads_from_wordpress_org
+  # The tools' packages run on this computer for this site, so the site's weekly run catches an
+  # advisory published for the release it uses.
   run_check "npm security audit (browser tests)" npm_audit tests/e2e
   run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
   run_check "npm security audit (the scripts' checker)" npm_audit tools/js-check
 }
 
 # The coding standards (the theme's ruleset, then each of the site's own plugins with its own),
-# then the rules for plugins and for site.json.
+# then the rules for shared code, site.json and the records.
 run_standards_and_rule_checks() {
   local plugin_slug
   run_check "WordPress Coding Standards (PHPCS)" in_analysis php vendor/bin/phpcs
@@ -752,46 +301,42 @@ run_standards_and_rule_checks() {
   run_check "Plugins name nothing of this site" plugins_name_nothing_of_this_site
   run_check "The tools name nothing of this site" tools_name_nothing_of_this_site
   run_check "Plugins never updated from WordPress.org" plugins_never_updated_from_wordpress_org
-  run_check "Every script in bin/ can be run" scripts_can_be_run
   run_check "site.json follows its rules" site_json_is_valid
-  run_check "site.json's fields are explained" site_json_fields_explained
-  run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples
-  run_check "bin/dev-site's refusals refuse bad examples" dev_site_refusals_refuse_bad_examples
-  run_check "The versions check's alerts" versions_check_alerts
-  run_check "The debug log rule on known lines" debug_log_rule
   run_check "The routines link to their site details" routines_link_to_site_details
-  run_check "The routines' link check refuses bad examples" routines_check_refuses_bad_examples
   run_check "The status sheet answers every item" status_sheet_complete
-  run_check "The status sheet's check refuses bad examples" status_sheet_check_refuses_bad_examples
-  run_check "The page check on known situations" site_check_situations
-  run_check "The deploy's checks on known situations" deploy_situations
 }
 
 run_analysis_and_file_checks() {
   run_check "Static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-  run_check "Playwright versions match" playwright_versions_match
   run_check "theme.json schema matches WordPress" theme_json_schema_matches_wordpress
-  run_check "Component stylesheets match their list" component_styles_match_files
-  run_check "The theme defines every design token used" theme_defines_every_token
-  run_check "The token check refuses bad examples" theme_token_check_refuses_bad_examples
-  run_check "Starter: site.json follows its rules" starter_site_json_is_valid
-  run_check "Starter: theme.json schema matches WordPress" starter_theme_json_schema_matches_wordpress
-  run_check "Starter: defines every design token used" starter_defines_every_token
-  run_check "Starter: holds exactly the site layer" starter_holds_the_site_layer
-  run_check "The site-layer check refuses bad examples" site_layer_check_refuses_bad_examples
-  run_check "The theme assembly on known examples" site_theme_assembly_on_examples
-  run_check "The dev-site guard on known examples" dev_site_guard_on_examples
-  run_check "The tools find the site with the tools apart" site_found_with_tools_apart
-  run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
-  run_check "Starter: static analysis (PHPStan)" in_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
-  run_check "Components appear on the example pages" components_shown_on_example_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check
   run_check "ESLint (the theme's scripts)" theme_scripts_lint
   run_check "CSS (Stylelint)" css_lint
-  run_check "Shell scripts (ShellCheck)" shellcheck_scripts
+  run_check "Shell scripts (the site's, ShellCheck)" shellcheck_site_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
   run_check "Compose file" compose_file_is_valid
+}
+
+# The site's own checks (tests/checks/*.sh), each file loaded in name order; a folder without any
+# is no error. They see this script's functions and settings (template plan T20).
+run_site_own_checks() {
+  local site_check_file
+  for site_check_file in "$SITE_OWN_CHECKS_DIR"/*.sh; do
+    [[ -f "$site_check_file" ]] || continue
+    log "Site's own checks: ${site_check_file#"$PROJECT_DIR"/}"
+    # The site's file, named at run time; the site's own ShellCheck check reads it.
+    # shellcheck source=/dev/null
+    source "$site_check_file"
+  done
+}
+
+# The tools' self-check, run here only while the tools are the site's own (this layout until the
+# site installs them through Composer, template plan T20): a site using installed tools does not
+# re-test them on every change; their own repository does.
+run_tools_self_check_when_own() {
+  [[ "$TOOLS_DIR" == "$PROJECT_DIR" ]] || return 0
+  run_check "The tools' self-check (tests/tools/check-tools.sh)" bash "$TOOLS_DIR/tests/tools/check-tools.sh"
 }
 
 main() {
@@ -802,6 +347,8 @@ main() {
   run_dependency_checks
   run_standards_and_rule_checks
   run_analysis_and_file_checks
+  run_site_own_checks
+  run_tools_self_check_when_own
   report
 }
 
