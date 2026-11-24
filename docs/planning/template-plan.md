@@ -58,7 +58,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   command raises it in the review of Dependabot's pull request (T18, option A). **Now: 2.1b-2,**
   `REPO_ROOT` split into three (T19): **2.1b-2a done** (#111, `de724ce`, 2026-11-24:
   `tools/paths.sh` and the rename, behavior unchanged; `bin/check`, the full `bin/test` and the
-  starter's tests passing); **2.1b-2b done** (2026-11-24: the Compose mount, the site's own
+  starter's tests passing); **2.1b-2b done** (#112, `39677f0`, 2026-11-24: the Compose mount, the site's own
   browser specs in `tests/browser/` mounted apart, the scenario debug-log fix, the status sheet's
   file lookup, `tests/tools/paths/`); **next: 2.1b-3** the repository (layout, `CHANGELOG.md`,
   its own checks, branch protection, the first tag). Then 2.1c the
@@ -839,7 +839,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `[x]` 2.1a the review (2026-11-24, `findings/step-2.1a-tools-review.md`); `[~]` 2.1b the
   repository (T18): `[x]` 2.1b-1 the trial (2026-11-24, `findings/step-2.1b-1-trial.md`), `[x]`
   2.1b-2 `REPO_ROOT` split (T19: `[x]` 2.1b-2a the rename (#111, `de724ce`), `[x]` 2.1b-2b the layout fixes and
-  the test (2026-11-24: the dev-only mu-plugins mounted from the tools' folder through
+  the test (#112, `39677f0`, 2026-11-24: the dev-only mu-plugins mounted from the tools' folder through
   `compose.site.yaml`; the site's browser specs in its own `tests/browser/`, mounted into the
   tools' `specs/dev/site/`; the scenario checks' debug-log rule reading the tested site's
   `site.json`, shown failing on a notice planted in the starter's theme; the status sheet's files

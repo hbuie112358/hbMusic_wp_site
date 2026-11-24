@@ -4,44 +4,43 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T10:30:00-05:00
-current_branch: chore/pause-2026-11-24b
-last_commit: de724ce
+timestamp: 2026-11-24T11:04:00-05:00
+current_branch: chore/pause-2026-11-24c
+last_commit: 39677f0
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (fourth session), template plan 2.1b-2: reading all 224 uses of REPO_ROOT found three
-  folders, not two (T19: TOOLS_DIR, PROJECT_DIR, SITE_DIR unchanged), agreed by the user, split
-  into 2a and 2b. 2.1b-2a done and merged (#111, de724ce): tools/paths.sh works out PROJECT_DIR
-  (Composer's COMPOSER_RUNTIME_BIN_DIR's parent; else the tools' folder if it holds site.json;
-  else refuse), every use renamed, docs/TOOLS.md updated. bin/check passed; the full bin/test here
-  (248 browser tests passed, 4 skipped) and the starter's tests (168 passed) passed; GitHub's
-  check and dev-site passed. Found on the way and added to 2b: the status sheet's file lookup.
+  2026-11-24 (fifth session), template plan 2.1b-2b done and merged (#112, 39677f0; the earlier
+  pause commit went with it as c5ded31): the dev-only mu-plugins mounted from the tools' folder
+  through compose.site.yaml; the site's own browser specs moved to tests/browser/, mounted
+  read-only into the tools' tests/e2e/specs/dev/site/ (bin/test and bin/check's type check); the
+  scenario checks' debug-log rule reading the tested site's site.json (shown failing on a notice
+  planted in the starter's theme); the status sheet's files found in the site's repository or the
+  tools' folder; tests/tools/paths/ with the tools apart from a stand-in site (shown failing on two
+  planted faults). Found for 2.1d and in the plan: .env's COMPOSE_FILE names compose.dev.yaml
+  relative to the site's repository. VS Code cannot resolve @playwright/test in tests/browser/
+  (editor only); the user chose to leave it.
 
 next_action: >
-  Template plan 2.1b-2b (T19): compose.dev.yaml's mu-plugins mount made absolute from TOOLS_DIR;
-  the site's own browser specs (tests/e2e/specs/dev/site/) mounted from the site apart from the
-  tools' tests/e2e (bin/test, bin/check's type check); tests/scenario/lib.sh reading SITE_DIR's
-  site.json (shown failing on a planted notice in the starter's theme first); the status sheet's
-  check (tools/status-sheet.sh) finding named files in either folder; a tools test with the tools
-  apart from a stand-in site (found through COMPOSER_RUNTIME_BIN_DIR, refused without it, a
-  relative SITE_DIR read from the site), its comments naming the one risk no code can catch (a
-  COMPOSER_RUNTIME_BIN_DIR left over from another project's Composer run). Start by reading those
-  places and proposing each change for the user to agree.
+  Template plan 2.1b-3, the dts-site-tools repository (T18, T19): its layout, CHANGELOG.md, its
+  own checks, branch protection, the first tag. Start by reading 2.1b-3's entry,
+  findings/step-2.1a-tools-review.md (what moves, stays or moves later) and
+  findings/step-2.1b-1-trial.md, then propose the repository's layout and each piece for the user
+  to agree; the handbook's toolkit/github.md settings apply to the new repository.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: bin/check all passing on main (2026-11-24, after #111); #111's check and dev-site jobs passed on GitHub; the full bin/test here 248 browser tests passed and 4 skipped (pages with too few videos), all scenario steps passed; the starter (SITE_DIR=starter) all steps passed, 168 browser tests (2026-11-24)
-  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); #111 changes only the tools, nothing to deploy for visitors. bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
-  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, rebuilt 2026-11-24 by the 2a test run); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time
+  checks: bin/check all passing on 2.1b-2b's branch (2026-11-24); #112's check and dev-site jobs passed on GitHub; the full bin/test here 248 browser tests passed and 4 skipped (pages with too few videos), all scenario steps passed; the starter (SITE_DIR=starter) all steps passed, 168 browser tests (2026-11-24)
+  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); #111 and #112 change only the tools, nothing to deploy for visitors. bin/deploy's commit list opens git's pager when longer than a screen; q goes on to the yes question (the user chose to leave it)
+  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev, rebuilt 2026-11-24 by the 2b test run); the starter's (dts-starter-dev) stopped, its data kept; one runs at a time
   dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
 
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      main is at de724ce, even with origin/main. Unpushed: chore/pause-2026-11-24b (1 commit, this
-      pause: resume-state.yaml and the plan's Current position, documents only).
+      main is at 39677f0, even with origin/main. Unpushed: chore/pause-2026-11-24c (1 commit, this
+      pause: resume-state.yaml and the plan's #112 references, documents only).
       starter/themes/ and tools/js-check/node_modules/ are build output, ignored by git.
   - file: data/ (not versioned)
     why: >
@@ -58,7 +57,7 @@ pending_decisions:
     continuity sheet, Bitwarden, the Cloudways trial, the company pages): listed and ticked in the
     handbook's WORKING_DRAFT.md, "Open items", not repeated here.
   - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6, proposed when each is built; toolkit/github.md's answered trap on pinning reusable workflows (T17), proposed at 2.1c.
-  - Pushing chore/pause-2026-11-24b (documents only, 1 commit) with 2b's work; Claude asks first.
+  - Pushing chore/pause-2026-11-24c (documents only, 1 commit) with 2.1b-3's work; Claude asks first.
   - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.0 to 6.0.1), a tools update for the user to review, later.
   - >
     Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the
@@ -113,6 +112,6 @@ resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the project check and the drift check
      (this repository and ~/dev/dts-handbook).
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T19 above all) and the entries of the current step (2.1) and the next (2.2); and the rebuild
-     plan's Current position (9u and 9w waiting).
-  3. Then next_action: step 2.1b-2b.
+     (T17-T19 above all) and the entries of the current step (2.1) and the next (2.2); and the
+     rebuild plan's Current position (9u waiting).
+  3. Then next_action: step 2.1b-3.
