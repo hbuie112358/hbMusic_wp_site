@@ -243,9 +243,9 @@ run_dependency_checks() {
 
 run_rule_checks() {
   run_check "WordPress Coding Standards (the dev site's must-use plugins)" in_tools_php_check \
-    php vendor/bin/phpcs --standard=tools/php-check/phpcs.xml.dist
+    php "$PHPCS_ENTRY" --standard=tools/php-check/phpcs.xml.dist
   run_check "Static analysis (the dev site's must-use plugins)" in_tools_php_check \
-    php vendor/bin/phpstan analyse -c tools/php-check/phpstan.neon.dist --no-progress --memory-limit=1G
+    php "$PHPSTAN_ENTRY" analyse -c tools/php-check/phpstan.neon.dist --no-progress --memory-limit=1G
   run_check "Every script in bin/ can be run" scripts_can_be_run
   run_check "site.json's fields are explained" site_json_fields_explained
   run_check "The site.json checks refuse bad examples" site_json_checks_refuse_bad_examples

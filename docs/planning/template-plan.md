@@ -64,7 +64,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   in two parts: **2.1b-3a done** (#113, `f3f4bf0`, 2026-11-24: `bin/check` split into the site's
   checks, the site's own in `tests/checks/` and the tools' self-check
   `tests/tools/check-tools.sh`, shared runner `tools/check-lib.sh`; the dev mu-plugin renamed
-  `dev-site-services.php` with its own PHP checker settings in `tools/php-check/`); **next:
+  `dev-site-services.php` with its own PHP checker settings in `tools/php-check/`); **2.1b-3a-2
+  done** (found while drafting 3b's `composer.json`, 2026-11-24: the checks start PHPCS and
+  PHPStan by their packages' own files, `PHPCS_ENTRY` and `PHPSTAN_ENTRY` in
+  `tools/check-lib.sh`, since a site's `bin-dir: bin` leaves `vendor/bin/` empty); **next:
   2.1b-3b** the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
   the changelog also names any change to what `bin/check` provides a site's own checks). Each
@@ -857,11 +860,17 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   tools' self-check and a site's own extra checks, the mu-plugin renamed (every earlier check
   still run, compared by name; three planted faults, one per part, each failing in its part; the
   self-check passing on a copy of the tools alone, which found `bin/dev-site` telling ShellCheck
-  to follow the site's `tests/dev-setup.sh`, now the site's ShellCheck's); `[ ]` 2.1b-3b the
+  to follow the site's `tests/dev-setup.sh`, now the site's ShellCheck's); `[x]` 2.1b-3a-2 the
+  PHP checkers started by their packages' own files, not `vendor/bin/` (a scratch install with
+  the bin folder set to `bin/` left no `vendor/bin/`; the old path failed there, the new ones
+  worked); `[ ]` 2.1b-3b the
   repository, its checks, settings and `v0.1.0`); `[ ]` 2.1c the reusable workflows, called pinned by commit; `[ ]` 2.1d this site
   switched over (found in 2.1b-2b: `.env`'s `COMPOSE_FILE`, written from `.env.example`, names
   `compose.dev.yaml` relative to the site's repository, so hand-typed `docker compose` commands
-  need its new place there). (T16: `bin/detach`
+  need its new place there; found in 2.1b-3a-2: Composer reads `allow-plugins` only from the
+  top-level `composer.json`, so the site's own must allow
+  `dealerdirect/phpcodesniffer-composer-installer`, the plugin that registers the WordPress
+  standards with PHPCS; what Composer does without it is seen at 2.1d). (T16: `bin/detach`
   and its release check are built at the first real handover, not here; T6, 2026-11-21, had kept
   them so detaching is real.) As each tool moves, Claude checks whether it is still needed
   outside this one repository (for example `bin/check`'s seven starter rules, the versions check's

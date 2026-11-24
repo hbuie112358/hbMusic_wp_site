@@ -80,5 +80,5 @@ run_check "Starter: theme.json schema matches WordPress" starter_theme_json_sche
 run_check "Starter: defines every design token used" starter_defines_every_token
 run_check "Starter: holds exactly the site layer" starter_holds_the_site_layer
 run_check "Starter: names nothing of this site" starter_names_nothing_of_this_site
-run_check "Starter: WordPress Coding Standards (PHPCS)" in_starter_analysis php vendor/bin/phpcs starter
-run_check "Starter: static analysis (PHPStan)" in_starter_analysis php vendor/bin/phpstan analyse --no-progress --memory-limit=1G starter/theme
+run_check "Starter: WordPress Coding Standards (PHPCS)" in_starter_analysis php "$PHPCS_ENTRY" starter
+run_check "Starter: static analysis (PHPStan)" in_starter_analysis php "$PHPSTAN_ENTRY" analyse --no-progress --memory-limit=1G starter/theme
