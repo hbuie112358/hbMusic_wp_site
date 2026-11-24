@@ -1,7 +1,9 @@
 {
-  // Type checking for the theme's browser scripts (plan D29), run by bin/check with the TypeScript
-  // compiler the browser tests already install, so no new tool: the scripts are plain JavaScript,
-  // run as they are, and their JSDoc comments carry the types. Strictness as for the tests.
+  // Type checking for the theme's browser scripts (plan D29, template plan 1.7), run by bin/check
+  // with this folder's own TypeScript (package.json): typescript-eslint, which ESLint uses here,
+  // supports TypeScript only up to 6.0, while the browser tests run TypeScript 7. The scripts are
+  // plain JavaScript, run as they are, and their JSDoc comments carry the types. The compiler
+  // settings are those ~/.claude/TYPESCRIPT_STANDARDS.md requires (constraint 13).
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
@@ -9,6 +11,8 @@
     "checkJs": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "types": [],
     "noEmit": true,

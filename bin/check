@@ -420,16 +420,26 @@ typescript_check() {
     "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p tsconfig.json'
 }
 
-# Type-checks the theme's browser scripts (plan D29) with the compiler installed for the browser
-# tests (tools/js-check/tsconfig.json): no new tool for one small script. The container sees the
-# scripts and the settings read-only.
+# Type-checks the theme's browser scripts (plan D29), then lints them with ESLint (template plan
+# 1.7), both with tools/js-check's own packages: typescript-eslint supports TypeScript only up to
+# 6.0, the browser tests run 7. The checker's folder is writable for npm's node_modules (ignored by
+# git); the scripts are read-only and mounted outside it, as for the CSS linter.
 theme_scripts_check() {
-  docker run --rm -w /e2e \
-    -v "$REPO_ROOT/tests/e2e:/e2e" \
+  in_js_check 'npx --no-install tsc -p tsconfig.json'
+}
+
+# ESLint checks only files under its configuration's base path, which with --config is the folder
+# it runs in: so it runs from /, where the scripts' /theme-js is below it.
+theme_scripts_lint() {
+  in_js_check 'cd / && /js-check/node_modules/.bin/eslint --config /js-check/eslint.config.mjs --max-warnings 0 /theme-js'
+}
+
+in_js_check() {
+  docker run --rm -w /js-check \
+    -v "$REPO_ROOT/tools/js-check:/js-check" \
     -v "$SITE_THEME_DIR/assets/js:/theme-js:ro" \
-    -v "$REPO_ROOT/tools/js-check:/js-check:ro" \
     -v "$NPM_CACHE_VOLUME:/root/.npm" \
-    "$PLAYWRIGHT_IMAGE" sh -c 'npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && npx --no-install tsc -p /js-check/tsconfig.json'
+    "$PLAYWRIGHT_IMAGE" sh -c "npm ci --ignore-scripts --no-audit --no-fund --loglevel=error && $1"
 }
 
 # The Playwright image and the @playwright/test package must be the same version, or the
@@ -578,8 +588,8 @@ components_shown_on_example_pages() {
   return "$missing"
 }
 
-# Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint); the
-# container sees only the two files.
+# Known vulnerabilities in an npm package's locked dependencies (tests/e2e, tools/css-lint,
+# tools/js-check); the container sees only the two files.
 # Every advisory npm knows for a package folder's locked packages fails the check, except those
 # accepted in the folder's audit-exceptions.json: each names one advisory, with its reason and a
 # review-by date, after which it fails again. An exception whose advisory npm no longer reports
@@ -716,6 +726,7 @@ run_dependency_checks() {
   run_check "Site packages: downloads come from WordPress.org" site_packages_downloads_from_wordpress_org
   run_check "npm security audit (browser tests)" npm_audit tests/e2e
   run_check "npm security audit (CSS linter)" npm_audit tools/css-lint
+  run_check "npm security audit (the scripts' checker)" npm_audit tools/js-check
 }
 
 # The coding standards (the theme's ruleset, then each of the site's own plugins with its own),
@@ -764,6 +775,7 @@ run_analysis_and_file_checks() {
   run_check "Components appear on the example pages" components_shown_on_example_pages
   run_check "TypeScript (browser tests)" typescript_check
   run_check "Type check (the theme's scripts)" theme_scripts_check
+  run_check "ESLint (the theme's scripts)" theme_scripts_lint
   run_check "CSS (Stylelint)" css_lint
   run_check "Shell scripts (ShellCheck)" shellcheck_scripts
   run_check "GitHub workflows (actionlint)" actionlint_workflows
