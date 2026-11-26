@@ -249,16 +249,22 @@ theme and the plugins); test code means the tests and the tools that check the c
   the user's yes for that push.
   *Why:* the user wants to commit freely and decide separately what goes public, without
   having to remember when to push.
-- **Commit messages carry the description; pull requests take it from them.** Each commit
-  message has a subject line and a body saying what changed and why, and ends with
-  `Co-Authored-By: Claude …`. A pull request's title and description come from its commits
-  (`gh pr create --fill`, or `--fill-verbose` for several commits), with no separately written
-  text and no "Generated with Claude Code" line.
-  *Why:* one text cannot drift from another; the commits credit both the user (author) and
-  Claude (co-author), so a pull request line crediting only Claude would misstate the work.
+- **The pull request carries the story's message; it becomes the squash commit on `main`.**
+  Pull requests merge by squash (the global `WORKING_STYLE.md`, since 2026-11-26; rebase
+  before). The pull request's title and description are the squash commit's subject and body,
+  written as that rule says and approved by the user before the push, ending with
+  `Co-Authored-By: Claude …` and with no "Generated with Claude Code" line; the merge passes the
+  same text (`gh pr merge --squash --subject … --body-file -`). Commits on the branch are working
+  notes, short, in the Conventional Commits form, with the same `Co-Authored-By` line.
+  *Why:* the squash commit credits both the user (author) and Claude (co-author), so a pull
+  request line crediting only Claude would misstate the work; one approved text is both the
+  pull request's and `main`'s, so the two cannot drift.
   Exception: Dependabot's update commits keep the messages Dependabot writes
   (`.github/dependabot.yml` shapes their subject line); they are neither the user's nor Claude's
-  work.
+  work. The tools' plugin-updates workflow merges them by rebase for now (a single commit, so
+  `main` gets the same one commit); a squash keeps their message too, since the repository's
+  default squash message for a single commit is that commit's own title and message (GitHub's
+  setting "commit or pull request title" with "commit messages", read 2026-11-26).
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the

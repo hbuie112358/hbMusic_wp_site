@@ -77,11 +77,26 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   checks passed; `main`'s protection requires `check / check` and `check / dev-site`; the
   starter's tests passed with the installed tools); part 8, the release, step 1 done (tools #3
   merged, the tools' `main` at `18ef4c0`); step 2 done (2026-11-26: `v0.2.0` tagged on `18ef4c0`,
-  annotated like `v0.1.0`, and pushed); step 3 under way (this site repinned to `0.2.0`, the
-  lock changing only the tools' entry, the callers rewritten by `bin/tools-pin`, `bin/check` 39
-  of 39). **Next:** the rest of step 3 (#116 merged, #97 closed) and step 4 (the user's
-  `bin/deploy staging` showing no change); each step one at a time, stopping after each (the
-  user, 2026-11-24).
+  annotated like `v0.1.0`, and pushed); step 3 done (this site repinned to `0.2.0`, `cf997d9`;
+  #116 merged; #97 closed by Dependabot itself, its group gone); step 4 done (the user's
+  `bin/deploy staging` of `ea87e75`, which also carried #117's Simple History 5.37.0: every page
+  passed, no new PHP log lines; the site's own folders unchanged in content, their counts only
+  new file dates). **So 2.1d is done,** the first milestone. Live still runs `4989781`.
+  **Next, before 2.2: 2.1e, the deploy's messages** (a tools release, then a repin here; the
+  user, 2026-11-26): the tested-commit line says the commit is the pull request squash-merged
+  (or rebase-merged) on GitHub and why the two names hold the same files; the per-folder change
+  counts, which count date-only differences, are replaced by the plain list of files that
+  change, shown before the `yes`; the commit list shortened or dropped. Open for the user: rsync's
+  file list (from a dry run of the copy: every file, the downloaded plugins' too, and the
+  server's own differences) or git's (`--name-only`, which shows a plugin update only as
+  `site-packages/composer.lock`), Claude recommending rsync's; the commit list dropped or one
+  line. Also in 2.1e: the plugin-updates workflow's `--rebase` to `--squash`. Found at 2.1d
+  step 3, for 2.1e or the tools' README: a clone that switches from a commit with the old
+  committed `bin/` loses Composer's commands (the reinstall `composer reinstall
+  dts/site-tools` restores them); the tools ship `bin/tools-update` but their `composer.json`
+  does not list it, so it is never installed (deliberate or missed, not checked).
+  **Pull requests merge by squash from now on** (the global `WORKING_STYLE.md`, the user,
+  2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
