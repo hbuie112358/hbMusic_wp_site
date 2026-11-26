@@ -4,9 +4,9 @@
 	xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
 	<description>The project's PHP follows the WordPress Coding Standards (plan step 3d).</description>
 
-	<!-- The project's own PHP. Plugins are checked by their own rulesets (plugins/*/phpcs.xml.dist),
-	     with their own prefixes, so a shared plugin never depends on this site's names; the tools'
-	     dev-site must-use plugins by the tools' self-check (tools/php-check/). -->
+	<!-- The project's own PHP. DTS's plugins are checked in their own repositories
+	     (bin/plugin-check), with their own prefixes, so a shared plugin never depends on this site's
+	     names; the tools' dev-site must-use plugins by the tools' self-check (tools/php-check/). -->
 	<file>themes</file>
 	<!-- The starter's site layer (template plan 1.6b), which uses the theme code's prefix, is checked
 	     with these rules by its own check (tests/checks/starter.sh), naming the folder. -->

@@ -2,7 +2,7 @@
 	"slug": "hbmusic",
 	"devSiteTitle": "Howard Buie Music (dev)",
 	"theme": "hbmusic-child",
-	"localPlugins": ["site-hardening", "editing-help"],
+	"localPlugins": [],
 	"testPages": [
 		{ "title": "Home", "address": "home", "pageTemplate": "page-no-title-with-call-to-action", "isFrontPage": true },
 		{ "title": "Music", "address": "music", "pageTemplate": "page-with-call-to-action" },

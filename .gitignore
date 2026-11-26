@@ -23,10 +23,6 @@
 !/themes/
 /themes/*
 !/themes/hbmusic-child/
-!/plugins/
-/plugins/*
-!/plugins/site-hardening/
-!/plugins/editing-help/
 # The project's subagents only, so a change to one shows in the history (AI_SECURITY.md, 1);
 # the personal settings beside them (settings.local.json) stay out.
 !/.claude/

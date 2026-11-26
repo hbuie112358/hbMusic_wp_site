@@ -70,14 +70,18 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   text domain `song-list`. A change to it is made in its repository (locally
   `~/dev/dts-song-list`) and reaches this site by a new tag and a raised pin, never by editing
   `site-packages/`.
-- `plugins/site-hardening/`: the Site Hardening plugin (plan D26): the security headers and
-  other hardening. It names nothing of this site, so it can be shared; the policy's outside
-  sources come from the child theme's `includes/site-facts.php`, each with its reason. Prefix
-  `sitehardening`, text domain `site-hardening`.
-- `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way: the
-  content guide in the admin, fed by the child theme through the plugin's filters. Prefix
-  `editinghelp`, text domain `editing-help`. The guide's text is also kept in the handbook
-  (`customer/content-guide.md`), with the same version number; a change goes into both.
+- Site Hardening (plan D26) and Editing Help (handbook H89): not in this repository since
+  template plan 2.2c; their own repositories `direct-technical-solutions/dts-site-hardening` and
+  `dts-editing-help`, installed by Composer from `site-packages/composer.lock` at their release
+  tags (`dts/site-hardening`, `dts/editing-help`). Site Hardening: the security headers and other
+  hardening, the policy's outside sources from the child theme's `includes/site-facts.php`, each
+  with its reason; prefix `sitehardening`, text domain `site-hardening`. Editing Help: the
+  content guide in the admin, fed by the child theme through the plugin's filters; prefix
+  `editinghelp`, text domain `editing-help`; the guide's text is also kept in the handbook
+  (`customer/content-guide.md`), with the same version number, and a change goes into both. A
+  change to either is made in its repository (locally `~/dev/dts-site-hardening`,
+  `~/dev/dts-editing-help`) and reaches this site by a new tag and a raised pin, never by
+  editing `site-packages/`.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
   wording and import file, and the photos.
 - `docs/planning/template-plan.md`: the active plan since 2026-11-20 (rolling-wave mode), the
@@ -261,7 +265,7 @@ tests and the tools that check the code.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
-  local scripts, `themes/hbmusic-child/` and the site's own plugins in `plugins/`). A new path is versioned only by adding it to the
+  local scripts and `themes/hbmusic-child/`). A new path is versioned only by adding it to the
   allow-list, with the user's approval.
   *Why:* `wordpress/`, `db/` and `backups/` hold credentials (`wp-config.php`), database dumps
   with user accounts and emails, and the former host's account identifiers.

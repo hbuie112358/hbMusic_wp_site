@@ -58,8 +58,8 @@ is "Howard Buie Music". Staging has no monitor: its site-wide password would fai
 ## Plugins and theme
 
 - **Delivered by `bin/deploy`** (pinned in `site-packages/composer.json`): Contact Form 7, Yoast
-  SEO, Simple History; and the site's own plugins (Song List, Site Hardening, Editing Help) and
-  child theme.
+  SEO, Simple History; DTS's plugins (Song List, Site Hardening, Editing Help, each from its own
+  repository by release tag); and the site's own child theme.
 - **Updated by hand, staging first:** WordPress, Twenty Twenty-Five (tested by the dev site when
   it matches `PARENT_THEME_VERSION` in the tools' `tools/versions.sh`, in `dts-site-tools`),
   Wordfence, FluentSMTP.

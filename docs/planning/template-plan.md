@@ -101,8 +101,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `1ffdbf7`, pushed, unmerged), `dts-song-list` released as `v0.2.1`; this site switched to it on
   `feat/song-list-from-dts` (`f73cf01`, local), proven by `bin/dev-site`, `bin/check` and the
   specs. **Now: 2.2c,** together (T27): steps 1 and 2 done, `dts-editing-help` `v0.1.1` on
-  `da3f399` and `dts-site-hardening` `v0.3.0` on `990361e`, each `main` protected; **next:**
-  step 3, this site switched to both on the same branch (the 2.2 entry), then the tools' pull
+  `da3f399` and `dts-site-hardening` `v0.3.0` on `990361e`, each `main` protected; step 3 built
+  and proven, uncommitted, with two tools fixes for 0.4.0 (the 2.2 entry; the starter broken
+  until 2.2d); **next:** the review gate and commits in both repositories, then the tools' pull
   request and `0.4.0`, this branch repinned to it before its own pull request. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
@@ -1065,10 +1066,24 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   plugin's files unchanged from `0903c1e` with the standard files; `bin/plugin-check --tag` 9 of
   9 for each with nothing to fix, `check / check` passing on GitHub (the button's run and the
   tag's), `main` protected, **`dts-editing-help` `v0.1.1` (`da3f399`) and `dts-site-hardening`
-  `v0.3.0` (`990361e`) tagged and pushed**; next: step 3, this site requiring both in
-  `site-packages/`, `plugins/editing-help/` and `plugins/site-hardening/` removed with their
-  allow-list lines and `localPlugins` entries, the wording elsewhere shown to the user first,
-  then `bin/check`, `bin/dev-site`, Site Hardening's scenario check and both plugins' specs; `[ ]` 2.2d the
+  `v0.3.0` (`990361e`) tagged and pushed**; step 3 built 2026-11-26, uncommitted: this site
+  requires both in `site-packages/` (locked at `da3f399` and `990361e`, each code file identical
+  to the removed folder, the same four release files added and `phpcs.xml.dist` left out as for
+  Song List), `plugins/` gone with its allow-list lines, `localPlugins` empty, `plugins` out of
+  `phpstan.neon.dist`, the wording approved by the user (the project's `CLAUDE.md`, records,
+  routines, the PHPCS comment; the status sheet's 6.8, found by its own check). Two gaps found
+  in the tools and fixed on `feat/dts-plugins` for 0.4.0 (the user, 2026-11-26): `bin/check`
+  mounted `plugins/` unconditionally, so Docker would create it owned by root, the names check
+  would read nothing and the "Update URI" check fail on the bare pattern (now
+  `site_plugins_mount_arguments` and `site_plugin_folders`, `tests/tools/site-plugins/`); and
+  the debug log rule counted only `localPlugins` as the site's own code, so since 2.2b a notice
+  from a DTS plugin was only shown (now `own_code_places` adds every `dts/*` plugin in
+  `site-packages/composer.lock`, two new sample lines and a no-lock case). Each new test shown
+  failing on a planted fault; the self-check 33 of 33; with the uncommitted tools against this
+  site, `bin/check` 36 of 36 (no `plugins/` created), `bin/dev-site` passing, Site Hardening's
+  scenario check and the final debug log check passing, Editing Help's and Site Hardening's specs
+  10 of 10. **The starter is broken until 2.2d** (accepted under T21): its `site.json` still
+  lists the two plugins as `localPlugins`, borrowed from this repository's `plugins/`; `[ ]` 2.2d the
   starter switched over, the milestone proof and the deploys. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
   plugin at its listed version; then each plugin's move is small. Checked by Composer's lock file,
   which records each release's exact commit (DTS's plugins have no published fingerprints like
