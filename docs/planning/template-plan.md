@@ -89,9 +89,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `0.3.0`, #120, `fd7f8d2`; this repository squash only); part 5 shown on staging (the user's
   deploy of `fd7f8d2`, every list "none", correctly). The user found the messages still hard to
   read, so part 6, **release 0.3.1** (T24), was built and released (tools #6, `1837f6c`,
-  `v0.3.1`, 2026-11-26) and this site repinned on `build/tools-0.3.1`; **next:** that pull
-  request, then a deploy (staging, then live, when the user chooses) shows the new layout; then
-  2.2. **Pull requests merge by squash**
+  `v0.3.1`, 2026-11-26) and this site repinned (#121, `0903c1e`); **next:** the user's deploy
+  of `0903c1e` to staging, then live, shows the new layout (the first run of Hostinger's own rsync
+  with `--out-format`); then 2.2. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -1004,8 +1004,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   server rsync marks a file sent with `<`, the local stand-in with `>`. Left as LOW from the
   review: the "only the lock file's other entries" pins line untested; an unreadable old lock
   reads as no pins; `bin/site-check`'s lines flush left between the indented ones; an
-  interrupted folder's partial list not shown. This site repinned on `build/tools-0.3.1`
-  (`bin/check` 39 of 39); next, live's deploy shows the new layout.
+  interrupted folder's partial list not shown. This site repinned (#121, `0903c1e`, both
+  required checks passed; `bin/check` 39 of 39 locally); next, the user's deploys of `0903c1e`
+  to staging and live show the new layout.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's
   plugin for any site that wants it, T16): each released by a Git tag, this site requiring them
   through Composer. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
