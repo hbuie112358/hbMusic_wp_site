@@ -83,8 +83,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   passed, no new PHP log lines; the site's own folders unchanged in content, their counts only
   new file dates). **So 2.1d is done,** the first milestone. Live still runs `4989781`.
   **Next, before 2.2: 2.1e, the deploy's messages,** designed 2026-11-26 (T23, its step entry);
-  first its proof on the deploy test's throwaway server, then the build in `dts-site-tools`, a
-  release `v0.3.0`, the repin here. **Pull requests merge by squash from now on** (the global
+  its proof on the deploy test's throwaway server done (2026-11-26, every check passed,
+  `findings/step-2.1e-1-proof.md`); part 2, the build, committed in `dts-site-tools`
+  (`ccd3b7e`, branch `feat/deploy-messages`, not pushed); **next: part 3** on the same branch,
+  then a release `v0.3.0`, the repin here. **Pull requests merge by squash from now on** (the global
   `WORKING_STYLE.md`, the user, 2026-11-26); rebase stays allowed in this repository until 2.1e
   moves the plugin-updates workflow to squash.
   2.1b-3b was
@@ -958,11 +960,18 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 - [ ] **2.1e The deploy's messages** (T23, the user, 2026-11-26), before 2.2, whose plugin move
   is the deploy where "nothing else changes" matters most. In order: (1) the proof on the deploy
   test's throwaway server (dry run and real run list the same files; no unchanged file listed
-  without `-t`), reported to the user before building; (2) the build in `dts-site-tools` on a
+  without `-t`), reported to the user before building; **done 2026-11-26, every check passed**
+  (`findings/step-2.1e-1-proof.md`); (2) the build in `dts-site-tools` on a
   branch, its deploy test scenarios covering each section (git changes and none, no note, a hand
   edit on the server shown by rsync alone with the one-line notice, the real copy matching the
   preview, the proof dry run failing on a planted difference), each shown failing on a planted
-  fault; (3) the plugin-updates workflow to squash, the README's `bin/` trap, `bin/tools-update`
+  fault; **committed 2026-11-26** in `dts-site-tools` as `ccd3b7e` on `feat/deploy-messages`,
+  not pushed (57 stand-in scenarios and 6 real-server ones passing, the self-check passing; the
+  stand-in now runs the real rsync between local folders, so whether GitHub's runner has rsync is
+  shown by the branch's first run; found and fixed on the way: Ctrl+C's message would have gone
+  into the copy's error file; left as LOW from the review: unusual file names quoted differently by
+  git and rsync, the proof's refusal reusing the "mix" sentence, no rename scenario, the note's
+  text shown raw); (3) the plugin-updates workflow to squash, the README's `bin/` trap, `bin/tools-update`
   settled; the tools' Dependabot #1 (PHPStan 2.3.5 to 2.3.6, this site's closed #97) and #2
   (`@stylistic/stylelint-plugin` 6.0.0 to 6.0.1, this site's #56, closed 2026-11-26 pointing
   there) reviewed by hand, lock files line by line (T9), the user deciding each; (4) `v0.3.0`
