@@ -261,10 +261,10 @@ theme and the plugins); test code means the tests and the tools that check the c
   pull request's and `main`'s, so the two cannot drift.
   Exception: Dependabot's update commits keep the messages Dependabot writes
   (`.github/dependabot.yml` shapes their subject line); they are neither the user's nor Claude's
-  work. The tools' plugin-updates workflow merges them by rebase for now (a single commit, so
-  `main` gets the same one commit); a squash keeps their message too, since the repository's
-  default squash message for a single commit is that commit's own title and message (GitHub's
-  setting "commit or pull request title" with "commit messages", read 2026-11-26).
+  work. The tools' plugin-updates workflow merges them by squash (since tools 0.3.0), passing
+  Dependabot's own commit message explicitly, so `main` gets that one commit's message whatever
+  the repository's default squash message is; a pull request with more than one commit waits
+  for the user.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the

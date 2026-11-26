@@ -84,11 +84,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   new file dates). **So 2.1d is done,** the first milestone. Live still runs `4989781`.
   **Next, before 2.2: 2.1e, the deploy's messages,** designed 2026-11-26 (T23, its step entry);
   its proof on the deploy test's throwaway server done (2026-11-26, every check passed,
-  `findings/step-2.1e-1-proof.md`); part 2, the build, committed in `dts-site-tools`
-  (`ccd3b7e`, branch `feat/deploy-messages`, not pushed); **next: part 3** on the same branch,
-  then a release `v0.3.0`, the repin here. **Pull requests merge by squash from now on** (the global
-  `WORKING_STYLE.md`, the user, 2026-11-26); rebase stays allowed in this repository until 2.1e
-  moves the plugin-updates workflow to squash.
+  `findings/step-2.1e-1-proof.md`); parts 2 and 3 merged in `dts-site-tools` (#4, `536700b`),
+  with its Dependabot #1 and #2; `v0.3.0` tagged on `2d7492c` (#5); part 4 under way: this site
+  repinned to `0.3.0` on `build/tools-0.3.0`, then this repository set to squash only; **next:
+  part 5**, the user's next deploy showing the new messages. **Pull requests merge by squash**
+  (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
   `CHANGELOG.md`, its `check` workflow, branch and tag rulesets, `v0.1.0`; from the 3a review:
@@ -974,10 +974,19 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   text shown raw); (3) the plugin-updates workflow to squash, the README's `bin/` trap, `bin/tools-update`
   settled; the tools' Dependabot #1 (PHPStan 2.3.5 to 2.3.6, this site's closed #97) and #2
   (`@stylistic/stylelint-plugin` 6.0.0 to 6.0.1, this site's #56, closed 2026-11-26 pointing
-  there) reviewed by hand, lock files line by line (T9), the user deciding each; (4) `v0.3.0`
-  tagged after the user's yes, this site repinned (`bin/tools-pin`,
-  `bin/check`), then this repository set to squash merges only; (5) the user's next deploy shows
-  the new messages.
+  there) reviewed by hand, lock files line by line (T9), the user deciding each; **done
+  2026-11-26:** the workflow squashes, passing Dependabot's own message, bound to the checked
+  head, a pull request of more than one commit waiting; `bin/tools-update` kept and fixed rather
+  than removed (the user asked to look back: it is the safe way to update what Dependabot is told
+  to leave alone, Playwright above all; it had refused in the tools' repository, which has no
+  `site.json`), with its own test; the tools' repository set to squash only; #1 and #2 merged
+  (Dependabot ignored `@dependabot rebase` on #2, cause not known; GitHub's branch update used
+  instead, harmless where nothing merges itself); #4 squash-merged as `536700b`, its `check`
+  passing on GitHub, so the runner has rsync; (4) `v0.3.0` tagged after the user's yes, this
+  site repinned (`bin/tools-pin`, `bin/check`), then this repository set to squash merges only;
+  **`v0.3.0` tagged 2026-11-26** on `2d7492c` (#5); this site repinned on `build/tools-0.3.0`
+  (the lock changing only the tools and PHPStan 2.3.6; `bin/check` 39 of 39); (5) the user's next
+  deploy shows the new messages.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's
   plugin for any site that wants it, T16): each released by a Git tag, this site requiring them
   through Composer. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
