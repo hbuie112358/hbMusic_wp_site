@@ -963,7 +963,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   edit on the server shown by rsync alone with the one-line notice, the real copy matching the
   preview, the proof dry run failing on a planted difference), each shown failing on a planted
   fault; (3) the plugin-updates workflow to squash, the README's `bin/` trap, `bin/tools-update`
-  settled; (4) `v0.3.0` tagged after the user's yes, this site repinned (`bin/tools-pin`,
+  settled; the tools' Dependabot #1 (PHPStan 2.3.5 to 2.3.6, this site's closed #97) and #2
+  (`@stylistic/stylelint-plugin` 6.0.0 to 6.0.1, this site's #56, closed 2026-11-26 pointing
+  there) reviewed by hand, lock files line by line (T9), the user deciding each; (4) `v0.3.0`
+  tagged after the user's yes, this site repinned (`bin/tools-pin`,
   `bin/check`), then this repository set to squash merges only; (5) the user's next deploy shows
   the new messages.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's

@@ -4,82 +4,78 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-24T15:45:00-05:00
-current_branch: feat/use-site-tools
-last_commit: 82eed0a
+timestamp: 2026-11-26T07:52:00-05:00
+current_branch: chore/pause-2026-11-26
+last_commit: 2166fe9
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-24 (tenth session). Template 2.1d, this site switched to dts-site-tools, parts 1-7 done
-  and part 8 step 1. This site installs the tools through Composer (vendor/dts/site-tools/, its
-  commands in bin/, both ignored), local copies removed, the three workflows generated callers,
-  Dependabot down to the tools and the plugins, the project's CLAUDE.md and documents updated
-  (the status sheet's test paths left for 2.2). Found and fixed in the tools: bin/tools-pin not
-  installed (composer.json's bin), .env's COMPOSE_FILE, the deploy tests leaking
-  COMPOSER_RUNTIME_BIN_DIR; bin/deploy requires "check / check" and "check / dev-site", the
-  names GitHub gives called jobs. #116 open, both checks passed; main's branch protection set to
-  the new names (the user's yes). Starter's tests passed. Tools #3 merged by rebase, tools main
-  at 18ef4c0. The user asked for part 8 one step at a time, stopping after each, to save the
-  usage allowance.
+  2026-11-26 (eleventh session). Template 2.1d done, the first milestone of stage 2: dts-site-tools
+  v0.2.0 tagged (annotated, on 18ef4c0) and pushed; this site repinned to 0.2.0 (cf997d9, #116
+  merged); #97 closed by Dependabot itself; the user's bin/deploy staging of ea87e75 (also
+  #117's Simple History 5.37.0) passed every page with no new PHP log lines. The deploy's
+  output was found misleading (date-only differences counted as changes), and 2.1e was designed
+  with the user (T23, #119, 2166fe9). Pull requests now merge by squash (the global
+  WORKING_STYLE.md and the project's CLAUDE.md, #118, e5ff0af); GitHub's plain merge commits
+  switched off, rebase still allowed until 2.1e. #56 closed, its update continuing as the
+  tools' #2. Found: switching from a commit with the old committed bin/ deletes Composer's
+  commands (composer reinstall dts/site-tools restores them); bin/tools-update not installed.
 
 next_action: >
-  Template plan 2.1d part 8, step 2: tag v0.2.0 on dts-site-tools' 18ef4c0 and push the tag
-  (git -C ~/dev/dts-site-tools tag v0.2.0 18ef4c0 && git -C ~/dev/dts-site-tools push origin
-  v0.2.0), then stop. Step 3, after the user's yes: here, composer.json "dts/site-tools":
-  "0.2.0", the lock resolved in a scratch folder (the composer container cannot write beside
-  read-only mounts; run without -u), the README's install command, bin/tools-pin, bin/check,
-  commit, push #116, wait for its checks, merge by rebase, update local main, delete the local
-  branches feat/use-site-tools and chore/pause-2026-11-24f once their changes are in main; close
-  Dependabot's #97 with a comment (the PHP checkers' updates now belong in dts-site-tools). Step
-  4: the user runs bin/deploy staging, expecting no file changes. Each step proposed and stopped
-  after.
+  Template plan 2.1e part 1: the proof on the deploy test's throwaway server, that rsync's dry
+  run and real run list the same files, and that without -t no unchanged file is listed;
+  reported to the user before anything is built. First read 2.1e's step entry and T23. Pull
+  main before making any branch.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "#116 at 82eed0a: check / check and check / dev-site passed on GitHub 2026-11-24. bin/check 39 of 39 locally with the installed tools. dts-site-tools self-check 30 of 30; its #3 check passed. Starter (SITE_DIR=starter): 17 scenarios and 168 browser tests passed 2026-11-24."
-  tools: "this site requires dts/site-tools at dev-feat/site-workflows, the lock at 4fc7b84 (pre-merge name of the tools' 8d5ce80); the remote branch is deleted, so a composer update before the repin to 0.2.0 would fail; composer install from the lock still works (GitHub keeps the commit while #116 references it is unverified)"
-  branch_protection: main requires "check / check" and "check / dev-site" (GitHub Actions), strict; changed 2026-11-24 with the user's yes
-  deployed: by bin/deploy from the user's computer only; staging and live run 4989781 (2026-11-24, the user); nothing since changes what visitors get
-  local_dev_sites: this site's dev site running on 10102 (hbmusic-dev), built from the installed tools; the starter's (dts-starter-dev) stopped, its data kept
-  env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml (changed with the user's yes)"
-  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.36.0 and Yoast SEO 28.9 (site-packages/composer.lock)
+  checks: "#119 at its last commit: check / check and check / dev-site passed on GitHub 2026-11-26. bin/check 39 of 39 locally with v0.2.0 installed (2026-11-26). Starter's tests last run 2026-11-24 with the tools at 4fc7b84, which differs from v0.2.0 only in CHANGELOG.md and README.md."
+  tools: "this site requires dts/site-tools 0.2.0, composer.lock at 18ef4c0 (tag v0.2.0, annotated, object edb7053); the three callers pinned to 18ef4c0 by bin/tools-pin"
+  branch_protection: main requires "check / check" and "check / dev-site" (GitHub Actions), strict
+  merge_settings: "this repository allows squash and rebase merges, not plain merge commits (2026-11-26, the user); rebase goes at 2.1e once the plugin-updates workflow squashes; default squash message: commit or pull request title, commit messages"
+  deployed: by bin/deploy from the user's computer only; staging runs ea87e75 (2026-11-26, the user); live runs 4989781 (deploying ea87e75 or later brings only Simple History 5.37.0)
+  local_dev_sites: this site's dev site (hbmusic-dev) as left on 2026-11-24, not checked this session; the starter's (dts-starter-dev) stopped, its data kept
+  env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
+  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.37.0 and Yoast SEO 28.9 (site-packages/composer.lock)
 
 uncommitted_changes:
   - file: none in this repository besides this commit's files
     why: >
-      feat/use-site-tools has 4 commits not on origin/main (the pause of 2026-11-24f, 7169290,
-      82eed0a, and this pause, unpushed); #116 holds the first three. Local branch
-      chore/pause-2026-11-24f (1 commit, 3c61b82, also in feat/use-site-tools) is not on the
-      remote; delete it after #116 merges.
+      The pause commit (resume-state.yaml, the plan's 2.1e entry naming the tools' #1 and #2) is
+      on local branch chore/pause-2026-11-26, 1 commit, not pushed; it goes with the next pull
+      request, squashed into it. main is even with origin/main at 2166fe9; no other local
+      branches.
   - file: ~/dev/dts-site-tools (its own repository)
-    why: Clean, on main at 18ef4c0 even with origin; feat/site-workflows merged (#3) and deleted. No v0.2.0 tag yet.
+    why: Clean, on main at 18ef4c0, even with origin; tag v0.2.0 pushed. Open there, Dependabot's #1 (PHPStan) and #2 (stylelint plugin), for 2.1e.
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
-    why: time-log.csv (updated by this pause) and time-corrections.csv uncommitted.
+    why: WORKING_STYLE.md (squash merges, the user's yes 2026-11-26), time-log.csv (updated by this pause) and time-corrections.csv uncommitted.
 
 pending_decisions:
   - >
-    Template 2.1d part 8 steps 2-4, one at a time (next_action); and the plan's finding: the
-    parent theme's pinned version is in the tools' tools/versions.sh, so raising it takes a tools
-    release (for the user to decide whether it moves to site.json).
+    Template 2.1e (T23), in five parts, each proposed and stopped after; the tools' #1 and #2 for
+    the user to decide in its review. The plan's finding still open: the parent theme's pinned
+    version is in the tools' tools/versions.sh, so raising it takes a tools release (whether it
+    moves to site.json).
+  - When to deploy live (ea87e75 or later: Simple History 5.37.0 only, by git and the deploy's checksums).
   - >
     Left as LOW from the review of the tools' d01ba99: no automated test of the .env marker
     substitution; bin/dev-site does not warn when an existing .env's COMPOSE_FILE names a missing
     file.
   - >
     The handbook's follow-ups for the user: listed in the handbook's WORKING_DRAFT.md, "Open
-    items", not repeated here.
+    items", not repeated here. Whether squash merging becomes a handbook rule for every DTS
+    repository (the global rule already covers the user's own), proposed for approval later.
   - The template plan's open decisions (its Current position): the handbook's wording for T5 and T6; toolkit/github.md's trap on pinning reusable workflows (T17), its wording to propose.
-  - Dependabot's #56 (@stylistic/stylelint-plugin 6.0.1), now a dts-site-tools matter, and #97 (to close in step 3).
   - Dated: DMARC to p=quarantine around 2026-12-15, once Brevo's DMARC reports show only the expected senders.
   - Handbook proposals collected in the template plan (1.5d entries), each for the user's approval later.
   - Raising the dev site's WordPress from 7.1.4 to 7.1.5.
   - >
     The site's type: the rebuild plan's D32 (Content by customer) against the project's
     CLAUDE.md (Fully managed) and exception E2; for the user to decide.
-  - The rebuild plan's 9o (host restore test, E10); the template plan's two "worth raising" items.
+  - The rebuild plan's 9o (host restore test, E10); the template plan's two "worth raising" items (the first now covered by 2.1e).
   - Bringing the off-computer backup of data/ up to date.
   - Left from the review of #93: the Alpine check reads the x86_64 list only; a future Alpine build time would show a negative age.
   - For the user: Search Console, Request indexing for the Book page.
@@ -87,12 +83,12 @@ pending_decisions:
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T22, 2.1d's entry.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T23, the 2.1e entry.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - docs/planning/template-notes.md: what a new site sets differently, and what is generic.
-  - CLAUDE.md (the project's): where the tools now are (vendor/dts/site-tools/), commands, tests, rules.
+  - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
   - records/: the status sheet, exceptions, the expected plugin set, search.
-  - ~/dev/dts-site-tools: the tools' repository (main at 18ef4c0, CHANGELOG 0.2.0).
+  - ~/dev/dts-site-tools: the tools' repository (main at 18ef4c0, tag v0.2.0); bin/deploy there.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
@@ -100,5 +96,5 @@ resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository,
      ~/dev/dts-site-tools and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T18-T22 above all) and 2.1's entry (its 2.1d part) and 2.2's.
-  3. Then next_action: part 8 step 2, proposed and stopped after (the user's wish).
+     (T21-T23 above all) and the 2.1e and 2.2 entries.
+  3. Then next_action: 2.1e part 1, proposed and stopped after.
