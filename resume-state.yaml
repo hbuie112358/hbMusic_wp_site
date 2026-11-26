@@ -4,86 +4,99 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-26T11:55:00-05:00
+timestamp: 2026-11-26T12:33:57-05:00
 current_branch: chore/pause-2026-11-26c
-last_commit: 0903c1e
+last_commit: 528bad9
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-26 (fourteenth session). Template 2.1e part 6 done: dts-site-tools 0.3.1 (T24) built,
-  released and pinned here. bin/deploy now shows five sections (what goes out; the downloaded
-  plugins, with whether their pins changed since the place's commit, from the two commits'
-  composer.lock, and the plugins that match on one line; what rsync will change before "yes";
-  what rsync changed; after the copy), each a header with its time and source, lines indented;
-  one rsync list from --out-format='%i %o <folder path>/%n' under a scope line; git a one-line
-  cross-check ("git agrees (since X): files", or "only rsync:"/"only git:" per file); every
-  page's site-check line kept. Tests: the stand-in rsync takes --out-format; the runner gained
-  pinnedInA and expectOutputInOrder; scenarios 58 and 59 new; 59 stand-in, 6 real-server and the
-  self-check 31 of 31 passing; ten planted faults each caught. Found: to a real server rsync marks
-  a sent file "<", the local stand-in ">" (Claude had told the user ">" first, corrected). Tools
-  #6 squash-merged as 1837f6c, v0.3.1 tagged on it; this site #121 (0903c1e), both required
-  checks passed.
+  2026-11-26 (fifteenth session). The user deployed 0903c1e to staging (no file changed) and live
+  (only Simple History 5.36.0 to 5.37.0, 14 files; git agreeing, the copy matching the preview,
+  the proof dry run empty, every page passing, no new PHP log lines), so 2.1e and 2.1 are done.
+  2.2 designed with the user (T25: dts-<slug> repositories, the address-and-commit integrity
+  check, tests staying in the tools, check settings left out of the download, Song List first;
+  then changed: plugin-check.yml moves to 2.2b with Song List's first tag as the proof, and
+  COMPOSER_AUTH passed to site-packages' Composer). 2.2a built and committed in dts-site-tools as
+  093f9ba on feat/dts-plugins (not pushed): self-check 31 of 31, 63 stand-in deploy scenarios
+  (four new, 60-63), seven lock-file examples, each new scenario failing on a planted fault (the
+  first plant for 61 too weak, redone). Plan commits on this branch: 528bad9 (2.1 done, T25).
 
 next_action: >
-  The user's deploy of 0903c1e: bin/deploy staging, then bin/deploy live (live accepts only
-  staging's commit). It is the first run of Hostinger's own rsync with --out-format; read the
-  output with the user (expected: the tools' workflow callers and plan files are not deployed, so
-  the site's own code shows "git agrees: no change ... since fd7f8d2" on staging and "since
-  4989781" on live, and live's plugin list shows Simple History 5.37.0 arriving). Then template
-  plan 2.2, the plugin repositories: read its entry and propose its design (the first plugin
-  fetched by Composer at a pinned version, built once for all three).
+  Template plan 2.2b: Song List's repository dts-song-list in the organization (each outside
+  step proposed to the user first: the repository, its settings and rulesets, the tag), its
+  fresh history from this repository's plugins/song-list/ (first commit naming the source
+  commit, T4), composer.json (type wordpress-plugin, composer/installers, dts/site-tools in
+  require-dev), .gitattributes export-ignore for its check settings, LICENSE, README, CHANGELOG;
+  plugin-check.yml built in the tools beside it (PHPCS, PHPStan, the names check, the tag equal
+  to the header's Version); this site requiring the tools branch feat/dts-plugins, then
+  dts/song-list at its first tag in site-packages/, plugins/song-list/ and localPlugins'
+  song-list removed; bin/dev-site and the Song List tests as the real proof of 2.2a; whether
+  Dependabot proposes dts/* tags from site-packages/ checked. Read T25 and the 2.2 entry first.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "This site's bin/check 39 of 39 with v0.3.1 (2026-11-26); #121's check / check and check / dev-site passed on GitHub. dts-site-tools self-check 31 of 31, deploy tests 59 stand-in and 6 real-server (2026-11-26, locally); its check passed on GitHub for #6. Starter's tests last run 2026-11-24."
+  checks: "This site's bin/check 39 of 39 with v0.3.1 (2026-11-26). dts-site-tools on feat/dts-plugins: self-check 31 of 31, 63 stand-in deploy scenarios (2026-11-26, locally); real-server deploy tests not rerun since 0.3.1 (6 of 6). Starter's tests last run 2026-11-24."
   tools: "this site requires dts/site-tools 0.3.1, composer.lock at 1837f6c (tag v0.3.1); the three callers pinned to 1837f6c by bin/tools-pin"
   branch_protection: main requires "check / check" and "check / dev-site" (GitHub Actions), strict
   merge_settings: "this repository and dts-site-tools allow squash merges only (2026-11-26)"
-  deployed: by bin/deploy from the user's computer only; staging runs fd7f8d2 (0.3.0's messages); live runs 4989781 (a deploy brings Simple History 5.37.0; no change to the site's own code since 4989781, checked 2026-11-26)
+  deployed: "staging and live both run 0903c1e (deployed by the user 2026-11-26)"
   local_dev_sites: this site's dev site (hbmusic-dev) as left on 2026-11-24, not checked; the starter's (dts-starter-dev) stopped, its data kept
   env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
-  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.37.0 and Yoast SEO 28.9 (site-packages/composer.lock)
+  dev_site_plugins: Contact Form 7 6.2.6, Simple History 5.37.0 and Yoast SEO 28.9 (site-packages/composer.lock); Song List, Site Hardening, Editing Help local (site.json)
   real_server_test: "the tools' tests/scenario/generic/dev-deploy-server.sh runs from the tools' repository with COMPOSER_RUNTIME_BIN_DIR set to a site's bin/ (it refuses without a site)"
 
 uncommitted_changes:
   - file: none in this repository besides this pause commit
     why: >
-      Branch chore/pause-2026-11-26c (from main at 0903c1e) holds this pause commit: the plan's
-      Current position and 2.1e entry (#121 merged, next the deploy) and this file; not pushed, it
-      goes with the next pull request. main is even with origin/main at 0903c1e; no other local
+      Branch chore/pause-2026-11-26c (from main at 0903c1e) holds f41d607 (the last pause),
+      528bad9 (2.1 done, T25) and this pause commit with the plan's 2.2a record; not pushed, they
+      go with the next pull request. main is even with origin/main at 0903c1e; no other local
       branches.
   - file: ~/dev/dts-site-tools (its own repository)
-    why: Clean; main even with origin/main at 1837f6c (tag v0.3.1); no other local branches.
+    why: >
+      Branch feat/dts-plugins (from main at 1837f6c) holds 093f9ba, 2.2a, not pushed: it waits
+      for 2.2b, where this site requires it and Song List's first tag proves it. main even with
+      origin/main at 1837f6c; working tree clean.
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
     why: WORKING_STYLE.md, this project's memory (MEMORY.md, fresh-session-per-plan-step.md), time-log.csv and time-corrections.csv uncommitted.
   - file: the session scratchpad
-    why: Only throwaway files (pull request texts already used, test outputs, the deploy backup used for planted faults).
+    why: Only throwaway files (the deploy and self-check outputs, the planted-fault copies).
 
 pending_decisions:
   - >
-    The deploy of 0903c1e to staging and then live: when is the user's call. Its output is the
-    first real look at 0.3.1's layout and at Hostinger's rsync with --out-format.
+    2.2b's outside steps, each the user's yes: creating dts-song-list in the organization, its
+    settings and rulesets, its first tag; pushing feat/dts-plugins.
+  - >
+    Left as LOW from 2.2a's review: COMPOSER_AUTH in the whole bin/dev-site step's environment
+    (the site's tests/dev-setup.sh runs there too); TESTS_LEFT_OUT may name a scenario-only
+    folder (harmless); the downloaded plugins' header reads "(git, Composer)" for a site
+    without downloaded plugins. Open from T25: whether Dependabot proposes dts/* tags from
+    site-packages/ (checked at 2.2b).
+  - >
+    The project's CLAUDE.md names plugins/site-hardening/includes/site-facts.php, which no
+    longer exists (the site's facts reach the plugin through the sitehardening_csp_sources
+    filter); fixed at 2.2d (T25).
   - >
     Offered, not yet decided: a read-only check on the server that each place's key reaches only
-    its own folders (T11's restriction, taken from the plan, not looked at this session).
+    its own folders (T11's restriction).
   - >
     To watch: this site's first weekly Dependabot plugin update is the first real run of the
     squash merge step (checked by actionlint only). Not known yet: why Dependabot ignored
     "@dependabot rebase" on the tools' #2.
   - >
-    Left as LOW from this session's review (0.3.1): the "only the lock file's other entries" pins
-    line untested; an unreadable old lock reads as no pins; bin/site-check's lines flush left
-    between the indented ones; an interrupted folder's partial list not shown. From earlier
-    reviews: bin/tools-update's .git guard passes a copy installed with --prefer-source; its test
-    checks the npm wait option is passed, not its value; the README's bin/ trap note not
-    reproduced; unusual file names quoted differently by git and rsync; the proof's refusal
-    reusing the "mix" sentence; no rename scenario; a note's text shown raw; no automated test of
-    the .env marker substitution; bin/dev-site not warning when .env's COMPOSE_FILE names a
-    missing file. The plan's finding still open: the parent theme's pinned version is in the
-    tools' tools/versions.sh, so raising it takes a tools release.
+    Left as LOW from earlier reviews (0.3.1 and before): the "only the lock file's other
+    entries" pins line untested; an unreadable old lock reads as no pins; bin/site-check's
+    lines flush left between the indented ones (seen in the 2026-11-26 deploys); an interrupted
+    folder's partial list not shown; bin/tools-update's .git guard passes a copy installed with
+    --prefer-source; its test checks the npm wait option is passed, not its value; the README's
+    bin/ trap note not reproduced; unusual file names quoted differently by git and rsync; the
+    proof's refusal reusing the "mix" sentence; no rename scenario; a note's text shown raw; no
+    automated test of the .env marker substitution; bin/dev-site not warning when .env's
+    COMPOSE_FILE names a missing file. The plan's finding still open: the parent theme's pinned
+    version is in the tools' tools/versions.sh, so raising it takes a tools release.
   - >
     The handbook's follow-ups for the user: listed in the handbook's WORKING_DRAFT.md, "Open
     items", not repeated here. Whether squash merging becomes a handbook rule for every DTS
@@ -103,18 +116,17 @@ pending_decisions:
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T24, the 2.1e and 2.2 entries.
-  - docs/planning/findings/step-2.1e-6-out-format-proof.md: part 6's proof; step-2.1e-1-proof.md: part 1's.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T25, the 2.2 entry.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
   - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
-  - ~/dev/dts-site-tools: the tools' repository (main at 1837f6c, tag v0.3.1, clean).
+  - ~/dev/dts-site-tools: the tools' repository (main at 1837f6c, tag v0.3.1; feat/dts-plugins at 093f9ba).
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository,
-     ~/dev/dts-site-tools (main at 1837f6c, clean) and ~/dev/dts-handbook.
+     ~/dev/dts-site-tools (main at 1837f6c, feat/dts-plugins at 093f9ba, clean) and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T21-T24 above all) and the 2.1e and 2.2 entries.
-  3. Then next_action: the user's deploy of 0903c1e, then 2.2.
+     (T25 above all) and the 2.2 entry.
+  3. Then next_action: 2.2b, Song List's repository, each outside step proposed first.
