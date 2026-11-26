@@ -35,7 +35,7 @@ concurrency:
 jobs:
   versions:
     # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
-    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-versions.yml@18ef4c0bbb1a04d470cc358edcea569f16b08070 # v0.2.0
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-versions.yml@2d7492cc2e25e367e7445040d93e6d8d2bfcd478 # v0.3.0
     with:
       # The weekly run has no inputs, so it takes the usual wait.
       cooldown-days: ${{ inputs.cooldown-days || '7' }}

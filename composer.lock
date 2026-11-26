@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21aa7b2681bb0a463edd9a940fda63ce",
+    "content-hash": "af2d8b55a3774e7b1efb9d4d9105cadb",
     "packages": [],
     "packages-dev": [
         {
@@ -106,16 +106,16 @@
         },
         {
             "name": "dts/site-tools",
-            "version": "v0.2.0",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/direct-technical-solutions/dts-site-tools.git",
-                "reference": "18ef4c0bbb1a04d470cc358edcea569f16b08070"
+                "reference": "2d7492cc2e25e367e7445040d93e6d8d2bfcd478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/18ef4c0bbb1a04d470cc358edcea569f16b08070",
-                "reference": "18ef4c0bbb1a04d470cc358edcea569f16b08070",
+                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/2d7492cc2e25e367e7445040d93e6d8d2bfcd478",
+                "reference": "2d7492cc2e25e367e7445040d93e6d8d2bfcd478",
                 "shasum": ""
             },
             "require": {
@@ -123,7 +123,7 @@
                 "php-stubs/wordpress-stubs": "7.1.2",
                 "phpcsstandards/phpcsextra": "1.5.1",
                 "phpcsstandards/phpcsutils": "1.2.3",
-                "phpstan/phpstan": "2.3.5",
+                "phpstan/phpstan": "2.3.6",
                 "squizlabs/php_codesniffer": "3.13.6",
                 "szepeviktor/phpstan-wordpress": "2.0.4",
                 "wp-coding-standards/wpcs": "3.4.1"
@@ -146,10 +146,10 @@
             "description": "The tools that check, test and deploy a DTS WordPress site: run on the developer's computer and in CI, never installed on the website.",
             "homepage": "https://github.com/direct-technical-solutions/dts-site-tools",
             "support": {
-                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/v0.2.0",
+                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/v0.3.0",
                 "issues": "https://github.com/direct-technical-solutions/dts-site-tools/issues"
             },
-            "time": "2026-11-24T20:36:01+00:00"
+            "time": "2026-11-26T14:59:51+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -383,11 +383,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.5",
+            "version": "2.3.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/645a1bd6bead15fc1b8474137467961d0fa30a79",
-                "reference": "645a1bd6bead15fc1b8474137467961d0fa30a79",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/00cedebb76cc82c1592414fa4f616cefdccda16f",
+                "reference": "00cedebb76cc82c1592414fa4f616cefdccda16f",
                 "shasum": ""
             },
             "require": {
@@ -443,8 +443,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-03T12:14:22+00:00",
-            "published-time": "2026-11-03T12:14:36+00:00"
+            "time": "2026-11-15T19:58:26+00:00",
+            "published-time": "2026-11-15T19:58:39+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

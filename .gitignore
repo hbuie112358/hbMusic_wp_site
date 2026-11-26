@@ -28,6 +28,11 @@
 !/plugins/song-list/
 !/plugins/site-hardening/
 !/plugins/editing-help/
+# The project's subagents only, so a change to one shows in the history (AI_SECURITY.md, 1);
+# the personal settings beside them (settings.local.json) stay out.
+!/.claude/
+/.claude/*
+!/.claude/agents/
 
 # Secrets, dumps and archives stay out even inside the allowed folders: a stray export saved
 # into docs/ or the theme must never be staged by `git add -A`.
