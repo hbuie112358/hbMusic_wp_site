@@ -81,17 +81,21 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   #116 merged; #97 closed by Dependabot itself, its group gone); step 4 done (the user's
   `bin/deploy staging` of `ea87e75`, which also carried #117's Simple History 5.37.0: every page
   passed, no new PHP log lines; the site's own folders unchanged in content, their counts only
-  new file dates). **So 2.1d is done,** the first milestone. Live still runs `4989781`.
-  **Next, before 2.2: 2.1e, the deploy's messages,** designed 2026-11-26 (T23, its step entry);
+  new file dates). **So 2.1d is done,** the first milestone.
+  **2.1e, the deploy's messages, done 2026-11-26,** so 2.1 is done; designed 2026-11-26 (T23, its step entry);
   its proof on the deploy test's throwaway server done (2026-11-26, every check passed,
   `findings/step-2.1e-1-proof.md`); parts 2 and 3 merged in `dts-site-tools` (#4, `536700b`),
   with its Dependabot #1 and #2; `v0.3.0` tagged on `2d7492c` (#5); part 4 done (this site on
   `0.3.0`, #120, `fd7f8d2`; this repository squash only); part 5 shown on staging (the user's
   deploy of `fd7f8d2`, every list "none", correctly). The user found the messages still hard to
   read, so part 6, **release 0.3.1** (T24), was built and released (tools #6, `1837f6c`,
-  `v0.3.1`, 2026-11-26) and this site repinned (#121, `0903c1e`); **next:** the user's deploy
-  of `0903c1e` to staging, then live, shows the new layout (the first run of Hostinger's own rsync
-  with `--out-format`); then 2.2. **Pull requests merge by squash**
+  `v0.3.1`, 2026-11-26) and this site repinned (#121, `0903c1e`); the user deployed `0903c1e` to
+  staging and live (2026-11-26, the first run of Hostinger's own rsync with `--out-format`):
+  staging "no file will change", live only Simple History 5.36.0 to 5.37.0 (14 files), git
+  agreeing on both, the copy matching the preview, the proof dry run empty, every page passing, no
+  new PHP log lines; **both places run `0903c1e`.** **Now: 2.2,** the plugin repositories,
+  designed 2026-11-26 (T25) in four parts; **next: 2.2a,** the tools' support for DTS's plugins
+  and `plugin-check.yml`, in `dts-site-tools`. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -115,7 +119,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   cause not known yet; hypotheses, each to confirm or rule out: a security update (those skip
   the wait; the repository's Dependabot alerts would show it), or WPackagist giving Dependabot
   no usable release time (#98's details against WPackagist's listing would show it).
-- **Then, in order:** 2.2 to 2.5 (stage 2, the shared repositories).
+- **Then, in order:** 2.3 to 2.5 (stage 2, the shared repositories).
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
@@ -159,6 +163,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 | T22 | 2.1c's design (the user, 2026-11-24, Claude's recommendations accepted): the three workflows become shared workflows in `dts-site-tools` (`site-check.yml` with the `check` and `dev-site` jobs, `site-versions.yml`, `site-plugin-updates.yml`), each installing the tools from the site's `composer.lock` first with one Composer command in its pinned container, written out in each workflow and the README (Composer given the run's read-only token; `--no-plugins --no-scripts` in the job that can merge). A site's three callers are **generated**: `bin/tools-pin` writes them from `tools/site-workflows/` with the lock's commit; `bin/check` (only in a site that installs the tools) fails when they differ from what it would write, catching a commit left behind and a hand edit with one rule. **Proven at the first call in 2.1d,** this site's switch-over branch calling the tools branch's commit, before `v0.2.0` is tagged; no throwaway caller repository. `bin/deploy`'s required-check names change at 2.1d, once the first call shows the names GitHub gives called jobs (expected `check / check`, `check / dev-site`, unverified), with this repository's branch protection (an outside change, proposed first). | The tools' files do not exist in a run until Composer installs them, and a called workflow does not know its own commit (2.1b-1's trial), so neither a shared install action nor a shared script can hold the install command; the self-check holds every copy to `tools/versions.sh`'s Composer image instead. Generated callers keep every site's workflows identical, so a fix reaches every site with its next tools release. A throwaway caller would prove the personal-account call and the check names a step earlier, at the cost of another outside repository; 2.1d proves both in the real setting. Changing the deploy's check names before seeing them would rewrite its 30 test scenarios on a guess. |
 | T23 | 2.1e's design, the deploy's messages (the user, 2026-11-26). **The rule:** what the deploy shows before the `yes` is exactly what it will do, and what it shows after is exactly what it did; every list comes straight from git or rsync as they print it, nothing counted, translated or summarized by the deploy's code. **Before the `yes`:** (1) the tested-commit line says the commit is the pull request squash-merged (or rebase-merged) on GitHub, and that the merge made a new commit with the same files as the pull request's last commit, whose checks passed; (2) the commit list kept, one line per pull request (squash makes each line a story); (3) a git section, always shown: `git diff --name-only <the server's note commit> <the commit going out> -- <the theme and the site's own plugins>`, printed as git writes it, the command in its header, `none` when git reports nothing, and saying so when the server has no note; (4) a server section: a dry run of exactly the same copy, rsync's own list per folder, the downloaded plugins included, and the deploy's note named as a change; (5) when the two lists disagree for the theme or the site's plugins, one line says so, and both lists are shown. **After the `yes`:** the real copy's own list and one line saying it matches the preview, or the difference; then a second dry run that must list nothing, or the deploy fails. **Removed:** the per-folder change counts and the `copies, in order` line. **Changed:** the copy no longer keeps file dates (`-t`), so a file with the same content is neither sent, listed nor touched. **Proven first,** on the deploy test's throwaway server: that rsync's dry run and real run list the same files, and that without `-t` no unchanged file is listed; if either is not so, Claude tells the user instead of working around it. **In the same release:** the plugin-updates workflow merges by squash, then this repository allows squash only; the tools' README names the old committed `bin/` trap (reinstall restores the commands); `bin/tools-update`, shipped but not in the tools' `composer.json` `bin`, checked and either listed or removed. | The deploy of `ea87e75` (2026-11-26) showed `song-list: 10 change(s)` and similar for folders whose content had not changed: `--itemize-changes` lists date-only differences, and `git archive` dates every file with its commit, so every new commit "changed" every file. The user: the messages must give the confidence that only what is intended changes, be simple, exact and indisputable, and come from the source that is the truth. Git answers what changed between the commit the server last received and the one going out; rsync answers what will actually change on the server, which also shows a hand edit or a half-finished earlier deploy; the two together show both, and their disagreement means something happened outside a deploy. The note is written only after every folder is copied, so it never names a commit half there. A squash or rebase merge leaves the files of the pull request's last commit, since `main` requires a branch up to date, so the tested-commit check (T11) is unchanged. |
 | T24 | 0.3.1, the deploy's messages made simple (the user, 2026-11-26, after staging's deploy of `fd7f8d2`: the lines were true but hard to read, "squash or rebase" hedged, and a git list narrowed to some folders could not show that nothing else was coming). **The tested-commit line** drops "by squash or rebase" and is otherwise kept (the user's choice): `commit <id>: pull request #<n>, merged on GitHub; the merge made a new commit with the same files as #<n>'s last commit <id>, whose checks passed`. **Sections,** each a header with its time and source, the lines under it indented: what goes out (the tested-commit line, the server's commit, the commits arriving); the downloaded plugins checked against WordPress.org; rsync before "yes"; rsync after; after the copy. Timestamps on the headers only; the site check keeps each page's line. **One rsync list,** the main answer to what changes on the server: per folder, in copy order, rsync's own lines printed with `--out-format='%i %o <folder path>/%n'` (for example `<f+++++++++ send plugins/simple-history/readme.txt`, `*deleting   del. themes/<theme>/old.php`), written by rsync itself so the deploy translates nothing (T23's rule); above it, one line naming every folder compared, the only ones copied (the commit's `site.json` theme and site plugins and its `site-packages/composer.lock` plugins, so changing the set shows in git); "no file will change" when rsync lists nothing; the deploy's note named last. **Git is a cross-check, not a list:** one line, `git agrees: no change to the site's own code since <server's commit>`, or the files git and rsync both name; when they differ, each file is named with which side has it (for example a hand edit on the server, deleted by rsync and unknown to git), before the "yes". The full `git diff` is not shown: nothing outside the copied folders can go (the user, 2026-11-26: "maybe I don't care if they can't go"). **After "yes":** the real copy's list in the same form, one line saying it matches the preview or naming the difference, then the second dry run that must list nothing. **Proven first** (`findings/step-2.1e-6-out-format-proof.md`): the format prints the same lines in the dry run and the real copy against the deploy test's server, deletions included, date-only differences not listed. **Tests:** the deploy scenarios follow the new layout, still asserting facts (which file, which side, which section), each changed one shown failing on a planted fault; then the full deploy tests and the self-check. **Release:** 0.3.1 with its changelog, tag and this site's repin, each with the user's yes. | The user: the messages must give confidence that only what is intended changes, simply. rsync performs the copy, so its list is what changes on the server; git cannot list the downloaded plugins or a hand edit, and a git list of files that cannot go is noise. A scope line makes an empty list meaningful. GitHub records no merge method (its API has `merged`, `mergedAt`, `mergedBy` and `mergeCommit`, no method; checked 2026-11-26), and the proof, the same files as the tested commit, needs none. rsync's codes kept beside the words (the user's choice): `send` alone does not tell a new file from a changed one. |
+| T25 | 2.2's design (the user, 2026-11-26, Claude's recommendations accepted). **Repositories:** `dts-song-list`, `dts-site-hardening`, `dts-editing-help` in the organization, Composer names `dts/<slug>` (the folder stays the WordPress slug); set up like `dts-site-tools` (public, a fresh history whose first commit names the source commit here, T4; GPL-2.0-or-later, README, changelog; squash only, `main` protected with `check` required, tags that never move, secret scanning, Dependabot for its actions); each `composer.json` of type `wordpress-plugin`, requiring `composer/installers`, with `dts/site-tools` in `require-dev` for its checks. **Its checks:** a reusable `plugin-check.yml` in the tools (PHPCS and PHPStan with the plugin's settings, the names-nothing-of-a-site check, and on a tag the tag equal to the main file's `Version:`, which `bin/deploy` reads). **The tools learn DTS's plugins** (`dts/*` in `site-packages/composer.lock`): `bin/dev-site` and `bin/deploy` install them from the lock; **their integrity check (D1):** each `dts/*` package's `dist.url` is `https://api.github.com/repos/direct-technical-solutions/<repo>/zipball/<commit>` with that commit equal to its `source.reference`, refused otherwise, naming the package; the deploy's pins line, "never lower" check and copy cover them; a change to one waits for the user (T9, T16, already so in `site_packages_not_plugins_only`); whether Dependabot proposes their tags from `site-packages/` is checked, not assumed. **Tests (D3):** stay in the tools, run when the site lists the plugin (`localPlugins` or `dts/<slug>` in the lock); moved into the plugin repositories at 2.4 at the earliest, once the starter can host them. **Download contents (D4):** the plugins' check settings and tests are left out of the release download (`.gitattributes` `export-ignore`), so the first deploy after the moves deletes the three `phpcs.xml.dist` files on each server, expected and named. **Order (D5):** 2.2a the tools' support and `plugin-check.yml` (tools 0.4.0), proven with a throwaway tag; 2.2b Song List; 2.2c Editing Help, then Site Hardening; 2.2d the starter switched over, the project's `CLAUDE.md`'s stale `includes/site-facts.php` line fixed, the milestone proof (T21) and the deploys. | GitHub publishes no checksums for its archives and the lock's `shasum` is empty, so the counterpart of WordPress.org's download-address check is the release's address and commit, trusting GitHub as the tools already do; a `--prefer-source` checkout (verified by the commit hash) was weighed and set aside: `.git` folders and the plugins' tests in every install and an exclusion in the deploy. A plugin repository has no site to run its browser tests against. A deployed `phpcs.xml.dist` serves no visitor. Song List is the smallest and least critical plugin; Site Hardening touches every page's headers, so it goes last. |
 
 ## Steps
 
@@ -878,16 +883,16 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 
 ### Stage 2: the shared repositories (rough)
 
-- [~] **2.1 `dts-site-tools`**: created in the organization, released by Git tags and pinned
+- [x] **2.1 `dts-site-tools`** (done 2026-11-26): created in the organization, released by Git tags and pinned
   through Composer (T8), with the reusable workflows; this site switched to it. Four parts (T17):
-  `[x]` 2.1a the review (2026-11-24, `findings/step-2.1a-tools-review.md`); `[~]` 2.1b the
+  `[x]` 2.1a the review (2026-11-24, `findings/step-2.1a-tools-review.md`); `[x]` 2.1b the
   repository (T18): `[x]` 2.1b-1 the trial (2026-11-24, `findings/step-2.1b-1-trial.md`), `[x]`
   2.1b-2 `REPO_ROOT` split (T19: `[x]` 2.1b-2a the rename (#111, `de724ce`), `[x]` 2.1b-2b the layout fixes and
   the test (#112, `39677f0`, 2026-11-24: the dev-only mu-plugins mounted from the tools' folder through
   `compose.site.yaml`; the site's browser specs in its own `tests/browser/`, mounted into the
   tools' `specs/dev/site/`; the scenario checks' debug-log rule reading the tested site's
   `site.json`, shown failing on a notice planted in the starter's theme; the status sheet's files
-  found in either folder; `tests/tools/paths/`, shown failing on two planted faults)), `[~]` 2.1b-3
+  found in either folder; `tests/tools/paths/`, shown failing on two planted faults)), `[x]` 2.1b-3
   the repository (T20, 2026-11-24: `[x]` 2.1b-3a here (#113, `f3f4bf0`), `bin/check` split into site checks, the
   tools' self-check and a site's own extra checks, the mu-plugin renamed (every earlier check
   still run, compared by name; three planted faults, one per part, each failing in its part; the
@@ -906,7 +911,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   files differ from `ce4ae46` on purpose, expected at 2.1d's file-by-file comparison:
   `tests/e2e/package.json` and its lock file's package name, `docs/TOOLS.md`'s deploy example,
   `tests/tools/dev-site-guard/run.sh`'s example names, and `tests/tools/check-tools.sh`'s Composer
-  validation with `--no-check-all`, since `--strict` failed on the exact versions T18 requires)); `[~]` 2.1c the reusable workflows, called pinned by commit (T22, 2026-11-24: built
+  validation with `--no-check-all`, since `--strict` failed on the exact versions T18 requires)); `[x]` 2.1c the reusable workflows, called pinned by commit (T22, 2026-11-24: built
   in `dts-site-tools` on branch `feat/site-workflows`, committed as `7c0225a` and pushed, unmerged until 2.1d's first call proves it: the three `site-*.yml`
   workflows, `tools/site-workflows/` with `bin/tools-pin` and `tools/tools-pin.sh`, `bin/check`'s
   pin check for sites that install the tools, the README's install command, `docs/TOOLS.md`, the
@@ -915,7 +920,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   callers), each shown failing on a planted fault; actionlint works offline and passed a
   misspelled input in a caller calling by GitHub address, so the self-check lints the callers
   rewritten to call by local path in a copy with a `.git` folder, which caught it; found: the existing `in_composer_of` mounts no
-  `bin/`, so the install command mounts the site's `bin/` itself); `[~]` 2.1d this site
+  `bin/`, so the install command mounts the site's `bin/` itself); `[x]` 2.1d this site
   switched over (the approach agreed 2026-11-24, eight parts: install, remove the copies,
   callers and Dependabot, `.env` and local checks, the first call, the real check names, the
   milestone proof, the release; the plugin-dependent tests left to 2.4, the user. Done so far,
@@ -937,8 +942,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   only under the old names is refused), then both checks passed; `main`'s protection set to the
   new names (the user's yes). The traces' path (`vendor/dts/site-tools/tests/e2e/test-results/`)
   is unverified until a browser test fails on GitHub. The starter's tests passed (17 scenarios,
-  168 browser tests). Tools #3 merged by rebase, `main` at `18ef4c0`. Remaining: tag `v0.2.0`,
-  repin here to `0.2.0` and merge #116, close #97, the user's staging deploy. From 2.1c, T22: the first call of the shared workflows from this site's branch,
+  168 browser tests). Tools #3 merged by rebase, `main` at `18ef4c0`. Then, done 2026-11-26 (the
+  Current position): `v0.2.0` tagged, this site repinned to `0.2.0` and #116 merged, #97 closed,
+  the user's staging deploy. From 2.1c, T22: the first call of the shared workflows from this site's branch,
   pinned to the tools branch's commit, confirming the personal-account caller, the check names
   GitHub gives called jobs and the traces' path in `vendor/`; then `bin/deploy`'s
   `REQUIRED_CHECKS` and its test scenarios, and this repository's branch protection, set to those
@@ -962,7 +968,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `dts-site-tools` a site cannot delete them. When they move, they follow the site's own list,
   `site-packages/composer.json`: a plugin listed means its tests run and must pass; a plugin not
   listed means `bin/test` names the tests left out and why, never skipping them silently.
-- [ ] **2.1e The deploy's messages** (T23, the user, 2026-11-26), before 2.2, whose plugin move
+- [x] **2.1e The deploy's messages** (T23, the user, 2026-11-26; done 2026-11-26), before 2.2, whose plugin move
   is the deploy where "nothing else changes" matters most. In order: (1) the proof on the deploy
   test's throwaway server (dry run and real run list the same files; no unchanged file listed
   without `-t`), reported to the user before building; **done 2026-11-26, every check passed**
@@ -1005,15 +1011,21 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   review: the "only the lock file's other entries" pins line untested; an unreadable old lock
   reads as no pins; `bin/site-check`'s lines flush left between the indented ones; an
   interrupted folder's partial list not shown. This site repinned (#121, `0903c1e`, both
-  required checks passed; `bin/check` 39 of 39 locally); next, the user's deploys of `0903c1e`
-  to staging and live show the new layout.
+  required checks passed; `bin/check` 39 of 39 locally); the user's deploys of `0903c1e`
+  (2026-11-26) showed the new layout against Hostinger's rsync: staging no file changed, live
+  only Simple History 5.37.0's 14 files, git agreeing, the copy matching the preview, the proof
+  dry run empty, every page passing, no new PHP log lines.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's
   plugin for any site that wants it, T16): each released by a Git tag, this site requiring them
-  through Composer. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
+  through Composer. Designed 2026-11-26 (T25), in four parts: `[ ]` 2.2a the tools' support for
+  DTS's plugins and the reusable `plugin-check.yml` (tools 0.4.0), proven with a throwaway tag;
+  `[ ]` 2.2b Song List moved; `[ ]` 2.2c Editing Help, then Site Hardening; `[ ]` 2.2d the
+  starter switched over, the milestone proof and the deploys. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
   plugin at its listed version; then each plugin's move is small. Checked by Composer's lock file,
   which records each release's exact commit (DTS's plugins have no published fingerprints like
   WordPress.org's). This site's `plugins/` folder leaves the repository; its checks and tests pass
-  as before, and a deploy shows no change in the plugins' files. The status sheet's evidence
+  as before, and a deploy shows no change in the plugins' files except the three `phpcs.xml.dist`
+  deleted (T25, D4). The status sheet's evidence
   naming the plugins' tests (`tests/scenario/plugins/…`, now in the tools) is reworded here, once
   those tests have their final home (left from 2.1d, the user, 2026-11-24).
 - [ ] **2.3 The generic theme code** in the components plugin chosen at 1.1 (T5, T16: the one
