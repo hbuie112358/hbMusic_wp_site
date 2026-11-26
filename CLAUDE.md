@@ -247,7 +247,7 @@ tests and the tools that check the code.
   *Why:* the user wants to commit freely and decide separately what goes public, without
   having to remember when to push.
 - **The pull request carries the story's message; it becomes the squash commit on `main`.**
-  The squash rule of the global `WORKING_STYLE.md` applies; in this project the pull request's
+  The squash rule of the global `PULL_REQUESTS.md` applies; in this project the pull request's
   title and description are that squash message, ending with `Co-Authored-By: Claude …` and
   with no "Generated with Claude Code" line. Commits on the branch are working notes, short, in
   the Conventional Commits form, with the same `Co-Authored-By` line.
