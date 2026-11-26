@@ -95,10 +95,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   agreeing on both, the copy matching the preview, the proof dry run empty, every page passing, no
   new PHP log lines; **both places run `0903c1e`.** **Now: 2.2,** the plugin repositories,
   designed 2026-11-26 (T25) in four parts; 2.2a, the tools' site side for DTS's
-  plugins, committed on `feat/dts-plugins` in `dts-site-tools` (`093f9ba`, not pushed); **now:
-  2.2b,** Song List's repository (created 2026-11-26) and `plugin-check.yml` (built, T26, not
-  committed), this site requiring the tools branch, Song List's first tag `v0.2.1` the real proof
-  of 2.2a. **Pull requests merge by squash**
+  plugins, committed on `feat/dts-plugins` in `dts-site-tools` (`093f9ba`); **now:
+  2.2b,** half done (2026-11-26): `plugin-check.yml` and `bin/plugin-check` on the tools branch
+  `feat/dts-plugins` (T26, `41a6155`, pushed, unmerged), `dts-song-list` released as `v0.2.1`
+  on its first commit `6e050c1`, `main` protected; **next:** this site requiring the tools branch
+  and `dts/song-list` 0.2.1, `plugins/song-list/` removed, `bin/dev-site` and the Song List tests
+  as the real proof of 2.2a (the 2.2 entry). **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -1032,11 +1034,19 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   user) the real proof: `dts-song-list` created 2026-11-26 with `dts-site-tools`' settings
   (public, squash only, branches deleted after merge, secret scanning with push protection,
   Dependabot alerts and security updates, the ruleset "release tags never move" on `v*` without
-  bypass), `main` unprotected until the first run shows the check's name; `bin/plugin-check`,
-  `plugin-check.yml`, the plugin caller and the site-side names check built on
-  `feat/dts-plugins` (T26, not committed yet: self-check 32 of 32, the new plugin rules test's 18
-  examples and the pin tests' two plugin examples, seven planted faults each caught; the Docker
-  parts of `bin/plugin-check` unproven until Song List's first run); `[ ]` 2.2c Editing Help, then Site Hardening; `[ ]` 2.2d the
+  bypass); `bin/plugin-check`, `plugin-check.yml`, the plugin caller and the site-side names
+  check built on `feat/dts-plugins` (T26, `5f3fb36`: self-check 32 of 32, the plugin rules
+  test's 18 examples and the pin tests' two plugin examples, seven planted faults each caught; a
+  local trial on a stand-in Song List then showed PHPStan needing `bin (?)` and the first full run
+  found actionlint started without the files, fixed in `41a6155` by one shared
+  `actionlint_workflows_of`; both pushed, the branch unmerged until 2.2b's proof); Song List's
+  first commit `6e050c1` (from this repository's `0903c1e`, kept locally in `~/dev/dts-song-list`),
+  `bin/plugin-check --tag v0.2.1` 9 of 9 locally, `check / check` passing on GitHub (the button's
+  run, then the tag's), `main` protected like the tools' (`check / check` required, up to date,
+  administrators included, linear, no force-push or deletion), **`v0.2.1` tagged and pushed**
+  (2026-11-26); **next in 2.2b:** this site requiring the tools branch and `dts/song-list` 0.2.1
+  in `site-packages/`, `plugins/song-list/` and its `localPlugins` entry removed, `bin/dev-site`
+  and the Song List tests as 2.2a's real proof, Dependabot's view of `dts/*` checked; `[ ]` 2.2c Editing Help, then Site Hardening; `[ ]` 2.2d the
   starter switched over, the milestone proof and the deploys. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
   plugin at its listed version; then each plugin's move is small. Checked by Composer's lock file,
   which records each release's exact commit (DTS's plugins have no published fingerprints like
