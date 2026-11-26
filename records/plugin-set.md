@@ -15,7 +15,7 @@ matching this list.
 | Contact Form 7 (`contact-form-7`) | `bin/deploy`, pinned in `site-packages/` | The booking form (handbook toolkit) |
 | Yoast SEO (`wordpress-seo`) | `bin/deploy`, pinned in `site-packages/` | Search titles, descriptions, page data (toolkit) |
 | Simple History (`simple-history`) | `bin/deploy`, pinned in `site-packages/` | The activity log (H94, template plan 1.5b) |
-| Song List (`song-list`) | `bin/deploy`, the site's own (`plugins/`) | The song list page and its admin form |
+| Song List (`song-list`) | `bin/deploy`, pinned in `site-packages/` (DTS's `dts-song-list`, by release tag) | The song list page and its admin form |
 | Site Hardening (`site-hardening`) | `bin/deploy`, the site's own | Security headers and small hardening settings (chapter 12, 3.2) |
 | Editing Help (`editing-help`) | `bin/deploy`, the site's own | The content guide in the admin (H89) |
 | Wordfence (`wordfence`) | installed by hand, updated in the monthly check | Firewall, login limits, two-factor login (toolkit) |

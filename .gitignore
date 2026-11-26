@@ -25,7 +25,6 @@
 !/themes/hbmusic-child/
 !/plugins/
 /plugins/*
-!/plugins/song-list/
 !/plugins/site-hardening/
 !/plugins/editing-help/
 # The project's subagents only, so a change to one shows in the history (AI_SECURITY.md, 1);

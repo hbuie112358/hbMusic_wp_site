@@ -1044,15 +1044,25 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `bin/plugin-check --tag v0.2.1` 9 of 9 locally, `check / check` passing on GitHub (the button's
   run, then the tag's), `main` protected like the tools' (`check / check` required, up to date,
   administrators included, linear, no force-push or deletion), **`v0.2.1` tagged and pushed**
-  (2026-11-26); **next in 2.2b:** this site requiring the tools branch and `dts/song-list` 0.2.1
-  in `site-packages/`, `plugins/song-list/` and its `localPlugins` entry removed, `bin/dev-site`
-  and the Song List tests as 2.2a's real proof, Dependabot's view of `dts/*` checked; `[ ]` 2.2c Editing Help, then Site Hardening; `[ ]` 2.2d the
+  (2026-11-26); this site requires the tools branch (`41a6155`, `bin/tools-pin`) and
+  `dts/song-list` 0.2.1 (locked at `6e050c1`, its download GitHub's zipball of that commit);
+  `plugins/song-list/` and its `localPlugins` entry removed. The download's code files are
+  identical to the removed folder; it also carries `CHANGELOG.md`, `composer.json`, `LICENSE` and
+  `README.md`, so the first deploy adds those four to Song List's folder on each server besides
+  deleting `phpcs.xml.dist`. The first `bin/dev-site` failed: the files volume (kept since
+  2026-11-04) held the old mount point `song-list/` as an empty folder, so `docker cp` nested the
+  plugin one level too deep; fixed in the tools (`1ffdbf7`, pushed: the folder deleted before
+  the copy, the name checked first; no kept test, by the user's choice, the failing dev site
+  itself the proof). Then `bin/dev-site` passed, the installed folder equal to the release,
+  `bin/check` 38 of 38 (the Song List plugin's PHPCS check gone with its folder), the Song List
+  and component styles specs 26 of 26 (2026-11-26); **next in 2.2b:** Dependabot's view of
+  `dts/*`, checked after the merge from its job log ("Check for updates" on `/site-packages`); `[ ]` 2.2c Editing Help, then Site Hardening; `[ ]` 2.2d the
   starter switched over, the milestone proof and the deploys. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
   plugin at its listed version; then each plugin's move is small. Checked by Composer's lock file,
   which records each release's exact commit (DTS's plugins have no published fingerprints like
   WordPress.org's). This site's `plugins/` folder leaves the repository; its checks and tests pass
   as before, and a deploy shows no change in the plugins' files except the three `phpcs.xml.dist`
-  deleted (T25, D4). The status sheet's evidence
+  deleted (T25, D4) and each plugin's four release files added. The status sheet's evidence
   naming the plugins' tests (`tests/scenario/plugins/…`, now in the tools) is reworded here, once
   those tests have their final home (left from 2.1d, the user, 2026-11-24).
 - [ ] **2.3 The generic theme code** in the components plugin chosen at 1.1 (T5, T16: the one

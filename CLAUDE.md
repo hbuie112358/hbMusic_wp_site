@@ -64,9 +64,14 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `wordpress/`: the old `public_html` exactly as exported. Kept unchanged as the reference copy
   of the old site; new work does not go here.
 - `themes/hbmusic-child/`: the new Twenty Twenty-Five child theme.
-- `plugins/song-list/`: the Song List plugin (plan D19), which names nothing of this site, so it
-  can be shared; its own prefix `songlist`, text domain `song-list` and `phpcs.xml.dist`.
-- `plugins/site-hardening/`: the Site Hardening plugin (plan D26), shared the same way; prefix
+- Song List (plan D19): not in this repository since template plan 2.2b; its own repository
+  `direct-technical-solutions/dts-song-list`, installed by Composer from
+  `site-packages/composer.lock` at its release tag (`dts/song-list`); its prefix `songlist` and
+  text domain `song-list`. A change to it is made in its repository (locally
+  `~/dev/dts-song-list`) and reaches this site by a new tag and a raised pin, never by editing
+  `site-packages/`.
+- `plugins/site-hardening/`: the Site Hardening plugin (plan D26), which names nothing of this
+  site, so it can be shared; prefix
   `sitehardening`, text domain `site-hardening`.
 - `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way; prefix
   `editinghelp`, text domain `editing-help`. It shows the content guide in the admin (a panel at
@@ -268,7 +273,7 @@ theme and the plugins); test code means the tests and the tools that check the c
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
-  local scripts, `themes/hbmusic-child/` and `plugins/song-list/`). A new path is versioned only by adding it to the
+  local scripts, `themes/hbmusic-child/` and the site's own plugins in `plugins/`). A new path is versioned only by adding it to the
   allow-list, with the user's approval.
   *Why:* `wordpress/`, `db/` and `backups/` hold credentials (`wp-config.php`), database dumps
   with user accounts and emails, and the former host's account identifiers.
