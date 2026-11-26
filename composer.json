@@ -10,7 +10,7 @@
         }
     ],
     "require-dev": {
-        "dts/site-tools": "dev-feat/site-workflows"
+        "dts/site-tools": "0.2.0"
     },
     "config": {
         "allow-plugins": {

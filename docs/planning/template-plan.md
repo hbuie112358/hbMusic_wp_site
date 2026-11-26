@@ -76,8 +76,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   in eight parts (its step entry): parts 1-7 done 2026-11-24 (#116 open at `82eed0a`, both
   checks passed; `main`'s protection requires `check / check` and `check / dev-site`; the
   starter's tests passed with the installed tools); part 8, the release, step 1 done (tools #3
-  merged, the tools' `main` at `18ef4c0`). **Next: part 8 step 2,** tag `v0.2.0` on `18ef4c0`;
-  then step 3 (this site repinned to `0.2.0`, #116 merged, #97 closed) and step 4 (the user's
+  merged, the tools' `main` at `18ef4c0`); step 2 done (2026-11-26: `v0.2.0` tagged on `18ef4c0`,
+  annotated like `v0.1.0`, and pushed); step 3 under way (this site repinned to `0.2.0`, the
+  lock changing only the tools' entry, the callers rewritten by `bin/tools-pin`, `bin/check` 39
+  of 39). **Next:** the rest of step 3 (#116 merged, #97 closed) and step 4 (the user's
   `bin/deploy staging` showing no change); each step one at a time, stopping after each (the
   user, 2026-11-24).
   2.1b-3b was
