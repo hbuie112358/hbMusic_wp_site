@@ -201,18 +201,27 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   parallel logins as the same user lost a session, and that test found itself logged out (plan
   8d, 2026-11-09).
 
+## Framework
+
+- WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the `hbmusic`
+  prefix and text domain), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
+  them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and `php:S105` (spaces)
+  are off in the user's VS Code user settings, because that extension reads rule settings only
+  there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
+  stays on, and its findings are fixed or explained.
+
 ## Coding standards by language
 
-The standard for each language this project uses, read at resume (the global `CLAUDE.md`'s
-resume protocol, step 1) and by "Reload rules". Production code means what runs on the site (the
-theme and the plugins); test code means the tests and the tools that check the code.
+The standard for each language this project uses. A written standard file is imported here, so
+it is loaded from the start of every session, before any code is written:
 
-- **PHP** (the theme, the plugins): the WordPress Coding Standards (tabs, `snake_case`, the
-  `hbmusic` prefix and text domain), as `phpcs.xml.dist` enforces them. Where a generic editor
-  rule contradicts them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and
-  `php:S105` (spaces) are off in the user's VS Code user settings, because that extension reads
-  rule settings only there (scope `application`). Every other rule stays on, and its findings
-  are fixed or explained.
+@~/.claude/TYPESCRIPT_STANDARDS.md
+
+Production code means what runs on the site (the theme and the plugins); test code means the
+tests and the tools that check the code.
+
+- **PHP** (the theme, the plugins): the WordPress Coding Standards, as `phpcs.xml.dist` enforces
+  them (see Framework).
 - **TypeScript and the theme's JavaScript:** `~/.claude/TYPESCRIPT_STANDARDS.md`, strictly for
   production code (the theme's scripts in `assets/js/`, type-checked and linted
   with ESLint through `tools/js-check/`). Test code (the browser tests in `tests/e2e/`) is held to clarity instead
