@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "af2d8b55a3774e7b1efb9d4d9105cadb",
+    "content-hash": "edc4b353f370e52ae089927b745ab20f",
     "packages": [],
     "packages-dev": [
         {
@@ -106,16 +106,16 @@
         },
         {
             "name": "dts/site-tools",
-            "version": "v0.3.0",
+            "version": "v0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/direct-technical-solutions/dts-site-tools.git",
-                "reference": "2d7492cc2e25e367e7445040d93e6d8d2bfcd478"
+                "reference": "1837f6c0da5c4b37fb6cf70f2424fe6c267aaadc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/2d7492cc2e25e367e7445040d93e6d8d2bfcd478",
-                "reference": "2d7492cc2e25e367e7445040d93e6d8d2bfcd478",
+                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/1837f6c0da5c4b37fb6cf70f2424fe6c267aaadc",
+                "reference": "1837f6c0da5c4b37fb6cf70f2424fe6c267aaadc",
                 "shasum": ""
             },
             "require": {
@@ -146,10 +146,10 @@
             "description": "The tools that check, test and deploy a DTS WordPress site: run on the developer's computer and in CI, never installed on the website.",
             "homepage": "https://github.com/direct-technical-solutions/dts-site-tools",
             "support": {
-                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/v0.3.0",
+                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/v0.3.1",
                 "issues": "https://github.com/direct-technical-solutions/dts-site-tools/issues"
             },
-            "time": "2026-11-26T14:59:51+00:00"
+            "time": "2026-11-26T16:32:35+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",

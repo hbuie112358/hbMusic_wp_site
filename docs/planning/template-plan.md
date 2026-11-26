@@ -88,10 +88,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   with its Dependabot #1 and #2; `v0.3.0` tagged on `2d7492c` (#5); part 4 done (this site on
   `0.3.0`, #120, `fd7f8d2`; this repository squash only); part 5 shown on staging (the user's
   deploy of `fd7f8d2`, every list "none", correctly). The user found the messages still hard to
-  read, so **next: part 6, release 0.3.1** (T24, its proof done,
-  `findings/step-2.1e-6-out-format-proof.md`), built in `dts-site-tools` on
-  `fix/tested-commit-line`, which holds the tested-commit wording, uncommitted; then the repin
-  here, then live's deploy shows the new layout. **Pull requests merge by squash**
+  read, so part 6, **release 0.3.1** (T24), was built and released (tools #6, `1837f6c`,
+  `v0.3.1`, 2026-11-26) and this site repinned on `build/tools-0.3.1`; **next:** that pull
+  request, then a deploy (staging, then live, when the user chooses) shows the new layout; then
+  2.2. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -994,10 +994,18 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `fd7f8d2`; this repository squash only); (5) the user's next deploy shows the new messages:
   **shown on staging 2026-11-26** (`fd7f8d2`, every list "none", correctly: nothing differed but
   the note); the user found them still hard to read, hence (6) **0.3.1** (T24): the tested-commit
-  line without "by squash or rebase" (made on `dts-site-tools`' `fix/tested-commit-line`,
-  uncommitted, deploy tests 57 of 57), the sections, one rsync list with its scope line, git as a
-  one-line cross-check; its proof done (`findings/step-2.1e-6-out-format-proof.md`); next the
-  build, then the release and repin, then live's deploy shows it.
+  line without "by squash or rebase", the sections, one rsync list with its scope line, git as a
+  one-line cross-check; its proof done (`findings/step-2.1e-6-out-format-proof.md`); **built and
+  released 2026-11-26** (the user's choices: the downloaded plugins' section says whether the pins
+  changed since the place's commit, the plugins that match sharing one line; the "git agrees"
+  line names the files; every page's line kept): tools #6 squash-merged as `1837f6c`, `v0.3.1`
+  tagged on it; 59 stand-in deploy scenarios (two new for the pins line), 6 real-server ones and
+  the self-check 31 of 31 passing, ten planted faults each caught. Found on the way: to a real
+  server rsync marks a file sent with `<`, the local stand-in with `>`. Left as LOW from the
+  review: the "only the lock file's other entries" pins line untested; an unreadable old lock
+  reads as no pins; `bin/site-check`'s lines flush left between the indented ones; an
+  interrupted folder's partial list not shown. This site repinned on `build/tools-0.3.1`
+  (`bin/check` 39 of 39); next, live's deploy shows the new layout.
 - [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's
   plugin for any site that wants it, T16): each released by a Git tag, this site requiring them
   through Composer. Built once here: the dev site, the tests and `bin/deploy` installing a DTS
