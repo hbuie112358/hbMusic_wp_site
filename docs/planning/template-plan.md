@@ -101,10 +101,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   `1ffdbf7`, pushed, unmerged), `dts-song-list` released as `v0.2.1`; this site switched to it on
   `feat/song-list-from-dts` (`f73cf01`, local), proven by `bin/dev-site`, `bin/check` and the
   specs. **Now: 2.2c,** together (T27): steps 1 and 2 done, `dts-editing-help` `v0.1.1` on
-  `da3f399` and `dts-site-hardening` `v0.3.0` on `990361e`, each `main` protected; step 3 built
-  and proven, uncommitted, with two tools fixes for 0.4.0 (the 2.2 entry; the starter broken
-  until 2.2d); **next:** the review gate and commits in both repositories, then the tools' pull
-  request and `0.4.0`, this branch repinned to it before its own pull request. **Pull requests merge by squash**
+  `da3f399` and `dts-site-hardening` `v0.3.0` on `990361e`, each `main` protected; step 3 done
+  (this site `7206cb6`, local), with two tools fixes for 0.4.0 (`598905b` on `feat/dts-plugins`,
+  not pushed; the 2.2 entry; the starter broken until 2.2d); **next:** the tools' pull request
+  and `0.4.0` (each the user's yes), this branch repinned to it before its own pull request. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -1066,7 +1066,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   plugin's files unchanged from `0903c1e` with the standard files; `bin/plugin-check --tag` 9 of
   9 for each with nothing to fix, `check / check` passing on GitHub (the button's run and the
   tag's), `main` protected, **`dts-editing-help` `v0.1.1` (`da3f399`) and `dts-site-hardening`
-  `v0.3.0` (`990361e`) tagged and pushed**; step 3 built 2026-11-26, uncommitted: this site
+  `v0.3.0` (`990361e`) tagged and pushed**; step 3 done 2026-11-26 (`7206cb6`, local; the tools' fixes `598905b`, not pushed): this site
   requires both in `site-packages/` (locked at `da3f399` and `990361e`, each code file identical
   to the removed folder, the same four release files added and `phpcs.xml.dist` left out as for
   Song List), `plugins/` gone with its allow-list lines, `localPlugins` empty, `plugins` out of
