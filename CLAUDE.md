@@ -70,14 +70,13 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   text domain `song-list`. A change to it is made in its repository (locally
   `~/dev/dts-song-list`) and reaches this site by a new tag and a raised pin, never by editing
   `site-packages/`.
-- `plugins/site-hardening/`: the Site Hardening plugin (plan D26), which names nothing of this
-  site, so it can be shared; prefix
+- `plugins/site-hardening/`: the Site Hardening plugin (plan D26): the security headers and
+  other hardening. It names nothing of this site, so it can be shared; the policy's outside
+  sources come from the child theme's `includes/site-facts.php`, each with its reason. Prefix
   `sitehardening`, text domain `site-hardening`.
-- `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way; prefix
-  `editinghelp`, text domain `editing-help`. It shows the content guide in the admin (a panel at
-  the top of the Dashboard, and the guide's page, linked in the left menu under Dashboard), ending with the site's page templates and ready-made
-  sections read from the theme; the child theme supplies its templates' descriptions and its
-  link example through the plugin's filters. The guide's text is also kept in the handbook
+- `plugins/editing-help/`: the Editing Help plugin (handbook H89), shared the same way: the
+  content guide in the admin, fed by the child theme through the plugin's filters. Prefix
+  `editinghelp`, text domain `editing-help`. The guide's text is also kept in the handbook
   (`customer/content-guide.md`), with the same version number; a change goes into both.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
   wording and import file, and the photos.
@@ -104,16 +103,10 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
 - `docs/ROUTINES.md`: the recurring care of the site (deploying, the monthly site check, what to
   do on each alert, visitors' data requests), the same for every DTS site (template plan 1.5c);
   it links each of this site's details (places, host, mail, uptime monitor, plugins and theme,
-  the expected set) to its heading in `docs/SITE_SPECIFIC_ROUTINES.md`, and `bin/check` fails if
-  a link finds no heading there or a heading there has no link (`tools/routines.sh`).
-
-The old site, as exported:
-- Active theme: the parent `music-lite` 1.5 (unmaintained). A `music-lite-child` theme is
-  installed but not active. `twentytwentyfive` 1.2 is installed.
-- Plugins: `updraftplus`, `wordfence`, `wordpress-seo`, and Hostinger's auto-updates
-  plugin (also as a must-use plugin in `wp-content/mu-plugins/`).
-- `wordpress/staging/` is a second complete WordPress install (7.1.4) with the same themes;
-  on the live server it was removed on 2026-11-02 (plan step 0g).
+  the expected set) to its heading in `docs/SITE_SPECIFIC_ROUTINES.md`; `bin/check` keeps the
+  two in step.
+- The old site's themes and plugins as exported: `docs/session-history.md`
+  (`old_site_as_exported`).
 
 ## Commands
 
@@ -132,12 +125,7 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   `bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another site.
 - `bin/dev-site`: builds the dev site from nothing (an empty database each run).
 - `bin/test`: the scenario checks and the browser tests against the dev site; every test runs
-  even after a failure. **Before a commit that touches the site, the theme or a plugin, Claude
-  runs `bin/check` and the browser tests of the part changed** (their spec files, in the
-  Playwright container as `bin/test` runs them), plus any scenario check the change touches; the
-  full `bin/test` runs on GitHub for every pull request (the required `dev-site` job), and Claude
-  runs it locally only for a change that reaches across the site (the user, 2026-11-17: a small
-  code change took about 15 minutes from ready to live, the full tests running three times).
+  even after a failure. What Claude runs before a commit: Testing.
 - `bin/check`: every static check, in pinned containers; every check runs even after a failure.
   Its parts: the site's checks, the site's own in `tests/checks/`, and that the site's workflows
   call the installed tools (`bin/tools-pin`). The tools' own self-check runs in their repository.
@@ -152,8 +140,7 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   the commit `composer.lock` installs; `bin/tools-pin` writes them, never edited by hand.
 - `site-packages/`: the downloaded plugins, pinned by Composer; Dependabot's WordPress.org plugin
   updates merge themselves (T9); updates to `composer/installers` and to the tools wait for the
-  user's review. A tools update (Dependabot raising `dts/site-tools` in `composer.json`) fails
-  `bin/check` until `bin/tools-pin` has run on its branch and its files are committed there.
+  user's review.
 - `bin/versions-check`: the weekly alerts for the parent theme, waiting plugin updates and the
   deploy test server's packages.
 - `bin/deploy staging|live`: run by the user, the only way code reaches staging and live.
@@ -162,16 +149,20 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 - `bin/screenshots previews | baseline | compare`: before/after pictures of the real content, local
   only, never a gate; whether a change looks right is the user's call.
 - `bin/tools-pin`: writes the site's three workflows for the tools release `composer.lock`
-  installs; run after each tools update.
+  installs; run after each tools update, on its branch (`bin/check` fails until then).
 - The tools' `tools/versions.sh`: the one place for the images and downloads the scripts use,
   the parent theme's pinned version included, so raising it takes a tools release.
-- `plugins/site-hardening/`: the security headers and other hardening; the policy's outside
-  sources are this site's facts (`includes/site-facts.php`), each with its reason.
 
 ## Testing
 
-- **Static checks:** `bin/check` (see Commands; in full, `docs/TOOLS.md`), before every commit; it also type-checks the
+- **Static checks:** `bin/check` (see Commands), before every commit; it also type-checks the
   browser tests (TypeScript, strict).
+- **Before a commit that touches the site, the theme or a plugin, Claude runs `bin/check` and
+  the browser tests of the part changed** (their spec files, in the Playwright container as
+  `bin/test` runs them), plus any scenario check the change touches. The full `bin/test` runs on
+  GitHub for every pull request (the required `dev-site` job); Claude runs it locally only for a
+  change that reaches across the site. *Why:* the user, 2026-11-17: a small code change took
+  about 15 minutes from ready to live, the full tests running three times.
 - **Scenario checks** (`tests/scenario/`): behaviour against the running dev site, such as the
   `.env` safety stop, the read-only theme and plugin mounts, and `bin/screenshots`'s previews
   (with a neutral fixture in `tests/scenario/fixtures/screenshots/`). Plain bash: the bats
@@ -179,9 +170,8 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 - **Browser tests** (the tools' `tests/e2e/` and this site's `tests/browser/`, Playwright): the new theme on the dev site, with axe
   (`@axe-core/playwright`) for accessibility and a recorder for the browser's CSP violation
   reports, and the Song List's page and admin form, which log in with the dev admin.
-- **PHPUnit** (unit and integration against a separate test database) arrives with the first
-  plugin that has real logic to test; the Song List has almost none. **Accessibility checks**
-  (axe) run in the dev browser tests since step 4c.
+- **PHPUnit:** none yet; added (unit, and integration against a separate test database) with
+  the first plugin here that has real logic to test.
 - A new test is shown to fail on a planted fault before it counts as working.
 - **The starter is tested with every change to what it shares** (template plan T15, the user,
   2026-11-24): before committing a change to the theme's generic files (anything outside the
@@ -197,7 +187,7 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   2026-11-24): the starter's tests and the full checks run at the milestones (this site switched
   to the shared tools, 2.1d; after 2.2 and 2.3; the starter, 2.4) and before every deploy, which
   stays strict; in between, Claude runs only what a change touches, or nothing for documents and
-  copies. This replaces the rule above until stage 2 is done. *Why:* nothing reaches the website
+  copies. This replaces the starter rule above until stage 2 is done. *Why:* nothing reaches the website
   without `bin/deploy`, and the user wants the work behind the scenes finished quickly.
 - **Tests share one dev site and run in parallel,** so each test is placed by what it changes:
   a test that only looks runs freely; a test that changes only its own uniquely named data (a
@@ -211,23 +201,18 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   parallel logins as the same user lost a session, and that test found itself logged out (plan
   8d, 2026-11-09).
 
-## Framework
-
-- WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the `hbmusic`
-  prefix and text domain), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
-  them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and `php:S105` (spaces)
-  are off in the user's VS Code user settings, because that extension reads rule settings only
-  there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
-  stays on, and its findings are fixed or explained.
-
 ## Coding standards by language
 
 The standard for each language this project uses, read at resume (the global `CLAUDE.md`'s
 resume protocol, step 1) and by "Reload rules". Production code means what runs on the site (the
 theme and the plugins); test code means the tests and the tools that check the code.
 
-- **PHP** (the theme, the plugins): the WordPress Coding Standards, as `phpcs.xml.dist` enforces
-  them (see Framework).
+- **PHP** (the theme, the plugins): the WordPress Coding Standards (tabs, `snake_case`, the
+  `hbmusic` prefix and text domain), as `phpcs.xml.dist` enforces them. Where a generic editor
+  rule contradicts them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and
+  `php:S105` (spaces) are off in the user's VS Code user settings, because that extension reads
+  rule settings only there (scope `application`). Every other rule stays on, and its findings
+  are fixed or explained.
 - **TypeScript and the theme's JavaScript:** `~/.claude/TYPESCRIPT_STANDARDS.md`, strictly for
   production code (the theme's scripts in `assets/js/`, type-checked and linted
   with ESLint through `tools/js-check/`). Test code (the browser tests in `tests/e2e/`) is held to clarity instead
@@ -237,10 +222,8 @@ theme and the plugins); test code means the tests and the tools that check the c
 - **CSS** (the theme, the plugins): `docs/planning/css-standards-notes.md`, read before any CSS
   or `theme.json` work (observations until a global CSS rule exists), and Stylelint in
   `bin/check`.
-- **Bash** (`bin/`, `tools/`, the scenario checks): ShellCheck in `bin/check`.
-- **Gaps:** no written standard yet for Bash (ShellCheck only) or for the theme's JavaScript
-  beyond `TYPESCRIPT_STANDARDS.md`, its type check and ESLint. Each is written when the user chooses,
-  proposed item by item like the CSS notes.
+- **Bash** (`bin/`, `tools/`, the scenario checks): ShellCheck in `bin/check`; no written
+  standard yet (written when the user chooses, proposed item by item like the CSS notes).
 
 ## Project rules
 
@@ -255,21 +238,17 @@ theme and the plugins); test code means the tests and the tools that check the c
   *Why:* the user wants to commit freely and decide separately what goes public, without
   having to remember when to push.
 - **The pull request carries the story's message; it becomes the squash commit on `main`.**
-  Pull requests merge by squash (the global `WORKING_STYLE.md`, since 2026-11-26; rebase
-  before). The pull request's title and description are the squash commit's subject and body,
-  written as that rule says and approved by the user before the push, ending with
-  `Co-Authored-By: Claude …` and with no "Generated with Claude Code" line; the merge passes the
-  same text (`gh pr merge --squash --subject … --body-file -`). Commits on the branch are working
-  notes, short, in the Conventional Commits form, with the same `Co-Authored-By` line.
+  The squash rule of the global `WORKING_STYLE.md` applies; in this project the pull request's
+  title and description are that squash message, ending with `Co-Authored-By: Claude …` and
+  with no "Generated with Claude Code" line. Commits on the branch are working notes, short, in
+  the Conventional Commits form, with the same `Co-Authored-By` line.
   *Why:* the squash commit credits both the user (author) and Claude (co-author), so a pull
   request line crediting only Claude would misstate the work; one approved text is both the
   pull request's and `main`'s, so the two cannot drift.
   Exception: Dependabot's update commits keep the messages Dependabot writes
   (`.github/dependabot.yml` shapes their subject line); they are neither the user's nor Claude's
-  work. The tools' plugin-updates workflow merges them by squash (since tools 0.3.0), passing
-  Dependabot's own commit message explicitly, so `main` gets that one commit's message whatever
-  the repository's default squash message is; a pull request with more than one commit waits
-  for the user.
+  work. The tools' plugin-updates workflow squash-merges them with that message; a pull request
+  with more than one commit waits for the user.
 
 - **Git versions only an allow-list.** `.gitignore` ignores everything and allows back only
   the paths listed in it (the project's notes and plan, the tooling, the configuration, the
