@@ -1,0 +1,34 @@
+/*
+ * Panel: a band set apart from the page by its own background, drawn as a block within the page's
+ * frame instead of a stripe across the screen (plan D29; the user asked for one frame on every
+ * page). Markup: the class "site-panel" on a group, next to the class of the component that gives
+ * it its look (site-hero, site-features, site-cta), with WordPress's wide alignment (in a
+ * template, on the template part that holds it). A new kind of panel needs only the class.
+ *
+ * The frame's width and centring come from WordPress itself: the wide alignment is the theme's
+ * wide width (theme.json), so no rule here overrides the layout. Owned here, so every panel
+ * behaves the same: its inner margin at the sides, rounded corners and the space between panels.
+ * The components keep only their own look and their spacing above and below.
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-panel {
+	padding-inline: var(--wp--custom--spacing--gutter);
+	border-radius: var(--wp--custom--panel-radius);
+}
+
+/*
+ * Two panels in a row keep a section's spacing between them: their backgrounds would otherwise
+ * meet, and a plain section's padding, which separates other neighbours, is not there.
+ */
+.wp-block-group.site-panel + .wp-block-group.site-panel {
+	margin-top: var(--wp--custom--spacing--section);
+}
+
+/*
+ * A panel that opens the page stands a gutter below the header, as panels stand off the page's
+ * sides, instead of touching the header's edge.
+ */
+.wp-block-post-content > .wp-block-group.site-panel:first-child {
+	margin-top: var(--wp--custom--spacing--gutter);
+}

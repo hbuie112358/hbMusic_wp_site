@@ -1,0 +1,165 @@
+/*
+ * Carousel: a row of slides (videos, pictures) that scrolls sideways and snaps to each slide, in CSS
+ * only (plan D29, option A+ chosen by the user over a scripted carousel). Markup: a group
+ * "site-carousel" (a section labelled for screen readers); each direct child is a slide.
+ *
+ * - The row is as wide as the page's frame (a wide block). The current slide sits in the middle,
+ *   with a small, equal part of its neighbours showing on each side, so it is clear there is more.
+ * - Swipe on touch screens, the trackpad or scrollbar with a mouse, the arrow keys once the row has
+ *   the keyboard focus (the theme makes the row focusable; see below) or a video inside it.
+ * - Browsers with CSS's native carousel controls (Chrome and Edge since 135; not yet Safari or
+ *   Firefox, which ignore these rules) also show previous/next buttons and one dot per slide.
+ * - Embedded videos are lazy-loaded, the first ones included (functions.php; WordPress alone left
+ *   the first three images and embeds of a page eager), so a player loads as the visitor nears
+ *   it; slides beside the current one count as near.
+ * - No wrap-around from the last slide to the first: that needs a script.
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-carousel {
+	/*
+	 * The row is a size container, so its slides and spacers are sized in cqi, hundredths of the
+	 * row's own width. Percentages would refer to the column each grid track sits in, not the row.
+	 */
+	container-type: inline-size;
+	display: grid;
+	grid-auto-columns: max-content;
+	grid-auto-flow: column;
+	gap: var(--wp--custom--carousel--gap);
+	padding-bottom: var(--wp--custom--carousel--gap);
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+
+	/*
+	 * In browsers without the native buttons (Firefox, Safari) the scrollbar is the only visible
+	 * sign that the row moves sideways: the user first missed Firefox's default one on the dark
+	 * page, then found a green one too loud. A soft grey thumb on the dark track is visible
+	 * (well above 3:1) without competing with the buttons.
+	 */
+	scrollbar-color: var(--wp--preset--color--accent-6) var(--wp--preset--color--accent-5);
+
+	/*
+	 * The arrows are placed against the row by this name; scoped to the row, so with several
+	 * carousels on a page each one's arrows stay on it instead of all following the last.
+	 */
+	anchor-name: --site-carousel;
+	anchor-scope: --site-carousel;
+	scroll-marker-group: after;
+}
+
+/*
+ * The row is reachable with the Tab key (functions.php adds tabindex), so the arrow keys scroll it;
+ * a ring shows when it has the keyboard focus.
+ */
+.wp-block-group.site-carousel:focus-visible {
+	outline: var(--wp--custom--focus-ring--width) solid var(--wp--preset--color--accent-1);
+	outline-offset: var(--wp--custom--focus-ring--offset);
+}
+
+/* Slides sit side by side: no flow-layout gap above each one, and each snaps to the row's middle. */
+.wp-block-group.site-carousel > * {
+	width: var(--wp--custom--carousel--slide-width);
+	margin-block: 0;
+	scroll-snap-align: center;
+}
+
+/*
+ * An empty spacer before the first slide and after the last, each as wide as one side's peek, so
+ * those two can reach the middle too. With both the same width, the last slide's middle stop is
+ * exactly the end of the row, never an approximation that would leave the "next" button showing
+ * (the user saw that at the last video). Generated content, not slides: no dot, never focused.
+ */
+.wp-block-group.site-carousel::before,
+.wp-block-group.site-carousel::after {
+	width: calc((100cqi - var(--wp--custom--carousel--slide-width)) / 2 - var(--wp--custom--carousel--gap));
+	content: "";
+}
+
+/* A video is a slide itself, at the usual 16:9 shape. */
+.site-carousel > iframe {
+	height: auto;
+	aspect-ratio: 16 / 9;
+	border: 0;
+}
+
+/*
+ * Native previous/next buttons, over the row's left and right edges, where supported: quiet dark
+ * discs that turn green only when pointed at, like the outlined buttons, so green stays for the
+ * page's main action (the user found green arrows too loud).
+ */
+.site-carousel::scroll-button(*) {
+	position: absolute;
+	position-anchor: --site-carousel;
+	top: calc(anchor(center) - var(--wp--custom--carousel--button-size) / 2);
+	width: var(--wp--custom--carousel--button-size);
+	height: var(--wp--custom--carousel--button-size);
+	font-size: 1.25rem;
+
+	/* Its own token: the disc stays dark over the video in any look, so the arrow must stay light. */
+	color: var(--wp--custom--carousel--button-color);
+	cursor: pointer;
+	background: var(--wp--custom--carousel--button-background);
+	border: 1px solid var(--wp--preset--color--accent-6);
+	border-radius: 50%;
+	transition:
+		background-color var(--wp--custom--motion--duration) ease,
+		color var(--wp--custom--motion--duration) ease;
+}
+
+@media (hover: hover) {
+	.site-carousel::scroll-button(*):hover {
+		color: var(--wp--preset--color--base);
+		background: var(--wp--preset--color--accent-1);
+	}
+}
+
+.site-carousel::scroll-button(left) {
+	left: calc(anchor(left) + var(--wp--custom--carousel--gap));
+	content: "←" / "Previous video";
+}
+
+.site-carousel::scroll-button(right) {
+	right: calc(anchor(right) + var(--wp--custom--carousel--gap));
+	content: "→" / "Next video";
+}
+
+/* At either end the button that leads nowhere fades out. */
+.site-carousel::scroll-button(*):disabled {
+	cursor: default;
+	opacity: 0;
+}
+
+.site-carousel::scroll-button(*):focus-visible {
+	outline: var(--wp--custom--focus-ring--width) solid var(--wp--preset--color--contrast);
+	outline-offset: var(--wp--custom--focus-ring--offset);
+}
+
+/* One dot per slide, under the row, in soft grey; the current slide's dot is filled in warm white. */
+.site-carousel::scroll-marker-group {
+	display: flex;
+	justify-content: center;
+	gap: var(--wp--custom--carousel--marker-size);
+	margin-top: var(--wp--custom--carousel--gap);
+}
+
+.site-carousel > *::scroll-marker {
+	width: var(--wp--custom--carousel--marker-size);
+	height: var(--wp--custom--carousel--marker-size);
+	content: "";
+	border: 2px solid var(--wp--preset--color--accent-6);
+	border-radius: 50%;
+}
+
+.site-carousel > *::scroll-marker:target-current {
+	background: var(--wp--preset--color--contrast);
+	border-color: var(--wp--preset--color--contrast);
+}
+
+/* People who ask their device for less motion get an instant jump instead of a glide. */
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-group.site-carousel {
+		scroll-behavior: auto;
+	}
+}

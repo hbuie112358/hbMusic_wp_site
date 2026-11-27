@@ -1,0 +1,103 @@
+/*
+ * Forms made with Contact Form 7 (contact, booking or quote forms): one field per line, labels
+ * above their fields, and a focus ring a keyboard user can follow (docs/SITE_CHECKLIST.md 7.2).
+ * Loaded only on pages with a form (functions.php).
+ */
+
+.wpcf7 label {
+	display: block;
+	margin-bottom: var(--wp--custom--spacing--form-field);
+	font-weight: 600;
+}
+
+.wpcf7 input:not([type="submit"]),
+.wpcf7 textarea {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	margin-top: 6px;
+	padding: 12px;
+	font: inherit;
+	color: var(--wp--preset--color--contrast);
+	background: var(--wp--preset--color--accent-4);
+	border: 1px solid var(--wp--preset--color--accent-6);
+	border-radius: var(--wp--custom--radius);
+
+	/* The browser's own parts of the fields (the date picker) follow the page's look, light or dark. */
+	color-scheme: var(--wp--custom--color-scheme);
+}
+
+.wpcf7 textarea {
+	height: 9em;
+}
+
+.wpcf7 input:focus,
+.wpcf7 textarea:focus {
+	outline: 2px solid var(--wp--preset--color--accent-1);
+	outline-offset: 2px;
+}
+
+/* The send button looks and responds like the site's other main buttons (buttons.css). */
+.wpcf7 input[type="submit"] {
+	padding: var(--wp--custom--button--padding-block) 32px;
+	font: inherit;
+	font-weight: 700;
+	color: var(--wp--preset--color--base);
+	cursor: pointer;
+	background-color: var(--wp--preset--color--accent-1);
+	background-image: linear-gradient(to bottom, rgb(255 255 255 / 8%), transparent);
+	border: 0;
+	border-radius: var(--wp--custom--radius);
+	box-shadow: var(--wp--preset--shadow--button-glow);
+	transition:
+		box-shadow var(--wp--custom--motion--duration) ease,
+		transform var(--wp--custom--motion--duration) ease;
+}
+
+/* Only on devices that really point; a touch screen would keep it lifted after a tap. */
+@media (hover: hover) {
+	.wpcf7 input[type="submit"]:hover {
+		box-shadow: var(--wp--preset--shadow--button-glow-raised);
+		transform: translateY(var(--wp--custom--button--lift));
+	}
+}
+
+.wpcf7 input[type="submit"]:focus-visible {
+	outline: var(--wp--custom--focus-ring--width) solid var(--wp--preset--color--accent-1);
+	outline-offset: var(--wp--custom--focus-ring--offset);
+}
+
+/* People who ask their device for less motion get no lift. */
+@media (prefers-reduced-motion: reduce) {
+	.wpcf7 input[type="submit"] {
+		transition: none;
+	}
+
+	.wpcf7 input[type="submit"]:hover {
+		transform: none;
+	}
+}
+
+.wpcf7 .wpcf7-not-valid-tip {
+	color: var(--wp--custom--color--form-error);
+}
+
+/*
+ * The form ends without space of its own below, like any other block, so a page ending with a
+ * form has the same space before the footer as every other page (template plan 1.3b): the send
+ * button's line, the form's last paragraph, had a bottom margin that reached past the form.
+ */
+.wpcf7 form > p:last-of-type {
+	margin-bottom: 0;
+}
+
+/*
+ * The message after sending, under the send button, also without space below. As specific as
+ * Contact Form 7's own rule (.wpcf7 form .wpcf7-response-output), which otherwise wins and adds
+ * its margin around the message.
+ */
+.wpcf7 form .wpcf7-response-output {
+	margin: var(--wp--custom--spacing--form-field) 0 0;
+	padding: 12px;
+	border-radius: var(--wp--custom--radius);
+}

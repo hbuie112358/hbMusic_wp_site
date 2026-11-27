@@ -2,12 +2,12 @@
 
 *In this file "the user" is the person Claude works with, and "Claude" is the assistant.*
 
-The site layer a new DTS brochure site starts from (template plan 1.6, T12 and T13): a neutral,
-light placeholder look, logo and wording that work out of the box and are replaced by the
-site's own. At template plan 2.4 this folder becomes the `dts-site-starter` repository's site
-layer; until then it lives here, checked by this repository's `bin/check`, and tested on a dev
-site of its own whenever a change touches what it shares with this site (T15; during stage 2, at
-the milestones, T21).
+The site a new DTS brochure site starts from (template plan 1.6, T12 and T13): a full child
+theme with a neutral, light placeholder look, logo and wording that work out of the box and are
+replaced by the site's own. At template plan 2.4c this folder becomes the `dts-site-starter`
+repository; until then it lives here, checked by this repository's `bin/check`, and tested on a
+dev site of its own whenever a change touches what it shares with this site (T15; during stage
+2, at the milestones, T21).
 
 ## What is here
 
@@ -20,22 +20,26 @@ the milestones, T21).
   `composer.lock` into `site-packages/wp-content/` (ignored by git). Dependabot does not update
   this list until 2.4 gives the starter its own repository, so its versions may be older than
   this site's.
-- `theme/`: only the site layer, the files listed in the tools' `tools/site-layer-files.txt`, each at the path
-  of the file it replaces in a full child theme, plus the logo in `assets/images/`. Everything
-  else (the component stylesheets, the scripts, `functions.php`, the page templates) is the shared
-  theme code, which the starter's dev site takes from this repository's theme until template plan
-  2.4 copies it into the starter's own theme (T29): `SITE_DIR=starter bin/dev-site` assembles the
-  full theme into `themes/dts-starter/` (`tools/site-theme.sh`; build output, ignored by git) and
-  builds the starter's dev site, and `SITE_DIR=starter bin/test` tests it.
-  - `theme.json`: the palette below and every design token the components read.
-  - `style.css`: the theme's name and description, which a new site changes.
-  - `parts/`: the header, the footer and the call to action ("Ready to talk?", a button "Get in
-    touch" to `/contact/`).
-  - `patterns/site-logo.php` and `assets/images/site-logo.svg`: a placeholder mark.
-  - `includes/site-facts.php`: no old addresses, no areas served, the plain schema.org
-    Organization, and the Content-Security-Policy's outside sources for the contact form's
-    Turnstile check only. The theme's click-to-load videos allow their own player; a site pasting
-    YouTube's player code into its pages adds https://www.youtube.com there.
+- `themes/dts-starter/`: the starter's full child theme (template plan 2.4b, T29), built by
+  `SITE_DIR=starter bin/dev-site` and tested by `SITE_DIR=starter bin/test`. Two kinds of files:
+  - **The shared theme files** (the component stylesheets, the scripts, `functions.php`, the
+    page templates, the video carousel pattern, the grain picture): identical to this
+    repository's theme, which `bin/check` holds both ways (`tests/checks/starter.sh`). A change
+    to one is made in both until the starter has its own repository (2.4c), whose theme is then
+    the master copy, each change copied by hand into each site that wants it (T29). No
+    `screenshot.png`: each new site makes its own (T15).
+  - **The site layer,** the files listed in the tools' `tools/site-layer-files.txt`, plus the
+    logo in `assets/images/`, each replaced by a new site's own:
+    - `theme.json`: the palette below and every design token the components read.
+    - `style.css`: the theme's name and description, which a new site changes, and its
+      `Version`, raised with every change to `patterns/`.
+    - `parts/`: the header, the footer and the call to action ("Ready to talk?", a button "Get
+      in touch" to `/contact/`).
+    - `patterns/site-logo.php` and `assets/images/site-logo.svg`: a placeholder mark.
+    - `includes/site-facts.php`: no old addresses, no areas served, the plain schema.org
+      Organization, and the Content-Security-Policy's outside sources for the contact form's
+      Turnstile check only. The theme's click-to-load videos allow their own player; a site
+      pasting YouTube's player code into its pages adds https://www.youtube.com there.
 - `tests/dev-content/`: neutral text for the four pages, where a site keeps its test pages. The Contact page holds the contact form's
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.

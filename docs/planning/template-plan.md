@@ -128,7 +128,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   starter, designed 2026-11-27 in four parts (T30, its step entry): **2.4a done** (2026-11-27):
   the neutral names, tools 0.5.0 (#10, `7f7e563`, tag `v0.5.0`), this site's #124 (`e2d34ea`)
   and the logo fix #125 (`66bde22`, theme `Version` 0.2.1), deployed to staging and live (its
-  entry has the counts). **Now: 2.4b,** the starter's full theme in `starter/`. **The user, about
+  entry has the counts); #126 (`8ce1078`) recorded it. **Now: 2.4b,** the starter's full theme
+  in `starter/`, in three parts (its entry): **2.4b-1** built on `feat/starter-full-theme`;
+  **next 2.4b-2,** the site's facts in a settings file (the user, 2026-11-27), designed for the
+  user's approval first; then 2.4b-3, the assembly out of the tools (0.6.0). **The user, about
   2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
@@ -1236,7 +1239,49 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     the user about 2026-12-04.
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
     From the 2.4a logo fix's review (LOW): the starter's `style.css` gets the same note as this
-    site's (raise `Version` with every change to `patterns/`).
+    site's (raise `Version` with every change to `patterns/`). **Designed 2026-11-27 (the user)
+    in two parts, a third added the same day (2.4b-2):**
+    - [~] **2.4b-1** (this repository, on tools 0.5.0; branch `feat/starter-full-theme`): the
+      starter's full theme committed in `starter/themes/dts-starter/` (35 files: this site's 36
+      less `screenshot.png` and this site's logo, which the assembly had been copying in, plus
+      the starter's logo), `starter/theme/` moved there by `git mv`, so `bin/dev-site` no longer
+      assembles it (it does so only for a site with a `theme/` folder); `.gitignore` and
+      `phpcs.xml.dist` no longer leave `starter/themes/` out; the starter's `style.css` note.
+      `tests/checks/starter.sh`: "holds exactly the site layer" replaced by **"shares this site's
+      theme files"** (every file outside the site layer and `assets/images/`, both ways, byte
+      for byte, plus each picture the shared files name; this site's `screenshot.png` its own),
+      shown failing on three planted faults (a changed script, the grain picture missing, a
+      `screenshot.png` added; each named), restored from backups; the token check reads the
+      starter's own stylesheets; the names check covers the whole starter. **Found by the wider
+      checks, fixed with the user's yes:** a shared comment naming this site (`buttons.css`,
+      "Book Howard", reworded in both copies; reaches live with the next deploy, comment only);
+      PHPStan treating one site's facts as fixed (with the starter's empty old-address list it
+      called the shared redirect unreachable), so `phpstan.neon.dist` declares
+      `DTSTHEME_OLD_ADDRESSES` per-site by type (`dynamicConstantNames`), **temporary until
+      2.4b-2**. Declaring all four facts was tried first and narrowed in the review (MEDIUM):
+      PHPStan does not check a fact's entries against the declared type (a scratch copy with the
+      towns as numbers passed), so the other three stay analysed by their values (the same copy
+      then fails at `functions.php` line 388; the starter passes). `bin/check` 36 passed; the
+      starter's tests all passed (20 of 20 groups, 169 browser tests; its dev site built with no
+      theme assembled). Review LOWs: the identity check compares only pictures the shared files
+      name (none named by a layer file today; no fix, 2.4c replaces the check); a missing
+      `site-layer-files.txt` would show as "differs" for every layer file (later, in 2.4b-3).
+    - [ ] **2.4b-2, next** (the user, 2026-11-27): **the site's facts in a settings file, not in
+      code.** The four facts in `includes/site-facts.php` (old addresses, organization types,
+      areas served, the policy's outside sources) are settings, not logic: a site changes them
+      by editing a settings file every site has (for example `site-facts.json` in the theme's
+      site layer), never PHP. The shared code reads the file and names no site's values;
+      `bin/check` holds the file's shape, naming a wrong entry, as it does `site.json`; a missing
+      or broken file on a server leaves the site working (no redirects, an error-log line). It
+      replaces 2.4b-1's temporary PHPStan setting, since PHPStan then sees no site's values.
+      Designed in full (where the file lives, how it is read and how often, its check, its
+      failure paths, its tests, both themes, the deploy) for the user's approval before
+      anything is built.
+    - [ ] **2.4b-3** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
+      `assemble_layer_theme` and `SITE_LAYER_DIR` removed, `docs/TOOLS.md` and the changelog;
+      `tools/site-layer-files.txt` kept (the one list of a site's own files, needed to copy a
+      shared change by hand, T29) with `site_layer_listed_files`, which `starter.sh` uses; then
+      this site's repin and `bin/tools-pin`, each with the user's yes.
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone).
   - [ ] **2.4d** the guides; handbook chapter 7's wording proposed.

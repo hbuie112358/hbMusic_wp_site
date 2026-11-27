@@ -1,0 +1,11 @@
+/*
+ * Lead: a page's or panel's opening statement, the sentence that says what it is about, a step
+ * larger than body text at every screen width (the lead size token grows from a phone's to a
+ * computer's). Markup: the class "site-lead" on a paragraph; used under the hero's headline and
+ * in the call-to-action panel, so the site's statement lines match.
+ */
+
+.site-lead {
+	font-size: var(--wp--custom--font-size--lead);
+	line-height: 1.5;
+}

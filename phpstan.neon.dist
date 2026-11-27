@@ -9,5 +9,12 @@ parameters:
     phpVersion: 80400
     paths:
         - themes
+    # Temporary, until template plan 2.4b-2 moves the site's facts into a settings file: the old
+    # addresses (the theme's includes/site-facts.php) are analysed by their type, not by one
+    # site's values, since with the starter's empty list PHPStan reports the shared redirect as
+    # unreachable. PHPStan does not check the list's entries against this type, so only this
+    # fact is declared; the others stay analysed by their values.
+    dynamicConstantNames:
+        DTSTHEME_OLD_ADDRESSES: 'array<string, string>'
     # DTS's plugins are analysed in their own repositories (bin/plugin-check); the tools' dev-site
     # must-use plugins by the tools' self-check (tools/php-check/).
