@@ -126,7 +126,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   page passing, no new PHP log lines; no emoji code on staging's admin and home page, by the
   user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
   starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
-  names, designed and approved, not yet started (first its tools branch). **Pull requests merge by squash**
+  names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, built
+  2026-11-27, uncommitted (the seven tests and the type check on the fixed names,
+  `tools/theme-components.sh` with its test, `SITE_PHP_PREFIX` gone, the token helper loaded once
+  by `bin/check`; self-check 35 of 35), waiting for its review gate; then part 2, this site's
+  branch. **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -1176,9 +1180,13 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 - [ ] **2.4 `dts-site-starter`** and its new-site guide, from `template-notes.md` and handbook
   chapter 7's six steps; the guide points to `site-settings.md` rather than repeating it.
   **Designed 2026-11-27 (T30) in four parts:**
-  - [ ] **2.4a** the neutral names (T30's list) in this site's theme, the starter's site layer
+  - [~] **2.4a** the neutral names (T30's list) in this site's theme, the starter's site layer
     and the tools (0.5.0), the component checks moved into the tools; proven as T30 says;
-    deployed after the user's folder copies and Site Editor check.
+    deployed after the user's folder copies and Site Editor check. Part 1 (tools branch) built,
+    uncommitted, its review gate next. Part 2 (this site's branch) also: `tests/checks/components.sh`
+    deleted, `starter.sh`'s own load of `theme-tokens.sh` and its slug exemption removed (bin/check
+    loads it now; a second load fails), `style.css` `Text Domain: dts-theme`, `phpcs.xml.dist`'s
+    prefix and text domain.
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone).

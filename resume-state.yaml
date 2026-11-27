@@ -4,36 +4,34 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-27T08:30:00-05:00
+timestamp: 2026-11-27T08:43:00-05:00
 current_branch: chore/pause-2026-11-27b
-last_commit: cd8e6b6
+last_commit: f9af335
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-27 (twenty-second session). The user questioned 2.3, the components plugin, and
-  decided T29: the plugin is not built for now; the shared theme code stays in the child theme
-  and is copied into the starter, with neutral names, at 2.4 (the starter's theme then the master
-  copy; no site updates from it by itself); carousels and videos kept; the emoji removal moved
-  into Site Hardening. Step 2.3a done the same day: Site Hardening 0.4.0 (#2, 9d59a9b, tag
-  v0.4.0; the review found the theme's admin emoji removal never worked, since WordPress adds the
-  admin's hooks after init; fixed with admin_init); tools 0.4.2 (#9, 6c3fc58, tag v0.4.2: the
-  emoji tests, and the Site Hardening scenario's probe drafts no longer left behind); this site
-  #123 (cd8e6b6: both pins, the theme's function removed, the starter's list raised, stale "2.3"
-  comments corrected, the project's CLAUDE.md pointing to T21's milestones). Proven on the dev
-  site in three runs (admin fails with 0.3.0; home page, embed, feed, email each fail with the
-  removal off; all pass with 0.4.0, 91 of 91 browser tests). The user deployed cd8e6b6 to staging
-  and live: 6 files each as previewed, every page passing, no new PHP log lines; no emoji code on
-  staging (the user's look) or live (curl). Found on the way: bin/dev-site refuses a DTS plugin
-  from a branch (version check), so the trial went tag-first; updating the tools while the dev
-  site runs empties its dev-only plugins (plan, worth raising (3)). Branch chore/pause-2026-11-27
-  deleted after checking its content is on main.
+  2026-11-27 (twenty-third session). 2.4 designed with the user and recorded as T30 (f9af335):
+  four parts, 2.4a the neutral names here, 2.4b the starter's full theme in starter/, 2.4c the
+  dts-site-starter repository (the milestone), 2.4d the guides and chapter 7's wording; this site
+  takes the same neutral names as the starter (dtstheme_/DTSTHEME_, text domain and patterns
+  dts-theme, handles dtstheme-, folder dts-theme-video-pictures, module @dts-theme/video-shared;
+  T30 has the list). 2.4a part 1 approved and built, uncommitted, on dts-site-tools branch
+  feat/neutral-theme-names (from main 6c3fc58): the seven tests and tools/js-check/tsconfig.json
+  on the fixed names; tools/theme-components.sh, the three component checks moved from the site,
+  run by bin/check for every site, with tests/tools/theme-components/run.sh (10 examples, three
+  planted faults each caught, file restored and compared identical); SITE_PHP_PREFIX removed;
+  bin/check loads tools/theme-tokens.sh once; docs/TOOLS.md, CHANGELOG.md (Unreleased, two
+  breaking changes), the self-check's list. Self-check 35 of 35 passed. A copied comment was
+  wrong (site-hero__photo does not count for site-hero; grep's \b treats _ as a word character)
+  and was corrected, with a test of both cases.
 
 next_action: >
-  Template plan 2.4, the starter (dts-site-starter), not yet designed: read its step entry (now
-  including T29's copy of the full child theme with neutral names) and T29, T15, T16, then
-  propose its design to the user in parts. The rebuild plan's 9u stays waiting for a break that
-  suits the user.
+  2.4a part 1: run the review gate on the uncommitted tools branch feat/neutral-theme-names in
+  ~/dev/dts-site-tools (git diff there; the new files tools/theme-components.sh and
+  tests/tools/theme-components/run.sh), report, wait for the user's fixes choice and "commit".
+  Then part 2, this site's branch: propose its changes first (T30 and the 2.4a step entry list
+  them). The rebuild plan's 9u stays waiting for a break that suits the user.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
@@ -50,13 +48,20 @@ verification:
   repin_command: "No written command raises the tools' pin in a site: the README's install command with composer.lock mounted writable and 'composer update dts/site-tools' (used again 2026-11-27); run bin/dev-site afterwards, or the running dev site loses its dev-only plugins"
 
 uncommitted_changes:
-  - file: docs/planning/template-plan.md
-    why: Committed with this pause (Current position, 2.3a marked done).
   - file: branches
     why: >
-      chore/pause-2026-11-27b holds only this pause commit, local, not pushed; main is even with
-      origin/main at cd8e6b6. Nothing else local.
-  - file: ~/dev/dts-site-tools, ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
+      chore/pause-2026-11-27b, local, not pushed: 2 commits not on origin/main (3b6a55d the last
+      pause, f9af335 T30), reaching main with the next pull request; main even with origin/main
+      at cd8e6b6.
+  - file: ~/dev/dts-site-tools (branch feat/neutral-theme-names, local, no commits yet)
+    why: >
+      2.4a part 1, uncommitted, waiting for the review gate and the user's "commit": modified
+      CHANGELOG.md, bin/check, docs/TOOLS.md, tests/e2e/specs/dev/components/component-styles.spec.ts,
+      tests/scenario/components/dev-embed-titles.sh, dev-patterns.sh, dev-privacy-link.sh,
+      dev-stylesheet-versions.sh, dev-video-pictures.sh, tests/scenario/generic/dev-organization-areas.sh,
+      tests/tools/check-tools.sh, tools/js-check/tsconfig.json; new tests/tools/theme-components/,
+      tools/theme-components.sh. main even with origin at 6c3fc58.
+  - file: ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
     why: Each main even with origin, clean, no other branches.
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
@@ -68,13 +73,13 @@ uncommitted_changes:
       review-gate-without-asking, say-the-step-each-message) and time-log.csv. Unchanged by this
       session apart from time-log.csv; all were already uncommitted at its start.
   - file: the session scratchpad
-    why: >
-      Throwaway logs, plus run-spec.sh, a small script that runs one Playwright spec as bin/test
-      does (lost with the session; the tools have no written way to run one spec, see
-      pending_decisions).
+    why: Throwaway only (the self-check's log, a backup of theme-components.sh used for the planted faults).
 
 pending_decisions:
-  - Template plan 2.4's design (next_action), for the user to approve in parts.
+  - >
+    2.4a part 1's review gate and commit (next_action); part 2's changes, to propose. Before 2.4a's
+    deploys (the user): the video picture folder copied to dts-theme-video-pictures in hPanel on
+    staging and live, the Site Editor checked for a saved header (T30).
   - >
     The plan's "worth raising" (3): updating the tools while the dev site runs empties its
     dev-only plugins; a written rule (run bin/dev-site after a tools update, with the unwritten
@@ -95,8 +100,8 @@ pending_decisions:
     removed once no project names them; each other project gets PROJECT_UPGRADE.md part C at its
     next session start.
   - >
-    LOW, found 2026-11-26: bin/check prints "readonly variable" twice because tests/checks/components.sh
-    and starter.sh both source the tools' theme-tokens.sh (values identical); to fix in the tools later.
+    LOW, found 2026-11-26: bin/check prints "readonly variable" twice (theme-tokens.sh sourced by
+    two site checks); fixed by 2.4a (bin/check loads it once; part 2 removes starter.sh's load).
   - >
     Left as LOW from T26's and 2.2a's reviews: the site-side names check runs in bin/dev-site only,
     not in bin/deploy; plugin-check.yml repeats the install command; SONGLIST_VERSION not checked
@@ -133,21 +138,23 @@ pending_decisions:
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T29, the 2.4 entry.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
   - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
-  - ~/dev/dts-site-tools: the tools' repository (main 6c3fc58, tag v0.4.2).
+  - ~/dev/dts-site-tools: the tools' repository (main 6c3fc58, tag v0.4.2; branch feat/neutral-theme-names, uncommitted 2.4a part 1).
   - ~/dev/dts-site-hardening (main 9d59a9b, tag v0.4.0), ~/dev/dts-song-list, ~/dev/dts-editing-help: the plugin repositories.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository,
-     ~/dev/dts-site-tools (main 6c3fc58, tag v0.4.2), the three plugin repositories (each main even
-     with origin, clean) and ~/dev/dts-handbook.
+     ~/dev/dts-site-tools (main 6c3fc58; branch feat/neutral-theme-names with the uncommitted files
+     listed above), the three plugin repositories (each main even with origin, clean) and
+     ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T29, T15, T16 above all, for 2.4) and the 2.4 entry.
-  3. Then next_action: design 2.4 with the user. Open every reply with the step being worked on,
-     word details plainly, end with one clear question, and say when a good moment to pause comes.
-  4. The pause commit is on chore/pause-2026-11-27b (local); it reaches main with the next pull request.
+     (T30, T29 above all) and the 2.4 entry.
+  3. Then next_action: the review gate on the tools branch. Open every reply with the step being
+     worked on, word details plainly, end with one clear question, and say when a good moment to
+     pause comes.
+  4. The pause commits are on chore/pause-2026-11-27b (local); they reach main with the next pull request.
