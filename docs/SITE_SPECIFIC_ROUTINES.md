@@ -104,4 +104,6 @@ they are confirmed or corrected with what rebuild plan 9q finds.
 ## Video pictures
 
 The click-to-load videos (rebuild plan 9v) keep their pictures in
-`wp-content/uploads/hbmusic-video-pictures/`.
+`wp-content/uploads/dts-theme-video-pictures/` (named `hbmusic-video-pictures/` until template
+plan 2.4a's deploy, which renamed the theme's shared names, T30; the old folder is copied to the
+new name before that deploy and deleted a week after it).

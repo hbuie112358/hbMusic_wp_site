@@ -12,11 +12,11 @@
  * link plays the video there. A script module (template plan 1.7).
  */
 
-import { PLAYER_ADDED_EVENT, originOf } from '@dts-site-components/video-shared';
+import { PLAYER_ADDED_EVENT, originOf } from '@dts-theme/video-shared';
 
 const FACADE_SELECTOR = 'a.video-facade[data-video-id]';
 // The player's origin comes from the facade (data-player-origin), written from PHP's
-// HBMUSIC_VIDEO_PLAYER_ORIGIN, its one home, which the security policy also allows as a frame;
+// DTSTHEME_VIDEO_PLAYER_ORIGIN, its one home, which the security policy also allows as a frame;
 // only https origins are used.
 const SECURE_ORIGIN_START = 'https://';
 const PLAYER_PATH = '/embed/';

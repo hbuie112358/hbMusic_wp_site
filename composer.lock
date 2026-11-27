@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06d3597ff182ffa9797b8a92d12b20e5",
+    "content-hash": "e9580a547a0c38f10654616f532f57a8",
     "packages": [],
     "packages-dev": [
         {
@@ -106,16 +106,16 @@
         },
         {
             "name": "dts/site-tools",
-            "version": "v0.4.2",
+            "version": "dev-feat/neutral-theme-names",
             "source": {
                 "type": "git",
                 "url": "https://github.com/direct-technical-solutions/dts-site-tools.git",
-                "reference": "6c3fc58590993e84f4a633d734b13723d4f9eca5"
+                "reference": "4831713bd438329360263d15b7edc3af066a9a2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/6c3fc58590993e84f4a633d734b13723d4f9eca5",
-                "reference": "6c3fc58590993e84f4a633d734b13723d4f9eca5",
+                "url": "https://api.github.com/repos/direct-technical-solutions/dts-site-tools/zipball/4831713bd438329360263d15b7edc3af066a9a2b",
+                "reference": "4831713bd438329360263d15b7edc3af066a9a2b",
                 "shasum": ""
             },
             "require": {
@@ -147,10 +147,10 @@
             "description": "The tools that check, test and deploy a DTS WordPress site: run on the developer's computer and in CI, never installed on the website.",
             "homepage": "https://github.com/direct-technical-solutions/dts-site-tools",
             "support": {
-                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/v0.4.2",
+                "source": "https://github.com/direct-technical-solutions/dts-site-tools/tree/feat/neutral-theme-names",
                 "issues": "https://github.com/direct-technical-solutions/dts-site-tools/issues"
             },
-            "time": "2026-11-27T12:48:04+00:00"
+            "time": "2026-11-27T13:52:46+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -661,7 +661,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "dts/site-tools": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},

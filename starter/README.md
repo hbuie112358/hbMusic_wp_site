@@ -40,8 +40,8 @@ the milestones, T21).
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.
 
-The text domain and prefix `hbmusic` are the shared theme code's until template plan 2.4 renames
-them (T29); `bin/check` allows that one name here and refuses the site's others.
+The shared theme code's text domain (`dts-theme`) and PHP prefix (`dtstheme_`, `DTSTHEME_`) are
+the same in every site (template plan T30); `bin/check` refuses any of this site's names here.
 
 ## The palette and its contrast
 

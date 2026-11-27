@@ -126,11 +126,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   page passing, no new PHP log lines; no emoji code on staging's admin and home page, by the
   user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
   starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
-  names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, built
-  2026-11-27, uncommitted (the seven tests and the type check on the fixed names,
-  `tools/theme-components.sh` with its test, `SITE_PHP_PREFIX` gone, the token helper loaded once
-  by `bin/check`; self-check 35 of 35), waiting for its review gate; then part 2, this site's
-  branch. **Pull requests merge by squash**
+  names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, committed
+  `4831713` after its review gate and pushed (no pull request yet); part 2, this site's branch
+  `feat/neutral-theme-names` on the tools branch (`dev-feat/neutral-theme-names`), built and
+  proven 2026-11-27, waiting for its review gate (its 2.4a entry has the counts). Then 0.5.0,
+  the repin to it, the pull requests; then the user's folder copies and the deploys.
+  **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -161,7 +162,14 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   again. To decide: a written rule (after updating the tools, run `bin/dev-site`), joined with the
   unwritten repin command, or a mount Composer does not replace; (4) at Site Hardening's next
   release (from 2.3a's review, LOW): its `composer.json` description names neither the emoji
-  removal nor the unfiltered-HTML rule (metadata only, shown in sites' lock files).
+  removal nor the unfiltered-HTML rule (metadata only, shown in sites' lock files); (5)
+  `bin/screenshots` shoots each page once the network is idle (`waitUntil: 'networkidle'` in the
+  tools' `tests/e2e/screenshots/pages.spec.ts`) but does not wait for the web fonts, so on a
+  freshly built dev site the first pages can be shot in the fallback font and differ from the
+  baseline (2.4a, 2026-11-27: the About page, both widths; identical on the next run); a wait for
+  `document.fonts.ready` before each shot, in a tools release; (6) from 2.4a part 1's review,
+  LOW: the site-layer check's test (`tests/tools/site-layer/run.sh` in the tools) creates its
+  temporary folder without stopping when `mktemp` fails, as the new component test now does.
 - **Then, in order:** 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3 (the
   components plugin) waits for T29's conditions.
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -1182,11 +1190,26 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   **Designed 2026-11-27 (T30) in four parts:**
   - [~] **2.4a** the neutral names (T30's list) in this site's theme, the starter's site layer
     and the tools (0.5.0), the component checks moved into the tools; proven as T30 says;
-    deployed after the user's folder copies and Site Editor check. Part 1 (tools branch) built,
-    uncommitted, its review gate next. Part 2 (this site's branch) also: `tests/checks/components.sh`
-    deleted, `starter.sh`'s own load of `theme-tokens.sh` and its slug exemption removed (bin/check
-    loads it now; a second load fails), `style.css` `Text Domain: dts-theme`, `phpcs.xml.dist`'s
-    prefix and text domain.
+    deployed after the user's folder copies and Site Editor check. Part 1 (tools branch):
+    committed `4831713` after its review gate (one fix: the new test stops when `mktemp` fails),
+    self-check 35 of 35, pushed. Part 2 (this site's branch, on the tools branch at
+    `dev-feat/neutral-theme-names`): the theme and the starter's site layer renamed (the class
+    file now `enum-dtstheme-carousel-scan.php`), `tests/checks/components.sh` deleted,
+    `starter.sh`'s own load of `theme-tokens.sh` and its slug exemption removed (bin/check loads
+    it now; a second load fails), `style.css` `Text Domain: dts-theme`, `phpcs.xml.dist`'s prefix
+    and text domain, the workflows written by `bin/tools-pin` for `4831713`, the documents. Proven
+    2026-11-27: `bin/check` 36 passed; the full `bin/test` all passed (249 browser tests, 4
+    skipped by design, the video-pause arrangements); the starter's tests all passed (169 browser
+    tests); `bin/screenshots compare` 24 of 24 identical (a first run, right after the rebuild,
+    showed the About page in the fallback font; run again, identical: "Worth raising" (5)); no
+    page or template on the dev site names `hbmusic/`, `hbmusic:` or `hbmusic-video` (database
+    query). Reviewed 2026-11-27: two findings, both later. **Before the deploys, added by the
+    review (MEDIUM):** the same read-only query on staging and on live (`wp db query` over the
+    places' SSH names, approved by the user then), which must return no rows: a page storing a
+    pattern by its old name would show nothing there after the deploy; T30's Site Editor check
+    covers only a saved header. **At the release step (LOW):** `composer.json` and the three
+    workflows name the tools branch (`dev-feat/neutral-theme-names`, `4831713`) until 0.5.0 is
+    released and pinned, so this branch does not reach `main` before then.
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone).

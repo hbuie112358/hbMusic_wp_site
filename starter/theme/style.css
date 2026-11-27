@@ -5,12 +5,12 @@ Description:       The starting look of a new DTS brochure site: a placeholder p
 Version:           0.1.0
 Requires at least: 7.1
 Requires PHP:      8.4
-Text Domain:       hbmusic
+Text Domain:       dts-theme
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 */
 
 /*
- * The text domain is the shared theme code's (hbmusic) until template plan 2.3 renames that
- * prefix; a site created from the starter changes the name and description above.
+ * The text domain is the shared theme code's (dts-theme), the same in every site (template plan
+ * T30); a site created from the starter changes only the name and description above.
  */

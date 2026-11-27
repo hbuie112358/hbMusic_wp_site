@@ -2,7 +2,7 @@
 /**
  * The child theme's functions.
  *
- * @package hbmusic
+ * @package dts-theme
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,13 +10,13 @@ defined( 'ABSPATH' ) || exit;
 // The site's own facts (its old addresses, organization, areas served, outside sources and link
 // example) are in their own file, the part a new site replaces (template plan 1.6b).
 require_once __DIR__ . '/includes/site-facts.php';
-require_once __DIR__ . '/includes/enum-hbmusic-carousel-scan.php';
+require_once __DIR__ . '/includes/enum-dtstheme-carousel-scan.php';
 require_once __DIR__ . '/includes/video-facade.php';
 
 /**
  * The heading tags, as WordPress's tag processor names them (upper case).
  */
-const HBMUSIC_HEADING_TAGS = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
+const DTSTHEME_HEADING_TAGS = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
 
 /**
  * The theme's component stylesheets (assets/css/components/, plan D29), listed under the block
@@ -24,7 +24,7 @@ const HBMUSIC_HEADING_TAGS = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
  * that have that block, and inlines them, so a page costs no extra request. A new component is
  * one file and its name here.
  */
-const HBMUSIC_COMPONENT_STYLES = array(
+const DTSTHEME_COMPONENT_STYLES = array(
 	'core/template-part' => array( 'site-header', 'site-footer' ),
 	'core/group'         => array( 'texture', 'site-panel', 'site-hero', 'site-section', 'site-features', 'site-cta', 'site-carousel' ),
 	'core/paragraph'     => array( 'site-media', 'site-lead' ),
@@ -38,16 +38,16 @@ const HBMUSIC_COMPONENT_STYLES = array(
  * The form stylesheet, which is loaded by page rather than by block: Contact Form 7's forms are
  * shortcodes, not blocks.
  */
-const HBMUSIC_FORM_STYLESHEET = 'assets/css/components/form.css';
+const DTSTHEME_FORM_STYLESHEET = 'assets/css/components/form.css';
 
 /**
  * The script that pauses embedded YouTube players so only one plays at a time (plan D29), loaded
  * with the click-to-load videos on pages that have one (includes/video-facade.php); its handle; and
  * the addresses that count as a player.
  */
-const HBMUSIC_VIDEO_PAUSE_SCRIPT   = 'assets/js/video-pause.js';
-const HBMUSIC_VIDEO_PAUSE_HANDLE   = 'hbmusic-video-pause';
-const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
+const DTSTHEME_VIDEO_PAUSE_SCRIPT   = 'assets/js/video-pause.js';
+const DTSTHEME_VIDEO_PAUSE_HANDLE   = 'dtstheme-video-pause';
+const DTSTHEME_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com' );
 
 /**
  * What the two video scripts share (template plan 1.7): a script module both import by this name,
@@ -56,36 +56,36 @@ const HBMUSIC_YOUTUBE_PLAYER_HOSTS = array( 'www.youtube.com', 'youtube.com', 'w
  * this site: the scripts' import lines and the type check's settings in tools/ repeat the name,
  * and the tools name no site.
  */
-const HBMUSIC_VIDEO_SHARED_SCRIPT = 'assets/js/video-shared.js';
-const HBMUSIC_VIDEO_SHARED_MODULE = '@dts-site-components/video-shared';
+const DTSTHEME_VIDEO_SHARED_SCRIPT = 'assets/js/video-shared.js';
+const DTSTHEME_VIDEO_SHARED_MODULE = '@dts-theme/video-shared';
 
 /**
  * The theme's scripts load as script modules at the end of the page (template plan 1.7): modules
  * are strict, run once, and wait for the page to be read, as the deferred classic scripts did.
  */
-const HBMUSIC_SCRIPT_MODULE_ARGS = array( 'in_footer' => true );
+const DTSTHEME_SCRIPT_MODULE_ARGS = array( 'in_footer' => true );
 
 /**
  * The script that closes the open hamburger menu on a tap outside it (plan 9t-5), loaded only
  * where a navigation block is rendered, and its handle.
  */
-const HBMUSIC_MENU_CLOSE_SCRIPT = 'assets/js/menu-close-outside.js';
-const HBMUSIC_MENU_CLOSE_HANDLE = 'hbmusic-menu-close-outside';
+const DTSTHEME_MENU_CLOSE_SCRIPT = 'assets/js/menu-close-outside.js';
+const DTSTHEME_MENU_CLOSE_HANDLE = 'dtstheme-menu-close-outside';
 
 /**
  * The class that marks the footer's Privacy Policy link (parts/footer.html), whose address the
- * theme fills in from Settings → Privacy (hbmusic_link_privacy_policy()).
+ * theme fills in from Settings → Privacy (dtstheme_link_privacy_policy()).
  */
-const HBMUSIC_PRIVACY_LINK_CLASS = 'site-privacy-link';
+const DTSTHEME_PRIVACY_LINK_CLASS = 'site-privacy-link';
 
 /**
  * Registers every component stylesheet with the block it styles.
  */
-function hbmusic_register_component_styles(): void {
-	foreach ( HBMUSIC_COMPONENT_STYLES as $block_name => $components ) {
+function dtstheme_register_component_styles(): void {
+	foreach ( DTSTHEME_COMPONENT_STYLES as $block_name => $components ) {
 		array_walk(
 			$components,
-			static fn ( string $component ) => hbmusic_register_component_style( $block_name, $component )
+			static fn ( string $component ) => dtstheme_register_component_style( $block_name, $component )
 		);
 	}
 }
@@ -102,31 +102,31 @@ function hbmusic_register_component_styles(): void {
  * @param string $block_name The block whose appearance loads the stylesheet.
  * @param string $component  The component's name, also its file name.
  */
-function hbmusic_register_component_style( string $block_name, string $component ): void {
+function dtstheme_register_component_style( string $block_name, string $component ): void {
 	$stylesheet = 'assets/css/components/' . $component . '.css';
 	wp_enqueue_block_style(
 		$block_name,
 		array(
-			'handle' => 'hbmusic-' . $component,
+			'handle' => 'dtstheme-' . $component,
 			'src'    => get_theme_file_uri( $stylesheet ),
 			'path'   => get_theme_file_path( $stylesheet ),
-			'ver'    => hbmusic_asset_version( $stylesheet ),
+			'ver'    => dtstheme_asset_version( $stylesheet ),
 		)
 	);
 }
-add_action( 'init', 'hbmusic_register_component_styles' );
+add_action( 'init', 'dtstheme_register_component_styles' );
 
 /**
- * Loads the form stylesheet on pages with a form only (see hbmusic_page_has_booking_form()).
+ * Loads the form stylesheet on pages with a form only (see dtstheme_page_has_booking_form()).
  */
-function hbmusic_enqueue_form_style(): void {
-	if ( ! hbmusic_page_has_booking_form() ) {
+function dtstheme_enqueue_form_style(): void {
+	if ( ! dtstheme_page_has_booking_form() ) {
 		return;
 	}
-	wp_enqueue_style( 'hbmusic-form', get_theme_file_uri( HBMUSIC_FORM_STYLESHEET ), array(), hbmusic_asset_version( HBMUSIC_FORM_STYLESHEET ) );
-	wp_style_add_data( 'hbmusic-form', 'path', get_theme_file_path( HBMUSIC_FORM_STYLESHEET ) );
+	wp_enqueue_style( 'dtstheme-form', get_theme_file_uri( DTSTHEME_FORM_STYLESHEET ), array(), dtstheme_asset_version( DTSTHEME_FORM_STYLESHEET ) );
+	wp_style_add_data( 'dtstheme-form', 'path', get_theme_file_path( DTSTHEME_FORM_STYLESHEET ) );
 }
-add_action( 'wp_enqueue_scripts', 'hbmusic_enqueue_form_style' );
+add_action( 'wp_enqueue_scripts', 'dtstheme_enqueue_form_style' );
 
 /**
  * A theme asset's version for its address (stylesheets, the video script): a fingerprint of its
@@ -140,7 +140,7 @@ add_action( 'wp_enqueue_scripts', 'hbmusic_enqueue_form_style' );
  * @param string $asset The file's path within the theme.
  * @return string The version.
  */
-function hbmusic_asset_version( string $asset ): string {
+function dtstheme_asset_version( string $asset ): string {
 	$fingerprint = md5_file( get_theme_file_path( $asset ) );
 	if ( false !== $fingerprint ) {
 		return $fingerprint;
@@ -158,11 +158,11 @@ function hbmusic_asset_version( string $asset ): string {
  * @param array<string, mixed> $block         The menu link block, with its "url" attribute.
  * @return string The HTML, marked if the link leads to the page being shown.
  */
-function hbmusic_mark_current_menu_link( string $block_content, array $block ): string {
+function dtstheme_mark_current_menu_link( string $block_content, array $block ): string {
 	$attributes = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
 	$link_url   = is_string( $attributes['url'] ?? null ) ? $attributes['url'] : '';
-	$link_path  = hbmusic_site_path( $link_url );
-	if ( null === $link_path || hbmusic_requested_path() !== $link_path ) {
+	$link_path  = dtstheme_site_path( $link_url );
+	if ( null === $link_path || dtstheme_requested_path() !== $link_path ) {
 		return $block_content;
 	}
 	$tags = new WP_HTML_Tag_Processor( $block_content );
@@ -171,7 +171,7 @@ function hbmusic_mark_current_menu_link( string $block_content, array $block ): 
 	}
 	return $tags->get_updated_html();
 }
-add_filter( 'render_block_core/navigation-link', 'hbmusic_mark_current_menu_link', 10, 2 );
+add_filter( 'render_block_core/navigation-link', 'dtstheme_mark_current_menu_link', 10, 2 );
 
 /**
  * Makes every carousel (a group with the class site-carousel, site-carousel.css) reachable with the
@@ -182,14 +182,14 @@ add_filter( 'render_block_core/navigation-link', 'hbmusic_mark_current_menu_link
  * @param string $block_content The group's HTML.
  * @return string The HTML, with tabindex="0" on a carousel.
  */
-function hbmusic_make_carousel_focusable( string $block_content ): string {
+function dtstheme_make_carousel_focusable( string $block_content ): string {
 	$tags = new WP_HTML_Tag_Processor( $block_content );
 	if ( $tags->next_tag() && $tags->has_class( 'site-carousel' ) && null === $tags->get_attribute( 'tabindex' ) ) {
 		$tags->set_attribute( 'tabindex', '0' );
 	}
 	return $tags->get_updated_html();
 }
-add_filter( 'render_block_core/group', 'hbmusic_make_carousel_focusable' );
+add_filter( 'render_block_core/group', 'dtstheme_make_carousel_focusable' );
 
 /**
  * Names each carousel after a heading directly above it, so screen readers announce "Rock" or
@@ -202,35 +202,35 @@ add_filter( 'render_block_core/group', 'hbmusic_make_carousel_focusable' );
  * @param string $block_content The page content's HTML.
  * @return string The HTML, with carousels after a heading linked to it.
  */
-function hbmusic_name_carousels_after_headings( string $block_content ): string {
+function dtstheme_name_carousels_after_headings( string $block_content ): string {
 	$tags     = new WP_HTML_Tag_Processor( $block_content );
-	$position = Hbmusic_Carousel_Scan::Elsewhere;
+	$position = Dtstheme_Carousel_Scan::Elsewhere;
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
-		$position = hbmusic_scan_for_carousel( $tags, $position );
+		$position = dtstheme_scan_for_carousel( $tags, $position );
 	}
 	return $tags->get_updated_html();
 }
-add_filter( 'render_block_core/post-content', 'hbmusic_name_carousels_after_headings' );
+add_filter( 'render_block_core/post-content', 'dtstheme_name_carousels_after_headings' );
 
 /**
  * Advances the scan by the tag at the processor's position, linking a carousel that directly
  * follows a heading.
  *
- * @param WP_HTML_Tag_Processor $tags     The processor, at an opening or closing tag.
- * @param Hbmusic_Carousel_Scan $position Where the scan stood before this tag.
- * @return Hbmusic_Carousel_Scan Where it stands after it.
+ * @param WP_HTML_Tag_Processor  $tags     The processor, at an opening or closing tag.
+ * @param Dtstheme_Carousel_Scan $position Where the scan stood before this tag.
+ * @return Dtstheme_Carousel_Scan Where it stands after it.
  */
-function hbmusic_scan_for_carousel( WP_HTML_Tag_Processor $tags, Hbmusic_Carousel_Scan $position ): Hbmusic_Carousel_Scan {
-	if ( in_array( $tags->get_tag(), HBMUSIC_HEADING_TAGS, true ) ) {
-		return hbmusic_scan_heading( $tags );
+function dtstheme_scan_for_carousel( WP_HTML_Tag_Processor $tags, Dtstheme_Carousel_Scan $position ): Dtstheme_Carousel_Scan {
+	if ( in_array( $tags->get_tag(), DTSTHEME_HEADING_TAGS, true ) ) {
+		return dtstheme_scan_heading( $tags );
 	}
-	if ( Hbmusic_Carousel_Scan::InHeading === $position ) {
+	if ( Dtstheme_Carousel_Scan::InHeading === $position ) {
 		return $position;
 	}
-	if ( Hbmusic_Carousel_Scan::AfterHeading === $position && ! $tags->is_tag_closer() && true === $tags->has_class( 'site-carousel' ) ) {
-		hbmusic_link_carousel_to_heading( $tags );
+	if ( Dtstheme_Carousel_Scan::AfterHeading === $position && ! $tags->is_tag_closer() && true === $tags->has_class( 'site-carousel' ) ) {
+		dtstheme_link_carousel_to_heading( $tags );
 	}
-	return Hbmusic_Carousel_Scan::Elsewhere;
+	return Dtstheme_Carousel_Scan::Elsewhere;
 }
 
 /**
@@ -238,14 +238,14 @@ function hbmusic_scan_for_carousel( WP_HTML_Tag_Processor $tags, Hbmusic_Carouse
  * after it.
  *
  * @param WP_HTML_Tag_Processor $tags The processor, at a heading's opening or closing tag.
- * @return Hbmusic_Carousel_Scan Where the scan stands.
+ * @return Dtstheme_Carousel_Scan Where the scan stands.
  */
-function hbmusic_scan_heading( WP_HTML_Tag_Processor $tags ): Hbmusic_Carousel_Scan {
+function dtstheme_scan_heading( WP_HTML_Tag_Processor $tags ): Dtstheme_Carousel_Scan {
 	if ( $tags->is_tag_closer() ) {
-		return Hbmusic_Carousel_Scan::AfterHeading;
+		return Dtstheme_Carousel_Scan::AfterHeading;
 	}
 	$tags->set_bookmark( 'heading' );
-	return Hbmusic_Carousel_Scan::InHeading;
+	return Dtstheme_Carousel_Scan::InHeading;
 }
 
 /**
@@ -255,7 +255,7 @@ function hbmusic_scan_heading( WP_HTML_Tag_Processor $tags ): Hbmusic_Carousel_S
  *
  * @param WP_HTML_Tag_Processor $tags The processor, at the carousel's opening tag.
  */
-function hbmusic_link_carousel_to_heading( WP_HTML_Tag_Processor $tags ): void {
+function dtstheme_link_carousel_to_heading( WP_HTML_Tag_Processor $tags ): void {
 	$tags->set_bookmark( 'carousel' );
 	$tags->seek( 'heading' );
 	$heading_id = $tags->get_attribute( 'id' );
@@ -276,7 +276,7 @@ function hbmusic_link_carousel_to_heading( WP_HTML_Tag_Processor $tags ): void {
  * @param string $url The link, absolute or starting with "/".
  * @return string|null The path, or null.
  */
-function hbmusic_site_path( string $url ): ?string {
+function dtstheme_site_path( string $url ): ?string {
 	if ( '' === $url ) {
 		return null;
 	}
@@ -295,30 +295,30 @@ function hbmusic_site_path( string $url ): ?string {
 }
 
 /**
- * The path of the page being shown, in the same form as hbmusic_site_path().
+ * The path of the page being shown, in the same form as dtstheme_site_path().
  *
  * @return string The path ("" for the home page).
  */
-function hbmusic_requested_path(): string {
+function dtstheme_requested_path(): string {
 	global $wp;
 	return $wp instanceof WP ? strtolower( trim( $wp->request, '/' ) ) : '';
 }
 
 /**
- * Adds the outside sources the site's pages need (HBMUSIC_OUTSIDE_SOURCES, each with its reason in
+ * Adds the outside sources the site's pages need (DTSTHEME_OUTSIDE_SOURCES, each with its reason in
  * includes/site-facts.php) to the Site Hardening plugin's Content-Security-Policy (plan D26;
  * docs/SITE_CHECKLIST.md 3.2), keeping the sources other code added before.
  *
  * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
  * @return array<string, list<string>> The sources with the site's.
  */
-function hbmusic_add_outside_sources( array $outside_sources ): array {
-	foreach ( HBMUSIC_OUTSIDE_SOURCES as $directive => $sources ) {
+function dtstheme_add_outside_sources( array $outside_sources ): array {
+	foreach ( DTSTHEME_OUTSIDE_SOURCES as $directive => $sources ) {
 		$outside_sources[ $directive ] = array_merge( $outside_sources[ $directive ] ?? array(), $sources );
 	}
 	return $outside_sources;
 }
-add_filter( 'sitehardening_csp_sources', 'hbmusic_add_outside_sources' );
+add_filter( 'sitehardening_csp_sources', 'dtstheme_add_outside_sources' );
 
 /**
  * Tells whether the page being shown has the booking form.
@@ -328,11 +328,11 @@ add_filter( 'sitehardening_csp_sources', 'hbmusic_add_outside_sources' );
  *
  * @return bool True on a page with the form.
  */
-function hbmusic_page_has_booking_form(): bool {
+function dtstheme_page_has_booking_form(): bool {
 	return is_singular() && has_shortcode( (string) get_post_field( 'post_content' ), 'contact-form-7' );
 }
-add_filter( 'wpcf7_load_js', 'hbmusic_page_has_booking_form' );
-add_filter( 'wpcf7_load_css', 'hbmusic_page_has_booking_form' );
+add_filter( 'wpcf7_load_js', 'dtstheme_page_has_booking_form' );
+add_filter( 'wpcf7_load_css', 'dtstheme_page_has_booking_form' );
 
 /**
  * Removes Cloudflare's script from pages without the booking form.
@@ -340,12 +340,12 @@ add_filter( 'wpcf7_load_css', 'hbmusic_page_has_booking_form' );
  * Contact Form 7's own loading filters do not cover this script. It runs at priority 11 because the
  * plugin adds the script at the default 10.
  */
-function hbmusic_remove_turnstile_script_without_form(): void {
-	if ( ! hbmusic_page_has_booking_form() ) {
+function dtstheme_remove_turnstile_script_without_form(): void {
+	if ( ! dtstheme_page_has_booking_form() ) {
 		wp_dequeue_script( 'cloudflare-turnstile' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'hbmusic_remove_turnstile_script_without_form', 11 );
+add_action( 'wp_enqueue_scripts', 'dtstheme_remove_turnstile_script_without_form', 11 );
 
 /**
  * Forwards a request for an old page address to the page that replaced it, permanently (301), so
@@ -357,21 +357,21 @@ add_action( 'wp_enqueue_scripts', 'hbmusic_remove_turnstile_script_without_form'
  * path is relative to the site's address, and home_url() builds the target, so the theme names no
  * domain (plan D7).
  */
-function hbmusic_redirect_old_address(): void {
+function dtstheme_redirect_old_address(): void {
 	global $wp;
 	$requested_path = $wp instanceof WP ? strtolower( $wp->request ) : '';
-	$new_path       = HBMUSIC_OLD_ADDRESSES[ $requested_path ] ?? null;
+	$new_path       = DTSTHEME_OLD_ADDRESSES[ $requested_path ] ?? null;
 	if ( null === $new_path ) {
 		return;
 	}
 	wp_safe_redirect( home_url( '/' . $new_path . '/' ), 301 );
 	exit;
 }
-add_action( 'template_redirect', 'hbmusic_redirect_old_address', 1 );
+add_action( 'template_redirect', 'dtstheme_redirect_old_address', 1 );
 
 /**
  * Describes the site's organization in Yoast SEO's page data with its own types and the towns it
- * serves (HBMUSIC_ORGANIZATION_TYPES and HBMUSIC_AREAS_SERVED, includes/site-facts.php; plan 8h),
+ * serves (DTSTHEME_ORGANIZATION_TYPES and DTSTHEME_AREAS_SERVED, includes/site-facts.php; plan 8h),
  * so search engines read the same facts as the page text. Yoast's Local SEO add-on would do this
  * for a fee.
  *
@@ -383,11 +383,11 @@ add_action( 'template_redirect', 'hbmusic_redirect_old_address', 1 );
  * @param array<string, mixed> $organization Yoast's Organization piece.
  * @return array<string, mixed> The piece with the site's types and areas served.
  */
-function hbmusic_describe_organization( array $organization ): array {
-	$organization['@type'] = HBMUSIC_ORGANIZATION_TYPES;
-	return hbmusic_add_areas_served( $organization, HBMUSIC_AREAS_SERVED );
+function dtstheme_describe_organization( array $organization ): array {
+	$organization['@type'] = DTSTHEME_ORGANIZATION_TYPES;
+	return dtstheme_add_areas_served( $organization, DTSTHEME_AREAS_SERVED );
 }
-add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
+add_filter( 'wpseo_schema_organization', 'dtstheme_describe_organization' );
 
 /**
  * Adds the towns served to an organization's page data, each as a schema.org City. The towns come
@@ -398,7 +398,7 @@ add_filter( 'wpseo_schema_organization', 'hbmusic_describe_organization' );
  * @param string[]             $towns        The towns served, possibly none.
  * @return array<string, mixed> The piece, with the towns if there are any.
  */
-function hbmusic_add_areas_served( array $organization, array $towns ): array {
+function dtstheme_add_areas_served( array $organization, array $towns ): array {
 	if ( array() === $towns ) {
 		return $organization;
 	}
@@ -425,10 +425,10 @@ function hbmusic_add_areas_served( array $organization, array $towns ): array {
  * @param string $title The title as WordPress read it from the player code.
  * @return string The title as plain text.
  */
-function hbmusic_decode_embed_title( string $title ): string {
+function dtstheme_decode_embed_title( string $title ): string {
 	return html_entity_decode( $title, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 }
-add_filter( 'oembed_iframe_title_attribute', 'hbmusic_decode_embed_title' );
+add_filter( 'oembed_iframe_title_attribute', 'dtstheme_decode_embed_title' );
 
 /**
  * Lazy-loads every embedded player in a page's content (videos, maps), the first ones included, so
@@ -439,10 +439,10 @@ add_filter( 'oembed_iframe_title_attribute', 'hbmusic_decode_embed_title' );
  *
  * @return string The loading value for every embedded frame.
  */
-function hbmusic_lazy_load_embeds(): string {
+function dtstheme_lazy_load_embeds(): string {
 	return 'lazy';
 }
-add_filter( 'wp_iframe_tag_add_loading_attr', 'hbmusic_lazy_load_embeds' );
+add_filter( 'wp_iframe_tag_add_loading_attr', 'dtstheme_lazy_load_embeds' );
 
 /**
  * Leaves a heading without text out of the page. An empty heading takes up space as a blank gap
@@ -454,11 +454,11 @@ add_filter( 'wp_iframe_tag_add_loading_attr', 'hbmusic_lazy_load_embeds' );
  * @param string $block_content The heading's HTML.
  * @return string The HTML, or nothing for a heading without text.
  */
-function hbmusic_drop_empty_heading( string $block_content ): string {
+function dtstheme_drop_empty_heading( string $block_content ): string {
 	$text = html_entity_decode( wp_strip_all_tags( $block_content ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	return '' === trim( $text, " \t\n\r\0\x0B\u{00A0}" ) ? '' : $block_content;
 }
-add_filter( 'render_block_core/heading', 'hbmusic_drop_empty_heading' );
+add_filter( 'render_block_core/heading', 'dtstheme_drop_empty_heading' );
 
 /**
  * Points the marked Privacy Policy link at the page chosen in Settings → Privacy, whatever that
@@ -472,8 +472,8 @@ add_filter( 'render_block_core/heading', 'hbmusic_drop_empty_heading' );
  * @param string $block_content The paragraph's HTML.
  * @return string The HTML with the link's address set, or nothing when there is no privacy page.
  */
-function hbmusic_link_privacy_policy( string $block_content ): string {
-	$tags = hbmusic_find_privacy_link( $block_content );
+function dtstheme_link_privacy_policy( string $block_content ): string {
+	$tags = dtstheme_find_privacy_link( $block_content );
 	if ( null === $tags ) {
 		return $block_content;
 	}
@@ -484,7 +484,7 @@ function hbmusic_link_privacy_policy( string $block_content ): string {
 	$tags->set_attribute( 'href', $privacy_policy_url );
 	return $tags->get_updated_html();
 }
-add_filter( 'render_block_core/paragraph', 'hbmusic_link_privacy_policy' );
+add_filter( 'render_block_core/paragraph', 'dtstheme_link_privacy_policy' );
 
 /**
  * Finds the marked Privacy Policy link in a paragraph. Every paragraph of every page passes through
@@ -494,15 +494,15 @@ add_filter( 'render_block_core/paragraph', 'hbmusic_link_privacy_policy' );
  * @param string $block_content The paragraph's HTML.
  * @return WP_HTML_Tag_Processor|null The reader, stopped on the link, or null if there is none.
  */
-function hbmusic_find_privacy_link( string $block_content ): ?WP_HTML_Tag_Processor {
-	if ( ! str_contains( $block_content, HBMUSIC_PRIVACY_LINK_CLASS ) ) {
+function dtstheme_find_privacy_link( string $block_content ): ?WP_HTML_Tag_Processor {
+	if ( ! str_contains( $block_content, DTSTHEME_PRIVACY_LINK_CLASS ) ) {
 		return null;
 	}
 	$tags            = new WP_HTML_Tag_Processor( $block_content );
 	$has_marked_link = $tags->next_tag(
 		array(
 			'tag_name'   => 'a',
-			'class_name' => HBMUSIC_PRIVACY_LINK_CLASS,
+			'class_name' => DTSTHEME_PRIVACY_LINK_CLASS,
 		)
 	);
 	return $has_marked_link ? $tags : null;
@@ -518,8 +518,8 @@ function hbmusic_find_privacy_link( string $block_content ): ?WP_HTML_Tag_Proces
  * @param string $block_content The group's HTML.
  * @return string The HTML, with a carousel and its slides described.
  */
-function hbmusic_describe_carousel( string $block_content ): string {
-	$slide_count = hbmusic_count_carousel_slides( $block_content );
+function dtstheme_describe_carousel( string $block_content ): string {
+	$slide_count = dtstheme_count_carousel_slides( $block_content );
 	if ( 0 === $slide_count ) {
 		return $block_content;
 	}
@@ -528,17 +528,17 @@ function hbmusic_describe_carousel( string $block_content ): string {
 		return $block_content;
 	}
 	/* translators: How a screen reader describes the kind of region a carousel is. */
-	$tags->set_attribute( 'aria-roledescription', __( 'carousel', 'hbmusic' ) );
+	$tags->set_attribute( 'aria-roledescription', __( 'carousel', 'dts-theme' ) );
 	$slide_depth = $tags->get_current_depth() + 1;
 	$slide       = 0;
 	while ( $tags->next_tag() ) {
 		if ( $tags->get_current_depth() === $slide_depth ) {
-			hbmusic_describe_slide( $tags, ++$slide, $slide_count );
+			dtstheme_describe_slide( $tags, ++$slide, $slide_count );
 		}
 	}
 	return null === $tags->get_last_error() ? $tags->get_updated_html() : $block_content;
 }
-add_filter( 'render_block_core/group', 'hbmusic_describe_carousel' );
+add_filter( 'render_block_core/group', 'dtstheme_describe_carousel' );
 
 /**
  * The number of slides (direct children) of the carousel that opens the given HTML, or 0 if the
@@ -547,7 +547,7 @@ add_filter( 'render_block_core/group', 'hbmusic_describe_carousel' );
  * @param string $block_content A group's HTML.
  * @return int The number of slides.
  */
-function hbmusic_count_carousel_slides( string $block_content ): int {
+function dtstheme_count_carousel_slides( string $block_content ): int {
 	$tags = WP_HTML_Processor::create_fragment( $block_content );
 	if ( null === $tags || ! $tags->next_tag() || true !== $tags->has_class( 'site-carousel' ) ) {
 		return 0;
@@ -567,15 +567,15 @@ function hbmusic_count_carousel_slides( string $block_content ): int {
  * @param int               $position    The slide's position, from 1.
  * @param int               $slide_count The number of slides.
  */
-function hbmusic_describe_slide( WP_HTML_Processor $tags, int $position, int $slide_count ): void {
+function dtstheme_describe_slide( WP_HTML_Processor $tags, int $position, int $slide_count ): void {
 	if ( 'IFRAME' === $tags->get_tag() ) {
 		return;
 	}
 	$tags->set_attribute( 'role', 'group' );
 	/* translators: How a screen reader describes one item of a carousel. */
-	$tags->set_attribute( 'aria-roledescription', __( 'slide', 'hbmusic' ) );
+	$tags->set_attribute( 'aria-roledescription', __( 'slide', 'dts-theme' ) );
 	/* translators: 1: the slide's position, 2: the number of slides. */
-	$tags->set_attribute( 'aria-label', sprintf( __( '%1$d of %2$d', 'hbmusic' ), $position, $slide_count ) );
+	$tags->set_attribute( 'aria-label', sprintf( __( '%1$d of %2$d', 'dts-theme' ), $position, $slide_count ) );
 }
 
 /**
@@ -584,10 +584,10 @@ function hbmusic_describe_slide( WP_HTML_Processor $tags, int $position, int $sl
  * @param string $address A frame's address.
  * @return bool Whether it is a YouTube player.
  */
-function hbmusic_is_youtube_player( string $address ): bool {
+function dtstheme_is_youtube_player( string $address ): bool {
 	$host = wp_parse_url( $address, PHP_URL_HOST );
 	$path = wp_parse_url( $address, PHP_URL_PATH );
-	return in_array( $host, HBMUSIC_YOUTUBE_PLAYER_HOSTS, true ) && is_string( $path ) && str_starts_with( $path, '/embed/' );
+	return in_array( $host, DTSTHEME_YOUTUBE_PLAYER_HOSTS, true ) && is_string( $path ) && str_starts_with( $path, '/embed/' );
 }
 
 /**
@@ -595,27 +595,27 @@ function hbmusic_is_youtube_player( string $address ): bool {
  * script that imports it registers it first, so it is read only on pages with a video; WordPress
  * ignores a second registration.
  */
-function hbmusic_register_video_shared_module(): void {
+function dtstheme_register_video_shared_module(): void {
 	wp_register_script_module(
-		HBMUSIC_VIDEO_SHARED_MODULE,
-		get_theme_file_uri( HBMUSIC_VIDEO_SHARED_SCRIPT ),
+		DTSTHEME_VIDEO_SHARED_MODULE,
+		get_theme_file_uri( DTSTHEME_VIDEO_SHARED_SCRIPT ),
 		array(),
-		hbmusic_asset_version( HBMUSIC_VIDEO_SHARED_SCRIPT ),
-		HBMUSIC_SCRIPT_MODULE_ARGS
+		dtstheme_asset_version( DTSTHEME_VIDEO_SHARED_SCRIPT ),
+		DTSTHEME_SCRIPT_MODULE_ARGS
 	);
 }
 
 /**
  * Loads the video script as a module at the end of the page, labelled by its contents' fingerprint.
  */
-function hbmusic_enqueue_video_pause_script(): void {
-	hbmusic_register_video_shared_module();
+function dtstheme_enqueue_video_pause_script(): void {
+	dtstheme_register_video_shared_module();
 	wp_enqueue_script_module(
-		HBMUSIC_VIDEO_PAUSE_HANDLE,
-		get_theme_file_uri( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
-		array( HBMUSIC_VIDEO_SHARED_MODULE ),
-		hbmusic_asset_version( HBMUSIC_VIDEO_PAUSE_SCRIPT ),
-		HBMUSIC_SCRIPT_MODULE_ARGS
+		DTSTHEME_VIDEO_PAUSE_HANDLE,
+		get_theme_file_uri( DTSTHEME_VIDEO_PAUSE_SCRIPT ),
+		array( DTSTHEME_VIDEO_SHARED_MODULE ),
+		dtstheme_asset_version( DTSTHEME_VIDEO_PAUSE_SCRIPT ),
+		DTSTHEME_SCRIPT_MODULE_ARGS
 	);
 }
 
@@ -628,17 +628,17 @@ function hbmusic_enqueue_video_pause_script(): void {
  * @param string $block_content The navigation block's markup.
  * @return string The same markup.
  */
-function hbmusic_enqueue_menu_close_script( string $block_content ): string {
+function dtstheme_enqueue_menu_close_script( string $block_content ): string {
 	wp_enqueue_script_module(
-		HBMUSIC_MENU_CLOSE_HANDLE,
-		get_theme_file_uri( HBMUSIC_MENU_CLOSE_SCRIPT ),
+		DTSTHEME_MENU_CLOSE_HANDLE,
+		get_theme_file_uri( DTSTHEME_MENU_CLOSE_SCRIPT ),
 		array(),
-		hbmusic_asset_version( HBMUSIC_MENU_CLOSE_SCRIPT ),
-		HBMUSIC_SCRIPT_MODULE_ARGS
+		dtstheme_asset_version( DTSTHEME_MENU_CLOSE_SCRIPT ),
+		DTSTHEME_SCRIPT_MODULE_ARGS
 	);
 	return $block_content;
 }
-add_filter( 'render_block_core/navigation', 'hbmusic_enqueue_menu_close_script' );
+add_filter( 'render_block_core/navigation', 'dtstheme_enqueue_menu_close_script' );
 
 /**
  * What each page template does, for the Editing Help plugin's guide (handbook H89): theme.json can
@@ -648,16 +648,16 @@ add_filter( 'render_block_core/navigation', 'hbmusic_enqueue_menu_close_script' 
  * @param mixed $descriptions The descriptions so far (an array of slug => line).
  * @return array<mixed> The descriptions, with this theme's.
  */
-function hbmusic_describe_page_templates( mixed $descriptions ): array {
+function dtstheme_describe_page_templates( mixed $descriptions ): array {
 	$descriptions = is_array( $descriptions ) ? $descriptions : array();
 	return array_merge(
 		$descriptions,
 		array(
-			'page'                              => __( "The WordPress default: shows the page's default title as a heading at the top.", 'hbmusic' ),
-			'page-no-title'                     => __( 'Leaves out the title that the WordPress default page would show at the top, for a page whose first section has a title that you specify, such as a home page.', 'hbmusic' ),
-			'page-with-call-to-action'          => __( 'Like the WordPress default page, with the call to action panel added at the end.', 'hbmusic' ),
-			'page-no-title-with-call-to-action' => __( 'Leaves out the title that the WordPress default page would show at the top, and adds the call to action panel at the end.', 'hbmusic' ),
+			'page'                              => __( "The WordPress default: shows the page's default title as a heading at the top.", 'dts-theme' ),
+			'page-no-title'                     => __( 'Leaves out the title that the WordPress default page would show at the top, for a page whose first section has a title that you specify, such as a home page.', 'dts-theme' ),
+			'page-with-call-to-action'          => __( 'Like the WordPress default page, with the call to action panel added at the end.', 'dts-theme' ),
+			'page-no-title-with-call-to-action' => __( 'Leaves out the title that the WordPress default page would show at the top, and adds the call to action panel at the end.', 'dts-theme' ),
 		)
 	);
 }
-add_filter( 'editinghelp_template_descriptions', 'hbmusic_describe_page_templates' );
+add_filter( 'editinghelp_template_descriptions', 'dtstheme_describe_page_templates' );
