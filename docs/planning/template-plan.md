@@ -127,14 +127,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
   starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
   names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, committed
-  `4831713` after its review gate and pushed (no pull request yet); part 2, this site's branch
-  `feat/neutral-theme-names` on the tools branch (`dev-feat/neutral-theme-names`), built,
-  proven, reviewed and committed `8783654` 2026-11-27, local (its 2.4a entry has the counts).
-  **Next: 0.5.0,** proposed to the user first: the tools' CHANGELOG "Unreleased" becomes
-  0.5.0, the tools branch's pull request and squash merge, the tag `v0.5.0`; then this site
-  pinned to 0.5.0 (`bin/tools-pin`, `bin/check`) and its pull request; then, before the
-  deploys, the user's folder copies, Site Editor check and the database query on staging and
-  live (the 2.4a entry); then the deploys.
+  `4831713` after its review gate and pushed; part 2, this site's branch
+  `feat/neutral-theme-names` on the tools branch, built, proven, reviewed and committed
+  `8783654` 2026-11-27 (its 2.4a entry has the counts). 0.5.0 released (tools #10, `7f7e563`,
+  tag `v0.5.0`), this site pinned to it (`d920bb7`, `bin/check` 36 passed). **Next:** this
+  site's pull request; then, before the deploys, the user's folder copies, Site Editor check and
+  the database query on staging and live (the 2.4a entry); then the deploys.
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
@@ -1213,7 +1211,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     pattern by its old name would show nothing there after the deploy; T30's Site Editor check
     covers only a saved header. **At the release step (LOW):** `composer.json` and the three
     workflows name the tools branch (`dev-feat/neutral-theme-names`, `4831713`) until 0.5.0 is
-    released and pinned, so this branch does not reach `main` before then.
+    released and pinned, so this branch does not reach `main` before then. Settled 2026-11-27:
+    0.5.0 released (tools #10, squash `7f7e563`, tag `v0.5.0`, its CHANGELOG with the missing
+    0.4.2 link added), this site pinned to it (`d920bb7`; `bin/check` 36 passed).
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone).
