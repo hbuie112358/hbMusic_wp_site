@@ -1,9 +1,9 @@
 # shellcheck shell=bash
 # This site's own checks of its theme's components (template plan T20), loaded by bin/check after
-# its own checks. They stay with the site until the components move into their shared plugin
-# (template plan 2.3), whose repository then checks them. Uses what bin/check provides to a site's
-# checks: run_check and log, TOOLS_DIR, PROJECT_DIR, SITE_THEME_DIR, SITE_PHP_PREFIX and
-# COMPONENT_EXAMPLES_DIR.
+# its own checks. They stay with the site until the starter gets its own copy of the shared
+# theme code (template plan 2.4, T29), whose repository then checks it. Uses what bin/check
+# provides to a site's checks: run_check and log, TOOLS_DIR, PROJECT_DIR, SITE_THEME_DIR,
+# SITE_PHP_PREFIX and COMPONENT_EXAMPLES_DIR.
 
 # shellcheck source=tools/theme-tokens.sh
 source "$TOOLS_DIR/tools/theme-tokens.sh"

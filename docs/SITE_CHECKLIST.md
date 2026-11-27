@@ -140,7 +140,7 @@ a nonce-based policy is used where a site handles payments or accounts. Also
   WordPress updates that add inline code keep working.
 - Check: the response headers carry the policy and the other headers, and the browser tests
   fail on any CSP violation, so an update that needs a new source shows up on staging first.
-- Kind: general · Status: partly: the policy and the other headers are sent on visitor pages by the Site Hardening plugin (8a, D26; before, by the dev site's Apache), and the browser tests fail on a missing header, a loosened strict rule or any violation (4c, 8a; WordPress's emoji script, which the policy refused, is switched off in the theme); staging after 8a's deploy, live at step 9; the admin pages deliberately keep WordPress's own headers (D28, section 16).
+- Kind: general · Status: partly: the policy and the other headers are sent on visitor pages by the Site Hardening plugin (8a, D26; before, by the dev site's Apache), and the browser tests fail on a missing header, a loosened strict rule or any violation (4c, 8a; WordPress's emoji script, which the policy refused, is switched off by the Site Hardening plugin since its 0.4.0, template plan 2.3a, and by the theme before); staging after 8a's deploy, live at step 9; the admin pages deliberately keep WordPress's own headers (D28, section 16).
 
 **3.3 A PHP version under active security support, that the WordPress version in use supports;
 set per site where the host allows it, with staging on the same version as live, and a new

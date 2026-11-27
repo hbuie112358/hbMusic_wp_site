@@ -24,7 +24,7 @@ the milestones, T21).
   of the file it replaces in a full child theme, plus the logo in `assets/images/`. Everything
   else (the component stylesheets, the scripts, `functions.php`, the page templates) is the shared
   theme code, which the starter's dev site takes from this repository's theme until template plan
-  2.3 moves it into the shared components plugin: `SITE_DIR=starter bin/dev-site` assembles the
+  2.4 copies it into the starter's own theme (T29): `SITE_DIR=starter bin/dev-site` assembles the
   full theme into `themes/dts-starter/` (`tools/site-theme.sh`; build output, ignored by git) and
   builds the starter's dev site, and `SITE_DIR=starter bin/test` tests it.
   - `theme.json`: the palette below and every design token the components read.
@@ -40,8 +40,8 @@ the milestones, T21).
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.
 
-The text domain and prefix `hbmusic` are the shared theme code's until template plan 2.3 renames
-them; `bin/check` allows that one name here and refuses the site's others.
+The text domain and prefix `hbmusic` are the shared theme code's until template plan 2.4 renames
+them (T29); `bin/check` allows that one name here and refuses the site's others.
 
 ## The palette and its contrast
 
