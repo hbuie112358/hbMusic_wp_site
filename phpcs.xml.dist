@@ -14,6 +14,11 @@
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<!-- The starter's assembled theme: build output, a copy of themes/ with the starter's layer. -->
 	<exclude-pattern>/starter/themes/*</exclude-pattern>
+	<!-- The starter's downloaded plugins, installed from starter/site-packages/ (template plan
+	     T28): others' code, checked against WordPress.org's checksums or in DTS's own plugin
+	     repositories, never with this site's rules; this site's own site-packages/ is outside
+	     <file> above for the same reason. -->
+	<exclude-pattern>/starter/site-packages/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg name="parallel" value="8"/>

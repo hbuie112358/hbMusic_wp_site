@@ -29,4 +29,4 @@ concurrency:
 jobs:
   check:
     # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
-    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-check.yml@9654f58d25cb22025dc786de60ec4a4f050e277e # v0.4.0
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-check.yml@1d102554d98de4062d23a287fd7686c79778fd9c # v0.4.1

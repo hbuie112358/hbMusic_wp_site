@@ -74,12 +74,13 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   template plan 2.2c; their own repositories `direct-technical-solutions/dts-site-hardening` and
   `dts-editing-help`, installed by Composer from `site-packages/composer.lock` at their release
   tags (`dts/site-hardening`, `dts/editing-help`). Site Hardening: the security headers and other
-  hardening, the policy's outside sources from the child theme's `includes/site-facts.php`, each
-  with its reason; prefix `sitehardening`, text domain `site-hardening`. Editing Help: the
-  content guide in the admin, fed by the child theme through the plugin's filters; prefix
-  `editinghelp`, text domain `editing-help`; the guide's text is also kept in the handbook
-  (`customer/content-guide.md`), with the same version number, and a change goes into both. A
-  change to either is made in its repository (locally `~/dev/dts-site-hardening`,
+  hardening; the policy's outside sources handed in by the child theme through the plugin's
+  `sitehardening_csp_sources` filter (listed, each with its reason, in `includes/site-facts.php`;
+  the shared video code adds its own player); prefix `sitehardening`, text domain
+  `site-hardening`. Editing Help: the content guide in the admin, fed by the child theme through
+  the plugin's filters; prefix `editinghelp`, text domain `editing-help`; the guide's text is also
+  kept in the handbook (`customer/content-guide.md`), with the same version number, and a change
+  goes into both. A change to either is made in its repository (locally `~/dev/dts-site-hardening`,
   `~/dev/dts-editing-help`) and reaches this site by a new tag and a raised pin, never by
   editing `site-packages/`.
 - `data/`: not versioned; the site's real content and one-time data: the song list, the pages'
@@ -94,7 +95,8 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   staging, by their short names in the user's SSH settings, template plan 1.4c); no secrets. Its fields are explained in
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
 - `starter/`: the starter, the neutral site layer a new site begins from (template plan 1.6,
-  T13), moving to `dts-site-starter` at 2.4: its own `site.json`, `theme/` with only the
+  T13), moving to `dts-site-starter` at 2.4: its own `site.json`, its own downloaded plugins in
+  `site-packages/` (template plan T28; Song List not among them), `theme/` with only the
   site-layer files (`tools/site-layer-files.txt`), neutral pages in `tests/dev-content/`, and its
   `README.md` with the palette's contrast. Never deployed; `bin/check` holds it. Laid out as a
   site, so the tools work on it with `SITE_DIR=starter` (template plan 1.6c, T14): its full theme
