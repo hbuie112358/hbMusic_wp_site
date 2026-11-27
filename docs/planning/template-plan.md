@@ -125,14 +125,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   (#123, `cd8e6b6`), deployed by the user to staging and live (6 files each, as previewed, every
   page passing, no new PHP log lines; no emoji code on staging's admin and home page, by the
   user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
-  starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
-  names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, committed
-  `4831713` after its review gate and pushed; part 2, this site's branch
-  `feat/neutral-theme-names` on the tools branch, built, proven, reviewed and committed
-  `8783654` 2026-11-27 (its 2.4a entry has the counts). 0.5.0 released (tools #10, `7f7e563`,
-  tag `v0.5.0`), this site pinned to it (`d920bb7`, `bin/check` 36 passed). **Next:** this
-  site's pull request; then, before the deploys, the user's folder copies, Site Editor check and
-  the database query on staging and live (the 2.4a entry); then the deploys.
+  starter, designed 2026-11-27 in four parts (T30, its step entry): **2.4a done** (2026-11-27):
+  the neutral names, tools 0.5.0 (#10, `7f7e563`, tag `v0.5.0`), this site's #124 (`e2d34ea`)
+  and the logo fix #125 (`66bde22`, theme `Version` 0.2.1), deployed to staging and live (its
+  entry has the counts). **Now: 2.4b,** the starter's full theme in `starter/`. **The user, about
+  2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
@@ -1195,7 +1192,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 - [ ] **2.4 `dts-site-starter`** and its new-site guide, from `template-notes.md` and handbook
   chapter 7's six steps; the guide points to `site-settings.md` rather than repeating it.
   **Designed 2026-11-27 (T30) in four parts:**
-  - [~] **2.4a** the neutral names (T30's list) in this site's theme, the starter's site layer
+  - [x] **2.4a** (#124 `e2d34ea`, #125 `66bde22`) the neutral names (T30's list) in this site's theme, the starter's site layer
     and the tools (0.5.0), the component checks moved into the tools; proven as T30 says;
     deployed after the user's folder copies and Site Editor check. Part 1 (tools branch):
     committed `4831713` after its review gate (one fix: the new test stops when `mktemp` fails),
@@ -1222,7 +1219,21 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     workflows name the tools branch (`dev-feat/neutral-theme-names`, `4831713`) until 0.5.0 is
     released and pinned, so this branch does not reach `main` before then. Settled 2026-11-27:
     0.5.0 released (tools #10, squash `7f7e563`, tag `v0.5.0`, its CHANGELOG with the missing
-    0.4.2 link added), this site pinned to it (`d920bb7`; `bin/check` 36 passed).
+    0.4.2 link added), this site pinned to it (`d920bb7`; `bin/check` 36 passed), merged as #124
+    (`e2d34ea`; `check / check` and `check / dev-site` passed). **Deployed 2026-11-27:** before
+    the deploys, staging had no picture folder (its pages named no picture address; its videos
+    showed the play button on a dark box before and after), live's 4 pictures copied by the user
+    into `dts-theme-video-pictures`, the query returning no rows on both. Staging at `e2d34ea`:
+    12 file lines (11 sent, the old class file deleted), every page passing, no new PHP log
+    lines, but **the logo missing**: WordPress kept the theme's cached pattern list
+    (`WP_Theme::get_pattern_cache()`, up to 30 minutes, reread early only when the theme's
+    `Version` changes), which still named `hbmusic/site-logo`; confirmed when the logo came back
+    by itself about 25 minutes later. Fixed by #125 (`66bde22`: `Version` 0.2.0 to 0.2.1, a note
+    in `style.css`; both checks passed; "Worth raising" (7)), deployed to staging (`style.css`
+    only, every page passing). Live at `66bde22`: the same 12 file lines, every page passing, no
+    new PHP log lines; the logo on Home, Music and About and the 4 pictures from the new folder
+    (200, JPEG), by `curl`, and the user's look in Chrome. The old folder on live is deleted by
+    the user about 2026-12-04.
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
     From the 2.4a logo fix's review (LOW): the starter's `style.css` gets the same note as this
     site's (raise `Version` with every change to `patterns/`).
