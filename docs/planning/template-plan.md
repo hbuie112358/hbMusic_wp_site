@@ -105,16 +105,20 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   (this site `7206cb6`, local), with two tools fixes for 0.4.0 (`598905b` on `feat/dts-plugins`,
   not pushed; the 2.2 entry; the starter broken until 2.2d); tools **`v0.4.0` released**
   (#7, `9654f58`, 2026-11-26), this branch repinned (`8e374ce`, local), the three plugins'
-  `require-dev` raised to 0.4.0 (each repository's #1, merged). **Now: 2.2d** (T28, the user,
-  2026-11-26: each site its own downloaded plugins): tools 0.4.1 committed on
-  `fix/site-packages-per-site` (`c322658`, `341e0a6`, not pushed; the second fixes two
-  scenarios that assumed a `plugins/` folder); the starter's `site-packages/`, `site.json`,
-  README, `.gitignore` and the project's `CLAUDE.md` written, uncommitted; the milestone proof
-  with the tools at `341e0a6` passed (this site 21 of 21 groups, 248 browser tests, 4 skipped by
-  design; the starter 20 of 20, 168, Song List's tests left out; self-check 34 of 34). **Next:**
-  release 0.4.1 (changelog heading, pull request, merge, tag, each the user's yes), this branch
-  repinned with the site-side files reviewed and committed, then its pull request and the
-  deploys. **Pull requests merge by squash**
+  `require-dev` raised to 0.4.0 (each repository's #1, merged). 2.2d (T28, the user,
+  2026-11-26: each site its own downloaded plugins): the milestone proof with the tools at
+  `341e0a6` passed (this site 21 of 21 groups, 248 browser tests, 4 skipped by design; the
+  starter 20 of 20, 168, Song List's tests left out; self-check 34 of 34); tools **`v0.4.1`
+  released** 2026-11-27 (#8, squash `1d10255`, tag pushed); this site repinned, the starter's
+  own `site-packages/` committed (its installed copies left out of the starter's PHPCS check,
+  found by `bin/check` after the repin) and the whole of 2.2 merged as **#122** (`63c15da`, both
+  required checks passing); the user deployed `63c15da` to staging and live (2026-11-27): on
+  each, rsync changed only the 15 expected files (each plugin's `phpcs.xml.dist` deleted, its
+  four release files added), git agreeing, every page passing, no new PHP log lines; staging's
+  headers equal live's and live's unchanged by the deploy (date and host request lines aside);
+  Dependabot's "Check for updates" on `/site-packages` read all three `dts/*` plugins ("No update
+  needed" for each). **So 2.2 is done,** the second milestone. **Now: 2.3,** the components
+  plugin (its step entry; not yet designed). **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -1037,7 +1041,8 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   (2026-11-26) showed the new layout against Hostinger's rsync: staging no file changed, live
   only Simple History 5.37.0's 14 files, git agreeing, the copy matching the preview, the proof
   dry run empty, every page passing, no new PHP log lines.
-- [ ] **2.2 The plugin repositories** (Site Hardening, Editing Help, and Song List, a musician's
+- [x] **2.2 The plugin repositories** (done 2026-11-27: #122, `63c15da`, deployed to staging and
+  live; the Current position has the details) (Site Hardening, Editing Help, and Song List, a musician's
   plugin for any site that wants it, T16): each released by a Git tag, this site requiring them
   through Composer. Designed 2026-11-26 (T25), in four parts: `[~]` 2.2a the tools' site side
   for DTS's plugins (tools 0.4.0), proven by examples and deploy scenarios (**committed
@@ -1071,8 +1076,9 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   the copy, the name checked first; no kept test, by the user's choice, the failing dev site
   itself the proof). Then `bin/dev-site` passed, the installed folder equal to the release,
   `bin/check` 38 of 38 (the Song List plugin's PHPCS check gone with its folder), the Song List
-  and component styles specs 26 of 26 (2026-11-26); **next in 2.2b:** Dependabot's view of
-  `dts/*`, checked after the merge from its job log ("Check for updates" on `/site-packages`); `[~]` 2.2c Editing Help and Site Hardening, together (T27): both repositories created
+  and component styles specs 26 of 26 (2026-11-26); Dependabot's view of `dts/*`, checked
+  after the merge from its job log ("Check for updates" on `/site-packages`, 2026-11-27): "No
+  update needed" for all three; `[~]` 2.2c Editing Help and Site Hardening, together (T27): both repositories created
   2026-11-26 with `dts-song-list`'s settings (read from GitHub and compared after), each
   plugin's files unchanged from `0903c1e` with the standard files; `bin/plugin-check --tag` 9 of
   9 for each with nothing to fix, `check / check` passing on GitHub (the button's run and the
