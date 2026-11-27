@@ -4,43 +4,50 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-27T10:37:00-05:00
-current_branch: docs/plan-2.4a-done
-last_commit: 18717bd
+timestamp: 2026-11-27T11:18:41-05:00
+current_branch: feat/starter-full-theme
+last_commit: bd6edc6
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-27 (twenty-fifth session). 2.4a done and deployed. Tools 0.5.0: CHANGELOG commit
-  ac950df (with the missing 0.4.2 link), tools #10 squash-merged as 7f7e563, tag v0.5.0 pushed.
-  This site pinned to 0.5.0 (d920bb7, review gate no findings, bin/check 36 passed), plan note
-  b83c66e, #124 merged as e2d34ea (both checks passed). Pre-deploy: staging had no picture folder
-  (its pages named no picture address); live's 4 pictures copied by the user into
-  dts-theme-video-pictures; the query (phpMyAdmin) returned no rows on both. Staging deploy of
-  e2d34ea: logo missing, cause confirmed in WordPress's code (cached pattern list, 30 minutes,
-  reread early only on a theme Version change) and by the logo returning by itself. Fix #125
-  merged as 66bde22 (style.css Version 0.2.1 and a note; review 2 LOW, both recorded in the
-  plan). Staging and live deployed at 66bde22, every page passing, no new PHP log lines; live's
-  logo and 4 pictures checked by curl and the user's look. Plan marked 2.4a done (18717bd, this
-  branch, local). New memory: one-ordered-list-of-steps (the user's steps in one When/Who/What
-  table, no apologies).
+  2026-11-27 (twenty-sixth session). #126 (the plan marking 2.4a done) squash-merged as 8ce1078,
+  both checks passed. A git-runner report of Docs instructions "in the push output" was checked
+  in its transcript: the push printed only GitHub's usual lines; the text was Claude Code's own
+  connector notice (mcp_instructions_delta), not an injection. 2.4b designed with the user (now
+  three parts). 2.4b-1 built, reviewed and committed as bd6edc6 on feat/starter-full-theme
+  (local): the starter's full theme committed in starter/themes/dts-starter/ (35 files; the
+  layer moved there by git mv; this site's logo and screenshot.png left out), .gitignore and
+  phpcs.xml.dist no longer leave it out, the style.css Version note, tests/checks/starter.sh's new
+  "shares this site's theme files" check (shown failing on three planted faults, restored from
+  backups), the token and names checks on the starter's own theme. Found by the wider checks and
+  fixed with the user's yes: the shared buttons.css comment naming "Book Howard" (reworded in
+  both copies), and PHPStan misreading the starter's empty old-address list, handled for now by
+  a temporary phpstan.neon.dist setting for DTSTHEME_OLD_ADDRESSES only (the review narrowed it
+  from all four facts: PHPStan does not check entries against a declared type, shown on a
+  scratch copy). The user then decided the site facts belong in a settings file, not code:
+  2.4b-2, next. bin/check 36 passed; the starter's tests 20 of 20 groups, 169 browser tests. New
+  memory: site-settings-in-config-files.
 
 next_action: >
-  Push this branch (docs/plan-2.4a-done, the plan commit 18717bd and this pause's commit) by its
-  pull request, after the user's yes (squash message approved first). Then 2.4b, the starter's
-  full theme in starter/ (the plan's 2.4b entry and T29, T30): read the code and the entry,
-  propose the approach, nothing built before the user decides.
+  2.4b-2, the site's facts in a settings file (the plan's 2.4b-2 entry; the user, 2026-11-27):
+  read includes/site-facts.php in both themes and every place functions.php and the shared code
+  read the four DTSTHEME_ facts, then propose the full design (where the file lives, how and how
+  often it is read, its bin/check shape check, the failure paths, the tests, both themes, the
+  removal of 2.4b-1's temporary PHPStan setting, the deploy) for the user's approval; nothing
+  built before the user decides. It can continue on feat/starter-full-theme (not pushed) or a
+  branch of its own; ask. Then 2.4b-3 (tools 0.6.0).
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "On d920bb7 (tools 0.5.0): bin/check 36 passed; #124 and #125: check / check and check / dev-site passed on GitHub. Full bin/test locally last on 8783654 (249 browser, 4 skipped by design); starter's tests 169 passed."
-  tools: "dts-site-tools main 7f7e563, tag v0.5.0 (annotated, pushed); no other branches. This site's main requires 0.5.0."
+  checks: "On bd6edc6: bin/check 36 passed; the starter's tests all passed (20 of 20 groups, 169 browser tests, none skipped). #126: check / check and check / dev-site passed on GitHub. This site's full bin/test last on 8783654 (249 browser, 4 skipped by design)."
+  tools: "dts-site-tools main 7f7e563, tag v0.5.0; no other branches. This site's main requires 0.5.0."
   site_packages: "dts/song-list v0.2.1 (6e050c1), dts/editing-help v0.1.1 (da3f399), dts/site-hardening v0.4.0 (9d59a9b); the starter's own list the same without Song List"
   plugin_repositories: "dts-site-hardening main 9d59a9b (tag v0.4.0); dts-song-list main 45ec9b1, dts-editing-help main 8011e4b; each clean (checked 2026-11-27)"
   branch_protection: "main requires check / check and check / dev-site (GitHub Actions), strict"
   merge_settings: "this repository, dts-site-tools and the three plugin repositories allow squash merges only"
-  deployed: "staging and live both run 66bde22 (deployed by the user 2026-11-27); theme Version 0.2.1; pictures in dts-theme-video-pictures on live (4 files); the old hbmusic-video-pictures still on live"
-  local_dev_sites: "this site's dev site (hbmusic-dev) rebuilt 2026-11-27 with tools 0.5.0, running (theme Version 0.2.1 through its read-only mount); the starter's (dts-starter-dev) stopped"
+  deployed: "staging and live both run 66bde22 (deployed by the user 2026-11-27); theme Version 0.2.1; pictures in dts-theme-video-pictures on live (4 files); the old hbmusic-video-pictures still on live. bd6edc6's buttons.css comment change reaches them with the next deploy (comment only)."
+  local_dev_sites: "this site's dev site (hbmusic-dev) running, started again after the starter's tests; the starter's (dts-starter-dev) stopped, last built 2026-11-27 from its committed theme with no assembly"
   screenshots_baseline: "screenshots/baseline/ (ignored by git): taken 2026-11-27 before the rename, from cd8e6b6's theme"
   env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
   github_rate_limit: "Composer's GitHub downloads run unauthenticated (60 requests an hour)"
@@ -50,43 +57,46 @@ verification:
 uncommitted_changes:
   - file: branches (this repository)
     why: >
-      docs/plan-2.4a-done, local, not pushed: 1 commit not on origin/main (18717bd, the plan
-      marked 2.4a done) plus this pause's commit; reaches main by its pull request on the user's
-      yes. main even with origin/main at 66bde22. No other local branches.
+      feat/starter-full-theme, local, not pushed: 1 commit not on origin/main (bd6edc6, 2.4b-1)
+      plus this pause's commit; reaches main by its pull request on the user's yes (with 2.4b-2
+      or on its own, the user's choice). main even with origin/main at 8ce1078. No other local
+      branches.
   - file: ~/dev/dts-site-tools, ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
-    why: Each on main, clean, no other branches (dts-site-tools main 7f7e563, even with origin).
+    why: Each on main, clean, no other branches (dts-site-tools 7f7e563, handbook 8a6d69c).
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
     why: >
       CLAUDE.md, MULTI_PROJECT_SETUP.md, PAUSE_CONVENTION.md, TESTING_APPROACH.md, settings.json,
       skills/review-gate/SKILL.md, the removed hook files and mark-approved.sh; this project's
-      memory (MEMORY.md, ask-before-every-commit.md, five new files: plain-wording-in-details,
-      review-gate-without-asking, say-the-step-each-message, pause-offer-says-both-paths and this
-      session's one-ordered-list-of-steps) and time-log.csv.
+      memory (MEMORY.md, ask-before-every-commit.md, six new files: plain-wording-in-details,
+      review-gate-without-asking, say-the-step-each-message, pause-offer-says-both-paths,
+      one-ordered-list-of-steps and this session's site-settings-in-config-files) and
+      time-log.csv.
   - file: the session scratchpad
-    why: Throwaway only (check and dev-site logs).
+    why: Throwaway only (check, dev-site and test logs, the PHPStan probes; their results are in the plan's 2.4b-1 entry).
 
 pending_decisions:
+  - >
+    2.4b-2's design (the site's facts in a settings file), for the user's approval before it is
+    built; and whether it continues on feat/starter-full-theme or its own branch.
   - >
     For the user, about 2026-12-04: delete hbmusic-video-pictures in live's
     public_html/wp-content/uploads/ (the copy in dts-theme-video-pictures is in use since the
     deploy). Staging never had one.
   - >
-    This branch's pull request (docs/plan-2.4a-done): its squash message for the user's approval,
-    then the push and merge.
+    From 2.4b-1's review, recorded in the plan: a missing site-layer-files.txt shows as "differs"
+    (LOW, later in 2.4b-3); the identity check compares only pictures the shared files name (LOW,
+    no fix, 2.4c replaces the check).
   - >
     The plan's "worth raising": (3) updating the tools while the dev site runs empties its dev-only
     plugins (a written rule or a different mount); (4) Site Hardening's composer.json description;
     (5) bin/screenshots does not wait for web fonts (document.fonts.ready); (6) the tools'
     site-layer test does not stop when mktemp fails (LOW); (7) a pattern change without a theme
-    Version raise passes every check, while staging and live keep the cached pattern list up to
-    30 minutes (a tools check, LOW, new 2026-11-27). 2.4b carries the same style.css note for the
-    starter (LOW).
+    Version raise passes every check (a tools check, LOW).
   - >
     No written way to run a single browser spec or scenario as bin/test does; worth a bin/test
-    option or a line in docs/TOOLS.md, in a later tools release (missed again 2026-11-27 for the
-    logo fix's check).
+    option or a line in docs/TOOLS.md, in a later tools release.
   - >
     Not known yet: a WP-CLI probe on the dev site (wp eval of the theme Version and the pattern
     registry) printed an empty version and "missing" while the page rendered the logo; not
@@ -140,10 +150,12 @@ pending_decisions:
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry (2.4a's deploy record, 2.4b next).
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry (2.4b-1 built, 2.4b-2 next, 2.4b-3).
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
-  - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
-  - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists (wait for checks to register before --watch).
+  - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges); its starter/ entry updated for the full theme.
+  - starter/README.md: the starter's full theme, its shared files and its site layer.
+  - tests/checks/starter.sh: the starter's checks, the identity check among them.
+  - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
   - ~/dev/dts-site-tools: the tools' repository (main 7f7e563, tag v0.5.0).
   - ~/dev/dts-site-hardening (main 9d59a9b, tag v0.4.0), ~/dev/dts-song-list, ~/dev/dts-editing-help: the plugin repositories.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
@@ -151,11 +163,13 @@ reference_documents: |
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository
-     (branch docs/plan-2.4a-done), ~/dev/dts-site-tools (main 7f7e563), the three plugin
+     (branch feat/starter-full-theme), ~/dev/dts-site-tools (main 7f7e563), the three plugin
      repositories and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T30, T29 above all) and the 2.4 entry (2.4a done, 2.4b next).
-  3. Then next_action: propose this branch's pull request, then 2.4b. Open every reply with the
-     step being worked on; give the user's steps in one When/Who/What table in their real order;
-     word details plainly; end with one clear question; no apologies.
-  4. This pause's commit is on docs/plan-2.4a-done; it reaches main with that branch's pull request.
+     (T29, T30 above all) and the 2.4 entry (2.4b-1 built, 2.4b-2 next).
+  3. Then next_action: read the code and propose 2.4b-2's full design; nothing built before the
+     user decides. Open every reply with the step being worked on; give the user's steps in one
+     When/Who/What table in their real order; word details plainly and simply (the user asked
+     twice this session for simpler answers); end with one clear question; no apologies.
+  4. This pause's commit is on feat/starter-full-theme; it reaches main with that branch's pull
+     request.
