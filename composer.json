@@ -10,7 +10,7 @@
         }
     ],
     "require-dev": {
-        "dts/site-tools": "dev-feat/neutral-theme-names"
+        "dts/site-tools": "0.5.0"
     },
     "config": {
         "allow-plugins": {
