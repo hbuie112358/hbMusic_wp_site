@@ -171,7 +171,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   baseline (2.4a, 2026-11-27: the About page, both widths; identical on the next run); a wait for
   `document.fonts.ready` before each shot, in a tools release; (6) from 2.4a part 1's review,
   LOW: the site-layer check's test (`tests/tools/site-layer/run.sh` in the tools) creates its
-  temporary folder without stopping when `mktemp` fails, as the new component test now does.
+  temporary folder without stopping when `mktemp` fails, as the new component test now does;
+  (7) a pattern changed without raising the theme's `Version` passes every check (the dev site
+  starts empty each run), while staging and live keep WordPress's cached pattern list for up to
+  30 minutes (`WP_Theme::get_pattern_cache()`; found at 2.4a's staging deploy, 2026-11-27: the
+  logo missing); a check in a tools release, failing when `patterns/` changed since the last
+  deploy and `Version` did not (from the fix's review, LOW).
 - **Then, in order:** 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3 (the
   components plugin) waits for T29's conditions.
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
@@ -1206,8 +1211,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     showed the About page in the fallback font; run again, identical: "Worth raising" (5)); no
     page or template on the dev site names `hbmusic/`, `hbmusic:` or `hbmusic-video` (database
     query). Reviewed 2026-11-27: two findings, both later. **Before the deploys, added by the
-    review (MEDIUM):** the same read-only query on staging and on live (`wp db query` over the
-    places' SSH names, approved by the user then), which must return no rows: a page storing a
+    review (MEDIUM):** the same read-only query on staging and on live (in hPanel's phpMyAdmin,
+    SQL tab, the user, 2026-11-27: the places' SSH keys only copy files, so they cannot run
+    WP-CLI; `SELECT ID, post_type, post_status, post_title FROM wp_posts WHERE post_type <>
+    'revision' AND (post_content LIKE '%hbmusic/%' OR post_content LIKE '%hbmusic:%' OR
+    post_content LIKE '%hbmusic-video%');`, with the prefix from `wp-config.php`; it covers a
+    saved header too), which must return no rows: a page storing a
     pattern by its old name would show nothing there after the deploy; T30's Site Editor check
     covers only a saved header. **At the release step (LOW):** `composer.json` and the three
     workflows name the tools branch (`dev-feat/neutral-theme-names`, `4831713`) until 0.5.0 is
@@ -1215,6 +1224,8 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     0.5.0 released (tools #10, squash `7f7e563`, tag `v0.5.0`, its CHANGELOG with the missing
     0.4.2 link added), this site pinned to it (`d920bb7`; `bin/check` 36 passed).
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
+    From the 2.4a logo fix's review (LOW): the starter's `style.css` gets the same note as this
+    site's (raise `Version` with every change to `patterns/`).
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone).
   - [ ] **2.4d** the guides; handbook chapter 7's wording proposed.
