@@ -2,11 +2,11 @@
 # This repository's checks of the starter (starter/, template plan 1.6b, T20), loaded by bin/check
 # after its own checks: the site layer a new site begins from, held to the same rules as this
 # site's, so it never drifts from the theme code it stands on. Its theme is checked against this
-# site's component stylesheets and theme files, which it is assembled with (1.6c) until 2.3 moves
-# them. They stay here until the starter has its own repository (2.4), where they become its
-# ordinary checks of its own files (T15). Uses what bin/check provides to a site's checks:
-# run_check and log, TOOLS_DIR, PROJECT_DIR, SITE_THEME_DIR, the site.json readers and
-# theme_json_schema_matches_wordpress.
+# site's component stylesheets and theme files, which it is assembled with (1.6c) until 2.4 copies
+# them into the starter (T29). They stay here until the starter has its own repository (2.4),
+# where they become its ordinary checks of its own files (T15). Uses what bin/check provides to
+# a site's checks: run_check and log, TOOLS_DIR, PROJECT_DIR, SITE_THEME_DIR, the site.json
+# readers and theme_json_schema_matches_wordpress.
 
 # shellcheck source=tools/theme-tokens.sh
 source "$TOOLS_DIR/tools/theme-tokens.sh"
@@ -62,9 +62,9 @@ starter_holds_the_site_layer() {
 }
 
 # The starter names nothing of this site but the shared theme code's prefix (the site's slug),
-# which its PHP and patterns must use until template plan 2.3 renames that prefix. Its assembled
-# theme (starter/themes/, build output ignored by git, template plan 1.6c) holds this site's
-# shared theme files and is not the starter's own.
+# which its PHP and patterns must use until template plan 2.4 renames that prefix (T29). Its
+# assembled theme (starter/themes/, build output ignored by git, template plan 1.6c) holds this
+# site's shared theme files and is not the starter's own.
 starter_names_nothing_of_this_site() {
   local slug name patterns=()
   slug="$(site_setting .slug)"

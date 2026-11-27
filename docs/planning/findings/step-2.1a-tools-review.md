@@ -37,7 +37,7 @@ user the same day (Claude's recommendations accepted). Nothing was changed by th
 | `specs/dev/components/`, `scenario/components/`, the components' example page, `tools/theme-tokens.sh`, `bin/check`'s component-list and "components appear on the example pages" checks | 2.3, the components plugin (`theme-tokens.sh` may instead stay a tool reading the plugin's token list). |
 | `specs/dev/plugins/*`, `scenario/plugins/*` | 2.2, each plugin's repository; Simple History's activity-log check (a WordPress.org plugin) stays a site test or moves to the tools, decided there. |
 | `bin/check`'s seven starter checks, `tools/site-layer.sh`, `tools/site-layer-files.txt` | 2.4, the starter repository's own checks. |
-| `tools/site-theme.sh` and the starter's theme assembly | Removed at 2.3, once the shared theme code has left the child theme (it is the stand-in until then). |
+| `tools/site-theme.sh` and the starter's theme assembly | Removed at 2.3, once the shared theme code has left the child theme (it is the stand-in until then). (Since T29, 2026-11-27: removed at 2.4, when the starter gets its own copy.) |
 
 ## The two checks on reusable workflows
 

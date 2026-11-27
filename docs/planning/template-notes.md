@@ -112,8 +112,8 @@ template project starts; until then, a list, not a to-do.
 - The video script (plan D29): `assets/js/video-pause.js` with its loading and YouTube's command
   switch in `functions.php`; generic for any site with YouTube embeds. The theme's scripts are
   script modules (template plan 1.7); what the two video scripts share is
-  `assets/js/video-shared.js`, the module `@dts-site-components/video-shared`, already named for
-  the components plugin it moves into at 2.3.
+  `assets/js/video-shared.js`, the module `@dts-site-components/video-shared`, named for the
+  components plugin once planned for 2.3 (not built for now, T29); the name stays.
 - The carousel's slide width token (`custom.carousel.slideWidth`) is in container units (`cqi`),
   which mean the carousel's own width only inside it; it is not a general-purpose length.
 - A comfortable line length for text: an inner group whose content width is the measure token,
@@ -150,8 +150,9 @@ template project starts; until then, a list, not a to-do.
   the list `PINS` at the top of the script names each site's pinned plugins and theme. Kept for
   many sites, where checking every site's Plugins page by eye does not scale.
 - `plugins/site-hardening/` (plan D26) as it is; each site adds its own outside sources, with
-  their reasons, through the `sitehardening_csp_sources` filter in its theme. The theme's
-  `functions.php` switching off WordPress's emoji script.
+  their reasons, through the `sitehardening_csp_sources` filter in its theme. WordPress's emoji
+  script is switched off by Site Hardening itself since its 0.4.0 (template plan T29), no longer
+  by the theme.
 - `docs/SITE_CHECKLIST.md`, on its way to a shared `~/.claude/WORDPRESS_STANDARDS.md` (D16).
 - The old-address redirects (plan D22, 8h): the function in the theme's `functions.php` is generic;
   the list `HBMUSIC_OLD_ADDRESSES` is the site's, empty for a new site, filled for a moved one.
