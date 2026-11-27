@@ -6,10 +6,9 @@
 # them into the starter (T29). They stay here until the starter has its own repository (2.4),
 # where they become its ordinary checks of its own files (T15). Uses what bin/check provides to
 # a site's checks: run_check and log, TOOLS_DIR, PROJECT_DIR, SITE_THEME_DIR, the site.json
-# readers and theme_json_schema_matches_wordpress.
+# readers, theme_json_schema_matches_wordpress and tools/theme-tokens.sh, which bin/check loads
+# itself (a second load fails on its readonly settings).
 
-# shellcheck source=tools/theme-tokens.sh
-source "$TOOLS_DIR/tools/theme-tokens.sh"
 # shellcheck source=tools/site-layer.sh
 source "$TOOLS_DIR/tools/site-layer.sh"
 
@@ -61,15 +60,14 @@ starter_holds_the_site_layer() {
   return 1
 }
 
-# The starter names nothing of this site but the shared theme code's prefix (the site's slug),
-# which its PHP and patterns must use until template plan 2.4 renames that prefix (T29). Its
-# assembled theme (starter/themes/, build output ignored by git, template plan 1.6c) holds this
-# site's shared theme files and is not the starter's own.
+# The starter names nothing of this site, its slug included: the shared theme code's names are
+# the same in every site (template plan T30). Its assembled theme (starter/themes/, build output
+# ignored by git, template plan 1.6c) holds this site's shared theme files and is not the
+# starter's own.
 starter_names_nothing_of_this_site() {
-  local slug name patterns=()
-  slug="$(site_setting .slug)"
+  local name patterns=()
   while IFS= read -r name; do
-    [[ "$name" == "$slug" ]] || patterns+=(-e "$name")
+    patterns+=(-e "$name")
   done < <(site_settings_query '.namesSharedCodeMustNotUse[]')
   ((${#patterns[@]} > 0)) || return 0
   ! grep -rniF --exclude-dir=themes "${patterns[@]}" "$STARTER_DIR"

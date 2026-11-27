@@ -209,8 +209,9 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 
 ## Framework
 
-- WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the `hbmusic`
-  prefix and text domain), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
+- WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the shared
+  theme code's prefix `dtstheme` and text domain `dts-theme`, the same in every site, template
+  plan T30), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
   them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and `php:S105` (spaces)
   are off in the user's VS Code user settings, because that extension reads rule settings only
   there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule

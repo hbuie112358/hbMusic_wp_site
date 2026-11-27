@@ -119,8 +119,21 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   Dependabot's "Check for updates" on `/site-packages` read all three `dts/*` plugins ("No update
   needed" for each). **So 2.2 is done,** the second milestone. **2.3's components plugin is not
   built for now** (T29, the user, 2026-11-27): the shared theme code stays in the child theme and
-  is copied into the starter, with neutral names, at 2.4. **Now: 2.3a,** the emoji removal moved
-  into Site Hardening (its step entry; not yet built). **Pull requests merge by squash**
+  is copied into the starter, with neutral names, at 2.4. **2.3a done** (2026-11-27): the emoji
+  removal moved into Site Hardening (0.4.0, #2, `9d59a9b`; its admin removal, which the theme's
+  never achieved, now works), its tests in the tools (0.4.2, #9, `6c3fc58`), this site switched
+  (#123, `cd8e6b6`), deployed by the user to staging and live (6 files each, as previewed, every
+  page passing, no new PHP log lines; no emoji code on staging's admin and home page, by the
+  user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
+  starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
+  names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, committed
+  `4831713` after its review gate and pushed; part 2, this site's branch
+  `feat/neutral-theme-names` on the tools branch, built, proven, reviewed and committed
+  `8783654` 2026-11-27 (its 2.4a entry has the counts). 0.5.0 released (tools #10, `7f7e563`,
+  tag `v0.5.0`), this site pinned to it (`d920bb7`, `bin/check` 36 passed). **Next:** this
+  site's pull request; then, before the deploys, the user's folder copies, Site Editor check and
+  the database query on staging and live (the 2.4a entry); then the deploys.
+  **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -151,9 +164,16 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   again. To decide: a written rule (after updating the tools, run `bin/dev-site`), joined with the
   unwritten repin command, or a mount Composer does not replace; (4) at Site Hardening's next
   release (from 2.3a's review, LOW): its `composer.json` description names neither the emoji
-  removal nor the unfiltered-HTML rule (metadata only, shown in sites' lock files).
-- **Then, in order:** 2.3a, then 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3
-  (the components plugin) waits for T29's conditions.
+  removal nor the unfiltered-HTML rule (metadata only, shown in sites' lock files); (5)
+  `bin/screenshots` shoots each page once the network is idle (`waitUntil: 'networkidle'` in the
+  tools' `tests/e2e/screenshots/pages.spec.ts`) but does not wait for the web fonts, so on a
+  freshly built dev site the first pages can be shot in the fallback font and differ from the
+  baseline (2.4a, 2026-11-27: the About page, both widths; identical on the next run); a wait for
+  `document.fonts.ready` before each shot, in a tools release; (6) from 2.4a part 1's review,
+  LOW: the site-layer check's test (`tests/tools/site-layer/run.sh` in the tools) creates its
+  temporary folder without stopping when `mktemp` fails, as the new component test now does.
+- **Then, in order:** 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3 (the
+  components plugin) waits for T29's conditions.
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
@@ -205,6 +225,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 | T27 | (Changes T25's order, D5, for 2.2c, the user, 2026-11-26.) Editing Help and Site Hardening move together, each to its own repository (`dts-editing-help`, `dts-site-hardening`; T2 unchanged): (1) both repositories created and each plugin's files and standard files put in, together; (2) then each finished in turn, Editing Help first: `bin/plugin-check` and its fixes, its check passing on GitHub, its first tag; (3) then this site switched to both downloads on one branch, both folders removed from `plugins/`, one proof run and one pull request; (4) the deploy as strict as ever, staging first, with Site Hardening's headers compared before and after. | Song List's move built and proved everything a move needs (2.2a, T26, the dev-site fix), so the rest is a repeated recipe; one site switch instead of two saves a lock update, a dev-site build, a full check run, a pull request and a deploy. The cost, accepted under T21: a failure is a little harder to place between two plugins. Site Hardening's risk (every page's headers) is held by the deploy, not by the order. |
 | T28 | 2.2d's design (the user, 2026-11-26): **each site has its own downloaded plugins.** The tools read `site-packages/` from the site worked on (`SITE_DIR`, which defaults to the project), not always from the project, with no fallback (a site without one stops at "composer.lock is missing"); tools 0.4.1, with a tools test of a stand-in site's own list. The starter gets `starter/site-packages/` with the toolkit's plugins at this site's versions (Contact Form 7, Yoast SEO, Simple History, Site Hardening, Editing Help), without Song List; `.gitignore` ignores `/starter/site-packages/wp-content/`; the starter's `localPlugins` empty. Dependabot does not update the starter's list until 2.4, and no check holds the two lists equal. | Since 2.2b the starter's dev site installed this site's downloads, Song List among them, whose page and songs come from this site's own setup, so Song List's page test would fail on the starter (found by reading the code, 2026-11-26; not run). Leaving the test out for the starter would hide a failure. At 2.4 the starter needs its own list anyway, so this brings that forward. A check holding the lists equal would fail every weekly Dependabot update of this site's; the starter is never deployed, so lagging versions cost only its dev site. |
 | T29 | **The components plugin is not built for now** (the user, 2026-11-27; replaces T5's plugin and, for DTS's shared theme code, T16's "no copy of shared code"). (1) The shared theme code stays in this site's child theme, as today. (2) At 2.4 the starter's repository gets the full child theme: the shared files, renamed once from `hbmusic` to neutral names and proven by the starter's tests, plus its neutral site layer; a new site created from it has its own copy. The theme assembly (`tools/site-theme.sh`) then leaves the tools. (3) The starter's theme is the master copy of the shared files: every change to them (a bug fix, an improvement, an accessibility correction) is made there, or carried there from the site where it was found, and then copied by hand into each site that wants it. Until 2.4, when the starter has no theme of its own yet, this site's theme is the master copy. (4) No site updates from the starter by itself: a site made from a GitHub template keeps no link to it, so each change to the shared files is copied into each site, then checked, tested and deployed there. Only the shared pieces a site lists at a version (the tools, DTS's plugins, the WordPress.org plugins, the parent theme) update through Dependabot and a deploy; the components plugin would bring the shared theme files into that group. (5) Everything is kept, the carousels and click-to-load videos included, used or not (the user: they may be used some day). (6) The emoji removal moves into the Site Hardening plugin (step 2.3a). (7) The components plugin is reconsidered when the site's design is settled and a second site is in view, or when the same change has had to be copied into several sites. Possible later improvements, not planned: the carousel stylesheet loaded only on pages that have a carousel (today it comes with WordPress's group block, so almost every page loads it, as its own file on the dev site; on live not checked); the video code's `youtube-nocookie.com` frame allowed in the security policy only where a page has a video (today on every page). | The user is still shaping the design and questions the carousels and videos; a plugin would turn each change to them into a release, a repin and a deploy, while one site uses them. A plugin for a few small, settled pieces (the menu script, 36 lines in two commits) costs more upkeep than copying them. What is truly shared is only known with a second site in view (H29). Copying straight from this site at each new site was weighed: every copy would need the `hbmusic` names renamed and tested again and would take along unfinished work, so the starter does that once. A tools command copying the shared files from a chosen starter version into a site was weighed and set aside: it would rebuild by hand what Composer and a plugin already do. Copying by hand costs little with two or three sites and grows with each site, which is point (7)'s signal to build the plugin; the code is already split into shared and site files, so that move stays straightforward. Unused features cost little: about 6.5 KB of styling (about 2.5 KB compressed, kept by the browser after the first page), one option in the editor's insert menu, and the policy entry above; they have no effect on search beyond that page weight, too small to change Google's loading measurements, and the shared tests keep them working on the starter's example page. The emoji removal belongs with Site Hardening: it turns off a WordPress feature visitors do not need, like the plugin's other switches; the plugin's own policy blocks the script it removes; and it keeps visitors' addresses from WordPress.org. The privacy link stays with the theme: it depends on the footer's markup, not on security. |
+| T30 | 2.4's design (the user, 2026-11-27). **Four parts, in order:** 2.4a the neutral names, here; 2.4b the starter's full theme, still in `starter/`, the theme assembly (`tools/site-theme.sh`, its test) leaving the tools; 2.4c the `dts-site-starter` repository (from `starter/`, protected like the others, a GitHub template, its own pull-request checks with the full dev-site tests as the starter's proof), then `starter/` and `tests/checks/starter.sh` leaving this repository, the milestone (T21); 2.4d the guides (new site, developer, a new site's first content), then handbook chapter 7's wording proposed (it still describes release zips with checksums and an empty child theme). **This site takes the same neutral names as the starter**, so a change copied between them (T29's master copy) needs no renaming and the shared tests know one set of names. **2.4a's names:** PHP `dtstheme_…` / `DTSTHEME_…`, the class `Dtstheme_Carousel_Scan` in `enum-dtstheme-carousel-scan.php`, text domain `dts-theme`, patterns `dts-theme/…` (the site-layer logo pattern included), style and script handles `dtstheme-…`, the event `dts-theme:player-added`, the picture folder `dts-theme-video-pictures`, the script module `@dts-theme/video-shared` (its components-plugin name dropped); the site-layer files' constants that the shared code reads (`includes/site-facts.php`) renamed too. Unchanged: the theme folder `hbmusic-child`, the theme's name, the slug. **The tools (0.5.0):** the shared tests use the fixed names; `bin/check`'s PHP prefix no longer comes from the slug; the three component checks (`tests/checks/components.sh`) move into the tools, run for any site whose theme has the components; the starter check's exemption for this site's slug goes. **Proof:** `bin/check`, the full `bin/test`, the starter's tests, `bin/screenshots compare` (every picture identical), each new test failing on a planted fault first; whether a page refers to the video-carousel pattern by name is confirmed on the dev site, not assumed. **Order:** the tools branch; this site's branch on it; 0.5.0, the repin, the pull request; then the deploys. **Before the deploys (the user):** the picture folder copied to its new name in hPanel's file manager on staging and on live, the old one deleted a week later (fallback: each page with a video saved again right after the deploy); the Site Editor checked for a saved header (it would keep `hbmusic/site-logo` and lose the logo). | A fixed name every site shares is what makes one master copy (T29) workable: with the prefix taken from each site's slug, every copy would be renamed and retested, and the tools' tests would need a prefix per site (seven of them call this site's functions by name today). The plugins' naming style (`songlist`/`song-list`) is kept. Without its picture a video shows its play button over an empty box until its page is saved (`hbmusic_video_facade_html()`, read 2026-11-27), so the folder is copied first. Renaming this site first, on live, proves the names before any second site depends on them, and makes 2.4b a plain copy. |
 
 ## Steps
 
@@ -1126,7 +1147,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   deleted (T25, D4) and each plugin's four release files added. The status sheet's evidence
   naming the plugins' tests (`tests/scenario/plugins/…`, now in the tools) is reworded here, once
   those tests have their final home (left from 2.1d, the user, 2026-11-24).
-- [ ] **2.3a The emoji removal into Site Hardening** (T29): `hbmusic_remove_emoji_support()`
+- [x] **2.3a The emoji removal into Site Hardening** (T29; done 2026-11-27: Site Hardening #2
+  `9d59a9b` tag `v0.4.0`, tools #9 `6c3fc58` tag `v0.4.2`, this site #123 `cd8e6b6`, deployed to
+  staging and live; the trial's planned branch install was refused by `bin/dev-site`'s version
+  check, so the plugin was tagged first and proven from its tag): `hbmusic_remove_emoji_support()`
   leaves the child theme and becomes part of the Site Hardening plugin, with a test that the
   emoji script is absent from a page, shown failing with the removal taken out. Site Hardening
   0.4.0 (it adds behavior), its changelog and tag each with the user's yes; this site's pin
@@ -1164,8 +1188,38 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   whether a plugin can supply the call-to-action page templates checked first (T5). Deployed to
   staging before live.
 - [ ] **2.4 `dts-site-starter`** and its new-site guide, from `template-notes.md` and handbook
-  chapter 7's six steps; the guide points to `site-settings.md` rather than repeating it. With
-  it (from the plan's review, 2026-11-21):
+  chapter 7's six steps; the guide points to `site-settings.md` rather than repeating it.
+  **Designed 2026-11-27 (T30) in four parts:**
+  - [~] **2.4a** the neutral names (T30's list) in this site's theme, the starter's site layer
+    and the tools (0.5.0), the component checks moved into the tools; proven as T30 says;
+    deployed after the user's folder copies and Site Editor check. Part 1 (tools branch):
+    committed `4831713` after its review gate (one fix: the new test stops when `mktemp` fails),
+    self-check 35 of 35, pushed. Part 2 (this site's branch, on the tools branch at
+    `dev-feat/neutral-theme-names`): the theme and the starter's site layer renamed (the class
+    file now `enum-dtstheme-carousel-scan.php`), `tests/checks/components.sh` deleted,
+    `starter.sh`'s own load of `theme-tokens.sh` and its slug exemption removed (bin/check loads
+    it now; a second load fails), `style.css` `Text Domain: dts-theme`, `phpcs.xml.dist`'s prefix
+    and text domain, the workflows written by `bin/tools-pin` for `4831713`, the documents. Proven
+    2026-11-27: `bin/check` 36 passed; the full `bin/test` all passed (249 browser tests, 4
+    skipped by design, the video-pause arrangements); the starter's tests all passed (169 browser
+    tests); `bin/screenshots compare` 24 of 24 identical (a first run, right after the rebuild,
+    showed the About page in the fallback font; run again, identical: "Worth raising" (5)); no
+    page or template on the dev site names `hbmusic/`, `hbmusic:` or `hbmusic-video` (database
+    query). Reviewed 2026-11-27: two findings, both later. **Before the deploys, added by the
+    review (MEDIUM):** the same read-only query on staging and on live (`wp db query` over the
+    places' SSH names, approved by the user then), which must return no rows: a page storing a
+    pattern by its old name would show nothing there after the deploy; T30's Site Editor check
+    covers only a saved header. **At the release step (LOW):** `composer.json` and the three
+    workflows name the tools branch (`dev-feat/neutral-theme-names`, `4831713`) until 0.5.0 is
+    released and pinned, so this branch does not reach `main` before then. Settled 2026-11-27:
+    0.5.0 released (tools #10, squash `7f7e563`, tag `v0.5.0`, its CHANGELOG with the missing
+    0.4.2 link added), this site pinned to it (`d920bb7`; `bin/check` 36 passed).
+  - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
+  - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
+    milestone).
+  - [ ] **2.4d** the guides; handbook chapter 7's wording proposed.
+
+  What 2.4 holds (from the plan's review, 2026-11-21):
   - a developer guide: how to run the site's tools, what each does, how a change goes from the
     dev site to live, for a developer other than the user;
   - a routine for a new site's first real content: where its pages and photos are built and how

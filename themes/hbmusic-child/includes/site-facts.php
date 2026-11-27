@@ -4,7 +4,7 @@
  * T13): the theme's functions read them from here and name no site themselves. A site without old
  * addresses or areas served leaves those lists empty.
  *
- * @package hbmusic
+ * @package dts-theme
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * nothing outside the site knows it. Also from live's export (plan 9e): the empty "Audio and
  * Video" page and three old video posts, whose videos are on Music now.
  */
-const HBMUSIC_OLD_ADDRESSES = array(
+const DTSTHEME_OLD_ADDRESSES = array(
 	'video'           => 'music',
 	'audio'           => 'music',
 	'audio-and-video' => 'music',
@@ -31,13 +31,13 @@ const HBMUSIC_OLD_ADDRESSES = array(
  * What the site's organization is, in schema.org's types, for Yoast SEO's page data: a musician
  * (MusicGroup, which also covers a solo musician) as well as Yoast's own Organization (plan 8h).
  */
-const HBMUSIC_ORGANIZATION_TYPES = array( 'Organization', 'MusicGroup' );
+const DTSTHEME_ORGANIZATION_TYPES = array( 'Organization', 'MusicGroup' );
 
 /**
  * The towns this site's musician travels to for events (plan D22), named in the page data for
  * search engines. The page text names the same towns.
  */
-const HBMUSIC_AREAS_SERVED = array(
+const DTSTHEME_AREAS_SERVED = array(
 	'Fayetteville, North Carolina',
 	'Hope Mills, North Carolina',
 	'Southern Pines, North Carolina',
@@ -52,7 +52,7 @@ const HBMUSIC_AREAS_SERVED = array(
  *   uses youtube.com. (The click-to-load player's youtube-nocookie.com is allowed by the video
  *   code itself, includes/video-facade.php.)
  */
-const HBMUSIC_OUTSIDE_SOURCES = array(
+const DTSTHEME_OUTSIDE_SOURCES = array(
 	'script-src' => array( 'https://challenges.cloudflare.com' ),
 	'frame-src'  => array( 'https://www.youtube.com', 'https://challenges.cloudflare.com' ),
 );
@@ -64,7 +64,7 @@ const HBMUSIC_OUTSIDE_SOURCES = array(
  *
  * @return string The example.
  */
-function hbmusic_link_example(): string {
-	return __( 'See the song list', 'hbmusic' );
+function dtstheme_link_example(): string {
+	return __( 'See the song list', 'dts-theme' );
 }
-add_filter( 'editinghelp_link_example', 'hbmusic_link_example' );
+add_filter( 'editinghelp_link_example', 'dtstheme_link_example' );

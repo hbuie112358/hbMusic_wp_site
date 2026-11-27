@@ -21,7 +21,7 @@
  * the visitor is in, the focus check) is held by one OnePlayerAtATime, built with its settings.
  */
 
-import { PLAYER_ADDED_EVENT, originOf } from '@dts-site-components/video-shared';
+import { PLAYER_ADDED_EVENT, originOf } from '@dts-theme/video-shared';
 
 /**
  * @typedef {object} PauseSettings

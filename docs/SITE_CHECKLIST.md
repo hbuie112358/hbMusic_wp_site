@@ -387,7 +387,7 @@ similar) in templates, patterns or PHP output; data for scripts goes through Wor
 **6.8 Functions, hooks and handles carry a theme prefix; all text is translatable with the
 theme's text domain.**
 - Why: no clashes with plugins; ready for translation.
-- Check: PHPCS (with the `hbmusic` prefix and text domain) and the Theme Check plugin report no
+- Check: PHPCS (with the shared theme code's prefix `dtstheme` and text domain `dts-theme`) and the Theme Check plugin report no
   errors.
 - Kind: WordPress · Status: in force through `bin/check` (3d); the theme from step 4.
 

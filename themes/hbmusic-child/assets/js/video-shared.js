@@ -2,14 +2,14 @@
  * What the theme's two video scripts share (template plan 1.7), in one home that both import:
  * the event the click-to-load videos announce a new player with (video-facade.js to
  * video-pause.js), and reading an address's origin. Loaded by WordPress as the script module
- * "@dts-site-components/video-shared" (functions.php), whose import map gives it its versioned address.
+ * "@dts-theme/video-shared" (functions.php), whose import map gives it its versioned address.
  */
 
 /**
  * The event video-facade.js sends on the document when a click-to-load video becomes a player;
  * its detail is the player's frame.
  */
-export const PLAYER_ADDED_EVENT = 'hbmusic:player-added';
+export const PLAYER_ADDED_EVENT = 'dts-theme:player-added';
 
 /**
  * The origin of an address: where a player's commands may go, or whether a player's origin is

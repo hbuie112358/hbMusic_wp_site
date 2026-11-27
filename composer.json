@@ -10,7 +10,7 @@
         }
     ],
     "require-dev": {
-        "dts/site-tools": "0.4.2"
+        "dts/site-tools": "0.5.0"
     },
     "config": {
         "allow-plugins": {
