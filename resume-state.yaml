@@ -4,58 +4,59 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-27T06:25:00-05:00
-current_branch: chore/pause-2026-11-27
-last_commit: 63c15da
+timestamp: 2026-11-27T08:30:00-05:00
+current_branch: chore/pause-2026-11-27b
+last_commit: cd8e6b6
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-27 (twenty-first session). Template plan 2.2 finished, the second milestone.
-  dts-site-tools v0.4.1 released (changelog ca682f1, #8 squash 1d10255, tag v0.4.1 pushed).
-  This site repinned to 0.4.1 and the starter's own site-packages/ committed (b2c571b, after the
-  review gate: two LOW, one fixed, one left as true metadata). bin/check first failed the
-  starter's PHPCS check, which read the installed plugins in starter/site-packages/wp-content/;
-  fixed by an exclude-pattern in phpcs.xml.dist (36 of 36 after; the check now reads only the
-  starter's two own PHP files). The branch merged as #122 (squash 63c15da; check / check 1m4s,
-  check / dev-site 6m21s); local branches feat/song-list-from-dts and chore/pause-2026-11-26c
-  deleted after checking their content is on main. The user deployed 63c15da to staging and
-  live: on each, rsync changed exactly the 15 expected files, git agreeing, 6 of 6 pages passing,
-  no new PHP log lines. Headers: staging after the deploy equal to live's (the page links' own
-  address and the host's password line aside; no staging "before" copy was saved); live's
-  before and after identical (date and host request lines aside). Dependabot's "Check for
-  updates" on /site-packages: "No update needed" for dts/song-list 0.2.1, dts/site-hardening
-  0.3.0, dts/editing-help 0.1.1. The user asked for plainer wording in details (memory
-  plain-wording-in-details).
+  2026-11-27 (twenty-second session). The user questioned 2.3, the components plugin, and
+  decided T29: the plugin is not built for now; the shared theme code stays in the child theme
+  and is copied into the starter, with neutral names, at 2.4 (the starter's theme then the master
+  copy; no site updates from it by itself); carousels and videos kept; the emoji removal moved
+  into Site Hardening. Step 2.3a done the same day: Site Hardening 0.4.0 (#2, 9d59a9b, tag
+  v0.4.0; the review found the theme's admin emoji removal never worked, since WordPress adds the
+  admin's hooks after init; fixed with admin_init); tools 0.4.2 (#9, 6c3fc58, tag v0.4.2: the
+  emoji tests, and the Site Hardening scenario's probe drafts no longer left behind); this site
+  #123 (cd8e6b6: both pins, the theme's function removed, the starter's list raised, stale "2.3"
+  comments corrected, the project's CLAUDE.md pointing to T21's milestones). Proven on the dev
+  site in three runs (admin fails with 0.3.0; home page, embed, feed, email each fail with the
+  removal off; all pass with 0.4.0, 91 of 91 browser tests). The user deployed cd8e6b6 to staging
+  and live: 6 files each as previewed, every page passing, no new PHP log lines; no emoji code on
+  staging (the user's look) or live (curl). Found on the way: bin/dev-site refuses a DTS plugin
+  from a branch (version check), so the trial went tag-first; updating the tools while the dev
+  site runs empties its dev-only plugins (plan, worth raising (3)). Branch chore/pause-2026-11-27
+  deleted after checking its content is on main.
 
 next_action: >
-  Template plan 2.3, the generic theme code in the components plugin (T5, T16; its step entry):
-  not yet designed. Start by reading the 2.3 entry and T5, then propose its design to the user in
-  parts (as 2.2 was, T25), including the first check T5 names: whether a plugin can supply the
-  call-to-action page templates. The rebuild plan's 9u stays waiting for a break that suits the user.
+  Template plan 2.4, the starter (dts-site-starter), not yet designed: read its step entry (now
+  including T29's copy of the full child theme with neutral names) and T29, T15, T16, then
+  propose its design to the user in parts. The rebuild plan's 9u stays waiting for a break that
+  suits the user.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "bin/check 36 of 36 on b2c571b (2026-11-27); GitHub's check / check and check / dev-site passed on #122."
-  tools: "dts-site-tools main 1d10255, tag v0.4.1; this site requires 0.4.1, its three workflows call 1d10255."
-  site_packages: "dts/song-list v0.2.1 (6e050c1), dts/editing-help v0.1.1 (da3f399), dts/site-hardening v0.3.0 (990361e); the starter's own list the same versions without Song List (not updated by Dependabot until 2.4)"
-  plugin_repositories: "dts-song-list main 45ec9b1, dts-editing-help main 8011e4b, dts-site-hardening main 420c2e5; each requires dts/site-tools 0.4.0 in require-dev; tags unchanged"
+  checks: "bin/check all passed on 7098c14 (2026-11-27); GitHub's check / check (1m13s) and check / dev-site (8m37s) passed on #123."
+  tools: "dts-site-tools main 6c3fc58, tag v0.4.2; this site requires 0.4.2, its three workflows call 6c3fc58."
+  site_packages: "dts/song-list v0.2.1 (6e050c1), dts/editing-help v0.1.1 (da3f399), dts/site-hardening v0.4.0 (9d59a9b); the starter's own list the same without Song List"
+  plugin_repositories: "dts-site-hardening main 9d59a9b (tag v0.4.0); dts-song-list main 45ec9b1, dts-editing-help main 8011e4b, tags unchanged; each main even with origin, only main locally"
   branch_protection: "main requires check / check and check / dev-site (GitHub Actions), strict"
   merge_settings: "this repository, dts-site-tools and the three plugin repositories allow squash merges only"
-  deployed: "staging and live both run 63c15da (deployed by the user 2026-11-27)"
-  local_dev_sites: "this site's dev site (hbmusic-dev) last built 2026-11-26 with the tools at c322658 plus the scenario fixes (code equal to 0.4.1 apart from the changelog); the starter's (dts-starter-dev) stopped, its data kept"
+  deployed: "staging and live both run cd8e6b6 (deployed by the user 2026-11-27)"
+  local_dev_sites: "this site's dev site (hbmusic-dev) rebuilt 2026-11-27 with tools 0.4.2 and Site Hardening 0.4.0, its dev-only plugins mounted; the starter's (dts-starter-dev) stopped, its data kept"
   env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
-  github_rate_limit: "Composer's GitHub downloads run unauthenticated (60 requests an hour); several composer updates in a row can use it up"
-  repin_command: "No written command raises the tools' pin in a site: the README's install command with composer.lock mounted writable and 'composer update dts/site-tools' was used (2026-11-27)"
+  github_rate_limit: "Composer's GitHub downloads run unauthenticated (60 requests an hour)"
+  repin_command: "No written command raises the tools' pin in a site: the README's install command with composer.lock mounted writable and 'composer update dts/site-tools' (used again 2026-11-27); run bin/dev-site afterwards, or the running dev site loses its dev-only plugins"
 
 uncommitted_changes:
   - file: docs/planning/template-plan.md
-    why: Committed with this pause (Current position, 2.2 marked done).
+    why: Committed with this pause (Current position, 2.3a marked done).
   - file: branches
     why: >
-      chore/pause-2026-11-27 holds only this pause commit, local, not pushed; main is even with
-      origin/main at 63c15da. Nothing else local.
-  - file: ~/dev/dts-site-tools, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-site-hardening
+      chore/pause-2026-11-27b holds only this pause commit, local, not pushed; main is even with
+      origin/main at cd8e6b6. Nothing else local.
+  - file: ~/dev/dts-site-tools, ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
     why: Each main even with origin, clean, no other branches.
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
@@ -64,24 +65,31 @@ uncommitted_changes:
       CLAUDE.md, MULTI_PROJECT_SETUP.md, PAUSE_CONVENTION.md, TESTING_APPROACH.md, settings.json,
       skills/review-gate/SKILL.md, the removed hook files and mark-approved.sh; this project's
       memory (MEMORY.md, ask-before-every-commit.md, three new files: plain-wording-in-details,
-      review-gate-without-asking, say-the-step-each-message) and time-log.csv. PAUSE_CONVENTION.md
-      and ask-before-every-commit.md were already changed at this session's start, not by this
-      session; when and why is not known.
+      review-gate-without-asking, say-the-step-each-message) and time-log.csv. Unchanged by this
+      session apart from time-log.csv; all were already uncommitted at its start.
   - file: the session scratchpad
-    why: Only throwaway files (check logs, the header copies compared above).
+    why: >
+      Throwaway logs, plus run-spec.sh, a small script that runs one Playwright spec as bin/test
+      does (lost with the session; the tools have no written way to run one spec, see
+      pending_decisions).
 
 pending_decisions:
+  - Template plan 2.4's design (next_action), for the user to approve in parts.
   - >
-    Template plan 2.3's design (next_action), for the user to approve in parts.
+    The plan's "worth raising" (3): updating the tools while the dev site runs empties its
+    dev-only plugins; a written rule (run bin/dev-site after a tools update, with the unwritten
+    repin command) or a mount Composer does not replace. And (4): Site Hardening's composer.json
+    description, at its next release.
   - >
-    The tools' repin command for a site is not written down (verification.repin_command); worth a
-    line in the tools' README or a small command in a later tools release.
+    No written way to run a single browser spec or scenario as bin/test does (this session used a
+    scratchpad script); worth a bin/test option or a line in docs/TOOLS.md, in a later tools release.
   - >
-    The plugin repositories' released tags still name dts/site-tools dev-feat/dts-plugins in
-    require-dev (metadata only; gone at each plugin's next release).
+    The plugin repositories' released tags dts-song-list v0.2.1 and dts-editing-help v0.1.1 still
+    name dts/site-tools dev-feat/dts-plugins in require-dev (metadata only; Site Hardening's is
+    gone with v0.4.0).
   - >
     LOW from 0.4.1's reviews, left by the user's choice: bin/versions-check's unset SITE_DIR has no
-    test; downloaded plugins (DTS's as WordPress.org's) are not checked read-only on the dev site.
+    test; downloaded plugins are not checked read-only on the dev site.
   - >
     In ~/.claude, later: the two pointer files (code_review_keyword.md, code_review_methodology.md)
     removed once no project names them; each other project gets PROJECT_UPGRADE.md part C at its
@@ -95,6 +103,9 @@ pending_decisions:
     against its header; COMPOSER_AUTH in the whole bin/dev-site step; TESTS_LEFT_OUT may name a
     scenario-only folder; the downloaded plugins' header "(git, Composer)" for a site without them.
   - >
+    Possible later improvements (T29): the carousel stylesheet only on pages with a carousel; the
+    youtube-nocookie.com frame in the policy only where a page has a video.
+  - >
     Offered, not yet decided: a read-only check on the server that each place's key reaches only
     its own folders (T11's restriction).
   - >
@@ -102,8 +113,8 @@ pending_decisions:
     squash merge step. Not known yet: why Dependabot ignored "@dependabot rebase" on the tools' #2.
   - >
     Left as LOW from earlier reviews (0.3.1 and before): see the 0.3.1 entry in the template plan
-    and docs/session-history.md; the plan's finding still open: the parent theme's pinned version
-    is in the tools' tools/versions.sh, so raising it takes a tools release.
+    and docs/session-history.md; the parent theme's pinned version is in the tools'
+    tools/versions.sh, so raising it takes a tools release.
   - >
     The handbook's follow-ups for the user: listed in the handbook's WORKING_DRAFT.md, "Open
     items". Whether squash merging becomes a handbook rule for every DTS repository.
@@ -118,25 +129,25 @@ pending_decisions:
   - Bringing the off-computer backup of data/ up to date.
   - Left from the review of #93: the Alpine check reads the x86_64 list only; a future Alpine build time would show a negative age.
   - For the user: Search Console, Request indexing for the Book page.
-  - Whether to clean up the Site Hardening check's leftover probe drafts on the dev site.
+  - Whether to clean up the Site Hardening check's leftover probe drafts on the dev site (moot after each rebuild; the leak itself is fixed in tools 0.4.2).
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T28, the 2.3 entry.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T29, the 2.4 entry.
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
   - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
-  - ~/dev/dts-site-tools: the tools' repository (main 1d10255, tag v0.4.1).
-  - ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-site-hardening: the plugin repositories.
+  - ~/dev/dts-site-tools: the tools' repository (main 6c3fc58, tag v0.4.2).
+  - ~/dev/dts-site-hardening (main 9d59a9b, tag v0.4.0), ~/dev/dts-song-list, ~/dev/dts-editing-help: the plugin repositories.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository,
-     ~/dev/dts-site-tools (main 1d10255, tag v0.4.1), the three plugin repositories (each main even
+     ~/dev/dts-site-tools (main 6c3fc58, tag v0.4.2), the three plugin repositories (each main even
      with origin, clean) and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T5 and T16 above all, for 2.3) and the 2.3 entry.
-  3. Then next_action: design 2.3 with the user. Open every reply with the step being worked on,
+     (T29, T15, T16 above all, for 2.4) and the 2.4 entry.
+  3. Then next_action: design 2.4 with the user. Open every reply with the step being worked on,
      word details plainly, end with one clear question, and say when a good moment to pause comes.
-  4. The pause commit is on chore/pause-2026-11-27 (local); it reaches main with the next pull request.
+  4. The pause commit is on chore/pause-2026-11-27b (local); it reaches main with the next pull request.

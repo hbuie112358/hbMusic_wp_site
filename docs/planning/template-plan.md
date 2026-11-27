@@ -119,8 +119,13 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   Dependabot's "Check for updates" on `/site-packages` read all three `dts/*` plugins ("No update
   needed" for each). **So 2.2 is done,** the second milestone. **2.3's components plugin is not
   built for now** (T29, the user, 2026-11-27): the shared theme code stays in the child theme and
-  is copied into the starter, with neutral names, at 2.4. **Now: 2.3a,** the emoji removal moved
-  into Site Hardening (its step entry; not yet built). **Pull requests merge by squash**
+  is copied into the starter, with neutral names, at 2.4. **2.3a done** (2026-11-27): the emoji
+  removal moved into Site Hardening (0.4.0, #2, `9d59a9b`; its admin removal, which the theme's
+  never achieved, now works), its tests in the tools (0.4.2, #9, `6c3fc58`), this site switched
+  (#123, `cd8e6b6`), deployed by the user to staging and live (6 files each, as previewed, every
+  page passing, no new PHP log lines; no emoji code on staging's admin and home page, by the
+  user's look, nor on live's home page, Music page and feed, by `curl`). **Now: 2.4,** the
+  starter (its step entry; not yet designed). **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was
   the repository (copy from `main`'s commit, `composer.json`, `LICENSE`, `README.md`,
@@ -152,8 +157,8 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   unwritten repin command, or a mount Composer does not replace; (4) at Site Hardening's next
   release (from 2.3a's review, LOW): its `composer.json` description names neither the emoji
   removal nor the unfiltered-HTML rule (metadata only, shown in sites' lock files).
-- **Then, in order:** 2.3a, then 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3
-  (the components plugin) waits for T29's conditions.
+- **Then, in order:** 2.4 and 2.5 (stage 2, the shared repositories). The rest of 2.3 (the
+  components plugin) waits for T29's conditions.
 - **Kept waiting, not forgotten (the user, 2026-11-20):** the rebuild plan's **9u**, the booking
   form's message when the "not a robot" check has not finished. The template came first by the
   user's choice; 9u is done at the first break in this plan's work that suits the user.
@@ -1126,7 +1131,10 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   deleted (T25, D4) and each plugin's four release files added. The status sheet's evidence
   naming the plugins' tests (`tests/scenario/plugins/…`, now in the tools) is reworded here, once
   those tests have their final home (left from 2.1d, the user, 2026-11-24).
-- [ ] **2.3a The emoji removal into Site Hardening** (T29): `hbmusic_remove_emoji_support()`
+- [x] **2.3a The emoji removal into Site Hardening** (T29; done 2026-11-27: Site Hardening #2
+  `9d59a9b` tag `v0.4.0`, tools #9 `6c3fc58` tag `v0.4.2`, this site #123 `cd8e6b6`, deployed to
+  staging and live; the trial's planned branch install was refused by `bin/dev-site`'s version
+  check, so the plugin was tagged first and proven from its tag): `hbmusic_remove_emoji_support()`
   leaves the child theme and becomes part of the Site Hardening plugin, with a test that the
   emoji script is absent from a page, shown failing with the removal taken out. Site Hardening
   0.4.0 (it adds behavior), its changelog and tag each with the user's yes; this site's pin
