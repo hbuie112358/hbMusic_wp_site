@@ -128,9 +128,13 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   starter, designed 2026-11-27 in four parts (T30, its step entry): **now: 2.4a,** the neutral
   names: part 1, the tools branch `feat/neutral-theme-names` in `dts-site-tools`, committed
   `4831713` after its review gate and pushed (no pull request yet); part 2, this site's branch
-  `feat/neutral-theme-names` on the tools branch (`dev-feat/neutral-theme-names`), built and
-  proven 2026-11-27, waiting for its review gate (its 2.4a entry has the counts). Then 0.5.0,
-  the repin to it, the pull requests; then the user's folder copies and the deploys.
+  `feat/neutral-theme-names` on the tools branch (`dev-feat/neutral-theme-names`), built,
+  proven, reviewed and committed `8783654` 2026-11-27, local (its 2.4a entry has the counts).
+  **Next: 0.5.0,** proposed to the user first: the tools' CHANGELOG "Unreleased" becomes
+  0.5.0, the tools branch's pull request and squash merge, the tag `v0.5.0`; then this site
+  pinned to 0.5.0 (`bin/tools-pin`, `bin/check`) and its pull request; then, before the
+  deploys, the user's folder copies, Site Editor check and the database query on staging and
+  live (the 2.4a entry); then the deploys.
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
   2.1b-3b was

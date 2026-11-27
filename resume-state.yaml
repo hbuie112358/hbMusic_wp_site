@@ -4,63 +4,64 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-27T08:43:00-05:00
-current_branch: chore/pause-2026-11-27b
-last_commit: f9af335
+timestamp: 2026-11-27T09:25:00-05:00
+current_branch: feat/neutral-theme-names
+last_commit: 8783654
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-27 (twenty-third session). 2.4 designed with the user and recorded as T30 (f9af335):
-  four parts, 2.4a the neutral names here, 2.4b the starter's full theme in starter/, 2.4c the
-  dts-site-starter repository (the milestone), 2.4d the guides and chapter 7's wording; this site
-  takes the same neutral names as the starter (dtstheme_/DTSTHEME_, text domain and patterns
-  dts-theme, handles dtstheme-, folder dts-theme-video-pictures, module @dts-theme/video-shared;
-  T30 has the list). 2.4a part 1 approved and built, uncommitted, on dts-site-tools branch
-  feat/neutral-theme-names (from main 6c3fc58): the seven tests and tools/js-check/tsconfig.json
-  on the fixed names; tools/theme-components.sh, the three component checks moved from the site,
-  run by bin/check for every site, with tests/tools/theme-components/run.sh (10 examples, three
-  planted faults each caught, file restored and compared identical); SITE_PHP_PREFIX removed;
-  bin/check loads tools/theme-tokens.sh once; docs/TOOLS.md, CHANGELOG.md (Unreleased, two
-  breaking changes), the self-check's list. Self-check 35 of 35 passed. A copied comment was
-  wrong (site-hero__photo does not count for site-hero; grep's \b treats _ as a word character)
-  and was corrected, with a test of both cases.
+  2026-11-27 (twenty-fourth session). 2.4a both parts built, proven, reviewed and committed.
+  Part 1, dts-site-tools branch feat/neutral-theme-names: review gate (1 MEDIUM fixed: the new
+  component test stops when mktemp fails; 2 LOW no fix), self-check 35 of 35, committed 4831713,
+  pushed to GitHub (no pull request). Part 2, this site's branch feat/neutral-theme-names (from
+  chore/pause-2026-11-27b): composer.json requires dts/site-tools dev-feat/neutral-theme-names
+  (4831713), workflows written by bin/tools-pin for it; the theme and the starter's site layer
+  renamed to T30's names (class file enum-dtstheme-carousel-scan.php), tests/checks/components.sh
+  deleted, starter.sh's own theme-tokens load and slug exemption removed, phpcs.xml.dist, the
+  project's CLAUDE.md (Framework line), SITE_CHECKLIST 6.8, SITE_SPECIFIC_ROUTINES (picture
+  folder), the plan. Proven: bin/check 36 passed; full bin/test all passed (249 browser tests, 4
+  skipped by design); the starter's tests all passed (169); bin/screenshots compare 24 of 24
+  identical on the second run (the first showed About in the fallback font: plan "Worth raising"
+  (5)); dev database query for hbmusic/, hbmusic:, hbmusic-video: no rows; the starter name check
+  caught a planted "hbmusic" (file restored, identical). Review gate: 1 MEDIUM and 1 LOW, both
+  "later", written into the 2.4a entry. Committed 8783654.
 
 next_action: >
-  2.4a part 1: run the review gate on the uncommitted tools branch feat/neutral-theme-names in
-  ~/dev/dts-site-tools (git diff there; the new files tools/theme-components.sh and
-  tests/tools/theme-components/run.sh), report, wait for the user's fixes choice and "commit".
-  Then part 2, this site's branch: propose its changes first (T30 and the 2.4a step entry list
-  them). The rebuild plan's 9u stays waiting for a break that suits the user.
+  2.4a's release: propose to the user first (nothing pushed, merged or tagged without the user's
+  yes): in ~/dev/dts-site-tools, the CHANGELOG's "Unreleased" becomes [0.5.0] - <date> (a commit
+  on feat/neutral-theme-names, docs only), the tools pull request's text (squash message), its
+  merge after GitHub's checks, the tag v0.5.0. Then this site: composer.json back to a release
+  ("0.5.0"), the repin command (verification.repin_command), bin/tools-pin, bin/dev-site,
+  bin/check, its pull request (carries the two pause commits too). Then the user's pre-deploy
+  tasks (2.4a entry) and the deploys. The rebuild plan's 9u stays waiting.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "bin/check all passed on 7098c14 (2026-11-27); GitHub's check / check (1m13s) and check / dev-site (8m37s) passed on #123."
-  tools: "dts-site-tools main 6c3fc58, tag v0.4.2; this site requires 0.4.2, its three workflows call 6c3fc58."
+  checks: "On 8783654 with tools 4831713: bin/check 36 passed; full bin/test all passed (249 browser, 4 skipped by design); starter's tests all passed (169); screenshots 24 of 24 identical."
+  tools: "dts-site-tools main 6c3fc58, tag v0.4.2; branch feat/neutral-theme-names 4831713 on origin (2.4a part 1, not merged, not released). This site's main requires 0.4.2; its branch feat/neutral-theme-names requires dev-feat/neutral-theme-names."
   site_packages: "dts/song-list v0.2.1 (6e050c1), dts/editing-help v0.1.1 (da3f399), dts/site-hardening v0.4.0 (9d59a9b); the starter's own list the same without Song List"
-  plugin_repositories: "dts-site-hardening main 9d59a9b (tag v0.4.0); dts-song-list main 45ec9b1, dts-editing-help main 8011e4b, tags unchanged; each main even with origin, only main locally"
+  plugin_repositories: "dts-site-hardening main 9d59a9b (tag v0.4.0); dts-song-list main 45ec9b1, dts-editing-help main 8011e4b, tags unchanged; each main even with origin, clean; none names hbmusic (checked 2026-11-27)"
   branch_protection: "main requires check / check and check / dev-site (GitHub Actions), strict"
   merge_settings: "this repository, dts-site-tools and the three plugin repositories allow squash merges only"
-  deployed: "staging and live both run cd8e6b6 (deployed by the user 2026-11-27)"
-  local_dev_sites: "this site's dev site (hbmusic-dev) rebuilt 2026-11-27 with tools 0.4.2 and Site Hardening 0.4.0, its dev-only plugins mounted; the starter's (dts-starter-dev) stopped, its data kept"
+  deployed: "staging and live both run cd8e6b6 (deployed by the user 2026-11-27); still the old hbmusic names and folder hbmusic-video-pictures"
+  local_dev_sites: "this site's dev site (hbmusic-dev) rebuilt 2026-11-27 from the renamed branch with tools 4831713, running; the starter's (dts-starter-dev) rebuilt and tested, stopped"
+  screenshots_baseline: "screenshots/baseline/ (ignored by git): taken 2026-11-27 before the rename, from cd8e6b6's theme"
   env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
   github_rate_limit: "Composer's GitHub downloads run unauthenticated (60 requests an hour)"
   repin_command: "No written command raises the tools' pin in a site: the README's install command with composer.lock mounted writable and 'composer update dts/site-tools' (used again 2026-11-27); run bin/dev-site afterwards, or the running dev site loses its dev-only plugins"
 
 uncommitted_changes:
-  - file: branches
+  - file: branches (this repository)
     why: >
-      chore/pause-2026-11-27b, local, not pushed: 2 commits not on origin/main (3b6a55d the last
-      pause, f9af335 T30), reaching main with the next pull request; main even with origin/main
-      at cd8e6b6.
-  - file: ~/dev/dts-site-tools (branch feat/neutral-theme-names, local, no commits yet)
+      feat/neutral-theme-names, local, not pushed: 4 commits not on origin/main (3b6a55d and
+      9e34f6d pauses, f9af335 T30, 8783654 2.4a part 2), plus this pause's commit; it reaches main
+      by its pull request after 0.5.0 and the repin. chore/pause-2026-11-27b (9e34f6d) is contained
+      in it and can be deleted then. main even with origin/main at cd8e6b6.
+  - file: ~/dev/dts-site-tools
     why: >
-      2.4a part 1, uncommitted, waiting for the review gate and the user's "commit": modified
-      CHANGELOG.md, bin/check, docs/TOOLS.md, tests/e2e/specs/dev/components/component-styles.spec.ts,
-      tests/scenario/components/dev-embed-titles.sh, dev-patterns.sh, dev-privacy-link.sh,
-      dev-stylesheet-versions.sh, dev-video-pictures.sh, tests/scenario/generic/dev-organization-areas.sh,
-      tests/tools/check-tools.sh, tools/js-check/tsconfig.json; new tests/tools/theme-components/,
-      tools/theme-components.sh. main even with origin at 6c3fc58.
+      Branch feat/neutral-theme-names at 4831713, pushed, even with origin, clean; no pull request
+      yet (waits for the 0.5.0 CHANGELOG commit and the user's yes). main even with origin at 6c3fc58.
   - file: ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
     why: Each main even with origin, clean, no other branches.
   - file: data/ (not versioned)
@@ -69,29 +70,29 @@ uncommitted_changes:
     why: >
       CLAUDE.md, MULTI_PROJECT_SETUP.md, PAUSE_CONVENTION.md, TESTING_APPROACH.md, settings.json,
       skills/review-gate/SKILL.md, the removed hook files and mark-approved.sh; this project's
-      memory (MEMORY.md, ask-before-every-commit.md, three new files: plain-wording-in-details,
-      review-gate-without-asking, say-the-step-each-message) and time-log.csv. Unchanged by this
-      session apart from time-log.csv; all were already uncommitted at its start.
+      memory (MEMORY.md, ask-before-every-commit.md, four new files: plain-wording-in-details,
+      review-gate-without-asking, say-the-step-each-message, and this session's
+      pause-offer-says-both-paths) and time-log.csv.
   - file: the session scratchpad
-    why: Throwaway only (the self-check's log, a backup of theme-components.sh used for the planted faults).
+    why: Throwaway only (check, test and screenshot logs; the rename's scratch copy).
 
 pending_decisions:
   - >
-    2.4a part 1's review gate and commit (next_action); part 2's changes, to propose. Before 2.4a's
-    deploys (the user): the video picture folder copied to dts-theme-video-pictures in hPanel on
-    staging and live, the Site Editor checked for a saved header (T30).
+    2.4a's release (next_action), each outward step for the user's yes. Before 2.4a's deploys (the
+    user): the picture folder copied to dts-theme-video-pictures in hPanel on staging and live (old
+    one deleted a week later), the Site Editor checked for a saved header, and the read-only query
+    for hbmusic/ on staging and live returning no rows (the 2.4a entry).
   - >
-    The plan's "worth raising" (3): updating the tools while the dev site runs empties its
-    dev-only plugins; a written rule (run bin/dev-site after a tools update, with the unwritten
-    repin command) or a mount Composer does not replace. And (4): Site Hardening's composer.json
-    description, at its next release.
+    The plan's "worth raising": (3) updating the tools while the dev site runs empties its dev-only
+    plugins (a written rule or a different mount); (4) Site Hardening's composer.json description;
+    (5) bin/screenshots does not wait for web fonts (document.fonts.ready), new 2026-11-27; (6) the
+    tools' site-layer test does not stop when mktemp fails, new 2026-11-27 (LOW).
   - >
-    No written way to run a single browser spec or scenario as bin/test does (this session used a
-    scratchpad script); worth a bin/test option or a line in docs/TOOLS.md, in a later tools release.
+    No written way to run a single browser spec or scenario as bin/test does; worth a bin/test
+    option or a line in docs/TOOLS.md, in a later tools release.
   - >
     The plugin repositories' released tags dts-song-list v0.2.1 and dts-editing-help v0.1.1 still
-    name dts/site-tools dev-feat/dts-plugins in require-dev (metadata only; Site Hardening's is
-    gone with v0.4.0).
+    name dts/site-tools dev-feat/dts-plugins in require-dev (metadata only).
   - >
     LOW from 0.4.1's reviews, left by the user's choice: bin/versions-check's unset SITE_DIR has no
     test; downloaded plugins are not checked read-only on the dev site.
@@ -100,13 +101,15 @@ pending_decisions:
     removed once no project names them; each other project gets PROJECT_UPGRADE.md part C at its
     next session start.
   - >
-    LOW, found 2026-11-26: bin/check prints "readonly variable" twice (theme-tokens.sh sourced by
-    two site checks); fixed by 2.4a (bin/check loads it once; part 2 removes starter.sh's load).
-  - >
     Left as LOW from T26's and 2.2a's reviews: the site-side names check runs in bin/dev-site only,
     not in bin/deploy; plugin-check.yml repeats the install command; SONGLIST_VERSION not checked
     against its header; COMPOSER_AUTH in the whole bin/dev-site step; TESTS_LEFT_OUT may name a
     scenario-only folder; the downloaded plugins' header "(git, Composer)" for a site without them.
+    (bin/check's double "readonly variable" is fixed on the 2.4a branches.)
+  - >
+    LOW from 2.4a part 1's review, no fix by the user's choice: the component checks run for every
+    site (a theme without the list fails, by design under T29); the example-page match also counts
+    a class that only ends in a component's name (unchanged from the site's old check).
   - >
     Possible later improvements (T29): the carousel stylesheet only on pages with a carousel; the
     youtube-nocookie.com frame in the policy only where a page has a video.
@@ -134,27 +137,25 @@ pending_decisions:
   - Bringing the off-computer backup of data/ up to date.
   - Left from the review of #93: the Alpine check reads the x86_64 list only; a future Alpine build time would show a negative age.
   - For the user: Search Console, Request indexing for the Book page.
-  - Whether to clean up the Site Hardening check's leftover probe drafts on the dev site (moot after each rebuild; the leak itself is fixed in tools 0.4.2).
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry.
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry (2.4a's counts and the pre-deploy tasks).
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
   - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
   - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
-  - ~/dev/dts-site-tools: the tools' repository (main 6c3fc58, tag v0.4.2; branch feat/neutral-theme-names, uncommitted 2.4a part 1).
+  - ~/dev/dts-site-tools: the tools' repository (main 6c3fc58, tag v0.4.2; branch feat/neutral-theme-names 4831713, pushed).
   - ~/dev/dts-site-hardening (main 9d59a9b, tag v0.4.0), ~/dev/dts-song-list, ~/dev/dts-editing-help: the plugin repositories.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
 resume_instructions: |
-  1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository,
-     ~/dev/dts-site-tools (main 6c3fc58; branch feat/neutral-theme-names with the uncommitted files
-     listed above), the three plugin repositories (each main even with origin, clean) and
-     ~/dev/dts-handbook.
+  1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository
+     (branch feat/neutral-theme-names), ~/dev/dts-site-tools (branch feat/neutral-theme-names at
+     4831713, even with origin), the three plugin repositories and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
      (T30, T29 above all) and the 2.4 entry.
-  3. Then next_action: the review gate on the tools branch. Open every reply with the step being
-     worked on, word details plainly, end with one clear question, and say when a good moment to
-     pause comes.
-  4. The pause commits are on chore/pause-2026-11-27b (local); they reach main with the next pull request.
+  3. Then next_action: propose 2.4a's release. Open every reply with the step being worked on,
+     word details plainly, end with one clear question; when suggesting a pause, say what is
+     saved and what happens with or without it.
+  4. This pause's commit is on feat/neutral-theme-names; it reaches main with that branch's pull request.
