@@ -9,5 +9,5 @@ parameters:
     phpVersion: 80400
     paths:
         - themes
-        - plugins
-    # The tools' dev-site must-use plugins are analysed by the tools' self-check (tools/php-check/).
+    # DTS's plugins are analysed in their own repositories (bin/plugin-check); the tools' dev-site
+    # must-use plugins by the tools' self-check (tools/php-check/).

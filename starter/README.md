@@ -5,14 +5,21 @@
 The site layer a new DTS brochure site starts from (template plan 1.6, T12 and T13): a neutral,
 light placeholder look, logo and wording that work out of the box and are replaced by the
 site's own. At template plan 2.4 this folder becomes the `dts-site-starter` repository's site
-layer; until then it lives here, checked by this repository's `bin/check` and proven weekly on a
-dev site of its own (1.6c).
+layer; until then it lives here, checked by this repository's `bin/check`, and tested on a dev
+site of its own whenever a change touches what it shares with this site (T15; during stage 2, at
+the milestones, T21).
 
 ## What is here
 
 - `site.json`: the starter's site facts, in the same form as every site's (the tools' `tools/site-settings.md`):
-  four test pages (Home, About, Contact, Privacy Policy) and the site's own plugins, Site
-  Hardening and Editing Help. No `deploy` section: the starter is never deployed.
+  four test pages (Home, About, Contact, Privacy Policy) and no plugins of its own
+  (`localPlugins` empty). No `deploy` section: the starter is never deployed.
+- `site-packages/`: the downloaded plugins a new site starts with (template plan T28), pinned
+  with Composer like every site's: Contact Form 7, Yoast SEO, Simple History, and DTS's Site
+  Hardening and Editing Help. `SITE_DIR=starter bin/dev-site` installs them from its
+  `composer.lock` into `site-packages/wp-content/` (ignored by git). Dependabot does not update
+  this list until 2.4 gives the starter its own repository, so its versions may be older than
+  this site's.
 - `theme/`: only the site layer, the files listed in the tools' `tools/site-layer-files.txt`, each at the path
   of the file it replaces in a full child theme, plus the logo in `assets/images/`. Everything
   else (the component stylesheets, the scripts, `functions.php`, the page templates) is the shared
