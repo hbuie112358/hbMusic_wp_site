@@ -94,14 +94,12 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   its slug, theme, plugins, the dev site's test pages and where `bin/deploy` copies to (live and
   staging, by their short names in the user's SSH settings, template plan 1.4c); no secrets. Its fields are explained in
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
-- `starter/`: the starter, the neutral site a new site begins from (template plan 1.6, T13),
-  moving to `dts-site-starter` at 2.4c: its own `site.json`, its own downloaded plugins in
-  `site-packages/` (template plan T28; Song List not among them), its full child theme in
-  `themes/dts-starter/` (2.4b, T29: its own site layer, `tools/site-layer-files.txt`, and the
-  shared theme files, which `bin/check` holds identical to this site's, so a change to one is
-  made in both), neutral pages in `tests/dev-content/`, and its `README.md` with the palette's
-  contrast. Never deployed; `bin/check` holds it. Laid out as a site, so the tools work on it
-  with `SITE_DIR=starter` (template plan 1.6c, T14).
+- The starter, the neutral site a new site begins from: not in this repository since template
+  plan 2.4c; its own repository `direct-technical-solutions/dts-site-starter` (locally
+  `~/dev/dts-site-starter`), a GitHub template with its own checks. Its theme
+  (`themes/dts-starter/`) is the master copy of the shared theme files (T29): everything outside
+  the site layer (the tools' `tools/site-layer-files.txt`) and this site's own pictures. This
+  site's copies may differ from it only where this site has not taken a change yet.
 - `resume-state.yaml`: only what resume needs to get back to where the last pause left off,
   with the open items; each pause replaces it, never appends. Past sessions and the sites' facts
   once kept there: `docs/session-history.md`, not read at resume.
@@ -126,10 +124,10 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
   Logins: `devadmin` and `deveditor`, passwords `DEV_ADMIN_PASSWORD` and `DEV_EDITOR_PASSWORD` in
   `.env`; to copy one without showing it:
   `grep '^DEV_ADMIN_PASSWORD=' .env | cut -d= -f2- | tr -d '\n' | wl-copy`.
-- **Which site:** `bin/dev-site` and `bin/test` work on this repository's site unless `SITE_DIR`
-  names another site's folder (`SITE_DIR=starter`); one dev site runs at a time, and both refuse,
-  naming the command that stops the other by name (`docker compose -p <slug>-dev stop`).
-  `bin/check` always checks this repository; `bin/deploy` and `bin/screenshots` refuse another site.
+- **One dev site at a time:** another site's dev site (the starter's, `dts-starter-dev`, both on
+  port 10102) is stopped by name before this one is built or started, and the other way round:
+  `docker compose -p <slug>-dev stop`; `bin/dev-site` and `bin/test` refuse while another runs,
+  naming that command.
 - `bin/dev-site`: builds the dev site from nothing (an empty database each run).
 - `bin/test`: the scenario checks and the browser tests against the dev site; every test runs
   even after a failure. What Claude runs before a commit: Testing.
@@ -180,22 +178,20 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 - **PHPUnit:** none yet; added (unit, and integration against a separate test database) with
   the first plugin here that has real logic to test.
 - A new test is shown to fail on a planted fault before it counts as working.
-- **The starter is tested with every change to what it shares** (template plan T15, the user,
-  2026-11-24): before committing a change to the theme's generic files (anything outside the
-  site layer, `tools/site-layer-files.txt`), the shared tests (`generic/`, `components/`,
-  `helpers/`, the plugins' tests), the tools (`bin/`, `tools/`) or a plugin the starter lists,
-  Claude also runs the starter's tests: this site's dev site stopped by name
-  (`docker compose -p hbmusic-dev stop`), `SITE_DIR=starter bin/dev-site`, `SITE_DIR=starter
-  bin/test`, then the starter's stopped and this site's started again. The review gate reports
-  the result. A change to this site's own files only (its site layer, its `tests/browser/` specs, its
-  content) does not need it. *Why:* the pull-request checks test this site alone; the starter
-  has no scheduled run, and both of its earlier breaks (1.6a, 1.6c-2) passed every check here.
+- **A change to the shared theme files is made in the starter first** (template plan T29, T32):
+  a change to anything outside the site layer (the tools' `tools/site-layer-files.txt`) and this
+  site's own pictures is made in `dts-site-starter` through its own pull request, whose checks
+  run the starter's full tests, and then copied here by hand, checked, tested and deployed. A
+  fix found here is carried to the starter the same way, in the same session where possible,
+  and the review gate says whether the starter has it. A change to this site's own files only
+  (its site layer, its `tests/browser/` specs, its content) stays here. *Why:* the starter's
+  theme is the master copy of the shared files (T29); a site made from a template keeps no link
+  to it, so nothing else carries a change between them.
 - **During the template's stage 2, the proof waits for milestones** (template plan T21, the user,
-  2026-11-24): the starter's tests and the full checks run at the template plan's milestones (T21)
-  and before every deploy, which stays strict; in between, Claude runs only what a change
-  touches, or nothing for documents and copies. This replaces the starter rule above until
-  stage 2 is done. *Why:* nothing reaches the website without `bin/deploy`, and the user wants
-  the work behind the scenes finished quickly.
+  2026-11-24): the full checks run at the template plan's milestones (T21) and before every
+  deploy, which stays strict; in between, Claude runs only what a change touches, or nothing for
+  documents and copies. *Why:* nothing reaches the website without `bin/deploy`, and the user
+  wants the work behind the scenes finished quickly.
 - **Tests share one dev site and run in parallel,** so each test is placed by what it changes:
   a test that only looks runs freely; a test that changes only its own uniquely named data (a
   song with a unique title, a booking request with a unique word) removes it afterwards and runs

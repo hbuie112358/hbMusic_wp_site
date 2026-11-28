@@ -26,4 +26,4 @@ jobs:
       contents: write
       pull-requests: write
     # Pinned by commit, not by tag: a tag can be moved to different code, a commit cannot.
-    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-plugin-updates.yml@19a7c5089f5fb01bc8fbabe461418c0622222a3a # v0.6.0
+    uses: direct-technical-solutions/dts-site-tools/.github/workflows/site-plugin-updates.yml@2df05aa7f67881e44d5ffe6696f8d2358fc76684 # v0.7.0
