@@ -130,11 +130,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   and the logo fix #125 (`66bde22`, theme `Version` 0.2.1), deployed to staging and live (its
   entry has the counts); #126 (`8ce1078`) recorded it. **Now: 2.4b,** the starter's full theme
   in `starter/`, in three parts (its entry): **2.4b-1** built on `feat/starter-full-theme`;
-  **2.4b-2 built** (T31, the site's facts in `site-facts.json`), on the same branch; **2.4b-3
-  built** in `dts-site-tools` on `feat/site-facts` (the facts check, the layer list, the
-  assembly removed); both reviewed 2026-11-27. **Next:** the two commits on the user's
-  "commit"; tools 0.6.0 (push, merge, tag, each on the user's yes); this site repinned to 0.6.0
-  and `bin/tools-pin`; then 2.4b's one pull request and the deploys. **The user, about
+  **2.4b-2 committed** (T31, the site's facts in `site-facts.json`), `b19c9d4` on the same
+  branch, local; **2.4b-3 committed** in `dts-site-tools` as `d9cff0c` on `feat/site-facts`
+  (the facts check, the layer list, the assembly removed), local; both reviewed 2026-11-27.
+  **Next:** tools 0.6.0 (push, pull request, merge, tag, each on the user's yes); this site
+  repinned to 0.6.0 and `bin/tools-pin` (with 2.4b-1's open LOW, if the user wants it there);
+  then 2.4b's one pull request and the deploys. **The user, about
   2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
@@ -1284,7 +1285,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       theme assembled). Review LOWs: the identity check compares only pictures the shared files
       name (none named by a layer file today; no fix, 2.4c replaces the check); a missing
       `site-layer-files.txt` would show as "differs" for every layer file (later, in 2.4b-3).
-    - [~] **2.4b-2, built and reviewed, not committed** (the user, 2026-11-27; designed as T31):
+    - [~] **2.4b-2, committed as `b19c9d4`, local** (the user, 2026-11-27; designed as T31):
       **the site's facts in a settings file, not in code.** The four facts in `includes/site-facts.php` (old addresses, organization types,
       areas served, the policy's outside sources) are settings, not logic: a site changes them
       by editing a settings file every site has (for example `site-facts.json` in the theme's
@@ -1308,8 +1309,8 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       site's file, Organization missing in the starter's), each restored from its backup. Review:
       the public file's reasons no longer mention staging (LOW, fixed); a broken file logs twice
       on the dev site only, WordPress's own notice with `WP_DEBUG` on (LOW, no fix).
-    - [~] **2.4b-3, built on the tools' `feat/site-facts`, with 2.4b-2's tools part (T31), not
-      committed** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
+    - [~] **2.4b-3, committed in the tools as `d9cff0c` on `feat/site-facts`, with 2.4b-2's
+      tools part (T31), not pushed** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
       `assemble_layer_theme` and `SITE_LAYER_DIR` removed, `docs/TOOLS.md` and the changelog;
       `tools/site-layer-files.txt` kept (the one list of a site's own files, needed to copy a
       shared change by hand, T29) with `site_layer_listed_files`, which `starter.sh` uses; then
