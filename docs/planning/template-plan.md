@@ -1316,11 +1316,17 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       shared change by hand, T29) with `site_layer_listed_files`, which `starter.sh` uses; then
       this site's repin and `bin/tools-pin`, each with the user's yes. **Still open from 2.4b-1's
       review (LOW):** a missing `site-layer-files.txt` shows as "differs" for every layer file in
-      `starter.sh`'s identity check; not done in this build.
+      `starter.sh`'s identity check; not done in this build, moved to 2.4c. **Released** as tools
+      `v0.6.0` (#11, squash `19a7c50`, tag pushed, 2026-11-27); this site repinned to 0.6.0 and
+      `bin/tools-pin` run on `feat/starter-full-theme` (`bin/check` 38 passed).
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone). From 2.4b's review (LOW): with the assembly gone, the tools'
     `site_layer_differences` (`tools/site-layer.sh`) is used only by its own test; decided here
-    with the layer functions' remaining use, once `starter.sh` leaves.
+    with the layer functions' remaining use, once `starter.sh` leaves. From 2.4b-1's review,
+    moved here at the repin's review (LOW, the user, 2026-11-27): a missing
+    `site-layer-files.txt` shows as "differs" for every layer file in `starter.sh`'s identity
+    check (`starter_shares_this_sites_theme_files`); whatever replaces that check names a
+    missing list as missing.
   - [ ] **2.4d** the guides; handbook chapter 7's wording proposed.
 
   What 2.4 holds (from the plan's review, 2026-11-21):
