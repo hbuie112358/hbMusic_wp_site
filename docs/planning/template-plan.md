@@ -128,14 +128,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   starter, designed 2026-11-27 in four parts (T30, its step entry): **2.4a done** (2026-11-27):
   the neutral names, tools 0.5.0 (#10, `7f7e563`, tag `v0.5.0`), this site's #124 (`e2d34ea`)
   and the logo fix #125 (`66bde22`, theme `Version` 0.2.1), deployed to staging and live (its
-  entry has the counts); #126 (`8ce1078`) recorded it. **Now: 2.4b,** the starter's full theme
-  in `starter/`, in three parts (its entry): **2.4b-1** built on `feat/starter-full-theme`;
-  **2.4b-2 committed** (T31, the site's facts in `site-facts.json`), `b19c9d4` on the same
-  branch, local; **2.4b-3 committed** in `dts-site-tools` as `d9cff0c` on `feat/site-facts`
-  (the facts check, the layer list, the assembly removed), local; both reviewed 2026-11-27.
-  **Next:** tools 0.6.0 (push, pull request, merge, tag, each on the user's yes); this site
-  repinned to 0.6.0 and `bin/tools-pin` (with 2.4b-1's open LOW, if the user wants it there);
-  then 2.4b's one pull request and the deploys. **The user, about
+  entry has the counts); #126 (`8ce1078`) recorded it. **2.4b done** (2026-11-27): the starter's
+  full theme in `starter/` and the site's facts in `site-facts.json` (T31); tools 0.6.0 (#11,
+  `19a7c50`, tag `v0.6.0`, the theme assembly removed); this site's #127 (`e333908`), deployed
+  by the user to staging and live (its entry has the counts). 2.4b-1's open LOW moved to 2.4c.
+  **Next: 2.4c,** the `dts-site-starter` repository, then `starter/` leaving this repository
+  (the milestone, T21). **The user, about
   2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
@@ -1256,11 +1254,19 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     new PHP log lines; the logo on Home, Music and About and the 4 pictures from the new folder
     (200, JPEG), by `curl`, and the user's look in Chrome. The old folder on live is deleted by
     the user about 2026-12-04.
-  - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
+  - [x] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
+    **Done 2026-11-27:** merged as #127 (squash `e333908`, `check / check` and `check / dev-site`
+    passing), deployed by the user to staging and live: on each, rsync changed only the 9
+    expected theme files (5 added, `includes/site-facts.php` deleted, `functions.php` and two
+    comment-only files changed), the copy matching the preview, the proof dry run empty, all 6
+    pages passing, no new PHP log lines. On live, read by `curl`: the old address `/video/`
+    still answers 301 to `/music/`, the policy still lists `challenges.cloudflare.com` and
+    `youtube.com`, the home page's data still has `areaServed`, so the theme reads
+    `site-facts.json` there.
     From the 2.4a logo fix's review (LOW): the starter's `style.css` gets the same note as this
     site's (raise `Version` with every change to `patterns/`). **Designed 2026-11-27 (the user)
     in two parts, a third added the same day (2.4b-2):**
-    - [~] **2.4b-1** (this repository, on tools 0.5.0; branch `feat/starter-full-theme`): the
+    - [x] **2.4b-1** (this repository, on tools 0.5.0; branch `feat/starter-full-theme`): the
       starter's full theme committed in `starter/themes/dts-starter/` (35 files: this site's 36
       less `screenshot.png` and this site's logo, which the assembly had been copying in, plus
       the starter's logo), `starter/theme/` moved there by `git mv`, so `bin/dev-site` no longer
@@ -1285,7 +1291,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       theme assembled). Review LOWs: the identity check compares only pictures the shared files
       name (none named by a layer file today; no fix, 2.4c replaces the check); a missing
       `site-layer-files.txt` would show as "differs" for every layer file (later, in 2.4b-3).
-    - [~] **2.4b-2, committed as `b19c9d4`, local** (the user, 2026-11-27; designed as T31):
+    - [x] **2.4b-2, committed as `b19c9d4`, merged in #127** (the user, 2026-11-27; designed as T31):
       **the site's facts in a settings file, not in code.** The four facts in `includes/site-facts.php` (old addresses, organization types,
       areas served, the policy's outside sources) are settings, not logic: a site changes them
       by editing a settings file every site has (for example `site-facts.json` in the theme's
@@ -1309,8 +1315,8 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       site's file, Organization missing in the starter's), each restored from its backup. Review:
       the public file's reasons no longer mention staging (LOW, fixed); a broken file logs twice
       on the dev site only, WordPress's own notice with `WP_DEBUG` on (LOW, no fix).
-    - [~] **2.4b-3, committed in the tools as `d9cff0c` on `feat/site-facts`, with 2.4b-2's
-      tools part (T31), not pushed** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
+    - [x] **2.4b-3, committed in the tools as `d9cff0c` on `feat/site-facts`, with 2.4b-2's
+      tools part (T31), released as 0.6.0** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
       `assemble_layer_theme` and `SITE_LAYER_DIR` removed, `docs/TOOLS.md` and the changelog;
       `tools/site-layer-files.txt` kept (the one list of a site's own files, needed to copy a
       shared change by hand, T29) with `site_layer_listed_files`, which `starter.sh` uses; then
