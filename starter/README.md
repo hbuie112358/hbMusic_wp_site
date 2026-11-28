@@ -36,10 +36,13 @@ dev site of its own whenever a change touches what it shares with this site (T15
     - `parts/`: the header, the footer and the call to action ("Ready to talk?", a button "Get
       in touch" to `/contact/`).
     - `patterns/site-logo.php` and `assets/images/site-logo.svg`: a placeholder mark.
-    - `includes/site-facts.php`: no old addresses, no areas served, the plain schema.org
-      Organization, and the Content-Security-Policy's outside sources for the contact form's
-      Turnstile check only. The theme's click-to-load videos allow their own player; a site
-      pasting YouTube's player code into its pages adds https://www.youtube.com there.
+    - `site-facts.json` (template plan 2.4b-2, T31): the site's facts as settings, each entry
+      with its reason; no old addresses, no areas served, the plain schema.org Organization, and
+      the Content-Security-Policy's outside sources for the contact form's Turnstile check only.
+      The theme's click-to-load videos allow their own player; a site pasting YouTube's player
+      code into its pages adds https://www.youtube.com there. `bin/check` holds its shape.
+    - `includes/site-text.php`: the guide's link example, the one site fact that is translated
+      text and so stays PHP.
 - `tests/dev-content/`: neutral text for the four pages, where a site keeps its test pages. The Contact page holds the contact form's
   shortcode; its form is this site's booking form from `config/`, a stand-in until 2.4 brings the
   starter's own.

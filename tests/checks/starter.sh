@@ -44,6 +44,22 @@ starter_site_json_is_valid() {
   return 1
 }
 
+# The starter's own site-facts.json (template plan 2.4b-2, T31), by the tools' rules
+# (site_facts_problems, tools/site-facts.jq), as bin/check holds this site's.
+starter_site_facts_are_valid() {
+  local facts_file="$STARTER_THEME_DIR/site-facts.json" problems shown
+  shown="${facts_file#"$PROJECT_DIR"/}"
+  [[ -f "$facts_file" ]] || { log "$shown is missing; the starter's theme reads its facts from it"; return 1; }
+  problems="$(site_facts_problems "$facts_file")" || {
+    log "$shown is not valid JSON (jq's message is above)"
+    return 1
+  }
+  [[ -z "$problems" ]] && return 0
+  log "$shown does not follow the rules in the tools' tools/site-facts.jq:"
+  printf '%s\n' "$problems" | sed 's/^/    /' >&2
+  return 1
+}
+
 starter_theme_json_schema_matches_wordpress() {
   theme_json_schema_matches_wordpress "$STARTER_THEME_DIR/theme.json"
 }
@@ -118,6 +134,7 @@ starter_names_nothing_of_this_site() {
 }
 
 run_check "Starter: site.json follows its rules" starter_site_json_is_valid
+run_check "Starter: site-facts.json follows its rules" starter_site_facts_are_valid
 run_check "Starter: theme.json schema matches WordPress" starter_theme_json_schema_matches_wordpress
 run_check "Starter: defines every design token used" starter_defines_every_token
 run_check "Starter: shares this site's theme files" starter_shares_this_sites_theme_files

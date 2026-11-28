@@ -7,11 +7,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// The site's own facts (its old addresses, organization, areas served, outside sources and link
-// example) are in their own file, the part a new site replaces (template plan 1.6b).
-require_once __DIR__ . '/includes/site-facts.php';
+// The site's own facts (its old addresses, organization, areas served and outside sources) are
+// settings in the theme's site-facts.json, and its own translated text (the guide's link example)
+// is in includes/site-text.php: the parts a new site replaces (template plan 1.6b, 2.4b-2, T31).
+require_once __DIR__ . '/includes/class-dtstheme-site-facts-error.php';
+require_once __DIR__ . '/includes/class-dtstheme-site-facts.php';
+require_once __DIR__ . '/includes/class-dtstheme-site-facts-hooks.php';
+require_once __DIR__ . '/includes/site-text.php';
 require_once __DIR__ . '/includes/enum-dtstheme-carousel-scan.php';
 require_once __DIR__ . '/includes/video-facade.php';
+
+( new Dtstheme_Site_Facts_Hooks( Dtstheme_Site_Facts::from_file( __DIR__ . '/site-facts.json' ) ) )->register();
 
 /**
  * The heading tags, as WordPress's tag processor names them (upper case).
@@ -305,20 +311,21 @@ function dtstheme_requested_path(): string {
 }
 
 /**
- * Adds the outside sources the site's pages need (DTSTHEME_OUTSIDE_SOURCES, each with its reason in
- * includes/site-facts.php) to the Site Hardening plugin's Content-Security-Policy (plan D26;
- * docs/SITE_CHECKLIST.md 3.2), keeping the sources other code added before.
+ * Adds the outside sources the site's pages need (site-facts.json's outsideSources, each with its
+ * reason there) to the Site Hardening plugin's Content-Security-Policy (plan D26;
+ * docs/SITE_CHECKLIST.md 3.2), keeping the sources other code added before. Hooked by
+ * Dtstheme_Site_Facts_Hooks.
  *
  * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
+ * @param array<string, list<string>> $site_sources    The site's own, by directive.
  * @return array<string, list<string>> The sources with the site's.
  */
-function dtstheme_add_outside_sources( array $outside_sources ): array {
-	foreach ( DTSTHEME_OUTSIDE_SOURCES as $directive => $sources ) {
+function dtstheme_add_outside_sources( array $outside_sources, array $site_sources ): array {
+	foreach ( $site_sources as $directive => $sources ) {
 		$outside_sources[ $directive ] = array_merge( $outside_sources[ $directive ] ?? array(), $sources );
 	}
 	return $outside_sources;
 }
-add_filter( 'sitehardening_csp_sources', 'dtstheme_add_outside_sources' );
 
 /**
  * Tells whether the page being shown has the booking form.
@@ -355,25 +362,26 @@ add_action( 'wp_enqueue_scripts', 'dtstheme_remove_turnstile_script_without_form
  * (redirect_canonical() and wp_old_slug_redirect(), both at 10 in wp-includes/default-filters.php):
  * an old page left in the database must not be shown instead. WordPress's request
  * path is relative to the site's address, and home_url() builds the target, so the theme names no
- * domain (plan D7).
+ * domain (plan D7). Hooked by Dtstheme_Site_Facts_Hooks.
+ *
+ * @param array<string, string> $old_addresses Each old path and the path that replaced it (site-facts.json's oldAddresses).
  */
-function dtstheme_redirect_old_address(): void {
+function dtstheme_redirect_old_address( array $old_addresses ): void {
 	global $wp;
 	$requested_path = $wp instanceof WP ? strtolower( $wp->request ) : '';
-	$new_path       = DTSTHEME_OLD_ADDRESSES[ $requested_path ] ?? null;
+	$new_path       = $old_addresses[ $requested_path ] ?? null;
 	if ( null === $new_path ) {
 		return;
 	}
 	wp_safe_redirect( home_url( '/' . $new_path . '/' ), 301 );
 	exit;
 }
-add_action( 'template_redirect', 'dtstheme_redirect_old_address', 1 );
 
 /**
  * Describes the site's organization in Yoast SEO's page data with its own types and the towns it
- * serves (DTSTHEME_ORGANIZATION_TYPES and DTSTHEME_AREAS_SERVED, includes/site-facts.php; plan 8h),
- * so search engines read the same facts as the page text. Yoast's Local SEO add-on would do this
- * for a fee.
+ * serves (site-facts.json's organizationTypes and areasServed; plan 8h), so search engines read
+ * the same facts as the page text. Hooked by Dtstheme_Site_Facts_Hooks. Yoast's Local SEO add-on
+ * would do this for a fee.
  *
  * Yoast builds the Organization only when its settings name a company with a logo; this adds to
  * that piece and keeps its name, logo and links. Its type is always "Organization" in Yoast 28.8
@@ -381,13 +389,13 @@ add_action( 'template_redirect', 'dtstheme_redirect_old_address', 1 );
  * merged with it. A site that serves no listed towns gets no empty areaServed.
  *
  * @param array<string, mixed> $organization Yoast's Organization piece.
+ * @param Dtstheme_Site_Facts  $site_facts   The site's facts.
  * @return array<string, mixed> The piece with the site's types and areas served.
  */
-function dtstheme_describe_organization( array $organization ): array {
-	$organization['@type'] = DTSTHEME_ORGANIZATION_TYPES;
-	return dtstheme_add_areas_served( $organization, DTSTHEME_AREAS_SERVED );
+function dtstheme_describe_organization( array $organization, Dtstheme_Site_Facts $site_facts ): array {
+	$organization['@type'] = $site_facts->organization_types;
+	return dtstheme_add_areas_served( $organization, $site_facts->areas_served );
 }
-add_filter( 'wpseo_schema_organization', 'dtstheme_describe_organization' );
 
 /**
  * Adds the towns served to an organization's page data, each as a schema.org City. The towns come

@@ -1,0 +1,15 @@
+{
+	"oldAddresses": [],
+	"organizationTypes": {
+		"types": [ "Organization" ],
+		"reason": "Yoast SEO's own Organization alone; a site adds a more exact schema.org type where one fits (such as LocalBusiness)."
+	},
+	"areasServed": {
+		"towns": [],
+		"reason": "None until the site's own are known; a site lists the towns it serves as its page text names them ('Town, State')."
+	},
+	"outsideSources": [
+		{ "directive": "script-src", "source": "https://challenges.cloudflare.com", "reason": "Cloudflare Turnstile's script protects the contact form." },
+		{ "directive": "frame-src", "source": "https://challenges.cloudflare.com", "reason": "Cloudflare Turnstile's widget frame on the contact form. The theme's click-to-load videos allow their own player; a site that pastes YouTube's player code into its pages adds https://www.youtube.com to frame-src." }
+	]
+}
