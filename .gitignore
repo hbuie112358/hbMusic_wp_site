@@ -16,7 +16,6 @@
 !/phpcs.xml.dist
 !/phpstan.neon.dist
 !/site.json
-!/starter/
 !/site-packages/
 !/themes/
 /themes/*
@@ -40,10 +39,8 @@ wp-config.php
 # Dependencies and build output are installed from lock files, never versioned.
 node_modules/
 vendor/
-# The downloaded plugins, installed from site-packages/composer.lock by bin/dev-site; the
-# starter's from its own list (template plan T28).
+# The downloaded plugins, installed from site-packages/composer.lock by bin/dev-site.
 /site-packages/wp-content/
-/starter/site-packages/wp-content/
 
 # Playwright's run output (traces, screenshots of failures).
 test-results/
