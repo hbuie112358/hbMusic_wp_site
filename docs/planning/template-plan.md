@@ -132,12 +132,11 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   full theme in `starter/` and the site's facts in `site-facts.json` (T31); tools 0.6.0 (#11,
   `19a7c50`, tag `v0.6.0`, the theme assembly removed); this site's #127 (`e333908`), deployed
   by the user to staging and live (its entry has the counts). 2.4b-1's open LOW moved to 2.4c.
-  **Now: 2.4c,** the `dts-site-starter` repository, then `starter/` leaving this repository
-  (the milestone, T21), designed 2026-11-27 in four parts (T32, its step entry); 2.4c-1 done (tools
-  0.7.0, #12, `2df05aa`); 2.4c-2 done (`~/dev/dts-site-starter`, first commit `bf76e0c`,
-  its proof passed); 2.4c-3 done (`direct-technical-solutions/dts-site-starter`, public, a
-  template, protected, its `check` passing on GitHub, tag `v0.1.0` on `cbac7c1`); **now: 2.4c-4,**
-  this site without `starter/`, repinned to 0.7.0, on `feat/starter-repository`. **The user, about
+  **2.4c done** (2026-11-27, the milestone, T21), designed in four parts (T32, its step entry):
+  tools 0.7.0 (#12, `2df05aa`); `direct-technical-solutions/dts-site-starter`, public, a
+  template, protected, its full tests passing locally and on GitHub, tag `v0.1.0` on `cbac7c1`;
+  this site without `starter/`, on 0.7.0, #129 (`adc7db3`); no deploy needed. **Next: 2.4d,**
+  the guides, then handbook chapter 7's wording proposed (designed with the user first). **The user, about
   2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
@@ -1339,7 +1338,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       `starter.sh`'s identity check; not done in this build, moved to 2.4c. **Released** as tools
       `v0.6.0` (#11, squash `19a7c50`, tag pushed, 2026-11-27); this site repinned to 0.6.0 and
       `bin/tools-pin` run on `feat/starter-full-theme` (`bin/check` 38 passed).
-  - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
+  - [x] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
     milestone). From 2.4b's review (LOW): with the assembly gone, the tools'
     `site_layer_differences` (`tools/site-layer.sh`) is used only by its own test; decided here
     with the layer functions' remaining use, once `starter.sh` leaves. From 2.4b-1's review,
@@ -1379,8 +1378,12 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
       Dependabot alerts and security updates, the token read-only and unable to approve), plus
       auto-merge (Dependabot's plugin updates, as on every site); the organization already
       allows only GitHub's own actions, pinned by commit.
-    - [ ] **2.4c-4** this site: `starter/` and `starter.sh` removed, repinned to 0.7.0, the
-      project's `CLAUDE.md` updated.
+    - [x] **2.4c-4** this site: `starter/` and `starter.sh` removed, repinned to 0.7.0, the
+      project's `CLAUDE.md` updated. **Done** 2026-11-27: merged as #129 (squash `adc7db3`,
+      `check / check` and `check / dev-site` passing), with the previous pause's state. Proof:
+      `bin/dev-site` rebuilt with 0.7.0, `bin/check` 30 of 30 (38 before, less the starter's
+      eight), `bin/test` all passed (22 of 22 groups; 249 browser tests, 4 skipped by design).
+      No deploy: no theme or plugin file changed. From its review (LOW): "worth raising" (9).
   - [ ] **2.4d** the guides; handbook chapter 7's wording proposed. From 2.4c-2's review (LOW,
     the user, 2026-11-27): the starter's comments and documents cite the first site's plans as
     their reasons ("template plan T9", "rebuild plan D27"; in `docs/ROUTINES.md`,
