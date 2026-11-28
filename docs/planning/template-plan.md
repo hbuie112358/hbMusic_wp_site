@@ -128,7 +128,14 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
   starter, designed 2026-11-27 in four parts (T30, its step entry): **2.4a done** (2026-11-27):
   the neutral names, tools 0.5.0 (#10, `7f7e563`, tag `v0.5.0`), this site's #124 (`e2d34ea`)
   and the logo fix #125 (`66bde22`, theme `Version` 0.2.1), deployed to staging and live (its
-  entry has the counts). **Now: 2.4b,** the starter's full theme in `starter/`. **The user, about
+  entry has the counts); #126 (`8ce1078`) recorded it. **Now: 2.4b,** the starter's full theme
+  in `starter/`, in three parts (its entry): **2.4b-1** built on `feat/starter-full-theme`;
+  **2.4b-2 committed** (T31, the site's facts in `site-facts.json`), `b19c9d4` on the same
+  branch, local; **2.4b-3 committed** in `dts-site-tools` as `d9cff0c` on `feat/site-facts`
+  (the facts check, the layer list, the assembly removed), local; both reviewed 2026-11-27.
+  **Next:** tools 0.6.0 (push, pull request, merge, tag, each on the user's yes); this site
+  repinned to 0.6.0 and `bin/tools-pin` (with 2.4b-1's open LOW, if the user wants it there);
+  then 2.4b's one pull request and the deploys. **The user, about
   2026-12-04:** delete `hbmusic-video-pictures` in live's uploads (staging never had one).
   **Pull requests merge by squash**
   (the global `WORKING_STYLE.md`, the user, 2026-11-26).
@@ -187,6 +194,20 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 - **Waiting on the user:** Dependabot's #56 (`@stylistic/stylelint-plugin` 6.0.0 to 6.0.1, the CSS
   linter's single-maintainer plugin, which D29 has looked at with each update): a tools update,
   reviewed by hand, later, when the user chooses (the user, 2026-11-21).
+- **To discuss with the user, at a good point (the user, 2026-11-27):** how to keep the files
+  loaded into the context at resume (both `CLAUDE.md` files, their imports, `MEMORY.md`,
+  `resume-state.yaml`, the plan's Current position) from growing unnoticed: a way to watch their
+  size, and where else additions could go instead.
+- **For the user, when convenient (2026-11-27):** turn off SonarQube for IDE's `php:S101` and
+  `php:S116` in the VS Code user settings' `sonarlint.rules` block, next to `php:S100` and
+  `php:S105` (`"php:S101": { "level": "off" }`, the same for S116): both conflict with the
+  WordPress standard's names (the project's `CLAUDE.md`, Framework). Until then the editor
+  warns on the theme's class and property names; nothing else depends on it.
+- **Later, when the user chooses (2026-11-27):** the language rules in the project's `CLAUDE.md`
+  (the Framework section's WordPress-over-SonarQube list, and the PHP lines under "Coding
+  standards by language") move into a PHP standards file in `~/.claude` (none exists yet), which
+  the project's `CLAUDE.md` then imports, so the `CLAUDE.md` files stay lean (the user).
+  Creating it is a change in `~/.claude`, proposed to the user first.
 - **Shared with the rebuild plan:** `bin/deploy` is this plan's step 1.4 and the rebuild plan's
   item 5, done once.
 - **Stale:** nothing. (The places that said 2.3 moves the shared theme code into a plugin were
@@ -228,6 +249,7 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
 | T28 | 2.2d's design (the user, 2026-11-26): **each site has its own downloaded plugins.** The tools read `site-packages/` from the site worked on (`SITE_DIR`, which defaults to the project), not always from the project, with no fallback (a site without one stops at "composer.lock is missing"); tools 0.4.1, with a tools test of a stand-in site's own list. The starter gets `starter/site-packages/` with the toolkit's plugins at this site's versions (Contact Form 7, Yoast SEO, Simple History, Site Hardening, Editing Help), without Song List; `.gitignore` ignores `/starter/site-packages/wp-content/`; the starter's `localPlugins` empty. Dependabot does not update the starter's list until 2.4, and no check holds the two lists equal. | Since 2.2b the starter's dev site installed this site's downloads, Song List among them, whose page and songs come from this site's own setup, so Song List's page test would fail on the starter (found by reading the code, 2026-11-26; not run). Leaving the test out for the starter would hide a failure. At 2.4 the starter needs its own list anyway, so this brings that forward. A check holding the lists equal would fail every weekly Dependabot update of this site's; the starter is never deployed, so lagging versions cost only its dev site. |
 | T29 | **The components plugin is not built for now** (the user, 2026-11-27; replaces T5's plugin and, for DTS's shared theme code, T16's "no copy of shared code"). (1) The shared theme code stays in this site's child theme, as today. (2) At 2.4 the starter's repository gets the full child theme: the shared files, renamed once from `hbmusic` to neutral names and proven by the starter's tests, plus its neutral site layer; a new site created from it has its own copy. The theme assembly (`tools/site-theme.sh`) then leaves the tools. (3) The starter's theme is the master copy of the shared files: every change to them (a bug fix, an improvement, an accessibility correction) is made there, or carried there from the site where it was found, and then copied by hand into each site that wants it. Until 2.4, when the starter has no theme of its own yet, this site's theme is the master copy. (4) No site updates from the starter by itself: a site made from a GitHub template keeps no link to it, so each change to the shared files is copied into each site, then checked, tested and deployed there. Only the shared pieces a site lists at a version (the tools, DTS's plugins, the WordPress.org plugins, the parent theme) update through Dependabot and a deploy; the components plugin would bring the shared theme files into that group. (5) Everything is kept, the carousels and click-to-load videos included, used or not (the user: they may be used some day). (6) The emoji removal moves into the Site Hardening plugin (step 2.3a). (7) The components plugin is reconsidered when the site's design is settled and a second site is in view, or when the same change has had to be copied into several sites. Possible later improvements, not planned: the carousel stylesheet loaded only on pages that have a carousel (today it comes with WordPress's group block, so almost every page loads it, as its own file on the dev site; on live not checked); the video code's `youtube-nocookie.com` frame allowed in the security policy only where a page has a video (today on every page). | The user is still shaping the design and questions the carousels and videos; a plugin would turn each change to them into a release, a repin and a deploy, while one site uses them. A plugin for a few small, settled pieces (the menu script, 36 lines in two commits) costs more upkeep than copying them. What is truly shared is only known with a second site in view (H29). Copying straight from this site at each new site was weighed: every copy would need the `hbmusic` names renamed and tested again and would take along unfinished work, so the starter does that once. A tools command copying the shared files from a chosen starter version into a site was weighed and set aside: it would rebuild by hand what Composer and a plugin already do. Copying by hand costs little with two or three sites and grows with each site, which is point (7)'s signal to build the plugin; the code is already split into shared and site files, so that move stays straightforward. Unused features cost little: about 6.5 KB of styling (about 2.5 KB compressed, kept by the browser after the first page), one option in the editor's insert menu, and the policy entry above; they have no effect on search beyond that page weight, too small to change Google's loading measurements, and the shared tests keep them working on the starter's example page. The emoji removal belongs with Site Hardening: it turns off a WordPress feature visitors do not need, like the plugin's other switches; the plugin's own policy blocks the script it removes; and it keeps visitors' addresses from WordPress.org. The privacy link stays with the theme: it depends on the footer's markup, not on security. |
 | T30 | 2.4's design (the user, 2026-11-27). **Four parts, in order:** 2.4a the neutral names, here; 2.4b the starter's full theme, still in `starter/`, the theme assembly (`tools/site-theme.sh`, its test) leaving the tools; 2.4c the `dts-site-starter` repository (from `starter/`, protected like the others, a GitHub template, its own pull-request checks with the full dev-site tests as the starter's proof), then `starter/` and `tests/checks/starter.sh` leaving this repository, the milestone (T21); 2.4d the guides (new site, developer, a new site's first content), then handbook chapter 7's wording proposed (it still describes release zips with checksums and an empty child theme). **This site takes the same neutral names as the starter**, so a change copied between them (T29's master copy) needs no renaming and the shared tests know one set of names. **2.4a's names:** PHP `dtstheme_…` / `DTSTHEME_…`, the class `Dtstheme_Carousel_Scan` in `enum-dtstheme-carousel-scan.php`, text domain `dts-theme`, patterns `dts-theme/…` (the site-layer logo pattern included), style and script handles `dtstheme-…`, the event `dts-theme:player-added`, the picture folder `dts-theme-video-pictures`, the script module `@dts-theme/video-shared` (its components-plugin name dropped); the site-layer files' constants that the shared code reads (`includes/site-facts.php`) renamed too. Unchanged: the theme folder `hbmusic-child`, the theme's name, the slug. **The tools (0.5.0):** the shared tests use the fixed names; `bin/check`'s PHP prefix no longer comes from the slug; the three component checks (`tests/checks/components.sh`) move into the tools, run for any site whose theme has the components; the starter check's exemption for this site's slug goes. **Proof:** `bin/check`, the full `bin/test`, the starter's tests, `bin/screenshots compare` (every picture identical), each new test failing on a planted fault first; whether a page refers to the video-carousel pattern by name is confirmed on the dev site, not assumed. **Order:** the tools branch; this site's branch on it; 0.5.0, the repin, the pull request; then the deploys. **Before the deploys (the user):** the picture folder copied to its new name in hPanel's file manager on staging and on live, the old one deleted a week later (fallback: each page with a video saved again right after the deploy); the Site Editor checked for a saved header (it would keep `hbmusic/site-logo` and lose the logo). | A fixed name every site shares is what makes one master copy (T29) workable: with the prefix taken from each site's slug, every copy would be renamed and retested, and the tools' tests would need a prefix per site (seven of them call this site's functions by name today). The plugins' naming style (`songlist`/`song-list`) is kept. Without its picture a video shows its play button over an empty box until its page is saved (`hbmusic_video_facade_html()`, read 2026-11-27), so the folder is copied first. Renaming this site first, on live, proves the names before any second site depends on them, and makes 2.4b a plain copy. |
+| T31 | 2.4b-2's design (the user, 2026-11-27). **The site's four facts (old addresses, organization types, towns served, the policy's outside sources) move from PHP into `site-facts.json`** at the top of the theme, next to `theme.json`, in both themes; the guide's link example stays PHP (translated text needs `__()`), renamed `includes/site-text.php`. **JSON, with a `reason` field** on each old address and each outside source, and one for the types and one for the towns: the reasons were PHP comments, and JSON has none. **Read** once per page load by the shared read-only class `Dtstheme_Site_Facts` (`includes/class-dtstheme-site-facts.php`), with WordPress's own `wp_json_file_decode()`; `functions.php` hands each fact to the function that uses it as a parameter. **Failure paths:** a missing or broken file, or a fact of the wrong shape, leaves that fact at a safe default (no redirects, no towns, no extra sources, Yoast's plain `Organization`) and writes a line to the PHP error log, since `wp_json_file_decode()` reports through `wp_trigger_error()`, which is silent with `WP_DEBUG` off (WordPress 7.1's `functions.php`, read 2026-11-27). **The check** (tools 0.6.0): `tools/site-facts.jq`, in the same form as `site-settings.jq`, in `bin/check`, naming each wrong entry; the layer list names `site-facts.json` and `includes/site-text.php` in place of `includes/site-facts.php`. 2.4b-3's removal goes in the same tools release. **Tests:** the check's planted faults in the tools' self-check; a tools scenario check of the reader on stand-in files (good, missing, broken, one fact of the wrong shape); this site's redirect, organization and policy tests unchanged; the starter's tests. 2.4b-1's temporary PHPStan setting goes. All on `feat/starter-full-theme`, one pull request for 2.4b. | The user: settings belong in a settings file, not code (2026-11-27). JSON over YAML, INI or a PHP data file: PHP and `jq` read it without help, it is already the project's settings format (`site.json`, `theme.json`), and a required `reason` field is checked where a comment could be left out or go stale; YAML would need a library shipped in the theme, INI handles lists of pairs poorly, a PHP data file is still code. The file is public at its address, like `theme.json`; everything in it is already visible in the redirects, the page data and the headers. |
 
 ## Steps
 
@@ -1236,9 +1258,75 @@ fixed in one home, a site's repository only listing which ones it uses and at wh
     the user about 2026-12-04.
   - [ ] **2.4b** the starter's full theme in `starter/`; the theme assembly leaves the tools.
     From the 2.4a logo fix's review (LOW): the starter's `style.css` gets the same note as this
-    site's (raise `Version` with every change to `patterns/`).
+    site's (raise `Version` with every change to `patterns/`). **Designed 2026-11-27 (the user)
+    in two parts, a third added the same day (2.4b-2):**
+    - [~] **2.4b-1** (this repository, on tools 0.5.0; branch `feat/starter-full-theme`): the
+      starter's full theme committed in `starter/themes/dts-starter/` (35 files: this site's 36
+      less `screenshot.png` and this site's logo, which the assembly had been copying in, plus
+      the starter's logo), `starter/theme/` moved there by `git mv`, so `bin/dev-site` no longer
+      assembles it (it does so only for a site with a `theme/` folder); `.gitignore` and
+      `phpcs.xml.dist` no longer leave `starter/themes/` out; the starter's `style.css` note.
+      `tests/checks/starter.sh`: "holds exactly the site layer" replaced by **"shares this site's
+      theme files"** (every file outside the site layer and `assets/images/`, both ways, byte
+      for byte, plus each picture the shared files name; this site's `screenshot.png` its own),
+      shown failing on three planted faults (a changed script, the grain picture missing, a
+      `screenshot.png` added; each named), restored from backups; the token check reads the
+      starter's own stylesheets; the names check covers the whole starter. **Found by the wider
+      checks, fixed with the user's yes:** a shared comment naming this site (`buttons.css`,
+      "Book Howard", reworded in both copies; reaches live with the next deploy, comment only);
+      PHPStan treating one site's facts as fixed (with the starter's empty old-address list it
+      called the shared redirect unreachable), so `phpstan.neon.dist` declares
+      `DTSTHEME_OLD_ADDRESSES` per-site by type (`dynamicConstantNames`), **temporary until
+      2.4b-2**. Declaring all four facts was tried first and narrowed in the review (MEDIUM):
+      PHPStan does not check a fact's entries against the declared type (a scratch copy with the
+      towns as numbers passed), so the other three stay analysed by their values (the same copy
+      then fails at `functions.php` line 388; the starter passes). `bin/check` 36 passed; the
+      starter's tests all passed (20 of 20 groups, 169 browser tests; its dev site built with no
+      theme assembled). Review LOWs: the identity check compares only pictures the shared files
+      name (none named by a layer file today; no fix, 2.4c replaces the check); a missing
+      `site-layer-files.txt` would show as "differs" for every layer file (later, in 2.4b-3).
+    - [~] **2.4b-2, committed as `b19c9d4`, local** (the user, 2026-11-27; designed as T31):
+      **the site's facts in a settings file, not in code.** The four facts in `includes/site-facts.php` (old addresses, organization types,
+      areas served, the policy's outside sources) are settings, not logic: a site changes them
+      by editing a settings file every site has (for example `site-facts.json` in the theme's
+      site layer), never PHP. The shared code reads the file and names no site's values;
+      `bin/check` holds the file's shape, naming a wrong entry, as it does `site.json`; a missing
+      or broken file on a server leaves the site working (no redirects, an error-log line). It
+      replaces 2.4b-1's temporary PHPStan setting, since PHPStan then sees no site's values.
+      Designed in full (where the file lives, how it is read and how often, its check, its
+      failure paths, its tests, both themes, the deploy) for the user's approval before
+      anything is built. **Built** as T31: `site-facts.json` in both themes; the shared
+      `Dtstheme_Site_Facts` (reader), `Dtstheme_Site_Facts_Error` and `Dtstheme_Site_Facts_Hooks`
+      (one typed method per hook, since PHPStan reads a closure given to `add_filter()` as untyped,
+      shown on a scratch file); the link example in `includes/site-text.php`; the error messages
+      fixed text, the fact's name added in the log line (the WordPress standard counts a name in a
+      raised error's message as unescaped output); 2.4b-1's PHPStan setting removed;
+      `starter.sh` checks the starter's file too. **Proof:** the tools' self-check 35 of 35; this
+      site's `bin/check` with the new tools 38 of 38 (with the installed 0.5.0 the starter's
+      identity check fails until the repin); the tools' new scenario `dev-site-facts` passed;
+      `bin/test` all passed (249 browser tests, 4 skipped by design); planted faults shown
+      failing (the reader without its log line, any directive accepted, an empty reason in this
+      site's file, Organization missing in the starter's), each restored from its backup. Review:
+      the public file's reasons no longer mention staging (LOW, fixed); a broken file logs twice
+      on the dev site only, WordPress's own notice with `WP_DEBUG` on (LOW, no fix).
+    - [~] **2.4b-3, committed in the tools as `d9cff0c` on `feat/site-facts`, with 2.4b-2's
+      tools part (T31), not pushed** (tools 0.6.0): `tools/site-theme.sh`, its test, `bin/dev-site`'s
+      `assemble_layer_theme` and `SITE_LAYER_DIR` removed, `docs/TOOLS.md` and the changelog;
+      `tools/site-layer-files.txt` kept (the one list of a site's own files, needed to copy a
+      shared change by hand, T29) with `site_layer_listed_files`, which `starter.sh` uses; then
+      this site's repin and `bin/tools-pin`, each with the user's yes. **Still open from 2.4b-1's
+      review (LOW):** a missing `site-layer-files.txt` shows as "differs" for every layer file in
+      `starter.sh`'s identity check; not done in this build, moved to 2.4c. **Released** as tools
+      `v0.6.0` (#11, squash `19a7c50`, tag pushed, 2026-11-27); this site repinned to 0.6.0 and
+      `bin/tools-pin` run on `feat/starter-full-theme` (`bin/check` 38 passed).
   - [ ] **2.4c** the `dts-site-starter` repository; then `starter/` leaves this repository (the
-    milestone).
+    milestone). From 2.4b's review (LOW): with the assembly gone, the tools'
+    `site_layer_differences` (`tools/site-layer.sh`) is used only by its own test; decided here
+    with the layer functions' remaining use, once `starter.sh` leaves. From 2.4b-1's review,
+    moved here at the repin's review (LOW, the user, 2026-11-27): a missing
+    `site-layer-files.txt` shows as "differs" for every layer file in `starter.sh`'s identity
+    check (`starter_shares_this_sites_theme_files`); whatever replaces that check names a
+    missing list as missing.
   - [ ] **2.4d** the guides; handbook chapter 7's wording proposed.
 
   What 2.4 holds (from the plan's review, 2026-11-21):

@@ -57,7 +57,7 @@ const DTSTHEME_VIDEO_PLAYER_ORIGIN = 'https://www.youtube-nocookie.com';
  * site using these videos gets it without listing it among its own facts. The header is sent
  * before the page is built, so it cannot depend on whether this page has a video; a frame from
  * this origin cannot run script in the page. Players pasted into content (youtube.com) stay a
- * site's own fact (includes/site-facts.php).
+ * site's own fact (the theme's site-facts.json).
  *
  * @param array<string, list<string>> $outside_sources The sources added so far, by directive.
  * @return array<string, list<string>> The sources with the player's frame.

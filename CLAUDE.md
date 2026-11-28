@@ -75,7 +75,7 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   `dts-editing-help`, installed by Composer from `site-packages/composer.lock` at their release
   tags (`dts/site-hardening`, `dts/editing-help`). Site Hardening: the security headers and other
   hardening; the policy's outside sources handed in by the child theme through the plugin's
-  `sitehardening_csp_sources` filter (listed, each with its reason, in `includes/site-facts.php`;
+  `sitehardening_csp_sources` filter (listed, each with its reason, in the theme's `site-facts.json`;
   the shared video code adds its own player); prefix `sitehardening`, text domain
   `site-hardening`. Editing Help: the content guide in the admin, fed by the child theme through
   the plugin's filters; prefix `editinghelp`, text domain `editing-help`; the guide's text is also
@@ -94,13 +94,14 @@ The places code passes through, in order (agreed with the user on 2026-11-04):
   its slug, theme, plugins, the dev site's test pages and where `bin/deploy` copies to (live and
   staging, by their short names in the user's SSH settings, template plan 1.4c); no secrets. Its fields are explained in
   `tools/site-settings.md` and their rules are in `tools/site-settings.jq`.
-- `starter/`: the starter, the neutral site layer a new site begins from (template plan 1.6,
-  T13), moving to `dts-site-starter` at 2.4: its own `site.json`, its own downloaded plugins in
-  `site-packages/` (template plan T28; Song List not among them), `theme/` with only the
-  site-layer files (`tools/site-layer-files.txt`), neutral pages in `tests/dev-content/`, and its
-  `README.md` with the palette's contrast. Never deployed; `bin/check` holds it. Laid out as a
-  site, so the tools work on it with `SITE_DIR=starter` (template plan 1.6c, T14): its full theme
-  is assembled into `starter/themes/` (ignored by git) on each build.
+- `starter/`: the starter, the neutral site a new site begins from (template plan 1.6, T13),
+  moving to `dts-site-starter` at 2.4c: its own `site.json`, its own downloaded plugins in
+  `site-packages/` (template plan T28; Song List not among them), its full child theme in
+  `themes/dts-starter/` (2.4b, T29: its own site layer, `tools/site-layer-files.txt`, and the
+  shared theme files, which `bin/check` holds identical to this site's, so a change to one is
+  made in both), neutral pages in `tests/dev-content/`, and its `README.md` with the palette's
+  contrast. Never deployed; `bin/check` holds it. Laid out as a site, so the tools work on it
+  with `SITE_DIR=starter` (template plan 1.6c, T14).
 - `resume-state.yaml`: only what resume needs to get back to where the last pause left off,
   with the open items; each pause replaces it, never appends. Past sessions and the sites' facts
   once kept there: `docs/session-history.md`, not read at resume.
@@ -212,8 +213,10 @@ and stop at once, naming the problem, if it breaks its rules. Ports: the **101xx
 - WordPress: PHP follows the WordPress Coding Standards (tabs, `snake_case`, the shared
   theme code's prefix `dtstheme` and text domain `dts-theme`, the same in every site, template
   plan T30), as `phpcs.xml.dist` enforces. Where a generic editor rule contradicts
-  them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase names) and `php:S105` (spaces)
-  are off in the user's VS Code user settings, because that extension reads rule settings only
+  them, WordPress wins: SonarQube for IDE's `php:S100` (camelCase function names), `php:S101`
+  (class names without underscores), `php:S116` (camelCase properties; the WordPress standard
+  requires snake_case, 2026-11-27) and `php:S105` (spaces) are off in the user's VS Code user
+  settings, because that extension reads rule settings only
   there (scope `application`), never from a project's `.vscode/settings.json`. Every other rule
   stays on, and its findings are fixed or explained.
 

@@ -1,0 +1,24 @@
+{
+	"oldAddresses": [
+		{ "from": "video", "to": "music", "reason": "The old site's Video page became Music (plan D22); search engines and old links still point at it." },
+		{ "from": "audio", "to": "music", "reason": "The old site's Audio page became Music (plan D22)." },
+		{ "from": "audio-and-video", "to": "music", "reason": "The old site's empty Audio and Video page, from live's export (plan 9e); its videos are on Music now." },
+		{ "from": "video-01", "to": "music", "reason": "An old video post, from live's export (plan 9e); its video is on Music now." },
+		{ "from": "video-02", "to": "music", "reason": "An old video post, from live's export (plan 9e); its video is on Music now." },
+		{ "from": "video-03", "to": "music", "reason": "An old video post, from live's export (plan 9e); its video is on Music now." },
+		{ "from": "contact", "to": "hire-acoustic-guitarist", "reason": "The old site's Contact page became Book, at /hire-acoustic-guitarist/ (plan D22, 1c)." }
+	],
+	"organizationTypes": {
+		"types": [ "Organization", "MusicGroup" ],
+		"reason": "A musician (MusicGroup, which also covers a solo musician) as well as Yoast SEO's own Organization (plan 8h)."
+	},
+	"areasServed": {
+		"towns": [ "Fayetteville, North Carolina", "Hope Mills, North Carolina", "Southern Pines, North Carolina" ],
+		"reason": "The towns the musician travels to for events (plan D22), named in the page data for search engines; the page text names the same towns."
+	},
+	"outsideSources": [
+		{ "directive": "script-src", "source": "https://challenges.cloudflare.com", "reason": "Cloudflare Turnstile's script protects the booking form (plan 5e)." },
+		{ "directive": "frame-src", "source": "https://www.youtube.com", "reason": "A video player pasted into a page's content plays from youtube.com (plan D19); the click-to-load player's youtube-nocookie.com is allowed by the video code itself (includes/video-facade.php)." },
+		{ "directive": "frame-src", "source": "https://challenges.cloudflare.com", "reason": "Cloudflare Turnstile's widget frame on the booking form (plan 5e)." }
+	]
+}

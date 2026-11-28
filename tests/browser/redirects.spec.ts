@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-// Protects the old addresses' redirects (plan D22, the child theme's DTSTHEME_OLD_ADDRESSES): each
+// Protects the old addresses' redirects (plan D22, the child theme's site-facts.json, oldAddresses): each
 // old address forwards permanently to the page that replaced it, which exists, and an address that
 // was never a page is still "not found" rather than forwarded somewhere.
 const OLD_TO_NEW: ReadonlyArray<readonly [string, string]> = [

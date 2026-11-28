@@ -4,43 +4,51 @@
 # once recorded here: docs/session-history.md, which resume does not read.
 project: hbMusic_wp_site
 project_state_version: 1
-timestamp: 2026-11-27T10:37:00-05:00
-current_branch: docs/plan-2.4a-done
-last_commit: 18717bd
+timestamp: 2026-11-27T19:25:00-05:00
+current_branch: feat/starter-full-theme
+last_commit: b19c9d4
 working_mode: rolling-wave
 active_plan: docs/planning/template-plan.md
 
 last_work: >
-  2026-11-27 (twenty-fifth session). 2.4a done and deployed. Tools 0.5.0: CHANGELOG commit
-  ac950df (with the missing 0.4.2 link), tools #10 squash-merged as 7f7e563, tag v0.5.0 pushed.
-  This site pinned to 0.5.0 (d920bb7, review gate no findings, bin/check 36 passed), plan note
-  b83c66e, #124 merged as e2d34ea (both checks passed). Pre-deploy: staging had no picture folder
-  (its pages named no picture address); live's 4 pictures copied by the user into
-  dts-theme-video-pictures; the query (phpMyAdmin) returned no rows on both. Staging deploy of
-  e2d34ea: logo missing, cause confirmed in WordPress's code (cached pattern list, 30 minutes,
-  reread early only on a theme Version change) and by the logo returning by itself. Fix #125
-  merged as 66bde22 (style.css Version 0.2.1 and a note; review 2 LOW, both recorded in the
-  plan). Staging and live deployed at 66bde22, every page passing, no new PHP log lines; live's
-  logo and 4 pictures checked by curl and the user's look. Plan marked 2.4a done (18717bd, this
-  branch, local). New memory: one-ordered-list-of-steps (the user's steps in one When/Who/What
-  table, no apologies).
+  2026-11-27 (twenty-seventh session). 2.4b-2 designed with the user (T31: the four site facts
+  in site-facts.json, JSON with a reason field per entry, read by WordPress's
+  wp_json_file_decode() with the theme's own error-log line, since wp_trigger_error() is silent
+  with WP_DEBUG off, read in WordPress 7.1's source), built and committed as b19c9d4 on
+  feat/starter-full-theme: Dtstheme_Site_Facts (reader), its error and hooks classes (one typed
+  method per hook: PHPStan reads a closure given to add_filter() as untyped, shown on a scratch
+  file), includes/site-text.php for the link example, 2.4b-1's PHPStan setting removed,
+  starter.sh checks the starter's file. Tools 0.6.0 built and committed as d9cff0c on the tools'
+  feat/site-facts (the user's yes to work there): tools/site-facts.jq on site.json's shared rule
+  engine, bin/check's new step, the layer list, 9 bad examples, the scenario dev-site-facts.sh,
+  and 2.4b-3 (the theme assembly removed). Proof: tools self-check 35 of 35; this site's
+  bin/check with the new tools 38 of 38; bin/test all passed (249 browser, 4 skipped by design);
+  planted faults each shown failing and restored. Review gate: 7 findings, the 5 recommended
+  fixed. PHPStan printed advice text addressed to AI agents only in Claude's direct runs with
+  errors (not in bin/check's container); looked at with the user, judged harmless, cause not
+  confirmed. The user: language rules belong in language standards files, not CLAUDE.md (new
+  memory language-rules-in-language-files); the S101/S116 settings and a PHP standards file are
+  the user's to-dos; a talk about keeping resume-loaded files lean is on the plan.
 
 next_action: >
-  Push this branch (docs/plan-2.4a-done, the plan commit 18717bd and this pause's commit) by its
-  pull request, after the user's yes (squash message approved first). Then 2.4b, the starter's
-  full theme in starter/ (the plan's 2.4b entry and T29, T30): read the code and the entry,
-  propose the approach, nothing built before the user decides.
+  Tools 0.6.0, each outside step on the user's yes: push the tools' feat/site-facts, open its
+  pull request, wait for its check, squash-merge, tag v0.6.0 on the merge (annotated, like
+  v0.5.0), push the tag. Then this site: repin dts/site-tools to 0.6.0 (the README's install
+  command with composer.lock writable and 'composer update dts/site-tools'), bin/dev-site,
+  bin/tools-pin, bin/check with the installed tools (expect 38 passed), review gate, commit;
+  offer 2.4b-1's open LOW (a missing site-layer-files.txt shown as "differs") for that commit.
+  Then 2.4b's one pull request (bd6edc6, b19c9d4 and the repin) and the user's deploys.
 
 verification:
   wordpress_version: 7.1.5 on live and staging, 7.1.4 on the dev site (to raise; 2026-11-23)
-  checks: "On d920bb7 (tools 0.5.0): bin/check 36 passed; #124 and #125: check / check and check / dev-site passed on GitHub. Full bin/test locally last on 8783654 (249 browser, 4 skipped by design); starter's tests 169 passed."
-  tools: "dts-site-tools main 7f7e563, tag v0.5.0 (annotated, pushed); no other branches. This site's main requires 0.5.0."
+  checks: "On b19c9d4's content: this site's bin/check with the tools' d9cff0c (run from ~/dev/dts-site-tools with COMPOSER_RUNTIME_BIN_DIR set to this site's bin/) 38 of 38 passed; with the installed 0.5.0 the starter's identity check fails until the repin (expected). Tools self-check on d9cff0c's content 35 of 35. bin/test on b19c9d4's content (before the review's comment and JSON fixes): every scenario check and 249 browser tests passed, 4 skipped by design. The starter's own dev-site tests not run this session (T21: at milestones)."
+  tools: "dts-site-tools main 7f7e563, tag v0.5.0; branch feat/site-facts at d9cff0c (1 commit, local, not pushed: 0.6.0). This site still requires 0.5.0 (vendor/ from 0.5.0)."
   site_packages: "dts/song-list v0.2.1 (6e050c1), dts/editing-help v0.1.1 (da3f399), dts/site-hardening v0.4.0 (9d59a9b); the starter's own list the same without Song List"
   plugin_repositories: "dts-site-hardening main 9d59a9b (tag v0.4.0); dts-song-list main 45ec9b1, dts-editing-help main 8011e4b; each clean (checked 2026-11-27)"
   branch_protection: "main requires check / check and check / dev-site (GitHub Actions), strict"
   merge_settings: "this repository, dts-site-tools and the three plugin repositories allow squash merges only"
-  deployed: "staging and live both run 66bde22 (deployed by the user 2026-11-27); theme Version 0.2.1; pictures in dts-theme-video-pictures on live (4 files); the old hbmusic-video-pictures still on live"
-  local_dev_sites: "this site's dev site (hbmusic-dev) rebuilt 2026-11-27 with tools 0.5.0, running (theme Version 0.2.1 through its read-only mount); the starter's (dts-starter-dev) stopped"
+  deployed: "staging and live both run 66bde22 (deployed by the user 2026-11-27); theme Version 0.2.1; pictures in dts-theme-video-pictures on live (4 files); the old hbmusic-video-pictures still on live. bd6edc6's buttons.css comment change reaches them with the next deploy (comment only)."
+  local_dev_sites: "this site's dev site (hbmusic-dev) running, serving the working tree's theme (the new site-facts reader); the starter's (dts-starter-dev) stopped, last built 2026-11-27 from its committed theme with no assembly"
   screenshots_baseline: "screenshots/baseline/ (ignored by git): taken 2026-11-27 before the rename, from cd8e6b6's theme"
   env: ".env's COMPOSE_FILE is vendor/dts/site-tools/compose.dev.yaml:compose.site.yaml"
   github_rate_limit: "Composer's GitHub downloads run unauthenticated (60 requests an hour)"
@@ -50,43 +58,65 @@ verification:
 uncommitted_changes:
   - file: branches (this repository)
     why: >
-      docs/plan-2.4a-done, local, not pushed: 1 commit not on origin/main (18717bd, the plan
-      marked 2.4a done) plus this pause's commit; reaches main by its pull request on the user's
-      yes. main even with origin/main at 66bde22. No other local branches.
-  - file: ~/dev/dts-site-tools, ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
-    why: Each on main, clean, no other branches (dts-site-tools main 7f7e563, even with origin).
+      feat/starter-full-theme, local, not pushed: 3 commits not on origin/main (bd6edc6 2.4b-1,
+      d04fb03 the last pause, b19c9d4 2.4b-2) plus this pause's commit; reaches main by 2.4b's one
+      pull request after tools 0.6.0 and the repin. main even with origin/main at 8ce1078. No
+      other local branches.
+  - file: ~/dev/dts-site-tools
+    why: >
+      Clean. Branch feat/site-facts, local, not pushed: 1 commit (d9cff0c, tools 0.6.0 with
+      2.4b-3); waits for the user's yes to push, merge and tag. main 7f7e563 even with origin.
+  - file: ~/dev/dts-site-hardening, ~/dev/dts-song-list, ~/dev/dts-editing-help, ~/dev/dts-handbook
+    why: Each on main, clean, no other branches (handbook 8a6d69c); not touched this session.
   - file: data/ (not versioned)
     why: Unchanged; its off-computer backup is still behind from the 2026-11-22 and 2026-11-23 records (D27).
   - file: ~/.claude (the user commits it on the host)
     why: >
       CLAUDE.md, MULTI_PROJECT_SETUP.md, PAUSE_CONVENTION.md, TESTING_APPROACH.md, settings.json,
       skills/review-gate/SKILL.md, the removed hook files and mark-approved.sh; this project's
-      memory (MEMORY.md, ask-before-every-commit.md, five new files: plain-wording-in-details,
-      review-gate-without-asking, say-the-step-each-message, pause-offer-says-both-paths and this
-      session's one-ordered-list-of-steps) and time-log.csv.
+      memory (MEMORY.md, ask-before-every-commit.md, seven new files: plain-wording-in-details,
+      review-gate-without-asking, say-the-step-each-message, pause-offer-says-both-paths,
+      one-ordered-list-of-steps, site-settings-in-config-files and this session's
+      language-rules-in-language-files) and time-log.csv.
   - file: the session scratchpad
-    why: Throwaway only (check and dev-site logs).
+    why: Throwaway only (check and test logs, the PHPStan closure probe, the planted faults' backups, all restored; the results are in the plan's 2.4b-2 entry).
 
 pending_decisions:
+  - >
+    Tools 0.6.0: the user's yes to push feat/site-facts, open its pull request, merge it and tag
+    v0.6.0; then the repin on this branch (next_action).
+  - >
+    2.4b-1's open LOW, not done in 2.4b-3's build: a missing site-layer-files.txt shows as
+    "differs" in starter.sh's identity check; offered for the repin commit, or later.
+  - >
+    For the user, when convenient: turn off SonarQube's php:S101 and php:S116 in the VS Code user
+    settings (the plan's Current position has the lines). Later, when the user chooses: move the
+    project's CLAUDE.md language rules into a new PHP standards file in ~/.claude (proposed first).
+  - >
+    To discuss at a good point (the user): keeping the files loaded at resume from growing
+    unnoticed (both CLAUDE.md files and their imports, MEMORY.md, resume-state.yaml, the plan's
+    Current position): a way to watch their size, and other places for additions.
+  - >
+    Not confirmed: why PHPStan printed advice addressed to AI agents only in Claude's direct runs
+    with errors and not in bin/check's container (hypothesis: it detects the agent session);
+    judged harmless with the user.
   - >
     For the user, about 2026-12-04: delete hbmusic-video-pictures in live's
     public_html/wp-content/uploads/ (the copy in dts-theme-video-pictures is in use since the
     deploy). Staging never had one.
   - >
-    This branch's pull request (docs/plan-2.4a-done): its squash message for the user's approval,
-    then the push and merge.
+    From 2.4b-1's review: the identity check compares only pictures the shared files name (LOW,
+    no fix, 2.4c replaces the check). From 2.4b's review: site_layer_differences used only by its
+    own test (LOW, in the 2.4c entry).
   - >
     The plan's "worth raising": (3) updating the tools while the dev site runs empties its dev-only
     plugins (a written rule or a different mount); (4) Site Hardening's composer.json description;
     (5) bin/screenshots does not wait for web fonts (document.fonts.ready); (6) the tools'
     site-layer test does not stop when mktemp fails (LOW); (7) a pattern change without a theme
-    Version raise passes every check, while staging and live keep the cached pattern list up to
-    30 minutes (a tools check, LOW, new 2026-11-27). 2.4b carries the same style.css note for the
-    starter (LOW).
+    Version raise passes every check (a tools check, LOW).
   - >
     No written way to run a single browser spec or scenario as bin/test does; worth a bin/test
-    option or a line in docs/TOOLS.md, in a later tools release (missed again 2026-11-27 for the
-    logo fix's check).
+    option or a line in docs/TOOLS.md, in a later tools release.
   - >
     Not known yet: a WP-CLI probe on the dev site (wp eval of the theme Version and the pattern
     registry) printed an empty version and "missing" while the page rendered the logo; not
@@ -140,22 +170,26 @@ pending_decisions:
   - Optional items as before: a pasted-code video test page (advised against); Search Console's older verification record; testimonials; step 3i; the new host (step 10); Yoast's Other profiles; the global CSS rule after D29; the global production/test code standard.
 
 reference_documents: |
-  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T30, the 2.4 entry (2.4a's deploy record, 2.4b next).
+  - docs/planning/template-plan.md: the active plan; Current position, Decisions T1-T31, the 2.4 entry (2.4b-1, 2.4b-2 and 2.4b-3 committed locally; tools 0.6.0 and the repin next).
   - docs/planning/rebuild-plan.md: this site's plan, paused for the template (9u kept waiting).
-  - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges).
-  - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists (wait for checks to register before --watch).
-  - ~/dev/dts-site-tools: the tools' repository (main 7f7e563, tag v0.5.0).
+  - CLAUDE.md (the project's): where the tools are (vendor/dts/site-tools/), commands, tests, rules (squash merges); its starter/ entry updated for the full theme.
+  - starter/README.md: the starter's full theme, its shared files and its site layer.
+  - tests/checks/starter.sh: the starter's checks, the identity check among them.
+  - .claude/agents/git-runner.md: the Haiku subagent for approved git/gh command lists.
+  - ~/dev/dts-site-tools: the tools' repository (main 7f7e563, tag v0.5.0; feat/site-facts d9cff0c, 0.6.0, not pushed). The user approved working there on 2026-11-27 for this branch; pushing, merging and tagging each need their own yes.
   - ~/dev/dts-site-hardening (main 9d59a9b, tag v0.4.0), ~/dev/dts-song-list, ~/dev/dts-editing-help: the plugin repositories.
   - ~/dev/dts-handbook (git only as git -C ~/dev/dts-handbook ...; nothing changed there without the user's approval).
   - docs/session-history.md: past sessions; not read at resume.
 
 resume_instructions: |
   1. Run the resume checkpoint (the global CLAUDE.md), with the drift check in this repository
-     (branch docs/plan-2.4a-done), ~/dev/dts-site-tools (main 7f7e563), the three plugin
-     repositories and ~/dev/dts-handbook.
+     (branch feat/starter-full-theme), ~/dev/dts-site-tools (branch feat/site-facts at d9cff0c,
+     main 7f7e563), the three plugin repositories and ~/dev/dts-handbook.
   2. working_mode is rolling-wave: read the template plan's Current position, its Decisions table
-     (T30, T29 above all) and the 2.4 entry (2.4a done, 2.4b next).
-  3. Then next_action: propose this branch's pull request, then 2.4b. Open every reply with the
-     step being worked on; give the user's steps in one When/Who/What table in their real order;
-     word details plainly; end with one clear question; no apologies.
-  4. This pause's commit is on docs/plan-2.4a-done; it reaches main with that branch's pull request.
+     (T29, T30, T31 above all) and the 2.4 entry (2.4b-1 to 2.4b-3 committed locally).
+  3. Then next_action: ask the user's yes for the tools release (push, pull request, merge, tag)
+     before any of it. Open every reply with the step being worked on; give the user's steps in one
+     When/Who/What table in their real order; word details plainly and simply (the user asked
+     twice this session for simpler answers); end with one clear question; no apologies.
+  4. This pause's commit is on feat/starter-full-theme; it reaches main with that branch's pull
+     request.

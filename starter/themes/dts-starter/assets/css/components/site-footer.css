@@ -1,0 +1,16 @@
+/*
+ * Site footer: the site's name, its tagline and the privacy link (parts/footer.html).
+ * Loaded with the template-part block, so on every page.
+ */
+
+/* Block and component class together outrank WordPress's layout rules at any load order. */
+.wp-block-group.site-footer {
+	padding: var(--wp--custom--spacing--footer) var(--wp--custom--spacing--gutter);
+	border-top: 1px solid var(--wp--preset--color--accent-5);
+}
+
+/* The site's name reads as a name, not as a link in running text. */
+.site-footer .wp-block-site-title a {
+	font-weight: 700;
+	text-decoration: none;
+}

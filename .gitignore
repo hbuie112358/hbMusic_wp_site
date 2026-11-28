@@ -17,8 +17,6 @@
 !/phpstan.neon.dist
 !/site.json
 !/starter/
-# The starter's full theme, assembled from its site layer on every dev-site build (template plan 1.6c).
-/starter/themes/
 !/site-packages/
 !/themes/
 /themes/*

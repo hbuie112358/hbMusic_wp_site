@@ -1,0 +1,14 @@
+/*
+ * Headings: lines of even length. Without this, a heading fills each line as far as it goes and
+ * can leave one word alone on its last line, which depends on the window's width ("music for your
+ * / event", seen by the user below about 1200px). Browsers without the setting wrap as before.
+ *
+ * WordPress sets "text-wrap: pretty" on headings and paragraphs with element selectors (h1, p);
+ * pretty avoids a lone word in long paragraphs, which they keep, but does not even out a short
+ * heading. The heading blocks' own classes outrank those element selectors.
+ */
+
+.wp-block-heading,
+.wp-block-post-title {
+	text-wrap: balance;
+}
